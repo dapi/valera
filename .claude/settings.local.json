@@ -25,7 +25,8 @@
       "Bash(./bin/rspec:*)",
       "Bash(bin/rails:*)",
       "Read(//home/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/telegram-bot-343e7179e22f/**)",
-      "Bash(RAILS_ENV=test bin/rails routes:*)"
+      "Bash(RAILS_ENV=test bin/rails routes:*)",
+      "Bash(rmdir:*)"
     ],
     "deny": [],
     "ask": []

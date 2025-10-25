@@ -38,11 +38,11 @@
 
 ### Архитектура
 ```
-Telegram → Webhook Endpoint → TelegramController → UserService → WelcomeService → Telegram API
+Telegram → Webhook Endpoint → Telegram::WebhookController → UserService → WelcomeService → Telegram API
 ```
 
 ### Компоненты
-- **TelegramController:** Обработка входящих webhook'ов
+- **Telegram::WebhookController:** Основной и единственный контроллер для обработки входящих webhook'ов от Telegram
 - **UserService:** Управление пользователями и их состоянием
 - **WelcomeService:** Генерация приветственных сообщений
 - **TelegramClient:** Отправка сообщений в Telegram
@@ -213,7 +213,7 @@ Telegram → Webhook Endpoint → TelegramController → UserService → Welcome
 ## 🧪 Тестирование
 
 ### Unit тесты
-- [ ] TelegramController webhook processing
+- [ ] Telegram::WebhookController webhook processing
 - [ ] UserService user identification logic
 - [ ] WelcomeService message generation
 - [ ] TelegramClient message sending

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe TelegramController, type: :request, telegram: true do
+RSpec.describe Telegram::WebhookController, type: :request, telegram: true do
   # Note: Telegram client is already stubbed in config/initializers for test mode
 
   describe 'POST #webhook' do

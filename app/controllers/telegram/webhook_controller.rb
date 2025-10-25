@@ -11,10 +11,14 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
     respond_with :message, text: "Сообщение получено!"
   end
 
-  # Example callback query handler
-  def callback_query(query)
-    # Handle callback queries from inline keyboards
-    # This will be implemented with actual bot logic
+  # Handle callback queries from inline keyboards
+  def callback_query(data)
+    answer_callback_query('Получено!')
+  end
+
+  # Example command handler
+  def start!(*args)
+    respond_with :message, text: "Привет! Я бот для автосервиса."
   end
 
   private

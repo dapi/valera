@@ -229,10 +229,10 @@ class WelcomeService
 end
 ```
 
-#### 2.2 Создание TelegramController
+#### 2.2 Использование Telegram::WebhookController
 ```ruby
-# app/controllers/telegram_controller.rb
-class TelegramController < ApplicationController
+# app/controllers/telegram/webhook_controller.rb
+class Telegram::WebhookController < Telegram::Bot::UpdatesController
   skip_before_action :verify_authenticity_token
 
   def webhook
