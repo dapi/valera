@@ -65,98 +65,38 @@ end
 
 ### Phase 2: Реализация сервисов
 
-#### 2.1 Создание WelcomeService
+#### 2.1 Упрощенный WelcomeService (только приветствие)
 ```ruby
 # app/services/welcome_service.rb
 class WelcomeService
-  include ActiveModel::Model
-  include ActiveModel::Attributes
+  def send_welcome_message(telegram_user)
+    template = load_template
+    message = interpolate_template(template, telegram_user)
 
-  attribute :telegram_client
-
-  def initialize(telegram_client = nil)
-    @telegram_client = telegram_client || TelegramClient.new
-  end
-
-  def handle_message(webhook_data)
-    user_info = extract_user_info(webhook_data)
-
-    # Проверка на спам (cooldown)
-    return if within_cooldown_period?(user_info[:telegram_id])
-
-    if new_user?(user_info[:telegram_id])
-      process_new_user(user_info, webhook_data)
+    # Отправляем через встроенный метод UpdatesController
+    # TelegramController должен передать себя или использовать respond_with
+    if defined?(Rails)
+      # В контексте Rails приложения
+      bot = Telegram.bot
+      bot.api.send_message(
+        chat_id: telegram_user.telegram_id,
+        text: message,
+        parse_mode: nil  # Dialogue-Only - без форматирования
+      )
     else
-      route_to_existing_user_flow(user_info, webhook_data)
+      # Для тестирования
+      Rails.logger.info "Welcome message for #{telegram_user.telegram_id}: #{message}"
     end
+
+    # Создаем запись о приветственном сообщении
+    create_welcome_message_record(telegram_user, message)
+    log_welcome_sent(telegram_user)
   rescue StandardError => e
-    log_error(e, user_info)
-    handle_error_gracefully(e, user_info)
+    log_error(e, telegram_user)
+    handle_error_gracefully(e, telegram_user)
   end
 
   private
-
-  def extract_user_info(webhook_data)
-    message = webhook_data.dig('message')
-
-    {
-      telegram_id: message.dig('from', 'id'),
-      chat_id: message.dig('chat', 'id'),
-      first_name: message.dig('from', 'first_name'),
-      username: message.dig('from', 'username'),
-      message_text: message.dig('text'),
-      timestamp: Time.current
-    }
-  end
-
-  def new_user?(telegram_id)
-    !Chat.exists?(telegram_id: telegram_id)
-  end
-
-  def within_cooldown_period?(telegram_id)
-    last_contact = Chat.where(telegram_id: telegram_id)
-                      .pluck(:last_contacted_at)
-                      .first
-
-    return false unless last_contact
-
-    last_contact > ApplicationConfig.welcome_cooldown_minutes.minutes.ago
-  end
-
-  def process_new_user(user_info, webhook_data)
-    create_chat_record(user_info)
-    send_welcome_message(user_info)
-    create_welcome_message_record(user_info)
-    log_welcome_sent(user_info)
-  end
-
-  def route_to_existing_user_flow(user_info, webhook_data)
-    update_last_contacted(user_info[:telegram_id])
-    # Передача в LLM систему для обработки
-    LlmMessageService.new.process_message(webhook_data)
-  end
-
-  def create_chat_record(user_info)
-    Chat.create!(
-      telegram_id: user_info[:telegram_id],
-      username: user_info[:username],
-      first_name: user_info[:first_name],
-      last_contacted_at: user_info[:timestamp],
-      created_at: user_info[:timestamp],
-      updated_at: user_info[:timestamp]
-    )
-  end
-
-  def send_welcome_message(user_info)
-    template = load_template
-    message = interpolate_template(template, user_info)
-
-    @telegram_client.send_message(
-      chat_id: user_info[:chat_id],
-      text: message,
-      parse_mode: nil  # Dialogue-Only - без форматирования
-    )
-  end
 
   def load_template
     template_path = ApplicationConfig.welcome_message_path
@@ -172,7 +112,50 @@ class WelcomeService
     fallback_welcome_message
   end
 
-  def interpolate_template(template, user_info)
+  def interpolate_template(template, telegram_user)
+    return template unless telegram_user.first_name&.strip&.present?
+
+    name = telegram_user.first_name.strip[0..30]  # Только ограничение длины
+    template.gsub("Здравствуйте!", "Здравствуйте, #{name}!")
+  end
+
+  def fallback_welcome_message
+    "🔧 Здравствуйте! Я Валера - AI-ассистент по кузовному ремонту. Расскажите, чем могу помочь?"
+  end
+
+  def create_welcome_message_record(telegram_user, message_text)
+    telegram_user.messages.create!(
+      content: message_text,
+      role: 'assistant',
+      message_type: 'welcome',
+      created_at: Time.current
+    )
+  rescue StandardError => e
+    Rails.logger.error "Failed to create welcome message record: #{e.message}"
+  end
+
+  def log_welcome_sent(telegram_user)
+    Rails.logger.info "Welcome sent to user #{telegram_user.telegram_id} (#{telegram_user.first_name})"
+  end
+
+  def log_error(error, telegram_user)
+    Rails.logger.error "WelcomeService error: #{error.message} for user #{telegram_user.telegram_id}"
+    Rails.logger.error error.backtrace.join("\n") if Rails.env.development?
+  end
+
+  def handle_error_gracefully(error, telegram_user)
+    # Graceful degradation - пытаемся отправить упрощенное сообщение
+    begin
+      bot = Telegram.bot
+      bot.api.send_message(
+        chat_id: telegram_user.telegram_id,
+        text: "Здравствуйте! Я Валера, помощник по кузовному ремонту. Чем могу помочь?"
+      )
+    rescue StandardError => fallback_error
+      Rails.logger.error "Failed to send fallback message: #{fallback_error.message}"
+    end
+  end
+end```
     return template unless user_info[:first_name]&.strip&.present?
 
     # Безопасная интерполяция только имени
@@ -229,23 +212,56 @@ class WelcomeService
 end
 ```
 
-#### 2.2 Использование Telegram::WebhookController
+#### 2.2 Обновление TelegramController с before_action фильтрами
 ```ruby
-# app/controllers/telegram/webhook_controller.rb
-class Telegram::WebhookController < Telegram::Bot::UpdatesController
-  skip_before_action :verify_authenticity_token
+# app/controllers/telegram_controller.rb
+class TelegramController < Telegram::Bot::UpdatesController
+  before_action :find_or_create_telegram_user
 
-  def webhook
-    webhook_data = JSON.parse(request.body.read)
+  # Обработка команды /start - приветствие новых пользователей
+  def start!(*args)
+    WelcomeService.new.send_welcome_message(@telegram_user)
+  end
 
-    # Валидация webhook от Telegram
-    return render_invalid_webhook unless valid_webhook?(webhook_data)
+  # Обработка обычных сообщений - временная реализация
+  def message(message)
+    # ВРЕМЕННАЯ РЕАЛИЗАЦИЯ для MVP
+    # TODO: В US-002 будет реализован LlmMessageService для обработки сообщений
+    respond_with :message, text: "Ваше сообщение получено! Бот находится в разработке. Используйте /start для приветствия."
+  end
 
-    # Логирование входящего запроса
-    Rails.logger.info "Telegram webhook received: #{webhook_data['update_id']}"
+  # Callback queries (будущие inline кнопки)
+  def callback_query(data)
+    answer_callback_query('Спасибо за ваш запрос!')
+  end
 
-    # Обработка сообщения
-    WelcomeService.new.handle_message(webhook_data)
+  private
+
+  # Фильтр для поиска или создания пользователя Telegram
+  def find_or_create_telegram_user
+    telegram_id = from.id
+    @telegram_user = Chat.find_by(telegram_id: telegram_id)
+
+    unless @telegram_user
+      @telegram_user = Chat.create!(
+        telegram_id: telegram_id,
+        username: from.username,
+        first_name: from.first_name,
+        last_contacted_at: Time.current
+      )
+    else
+      # Обновляем время последнего контакта
+      @telegram_user.update!(last_contacted_at: Time.current)
+    end
+  end
+
+  # Вспомогательный метод для доступа к пользователю
+  def telegram_user
+    @telegram_user
+  end
+end
+```
+
 
     render json: { status: 'ok' }
   rescue JSON::ParserError => e
