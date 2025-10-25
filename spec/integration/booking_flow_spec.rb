@@ -30,10 +30,12 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
         }
       )
 
-      # Проверяем, что запись создана в реальной базе данных
-      expect(Booking.count).to eq(1)
-      booking = Booking.first
+      # Проверяем успешный результат
+      expect(result[:success]).to be true
+      expect(result[:booking_id]).to be_present
 
+      # Проверяем, что запись создана с правильными данными
+      booking = Booking.find(result[:booking_id])
       expect(booking.telegram_user).to eq(telegram_user)
       expect(booking.chat).to eq(chat)
       expect(booking.meta['customer_name']).to eq('Иван Петров')
@@ -45,6 +47,8 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
     end
 
     it 'handles booking creation with invalid parameters' do
+      initial_count = Booking.count
+
       invalid_parameters = {
         customer_name: '',  # Пустое имя
         customer_phone: '123',  # Невалидный телефон
@@ -59,12 +63,12 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
         }
       )
 
-      # Проверяем, что запись не создана
-      expect(Booking.count).to eq(0)
-
       # Проверяем, что результат содержит ошибку
       expect(result[:success]).to be false
       expect(result[:message]).to include('Не удалось создать запись')
+
+      # Проверяем, что количество записей не изменилось
+      expect(Booking.count).to eq(initial_count)
     end
 
     it 'normalizes phone numbers correctly' do
@@ -76,8 +80,7 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
       ]
 
       phone_formats.each do |phone_format|
-        # Clear previous bookings
-        Booking.delete_all
+        initial_count = Booking.count
 
         parameters = booking_parameters.merge(customer_phone: phone_format)
 
@@ -89,8 +92,11 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
           }
         )
 
-        expect(Booking.count).to eq(1)
-        booking = Booking.first
+        # Проверяем, что была создана новая запись
+        expect(Booking.count).to eq(initial_count + 1)
+
+        # Находим последнюю созданную запись
+        booking = Booking.last
         expect(booking.meta['customer_phone']).to match(/\+7\(\d{3}\)\d{3}-\d{2}-\d{2}/)
       end
     end
@@ -162,6 +168,9 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
       it 'maintains proper relationships between booking, user and chat' do
         allow(BookingNotificationJob).to receive(:perform_later)
 
+        initial_count = Booking.count
+        initial_user_bookings = Booking.where(telegram_user: telegram_user).count
+
         # Create booking for first chat
         result1 = BookingCreatorTool.call(
           parameters: booking_parameters,
@@ -181,12 +190,13 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
           }
         )
 
-        expect(Booking.count).to eq(2)
-        expect(Booking.where(telegram_user: telegram_user).count).to eq(2)
+        # Проверяем, что добавилось 2 записи
+        expect(Booking.count).to eq(initial_count + 2)
+        expect(Booking.where(telegram_user: telegram_user).count).to eq(initial_user_bookings + 2)
 
         # Verify specific relationships
-        booking1 = Booking.joins(:chat).where(chats: { id: chat.id }).first
-        booking2 = Booking.joins(:chat).where(chats: { id: chat2.id }).first
+        booking1 = Booking.joins(:chat).where(chats: { id: chat.id }).last
+        booking2 = Booking.joins(:chat).where(chats: { id: chat2.id }).last
 
         expect(booking1.chat).to eq(chat)
         expect(booking2.chat).to eq(chat2)

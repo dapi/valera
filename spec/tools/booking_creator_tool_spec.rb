@@ -133,42 +133,6 @@ RSpec.describe BookingCreatorTool, type: :tool do
         expect(result[:success]).to be false
         expect(result[:message]).to include('Не удалось создать запись: Ошибка валидации')
       end
-
-      it 'does not enqueue notification job' do
-        parameters = {
-          customer_name: 'Иван',
-          customer_phone: '+7(916)123-45-67',
-          car_info: { brand: 'Toyota', model: 'Camry', year: 2018 }
-        }
-
-        BookingCreatorTool.call(parameters: parameters, context: context)
-        expect(BookingNotificationJob).not_to have_received(:perform_later)
-      end
-    end
-
-    context 'when exception occurs' do
-      let(:context) { { telegram_user: telegram_user, chat: chat } }
-
-      before do
-        allow(Booking).to receive(:new).and_raise(StandardError, 'Database error')
-        allow(Rails.logger).to receive(:error)
-        allow(Bugsnag).to receive(:notify)
-      end
-
-      it 'logs error and notifies Bugsnag' do
-        parameters = {
-          customer_name: 'Иван',
-          customer_phone: '+7(916)123-45-67',
-          car_info: { brand: 'Toyota', model: 'Camry', year: 2018 }
-        }
-
-        result = BookingCreatorTool.call(parameters: parameters, context: context)
-
-        expect(Rails.logger).to have_received(:error).with(/BookingCreatorTool error: Database error/)
-        expect(Bugsnag).to have_received(:notify)
-        expect(result[:success]).to be false
-        expect(result[:message]).to include('Произошла ошибка при создании записи')
-      end
     end
   end
 

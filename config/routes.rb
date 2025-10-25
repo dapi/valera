@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  resources :test_models
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Telegram bot webhook using the telegram_webhook helper

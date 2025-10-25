@@ -7,7 +7,6 @@ class BookingNotificationJob < ApplicationJob
   retry_on StandardError, wait: :exponentially_longer, attempts: 3
 
   def perform(booking)
-    return unless booking&.telegram_user
     return unless ApplicationConfig.admin_chat_id.present?
 
     send_notification_to_managers(booking)
@@ -23,9 +22,7 @@ class BookingNotificationJob < ApplicationJob
     message = format_manager_notification(booking)
 
     # Используем Telegram API для отправки сообщения в менеджерский чат
-    bot = Telegram::Bot::Client.new(ApplicationConfig.bot_token)
-
-    bot.api.send_message(
+    Telegram.bot.send_message(
       chat_id: ApplicationConfig.admin_chat_id,
       text: message,
       parse_mode: 'HTML'
@@ -42,14 +39,10 @@ class BookingNotificationJob < ApplicationJob
       🚗 <b>Автомобиль:</b> #{format_car_info(booking.car_info)}
       ⏰ <b>Время записи:</b> #{format_preferred_time(booking)}
 
-      📍 <b>Адрес:</b> г. Чебоксары, Ядринское ш., 3
-
       📝 <b>История диалога:</b>
       #{extract_dialogue_context(booking)}
 
       🔗 <b>ID заявки:</b> ##{booking.id}
-
-      ⚡ <b>СРОЧНО:</b> Перезвонить клиенту в течение часа для подтверждения!
     MESSAGE
   end
 
