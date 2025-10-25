@@ -3,6 +3,7 @@ require "rubygems"
 require "bundler/setup"
 
 ARGV.unshift("--ensure-latest")
+ARGV.unshift("--skip-files", "docs/")
 
 # Use custom ignore configuration if it exists
 config_file = File.join(File.dirname(__FILE__), '..', 'config', 'brakeman.yml')
