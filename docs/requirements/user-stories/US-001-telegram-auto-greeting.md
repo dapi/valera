@@ -53,8 +53,8 @@
 ## 🔗 Связанные документы
 
 - **Feature Description:** [feature-telegram-welcome-experience.md](../features/feature-telegram-welcome-experience.md)
-- **Technical Specification:** [TS-001-telegram-webhook-handling.md](../specifications/TS-001-telegram-webhook-handling.md)
-- **Implementation Plan:** [protocol-telegram-welcome.md](../../.protocols/protocol-telegram-welcome.md)
+- **Technical Specification:** [TS-001-telegram-welcome-message.md](../specifications/TS-001-telegram-welcome-message.md)
+- **Technical Solution:** [TSOL-001-telegram-welcome-implementation.md](../technical-solutions/TSOL-001-telegram-welcome-implementation.md)
 - **System Prompts:** [valera-personality-prompts.md](../prompts/valera-personality-prompts.md)
 
 ## 🚫 Исключения (Edge Cases - MVP)

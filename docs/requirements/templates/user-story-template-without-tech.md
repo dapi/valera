@@ -102,7 +102,8 @@
 
 - **Feature Description:** [ссылка на feature описание]
 - **Technical Specification:** [ссылка на техническую спецификацию TS-XXX]
-- **Technical Solution:** [ссылка на техническое решение TSOL-XXX в technical-solutions/]
+- **Technical Solution:** [ссылка на техническое решение TSOL-XXX]
+- **Implementation Plan:** [ссылка на план имплементации в .protocols/]
 
 ## ✅ Definition of Done
 

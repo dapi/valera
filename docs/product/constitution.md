@@ -190,7 +190,7 @@ System Prompt: "Если клиент упоминает ДТП - сразу у�
 
 - [Feature: Telegram Bodyshop Repair](../requirements/features/feature-telegram-service-booking.md)
 - [Technical Specifications](../requirements/specifications/)
-- [Implementation Protocols](../../.protocols/)
+- [Technical Solutions](../requirements/technical-solutions/)
 
 ---
 

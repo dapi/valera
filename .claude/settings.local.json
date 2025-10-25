@@ -17,7 +17,15 @@
       "Bash(bundle show:*)",
       "Bash(./bin/docs list:*)",
       "Bash(tree:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(rails generate:*)",
+      "Bash(bundle exec rails generate:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(bundle binstubs:*)",
+      "Bash(./bin/rspec:*)",
+      "Bash(bin/rails:*)",
+      "Read(//home/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/telegram-bot-343e7179e22f/**)",
+      "Bash(RAILS_ENV=test bin/rails routes:*)"
     ],
     "deny": [],
     "ask": []

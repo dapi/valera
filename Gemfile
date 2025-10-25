@@ -63,6 +63,9 @@ group :development, :test do
   gem "rubocop-factory_bot", require: false
   gem "rubocop-capybara", require: false
   gem "rubocop-performance", require: false
+
+  # RSpec for testing (used primarily for Telegram bot functionality)
+  gem "rspec-rails"
 end
 
 group :development do

@@ -42,8 +42,8 @@
 6. **No File Operations in Tests** - безопасность тестов
 
 ### 📋 Процесс работы с требованиями
-1. User Story → Feature Description → Technical Specification → Implementation Plan
-2. Планы сохраняются в `.protocols/` (строгое правило)
+1. User Story → Feature Description → Technical Specification → Technical Solution
+2. Technical Solutions сохраняются в `docs/requirements/technical-solutions/`
 3. Соблюдать последовательность фаз в [ROADMAP.md](../ROADMAP.md)
 
 ### 🤖 Автоматическое обучение AI
