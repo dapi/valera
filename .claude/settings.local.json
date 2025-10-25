@@ -56,7 +56,8 @@
       "Bash(RAILS_ENV=test env:*)",
       "Bash(env:*)",
       "Bash(BOT_TOKEN=123:fake RAILS_ENV=test bin/rails runner:*)",
-      "Bash(unset:*)"
+      "Bash(unset:*)",
+      "Bash(RAILS_ENV=development bin/rails runner:*)"
     ],
     "deny": [],
     "ask": []

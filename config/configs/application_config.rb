@@ -2,7 +2,6 @@
 
 # Base class for application config classes
 class ApplicationConfig < Anyway::Config
-  config_name :valera
   env_prefix ''
 
   attr_config(
