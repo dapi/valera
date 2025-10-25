@@ -15,7 +15,9 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:rubygems.org)",
       "Bash(bundle show:*)",
-      "Read(//home/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/telegram-bot-343e7179e22f/**)"
+      "Bash(./bin/docs list:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

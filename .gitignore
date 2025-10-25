@@ -39,3 +39,5 @@
 
 /config/*.local.yml
 /config/credentials/local.*
+
+.backup

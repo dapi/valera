@@ -3,33 +3,6 @@
 ## Overview
 `telegram-bot-rb` - это Ruby gem для создания Telegram ботов с поддержкой всех основных функций Telegram Bot API.
 
-## Basic Setup
-
-### Installation
-```ruby
-gem 'telegram-bot'
-```
-
-### Basic Bot Example
-```ruby
-require 'telegram/bot'
-
-token = 'YOUR_BOT_TOKEN'
-
-Telegram::Bot::Client.run(token) do |bot|
-  bot.listen do |message|
-    case message.text
-    when '/start'
-      bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name}!")
-    when '/stop'
-      bot.api.send_message(chat_id: message.chat.id, text: "Bye!")
-    else
-      bot.api.send_message(chat_id: message.chat.id, text: "I don't understand this command")
-    end
-  end
-end
-```
-
 ## Core Components
 
 ### Bot Client
@@ -67,31 +40,6 @@ bot.listen do |message|
   when Telegram::Bot::Types::CallbackQuery
     # Handle callback
     bot.api.answer_callback_query(callback_query_id: message.id)
-  end
-end
-```
-
-## Webhooks Setup
-
-### Setting Webhook
-```ruby
-bot = Telegram::Bot::Client.new(token)
-bot.api.set_webhook(url: 'https://your-domain.com/webhook')
-```
-
-### Rails Integration Example
-```ruby
-# config/routes.rb
-Rails.application.routes.draw do
-  post '/webhook' => 'telegram_webhook#update'
-end
-
-# app/controllers/telegram_webhook_controller.rb
-class TelegramWebhookController < ApplicationController
-  def update
-    # Update telegram-bot-rb gem to support webhook mode
-    Telegram::Bot::Client.update(params)
-    head :ok
   end
 end
 ```
@@ -223,26 +171,6 @@ rescue Telegram::Bot::Exceptions::ResponseError => e
 rescue Faraday::TimeoutError, Faraday::ConnectionFailed
   puts "Network error, retrying..."
   retry
-end
-```
-
-## Configuration
-
-### Environment Configuration
-```ruby
-# config/initializers/telegram_bot.rb
-Telegram::Bot.configure do |config|
-  config.default = :production
-  config.adapters = {
-    production: {
-      token: ENV['TELEGRAM_BOT_TOKEN'],
-      username: ENV['TELEGRAM_BOT_USERNAME']
-    },
-    development: {
-      token: ENV['TELEGRAM_BOT_TOKEN_DEV'],
-      username: ENV['TELEGRAM_BOT_USERNAME_DEV']
-    }
-  }
 end
 ```
 

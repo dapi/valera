@@ -2,140 +2,47 @@
 
 ## Core Classes and Methods
 
-### RubyLLM.configure
-Основной метод конфигурации gem:
-
-```ruby
-RubyLLM.configure do |config|
-  config.use_new_acts_as = true
-  config.request_timeout = 120
-  config.max_retries = 1
-  config.openai_api_key = ENV['OPENAI_API_KEY']
-  config.anthropic_api_key = ENV['ANTHROPIC_API_KEY']
-  config.gemini_api_key = ENV['GEMINI_API_KEY']
-  config.deepseek_api_key = ENV['DEEPSEEK_API_KEY']
-  config.perplexity_api_key = ENV['PERPLEXITY_API_KEY']
-  config.openrouter_api_key = ENV['OPENROUTER_API_KEY']
-  config.mistral_api_key = ENV['MISTRAL_API_KEY']
-  config.vertexai_location = ENV['GOOGLE_CLOUD_LOCATION']
-  config.vertexai_project_id = ENV['GOOGLE_CLOUD_PROJECT']
-  config.default_model = 'gpt-4'
-  config.default_embedding_model = 'text-embedding-3-large'
-  config.default_image_model = 'dall-e-3'
-end
-```
 
 ### RubyLLM.chat
 Создание нового чата:
 
 ```ruby
-# Базовый чат
-chat = RubyLLM.chat.new
-
-# С указанием модели
-chat = RubyLLM.chat.new(model: 'gpt-4')
-
-# С системным промптом
-chat = RubyLLM.chat.new(
-  model: 'claude-sonnet-4',
-  system: "Ты - полезный ассистент"
-)
-
-# С инструментами
-chat = RubyLLM.chat.new(
-  model: 'gpt-4',
-  tools: [tool_definition]
-)
-
-# С параметрами
-chat = RubyLLM.chat.new(
-  model: 'gpt-4',
-  temperature: 0.7,
-  max_tokens: 1000,
-  top_p: 0.9
-)
+# Основные варианты создания чата
+chat = RubyLLM.chat.new(model: 'gpt-4', system: "Ассистент")
+chat = RubyLLM.chat.new(model: 'gpt-4', tools: [tool_definition])
 ```
 
 ### RubyLLM.chat.say
 Отправка сообщения в чат:
 
 ```ruby
-# Простое сообщение
-response = chat.say("Привет, мир!")
-
-# С опциями
-response = chat.say(
-  "Расскажи историю",
-  stream: false,
-  temperature: 0.8
-)
-
-# С изображениями
-response = chat.say(
-  "Опиши это изображение",
-  images: ['path/to/image.jpg']
-)
-
-# Стриминг ответа
-chat.say("Напиши историю", stream: true) do |chunk|
-  print chunk.content
-end
+# Ключевые опции
+response = chat.say("Привет, мир!", stream: false, temperature: 0.8)
+response = chat.say("Опиши изображение", images: ['path/to/image.jpg'])
 ```
 
 ### RubyLLM.chat.messages
 Получение истории сообщений:
 
 ```ruby
-chat.messages.each do |message|
-  puts "#{message.role}: #{message.content}"
-end
-
-# Фильтрация по роли
+chat.messages.each { |m| puts "#{m.role}: #{m.content}" }
 user_messages = chat.messages.select { |m| m.role == :user }
-assistant_messages = chat.messages.select { |m| m.role == :assistant }
 ```
 
 ### RubyLLM.embed
 Создание эмбеддингов:
 
 ```ruby
-# Базовое использование
-embedding = RubyLLM.embed("Пример текста")
-
-# С указанием модели
-embedding = RubyLLM.embed(
-  "Пример текста",
-  model: 'text-embedding-3-large'
-)
-
-# Пакетная обработка
-embeddings = RubyLLM.embed([
-  "Текст 1",
-  "Текст 2",
-  "Текст 3"
-])
+embedding = RubyLLM.embed("Пример текста", model: 'text-embedding-3-large')
+embeddings = RubyLLM.embed(["Текст 1", "Текст 2"])
 ```
 
 ### RubyLLM.paint
 Генерация изображений:
 
 ```ruby
-# Базовая генерация
-image = RubyLLM.paint("Красивый закат")
-
-# С параметрами
-image = RubyLLM.paint(
-  "Закат над горами",
-  model: 'dall-e-3',
-  size: '1024x1024',
-  quality: 'hd'
-)
-
-# С указанием стиля
-image = RubyLLM.paint(
-  "Кот в стиле Ван Гога",
-  style: 'vivid'
-)
+image = RubyLLM.paint("Закат над горами", model: 'dall-e-3', size: '1024x1024')
+image = RubyLLM.paint("Кот в стиле Ван Гога", style: 'vivid')
 ```
 
 ## Model Management
@@ -144,34 +51,15 @@ image = RubyLLM.paint(
 Работа с моделями:
 
 ```ruby
-# Получение всех моделей
+# Основные операции с моделями
 models = RubyLLM.models
-
-# Фильтрация по провайдеру
 openai_models = RubyLLM.models.select(provider: :openai)
-anthropic_models = RubyLLM.models.select(provider: :anthropic)
-
-# Фильтрация по возможностям
 vision_models = RubyLLM.models.select(capabilities: :vision)
-text_models = RubyLLM.models.select(capabilities: :text)
-
-# Фильтрация по семейству
-gpt_models = RubyLLM.models.select(family: 'gpt')
-claude_models = RubyLLM.models.select(family: 'claude')
-
-# Поиск конкретной модели
 model = RubyLLM.models.find('gpt-4')
 
-# Получение информации о модели
-model.id           # 'gpt-4'
-model.name         # 'GPT-4'
-model.provider     # :openai
-model.family       # 'gpt'
-model.context_window # 8192
-model.max_output_tokens # 4096
-model.modalities   # [:text, :vision]
-model.capabilities # [:chat, :vision, :tools]
-model.pricing      # { input: 0.03, output: 0.06 }
+# Атрибуты модели
+model.id, model.name, model.provider, model.family
+model.context_window, model.capabilities, model.pricing
 ```
 
 ### RubyLLM.models.load_from_json!
@@ -317,37 +205,6 @@ if response.tool_calls.any?
 end
 ```
 
-## Streaming Responses
-
-### Basic Streaming
-```ruby
-chat = RubyLLM.chat.new(model: 'gpt-4')
-
-chat.say("Напиши историю о роботе", stream: true) do |chunk|
-  print chunk.content
-  $stdout.flush
-end
-```
-
-### Streaming with Progress
-```ruby
-def stream_with_progress(chat, message)
-  puts "Начинаю генерацию..."
-  chars_written = 0
-
-  chat.say(message, stream: true) do |chunk|
-    print chunk.content
-    chars_written += chunk.content.length
-
-    # Прогресс бар
-    if chars_written % 50 == 0
-      puts "\n[#{'=' * (chars_written / 50)}]"
-    end
-  end
-
-  puts "\nГенерация завершена!"
-end
-```
 
 ## Error Types
 
