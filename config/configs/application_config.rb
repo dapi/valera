@@ -7,8 +7,12 @@ class ApplicationConfig < Anyway::Config
 
   attr_config(
     # RubyLLM configuration
-    llm_provider: 'deepseek',
-    llm_model: 'deepseek-chat',
+    # Telegram configuration
+    :bot_token,
+    :admin_chat_id,  # ID чата для отправки уведомлений о заявках
+
+    :llm_provider,
+    :llm_model,
 
     # File paths
     system_prompt_path: './data/system-prompt.md',
@@ -16,13 +20,6 @@ class ApplicationConfig < Anyway::Config
     price_list_path: './data/price.csv',
     company_info_path: './data/company-info.md',
     redis_cache_store_url: 'redis://localhost:6379/2',
-
-    # Telegram configuration
-    bot_token: '',
-    admin_chat_id: nil,  # ID чата для отправки уведомлений о заявках
-
-    # Bugsnag configuration
-    bugsnag_api_key: '',
 
     # Rate limiter configuration
     rate_limit_requests: 10,

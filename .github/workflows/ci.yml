@@ -157,7 +157,6 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/valera_test
           SELENIUM_DRIVER: chrome
-          BOT_TOKEN: 123:fake
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:test:prepare ruby_llm:load_models test:system

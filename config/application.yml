@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+default: &default
+
+development:
+  <<: *default
+
+production:
+  <<: *default
+
+test:
+  <<: *default
+  bot_token: 123:fake
+  llm_provider: 'deepseek'
+  llm_model: 'deepseek-chat'
