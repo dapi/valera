@@ -15,3 +15,14 @@ RSpec.configure do |config|
 
   # Note: Telegram client is already stubbed in config/initializers for test mode
 end
+
+# Helper method for stubbing Telegram bot client in job specs
+def stub_telegram_bot_client
+  client = double('Telegram::Bot::Client')
+  api = double('Telegram::Bot::Api')
+
+  allow(Telegram::Bot::Client).to receive(:new).and_return(client)
+  allow(client).to receive(:api).and_return(api)
+
+  api
+end

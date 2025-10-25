@@ -1,0 +1,12 @@
+one:
+  telegram_user: one
+  chat: one
+  meta:
+    customer_name: 'Иван Петров'
+    customer_phone: '+7(916)123-45-67'
+    car_info:
+      brand: 'Toyota'
+      model: 'Camry'
+      year: 2018
+    preferred_date: '2025-10-27'
+    preferred_time: '10:00'
