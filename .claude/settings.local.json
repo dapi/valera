@@ -47,7 +47,8 @@
       "Bash(if [ -f \"$file\" ])",
       "Bash(rails console:*)",
       "Bash(./docs/scripts/documentation-audit.sh:*)",
-      "Bash(dos2unix:*)"
+      "Bash(dos2unix:*)",
+      "Bash(bin/brakeman:*)"
     ],
     "deny": [],
     "ask": []

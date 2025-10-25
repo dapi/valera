@@ -7,8 +7,8 @@ class ApplicationConfig < Anyway::Config
 
   attr_config(
     # RubyLLM configuration
-    llm_provider: '',
-    llm_model: '',
+    llm_provider: 'deepseek',
+    llm_model: 'deepseek-chat',
 
     # File paths
     system_prompt_path: './data/system-prompt.md',
