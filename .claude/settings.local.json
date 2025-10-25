@@ -28,7 +28,9 @@
       "Bash(RAILS_ENV=test bin/rails routes:*)",
       "Bash(rmdir:*)",
       "Bash(rake:*)",
-      "Bash(bundle exec rake:*)"
+      "Bash(bundle exec rake:*)",
+      "Read(//home/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/gems/rspec-rails-8.0.2/**)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

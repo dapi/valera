@@ -3,6 +3,7 @@
 # Controller for handling Telegram bot webhooks
 class Telegram::WebhookController < Telegram::Bot::UpdatesController
   before_action :find_or_create_telegram_user
+  before_action :find_or_create_llm_chat
   # Basic webhook endpoint for Telegram bot
   # This controller inherits from Telegram::Bot::UpdatesController
   # which provides all the basic functionality for handling bot updates
@@ -24,7 +25,8 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
 
   private
 
-  attr_reader :telegram_user, :llm_chat
+  attr_reader :telegram_user # Текущийп пользовтель
+  attr_reader :llm_chat # Текущий LLM Chat
 
   def find_or_create_telegram_user
     @telegram_user = TelegramUser.find_or_create_by!(id: from['id'])

@@ -37,76 +37,111 @@
 
 ### Архитектура
 ```
-Telegram Webhook → TelegramController → WelcomeService → Template Engine → Telegram API
-                                    ↓
-                              Chat/Message Models ← LLM System (для последующих сообщений)
+Telegram API → telegram_webhook helper → Telegram::WebhookController → WelcomeService → Template Engine → respond_with
+                                                     ↓
+                                           TelegramUser/Chat Models ← LLM System (для последующих сообщений)
 ```
 
 ### Компоненты
-- **TelegramController:** Обработка входящих webhook'ов
-- **WelcomeService:** Логика определения новых пользователей
+- **Telegram::WebhookController:** Наследуется от `Telegram::Bot::UpdatesController`, обрабатывает входящие обновления
+- **WelcomeService:** Логика определения новых пользователей и отправки приветствия
 - **TemplateEngine:** Обработка шаблона welcome message
-- **TelegramClient:** Отправка сообщений
+- **respond_with:** Встроенный метод контроллера для отправки сообщений
 
 ### Алгоритм работы
-1. **Получение webhook:** Валидация и парсинг входящего сообщения
-2. **Определение пользователя:** Проверка существования Chat записи по telegram_id
+1. **Получение webhook:** Автоматическая обработка через `telegram_webhook` helper
+2. **Определение пользователя:** Проверка существования TelegramUser по `from['id']`
 3. **Логика приветствия:**
-   - Если новый пользователь → отправить welcome message из шаблона
-   - Если существующий → маршрутизировать в LLM систему
-4. **Обработка шаблона:** Интерполяция {{username}} если доступно
-5. **Отправка сообщения:** Через TelegramClient
-6. **Сохранение контекста:** Создание Chat и Message записей
+   - **Новый пользователь:** Отправка welcome message через `start!` command handler
+   - **Существующий пользователь:** Маршрутизация в LLM систему через `message` handler
+4. **Обработка шаблона:** Интерполяция `#{name}` на `telegram_user.name`
+5. **Отправка сообщения:** Через `respond_with :message, text:` в контроллере
+6. **Сохранение контекста:** Создание TelegramUser записи через `find_or_create_by!` (Chat/Message логика будет в отдельной спецификации)
 
 ## 🗄️ Данные и схема
 
 ### Конфигурация
 ```ruby
-# ApplicationConfig
-welcome_message_path: './data/welcome-message.md'
-welcome_message_template: "./data/welcome-message.md"
+# ApplicationConfig - путь к шаблону захардкожен в welcome_message_template_path методе
+```
+
+### Локализация (I18n)
+```yaml
+# config/locales/ru.yml
+ru:
+  telegram:
+    welcome_message:
+      default: |
+        🔧 Здравствуйте! Я Валера - AI-ассистент по кузовному ремонту и покраске.
+
+        Сейчас могу помочь с:
+        📋 Текстовыми консультациями по кузовному ремонту
+        💰 Расчетом стоимости по вашему описанию повреждений
+        🚗 Записью на бесплатный осмотр в сервис
+
+        В ближайшее время добавлю оценку по фото и помощь со страховками!
+
+        Расскажите, с чем нужно помочь с вашим автомобилем?
 ```
 
 ### Шаблон welcome message
 ```markdown
-🔧 Здравствуйте! Я Валера - AI-ассистент по кузовному ремонту и покраске автосервиса "Кузник".
+# data/welcome-message.md
+🔧 Здравствуйте! Я Валера - AI-ассистент по кузовному ремонту и покраске.
 
 Сейчас могу помочь с:
 📋 Текстовыми консультациями по кузовному ремонту
 💰 Расчетом стоимости по вашему описанию повреждений
-🚗 Записью на бесплатный осмотр в наш сервис в Чебоксарах
+🚗 Записью на бесплатный осмотр в сервис
 
 В ближайшее время добавлю оценку по фото и помощь со страховками!
 
 Расскажите, с чем нужно помочь с вашим автомобилем?
 ```
 
+**Примечание:** Шаблон может использовать `#{name}` для персонализации, которая будет заменена на имя пользователя или @username в `interpolate_template`.
+
 ### База данных
-- **Chat** (существующая) - добавление поля `last_contacted_at`
-- **Message** (существующая) - добавление поля `message_type`
-- **Индексы:** На `chats.telegram_id` для быстрого поиска
+**Текущая структура (уже реализована):**
+- **TelegramUser** - таблица пользователей Telegram
+  - `id` (bigint, primary key) - Telegram user ID
+  - `first_name`, `last_name`, `username`, `photo_url`
+  - `created_at`, `updated_at`
+- **Chat** - таблица чатов, связанная с TelegramUser
+  - `telegram_user_id` (foreign key, unique)
+  - `model_id` (foreign key)
+  - `created_at`, `updated_at`
+- **Message** - таблица сообщений в чате
+  - `chat_id` (foreign key)
+  - `role` (string: 'user', 'assistant', 'system')
+  - `content` (text)
+  - `input_tokens`, `output_tokens` (integer)
+  - `tool_call_id`, `model_id` (foreign keys)
+
+**Индексы:** Уже существуют на `telegram_user_id`, `chat_id`, `role`
 
 ### Форматы данных
 ```ruby
-# Telegram webhook payload
-{
-  "message": {
-    "from": {
-      "id": 123456789,
-      "first_name": "Александр",
-      "username": "alex_user"
-    },
-    "chat": {
-      "id": 123456789,
-      "type": "private"
-    },
-    "text": "Привет"
-  }
-}
+# Доступные данные в Telegram::Bot::UpdatesController
+# from['id'], from['first_name'], from['username'] и т.д.
+
+# TelegramUser запись (после find_or_create)
+#<TelegramUser:0x00001234567890
+  id: 123456789,
+  first_name: "Александр",
+  last_name: "Иванов",
+  username: "alex_user",
+  created_at: "2025-10-25 20:00:00",
+  updated_at: "2025-10-25 20:00:00">
 
 # Template interpolation result
-"Здравствуйте, Александр! Я Валера - AI-ассистент..."
+"Здравствуйте, @alex_user! 🔧 Я Валера - AI-ассистент..."
 ```
+
+### Типы входящих сообщений
+- **Команда `/start`:** Обрабатывается через `start!` method → welcome message
+- **Текстовые сообщения:** Обрабатываются через `message` method → LLM система
+- **Другие типы:** Callback queries, inline keyboards и т.д.
 
 ## 🔌 Интеграции и зависимости
 
@@ -121,23 +156,10 @@ welcome_message_template: "./data/welcome-message.md"
 - **rails:** Rails framework (существующий)
 - **pg:** PostgreSQL (существующий)
 
-## 🌐 API и интерфейсы
+## 🌐 Telegram Webhook интерфейс
 
-### Endpoints
-- `POST /api/v1/telegram/webhook` - Основной webhook endpoint
-
-### Request/Response форматы
-**Request:** Telegram webhook payload
-**Response:** HTTP 200 OK (empty body)
-
-```ruby
-# Welcome message payload
-{
-  "chat_id": 123456789,
-  "text": "🔧 Здравствуйте! Я Валера - AI-ассистент по кузовному ремонту...",
-  "parse_mode": nil  # Без форматирования для Dialogue-Only
-}
-```
+### Webhook endpoint
+Основной webhook endpoint обрабатывается через `Telegram::Bot::UpdatesController` в `Telegram::WebhookController`
 
 ## 🔒 Безопасность
 
@@ -186,69 +208,75 @@ welcome_message_template: "./data/welcome-message.md"
 
 ## 🔧 Детальная реализация
 
-### WelcomeService
+### ApplicationConfig
 ```ruby
-class WelcomeService
-  def initialize(telegram_client)
-    @telegram_client = telegram_client
-  end
+# config/configs/application_config.rb
+class ApplicationConfig
+  # ... существующий код ...
 
-  def handle_message(webhook_data)
-    user_info = extract_user_info(webhook_data)
-
-    if new_user?(user_info[:telegram_id])
-      send_welcome_message(user_info)
-      create_chat_record(user_info)
-    else
-      # Маршрутизация в LLM систему
-      route_to_llm(webhook_data)
-    end
+  def welcome_message_template
+    template_path = welcome_message_template_path
+    File.read(template_path)
+  rescue Errno::ENOENT
+    I18n.t('telegram.welcome_message.default')
   end
 
   private
 
-  def new_user?(telegram_id)
-    Chat.exists?(telegram_id: telegram_id)
-  end
-
-  def send_welcome_message(user_info)
-    template = load_template
-    message = interpolate_template(template, user_info)
-
-    @telegram_client.send_message(
-      chat_id: user_info[:chat_id],
-      text: message
-    )
-  end
-
-  def load_template
-    template_path = ApplicationConfig.welcome_message_path
-    File.read(template_path)
-  end
-
-  def interpolate_template(template, user_info)
-    return template unless user_info[:first_name]
-
-    template.gsub("Здравствуйте!", "Здравствуйте, #{user_info[:first_name]}!")
+  def welcome_message_template_path
+    Rails.root.join('data', 'welcome-message.md')
   end
 end
 ```
 
-### TelegramController
+### WelcomeService
 ```ruby
-class TelegramController < ApplicationController
-  def webhook
-    webhook_data = JSON.parse(request.body.read)
+# frozen_string_literal: true
 
-    WelcomeService.new(telegram_client).handle_message(webhook_data)
+class WelcomeService
+  def send_welcome_message(telegram_user, controller)
+    template = ApplicationConfig.welcome_message_template
+    message = interpolate_template(template, telegram_user)
 
-    render json: { status: 'ok' }
+    # Отправка через respond_with из контроллера
+    controller.respond_with :message, text: message
+
+    Rails.logger.info "Welcome message sent to telegram_user: #{telegram_user.id}"
   end
 
   private
 
-  def telegram_client
-    @telegram_client ||= TelegramClient.new
+  def interpolate_template(template, telegram_user)
+    # Простая интерполяция #{name} -> telegram_user.name
+    template.gsub("#{name}", telegram_user.name)
+  end
+end
+```
+
+### Telegram::WebhookController
+```ruby
+# frozen_string_literal: true
+
+class Telegram::WebhookController < Telegram::Bot::UpdatesController
+  before_action :find_or_create_telegram_user
+
+  # message method остается без изменений - обрабатывается ruby_llm через acts_as_chat
+
+  # Command handler /start - ЗДЕСЬ ТОЛЬКО ОТПРАВКА WELCOME
+  def start!(*args)
+    # Отправляем приветствие новому пользователю
+    WelcomeService.new.send_welcome_message(telegram_user, self)
+
+    nil
+  end
+
+  private
+
+  attr_reader :telegram_user
+
+  def find_or_create_telegram_user
+    # Метод остается без изменений - используется существующая реализация
+    @telegram_user = TelegramUser.find_or_create_by!(id: from['id'])
   end
 end
 ```
@@ -312,3 +340,9 @@ TELEGRAM_BOT_TOKEN="production_bot_token"
   - Добавлен Hybrid Architecture подход
   - Детализирована техническая реализация
   - Определены критерии готовности и риски
+- 25.10.2025 20:30 - v1.1: Обновление спецификации согласно текущей архитектуре
+  - Исправлена архитектура: Telegram::WebhookController вместо TelegramController
+  - Обновлен алгоритм работы с учетом telegram-bot-rb gem
+  - Актуализирована схема данных (TelegramUser/Chat/Message)
+  - Добавлены детали интеграции с telegram_webhook helper
+  - Обновлены примеры кода для соответствия реальной реализации
