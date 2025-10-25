@@ -19,6 +19,8 @@ gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# Данный репоизтоий используется только из-за поддержки Rails 8.1.
+# Реальный оригиниальный источник с документацией - https://github.com/telegram-bot-rb/telegram-bot
 gem 'telegram-bot', github: 'mprokopov/telegram-bot'
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
@@ -81,3 +83,6 @@ gem "anyway_config", "~> 2.7"
 gem "semver2", "~> 3.4"
 
 gem "ruby_llm", "~> 1.8"
+
+gem "redis", "~> 5.4"
+gem "hiredis", "~> 0.6.3"

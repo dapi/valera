@@ -15,9 +15,10 @@ class ApplicationConfig < Anyway::Config
     welcome_message_path: './data/welcome-message.md',
     price_list_path: './data/price.csv',
     company_info_path: './data/company-info.md',
+    redis_cache_store_url: 'redis://localhost:6379/2',
 
     # Telegram configuration
-    telegram_bot_token: '',
+    bot_token: '',
     admin_chat_id: nil,  # ID чата для отправки уведомлений о заявках
 
     # Rate limiter configuration
@@ -38,7 +39,7 @@ class ApplicationConfig < Anyway::Config
     welcome_message_path: :string,
     price_list_path: :string,
     company_info_path: :string,
-    telegram_bot_token: :string,
+    bot_token: :string,
     admin_chat_id: :integer,
 
     # Integers
@@ -49,7 +50,7 @@ class ApplicationConfig < Anyway::Config
   )
 
   # Declare required parameters using anyway_config's required method
-  required :telegram_bot_token, :llm_provider, :llm_model
+  required :bot_token, :llm_provider, :llm_model
 
   class << self
     # Make it possible to access a singleton config instance
