@@ -7,7 +7,10 @@
       "Bash(rails runner:*)",
       "Bash(bundle exec rails runner:*)",
       "Bash(ruby:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)"
     ],
     "deny": [],
     "ask": []
