@@ -21,6 +21,9 @@ class ApplicationConfig < Anyway::Config
     bot_token: '',
     admin_chat_id: nil,  # ID чата для отправки уведомлений о заявках
 
+    # Bugsnag configuration
+    bugsnag_api_key: '',
+
     # Rate limiter configuration
     rate_limit_requests: 10,
     rate_limit_period: 60,
@@ -40,6 +43,7 @@ class ApplicationConfig < Anyway::Config
     price_list_path: :string,
     company_info_path: :string,
     bot_token: :string,
+    bugsnag_api_key: :string,
     admin_chat_id: :integer,
 
     # Integers

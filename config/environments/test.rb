@@ -6,6 +6,22 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Configure test LLM settings to avoid errors
+  config.valera = {
+    llm_provider: 'test',
+    llm_model: 'test-model',
+    bot_token: 'test_token_12345',
+    admin_chat_id: 123456,
+    system_prompt_path: './data/system-prompt.md',
+    welcome_message_path: './data/welcome-message.md',
+    price_list_path: './data/price.csv',
+    company_info_path: './data/company-info.md',
+    redis_cache_store_url: 'redis://localhost:6379/2',
+    rate_limit_requests: 10,
+    rate_limit_period: 60,
+    max_history_size: 10
+  }
+
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
 

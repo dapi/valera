@@ -10,9 +10,24 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
 
   # Handle incoming messages - передаем в LLM систему через ruby_llm
   def message(message)
-    # Создаем Chat запись, если ее нет
-    # ruby_llm автоматически обработает сообщение через acts_as_chat
-    # Ничего не делаем здесь - LLM система обрабатывает сообщения автоматически
+    # Проверяем, что это текстовое сообщение
+    return unless message['text'].present?
+
+    # Передаем сообщение в LLM через chat.ask
+    # ruby_llm автоматически:
+    # 1. Сохранит сообщение в Message модель
+    # 2. Использует системный промпт (уже с инструкциями по консультациям!)
+    # 3. Сгенерирует AI ответ
+
+    ai_response = llm_chat.ask(message['text'])
+
+    # Отправляем ответ клиенту через Telegram API
+    respond_with :message, text: ai_response
+  rescue => e
+    # Обработка ошибок AI
+    Bugsnag.notify(e)
+    Rails.logger.error "Error processing message: #{e.message}"
+    respond_with :message, text: "Извините, произошла ошибка. Попробуйте еще раз."
   end
 
   # Handle callback queries from inline keyboards
@@ -38,7 +53,10 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
   end
 
   def find_or_create_llm_chat
-    @llm_chat = Chat.find_or_create_by!(telegram_user: telegram_user)
+    @llm_chat = Chat.find_or_create_by!(telegram_user: telegram_user) do |chat|
+      # Устанавливаем модель по умолчанию для новых чатов
+      chat.model = Model.find_by!(provider: ApplicationConfig.llm_provider, model_id: ApplicationConfig.llm_model)
+    end
   end
 
   # Add any helper methods here
