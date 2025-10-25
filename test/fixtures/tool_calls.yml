@@ -1,0 +1,15 @@
+one:
+  tool_call_id: call_abc123
+  name: get_weather
+  arguments:
+    location: Moscow
+    units: celsius
+  message_id: 1
+
+two:
+  tool_call_id: call_def456
+  name: calculate_price
+  arguments:
+    service: oil_change
+    car_model: Toyota Camry
+  message_id: 2

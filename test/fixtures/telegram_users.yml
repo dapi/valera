@@ -1,0 +1,11 @@
+one:
+  username: user_one
+  first_name: Ivan
+  last_name: Petrov
+  photo_url: https://example.com/photo1.jpg
+
+two:
+  username: user_two
+  first_name: Maria
+  last_name: Ivanova
+  photo_url: https://example.com/photo2.jpg

@@ -1,0 +1,34 @@
+one:
+  provider: openai
+  model_id: gpt-4
+  name: GPT-4
+  family: gpt
+  context_window: 8192
+  max_output_tokens: 4096
+  capabilities: ["chat", "function_calling"]
+  modalities:
+    text: true
+  pricing:
+    input: 0.00003
+    output: 0.00006
+  metadata: {}
+  knowledge_cutoff: 2024-09-01
+  model_created_at: 2023-03-14
+
+two:
+  provider: anthropic
+  model_id: claude-3-sonnet
+  name: Claude 3 Sonnet
+  family: claude
+  context_window: 200000
+  max_output_tokens: 4096
+  capabilities: ["chat", "vision"]
+  modalities:
+    text: true
+    image: true
+  pricing:
+    input: 0.000003
+    output: 0.000015
+  metadata: {}
+  knowledge_cutoff: 2024-04-01
+  model_created_at: 2024-03-04

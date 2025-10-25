@@ -10,15 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_25_074143) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_25_160539) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "chats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "model_id"
+    t.bigint "telegram_user_id", null: false
     t.datetime "updated_at", null: false
     t.index ["model_id"], name: "index_chats_on_model_id"
+    t.index ["telegram_user_id"], name: "chat_telegram_user_uniq", unique: true
+    t.index ["telegram_user_id"], name: "index_chats_on_telegram_user_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -59,6 +62,22 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_25_074143) do
     t.index ["provider"], name: "index_models_on_provider"
   end
 
+  create_table "telegram_users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "first_name"
+    t.string "last_name"
+    t.string "photo_url"
+    t.datetime "updated_at", null: false
+    t.string "username"
+  end
+
+  create_table "test_models", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "tool_calls", force: :cascade do |t|
     t.jsonb "arguments", default: {}
     t.datetime "created_at", null: false
@@ -72,6 +91,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_25_074143) do
   end
 
   add_foreign_key "chats", "models"
+  add_foreign_key "chats", "telegram_users"
   add_foreign_key "messages", "chats"
   add_foreign_key "messages", "models"
   add_foreign_key "messages", "tool_calls"
