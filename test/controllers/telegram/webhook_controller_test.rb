@@ -6,7 +6,7 @@ class Telegram::WebhookControllerTest < ActionDispatch::IntegrationTest
   def setup
     # Создаем тестовые данные пользователя Telegram
     @telegram_user_data = {
-      'id' => 12345,
+      'id' => 12_345,
       'first_name' => 'Иван',
       'last_name' => 'Петров',
       'username' => 'ivan_petrov'
@@ -26,14 +26,14 @@ class Telegram::WebhookControllerTest < ActionDispatch::IntegrationTest
 
   test "TelegramUser can create new users" do
     new_user_data = {
-      id: 67890,
+      id: 67_890,
       first_name: 'Анна',
       username: 'anna_user'
     }
 
     new_user = TelegramUser.create!(new_user_data)
 
-    assert_equal 67890, new_user.id
+    assert_equal 67_890, new_user.id
     assert_equal 'Анна', new_user.first_name
     assert_equal 'anna_user', new_user.username
   end

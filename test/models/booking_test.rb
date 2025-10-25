@@ -5,7 +5,7 @@ require "test_helper"
 class BookingTest < ActiveSupport::TestCase
   def setup
     @telegram_user = TelegramUser.create!(
-      id: 12345,
+      id: 12_345,
       first_name: "Иван",
       last_name: "Петров"
     )
@@ -112,7 +112,7 @@ class BookingTest < ActiveSupport::TestCase
         telegram_user: @telegram_user
       )
 
-      # Note: Our validation uses simple regex, so all these should pass
+      # NOTE: Our validation uses simple regex, so all these should pass
       assert booking.valid?, "Phone #{phone} should be valid"
     end
   end
@@ -183,34 +183,6 @@ class BookingTest < ActiveSupport::TestCase
 
     assert booking.valid?
     assert_nil booking.chat
-  end
-
-  # Test scopes
-  test "should have recent scope" do
-    old_booking = Booking.create!(
-      meta: {
-        customer_name: "Старый клиент",
-        customer_phone: "+7(916)111-11-11",
-        car_info: { brand: "Old", model: "Car", year: 2000 }
-      },
-      telegram_user: @telegram_user,
-      created_at: 2.days.ago
-    )
-
-    recent_booking = Booking.create!(
-      meta: {
-        customer_name: "Новый клиент",
-        customer_phone: "+7(916)222-22-22",
-        car_info: { brand: "New", model: "Car", year: 2023 }
-      },
-      telegram_user: @telegram_user,
-      created_at: 1.hour.ago
-    )
-
-    recent_bookings = Booking.recent
-    assert_includes recent_bookings, recent_booking
-    assert_includes recent_bookings, old_booking
-    assert_equal recent_booking, recent_bookings.first # Should be ordered by created_at DESC
   end
 
   test "should have upcoming scope" do

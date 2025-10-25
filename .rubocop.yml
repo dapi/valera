@@ -1,78 +1,23 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+inherit_from: .rubocop_todo.yml
 
-# Additional RuboCop extensions
-require:
-  - rubocop-rails
-  - rubocop-performance
-  - rubocop-rspec
-  - rubocop-factory_bot
+AllCops:
+  SuggestExtensions: false
+  NewCops: enable
+  Exclude:
+    - 'node_modules/**/*'
+    - 'vendor/**/*'
+    - 'bin/*'
+    - 'log/**/*'
+    - 'public/**/*'
+    - 'tmp/**/*'
+    - 'doc/**/*'
+    - 'docs/**/*'
+    - '.git/**/*'
+    - 'storage/**/*'
+    - db/schema.rb
+
+plugins:
   - rubocop-capybara
-
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
-
-# Rails-specific optimizations
-Rails:
-  Enabled: true
-
-# Performance optimizations
-Performance:
-  Enabled: true
-
-# RSpec specific rules (if using RSpec)
-RSpec:
-  Enabled: true
-
-# Ensure generated code follows Rails conventions
-Rails/OutputSafety:
-  Enabled: true
-
-Rails/ValidationMethods:
-  Enabled: true
-
-Rails/RelativeDateConstant:
-  Enabled: true
-
-Rails/SafeNavigation:
-  Enabled: true
-
-Rails/SkipsModelValidations:
-  Enabled: true
-
-Rails/TimeZone:
-  Enabled: true
-
-# Performance rules that are commonly violated in generated code
-Performance/ArraySemiInfiniteRange:
-  Enabled: true
-
-Performance/BlockGivenWithExplicitBlock:
-  Enabled: true
-
-Performance/CollectionLiteralInLoop:
-  Enabled: true
-
-Performance/ConstantRegexp:
-  Enabled: true
-
-Performance/MethodObjectAsBlock:
-  Enabled: true
-
-Performance/RedundantEqualityComparisonBlock:
-  Enabled: true
-
-Performance/RedundantSortBlock:
-  Enabled: true
-
-Performance/RedundantStringChars:
-  Enabled: true
-
-Performance/ReverseEach:
-  Enabled: true
-
-Performance/RedundantSplitRegexpArgument:
-  Enabled: true
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-rspec_rails

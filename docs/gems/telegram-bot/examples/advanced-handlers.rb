@@ -19,14 +19,12 @@ class AdvancedBot
     puts "Starting advanced bot with file handling and state management..."
 
     @bot.listen do |message|
-      begin
-        handle_message(message)
-        save_user_data
-      rescue => e
-        puts "Error handling message: #{e.message}"
-        puts e.backtrace.first(5)
-        send_error_message(message.chat.id)
-      end
+      handle_message(message)
+      save_user_data
+    rescue StandardError => e
+      puts "Error handling message: #{e.message}"
+      puts e.backtrace.first(5)
+      send_error_message(message.chat.id)
     end
   end
 
@@ -290,7 +288,7 @@ class AdvancedBot
               "Размер: #{format_file_size(file_info.file_size)}\n" \
               "Всего файлов: #{@user_data[user_id][:files].size}"
       )
-    rescue => e
+    rescue StandardError => e
       @bot.api.send_message(
         chat_id: message.chat.id,
         text: "❌ Ошибка при обработке файла: #{e.message}"
@@ -433,7 +431,7 @@ class AdvancedBot
     when 'location'
       request_location(callback_query.message, user_id)
     when /^file_(\d+)$/
-      file_index = $1.to_i
+      file_index = ::Regexp.last_match(1).to_i
       show_file_details(callback_query.message, user_id, file_index)
     end
 
@@ -507,23 +505,21 @@ class AdvancedBot
   end
 
   def download_file(file_info, user_id)
-    begin
-      file = @bot.api.get_file(file_id: file_info.file_id)
-      file_url = "https://api.telegram.org/file/bot#{ENV['TELEGRAM_BOT_TOKEN']}/#{file.file_path}"
+    file = @bot.api.get_file(file_id: file_info.file_id)
+    file_url = "https://api.telegram.org/file/bot#{ENV['TELEGRAM_BOT_TOKEN']}/#{file.file_path}"
 
-      # Создаем директорию для пользователя
-      user_dir = File.join(@data_dir, "user_#{user_id}")
-      FileUtils.mkdir_p(user_dir)
+    # Создаем директорию для пользователя
+    user_dir = File.join(@data_dir, "user_#{user_id}")
+    FileUtils.mkdir_p(user_dir)
 
-      # Скачиваем файл
-      require 'open-uri'
-      file_path = File.join(user_dir, file_info.file_name || "file_#{file_info.file_id}")
-      File.open(file_path, 'wb') { |f| f.write(open(file_url).read) }
+    # Скачиваем файл
+    require 'open-uri'
+    file_path = File.join(user_dir, file_info.file_name || "file_#{file_info.file_id}")
+    File.open(file_path, 'wb') { |f| f.write(open(file_url).read) }
 
-      puts "File downloaded: #{file_path}"
-    rescue => e
-      puts "Error downloading file: #{e.message}"
-    end
+    puts "File downloaded: #{file_path}"
+  rescue StandardError => e
+    puts "Error downloading file: #{e.message}"
   end
 
   def save_user_data
@@ -532,9 +528,7 @@ class AdvancedBot
 
   def load_user_data
     data_file = File.join(@data_dir, 'user_data.json')
-    if File.exist?(data_file)
-      @user_data = JSON.parse(File.read(data_file), symbolize_names: true)
-    end
+    @user_data = JSON.parse(File.read(data_file), symbolize_names: true) if File.exist?(data_file)
     @start_time = Time.now
   end
 
@@ -555,7 +549,7 @@ class AdvancedBot
 
   def format_time(iso_time)
     Time.parse(iso_time).strftime('%d.%m.%Y %H:%M:%S')
-  rescue
+  rescue StandardError
     'Неизвестно'
   end
 
@@ -570,7 +564,7 @@ class AdvancedBot
       chat_id: chat_id,
       text: "❌ Произошла ошибка. Попробуйте еще раз позже."
     )
-  rescue
+  rescue StandardError
     puts "Failed to send error message to chat #{chat_id}"
   end
 end

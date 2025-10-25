@@ -69,7 +69,7 @@ class ToolCallingBot
             },
             units: {
               type: 'string',
-              enum: ['celsius', 'fahrenheit'],
+              enum: %w[celsius fahrenheit],
               description: 'Единицы измерения температуры',
               default: 'celsius'
             }
@@ -147,7 +147,7 @@ class ToolCallingBot
               description: 'Целевой язык (например: "en", "ru")'
             }
           },
-          required: ['text', 'to_lang']
+          required: %w[text to_lang]
         }
       }
     ]
@@ -164,35 +164,33 @@ class ToolCallingBot
   end
 
   def process_message_with_tools(message)
-    begin
-      print "🤔 Анализирую запрос... "
+    print "🤔 Анализирую запрос... "
 
-      response = @chat.say(message)
-      puts "\n"
+    response = @chat.say(message)
+    puts "\n"
 
-      # Если модель вызвала инструменты
-      if response.tool_calls.any?
-        handle_tool_calls(response)
-      else
-        puts "🤖 #{response.content}"
-      end
-
-      # Показываем информацию об использовании токенов
-      if response.usage
-        tokens = response.usage[:total_tokens]
-        puts "💰 Использовано токенов: #{tokens}"
-      end
-
-      puts
-    rescue RubyLLM::AuthenticationError => e
-      puts "\n❌ Ошибка аутентификации: #{e.message}"
-    rescue RubyLLM::RateLimitError => e
-      puts "\n⏰ Превышен лимит запросов. Повторите через #{e.retry_after} секунд"
-      sleep(e.retry_after || 5)
-      retry
-    rescue => e
-      puts "\n❌ Ошибка: #{e.message}"
+    # Если модель вызвала инструменты
+    if response.tool_calls.any?
+      handle_tool_calls(response)
+    else
+      puts "🤖 #{response.content}"
     end
+
+    # Показываем информацию об использовании токенов
+    if response.usage
+      tokens = response.usage[:total_tokens]
+      puts "💰 Использовано токенов: #{tokens}"
+    end
+
+    puts
+  rescue RubyLLM::AuthenticationError => e
+    puts "\n❌ Ошибка аутентификации: #{e.message}"
+  rescue RubyLLM::RateLimitError => e
+    puts "\n⏰ Превышен лимит запросов. Повторите через #{e.retry_after} секунд"
+    sleep(e.retry_after || 5)
+    retry
+  rescue StandardError => e
+    puts "\n❌ Ошибка: #{e.message}"
   end
 
   def handle_tool_calls(response)
@@ -226,7 +224,7 @@ class ToolCallingBot
       )
 
       puts "🤖 #{tool_response.content}"
-    rescue => e
+    rescue StandardError => e
       puts "❌ Ошибка: #{e.message}"
 
       # Отправляем информацию об ошибке
@@ -270,7 +268,7 @@ class ToolCallingBot
     }
 
     data = weather_data[city] || { temp: 20, condition: 'Ясно', humidity: 50 }
-    temp = units == 'fahrenheit' ? (data[:temp] * 9/5 + 32).round(1) : data[:temp]
+    temp = units == 'fahrenheit' ? (data[:temp] * 9 / 5 + 32).round(1) : data[:temp]
     unit = units == 'fahrenheit' ? '°F' : '°C'
 
     "В городе #{city}: #{temp}#{unit}, #{data[:condition]}, влажность #{data[:humidity]}%"
@@ -279,9 +277,7 @@ class ToolCallingBot
   def calculate_expression(expression)
     # Безопасное вычисление математических выражений
     # Разрешаем только базовые операции и числа
-    unless expression.match(/^[\d\+\-\*\/\(\)\s\.]+$/)
-      raise "Недопустимое математическое выражение"
-    end
+    raise "Недопустимое математическое выражение" unless expression.match(%r{^[\d+\-*/()\s.]+$})
 
     begin
       # Используем eval с ограниченным контекстом
@@ -289,7 +285,7 @@ class ToolCallingBot
       "Результат: #{expression} = #{result}"
     rescue ZeroDivisionError
       "Ошибка: деление на ноль"
-    rescue => e
+    rescue StandardError => e
       "Ошибка вычисления: #{e.message}"
     end
   end
@@ -334,7 +330,7 @@ class ToolCallingBot
       # В реальном приложении здесь была бы работа с часовыми поясами
       city_name = city || tz
       "Текущее время в #{city_name}: #{now.strftime('%H:%M:%S')} (#{now.strftime('%d.%m.%Y')})"
-    rescue => e
+    rescue StandardError => e
       "Не удалось получить время для #{city_name}: #{e.message}"
     end
   end
@@ -405,11 +401,11 @@ class ToolCallingBot
     @tools.each do |tool|
       puts "\n📋 #{tool[:name]}"
       puts "   #{tool[:description]}"
-      if tool[:parameters][:properties]
-        tool[:parameters][:properties].each do |param_name, param_info|
-          required = tool[:parameters][:required]&.include?(param_name) ? " (обязательно)" : " (опционально)"
-          puts "   • #{param_name}: #{param_info[:description]}#{required}"
-        end
+      next unless tool[:parameters][:properties]
+
+      tool[:parameters][:properties].each do |param_name, param_info|
+        required = tool[:parameters][:required]&.include?(param_name) ? " (обязательно)" : " (опционально)"
+        puts "   • #{param_name}: #{param_info[:description]}#{required}"
       end
     end
     puts
@@ -428,8 +424,6 @@ class ToolCallScenarios
     demonstrate_calculation_tool
     demonstrate_multi_tool_usage
   end
-
-  private
 
   def self.configure_llm
     RubyLLM.configure do |config|
@@ -451,7 +445,7 @@ class ToolCallScenarios
           type: 'object',
           properties: {
             city: { type: 'string', description: 'Город' },
-            units: { type: 'string', enum: ['celsius', 'fahrenheit'] }
+            units: { type: 'string', enum: %w[celsius fahrenheit] }
           },
           required: ['city']
         }
@@ -466,11 +460,11 @@ class ToolCallScenarios
 
     # Эмуляция выполнения инструмента
     def chat.execute_tool_call(tool_call)
-      if tool_call.name == 'get_weather'
-        args = JSON.parse(tool_call.arguments)
-        city = args['city']
-        "В #{city} сейчас +18°C, солнечно, влажность 65%."
-      end
+      return unless tool_call.name == 'get_weather'
+
+      args = JSON.parse(tool_call.arguments)
+      city = args['city']
+      "В #{city} сейчас +18°C, солнечно, влажность 65%."
     end
 
     prompt = "Какая погода в Париже?"
@@ -522,12 +516,12 @@ class ToolCallScenarios
 
     # Эмуляция выполнения инструмента
     def chat.execute_tool_call(tool_call)
-      if tool_call.name == 'calculate'
-        args = JSON.parse(tool_call.arguments)
-        expression = args['expression']
-        result = eval(expression)
-        "Результат: #{expression} = #{result}"
-      end
+      return unless tool_call.name == 'calculate'
+
+      args = JSON.parse(tool_call.arguments)
+      expression = args['expression']
+      result = eval(expression)
+      "Результат: #{expression} = #{result}"
     end
 
     prompt = "Сколько будет (25 * 4) + 17?"

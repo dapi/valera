@@ -32,5 +32,5 @@ end
 unless Rails.env.production?
   # Clear any existing default task and set ours
   Rake::Task[:default].clear if Rake::Task.task_defined?(:default)
-  task :default => :all_tests
+  task default: :all_tests
 end

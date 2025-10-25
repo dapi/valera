@@ -5,7 +5,7 @@ require "test_helper"
 class WelcomeServiceTest < ActiveSupport::TestCase
   def setup
     @telegram_user = TelegramUser.new(
-      id: 12345,
+      id: 12_345,
       first_name: "Иван",
       last_name: "Петров",
       username: "ivan_petrov"
@@ -26,7 +26,7 @@ class WelcomeServiceTest < ActiveSupport::TestCase
 
   test "uses username when name is not available" do
     telegram_user = TelegramUser.new(
-      id: 12345,
+      id: 12_345,
       first_name: nil,
       last_name: nil,
       username: "test_user"
@@ -42,7 +42,7 @@ class WelcomeServiceTest < ActiveSupport::TestCase
 
   test "handles first_name only" do
     telegram_user = TelegramUser.new(
-      id: 12345,
+      id: 12_345,
       first_name: "Анна",
       last_name: nil,
       username: "anna_user"

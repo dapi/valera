@@ -58,6 +58,8 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
+  gem 'rubocop-rspec_rails'
+
   # Additional RuboCop extensions for better Rails integration
   gem "rubocop-rails", require: false
   gem "rubocop-rspec", require: false
