@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/mprokopov/telegram-bot.git
-  revision: 343e7179e22f0a685111447976b9c54d04711949
+  revision: b8ebc2d491016b206e5ac1c41ee71e16ec94dbee
   specs:
     telegram-bot (0.16.7)
       actionpack (>= 4.0)
@@ -166,7 +166,7 @@ GEM
     jbuilder (2.14.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    json (2.15.1)
+    json (2.15.2)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
