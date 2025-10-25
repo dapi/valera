@@ -2,16 +2,14 @@ require 'rails_helper'
 require 'telegram/bot/updates_controller/rspec_helpers'
 
 RSpec.describe Telegram::WebhookController, type: :telegram_bot_controller do
-
   let(:from_id) { 12345 }
+  let(:model) { models(:deepseek) }
+  let(:chat) { Chat.create!(telegram_user: telegram_user, model: model) }
   let(:chat_id) { 12345 }
   let(:telegram_user) { TelegramUser.create!(id: from_id, first_name: "Иван", last_name: "Петров") }
 
   # Load fixtures
   fixtures :all
-
-  let(:model) { models(:deepseek) }
-  let(:chat) { Chat.create!(telegram_user: telegram_user, model: model) }
 
   # Mock the LLM chat to avoid real API calls in tests
   before do
@@ -26,12 +24,12 @@ RSpec.describe Telegram::WebhookController, type: :telegram_bot_controller do
   describe '#start!' do
     subject { -> { dispatch_command(:start) } }
 
-    it { should make_telegram_request(bot, :sendMessage) }
+    it { is_expected.to make_telegram_request(bot, :sendMessage) }
   end
 
   it 'handles /start command and sends welcome message' do
-    expect { dispatch_command(:start) }.
-      to make_telegram_request(bot, :sendMessage)
+    expect { dispatch_command(:start) }
+      .to make_telegram_request(bot, :sendMessage)
   end
 
   # TODO: Fix callback_query test - needs proper setup for answer_callback_query
@@ -49,18 +47,18 @@ RSpec.describe Telegram::WebhookController, type: :telegram_bot_controller do
       # and response is sent back to user
       allow(chat).to receive(:complete).and_return('Здравствуйте!')
 
-      expect { dispatch_message('Привет!') }.
-        to make_telegram_request(bot, :sendMessage).
-        with(hash_including(text: 'Здравствуйте!'))
+      expect { dispatch_message('Привет!') }
+        .to make_telegram_request(bot, :sendMessage)
+        .with(hash_including(text: 'Здравствуйте!'))
     end
 
     it 'processes car repair consultation messages' do
       # Mock LLM response for car repair consultation
       allow(chat).to receive(:complete).and_return('Ориентировочно 7000-10000₽')
 
-      expect { dispatch_message('сколько стоит убрать вмятину?') }.
-        to make_telegram_request(bot, :sendMessage).
-        with(hash_including(text: 'Ориентировочно 7000-10000₽'))
+      expect { dispatch_message('сколько стоит убрать вмятину?') }
+        .to make_telegram_request(bot, :sendMessage)
+        .with(hash_including(text: 'Ориентировочно 7000-10000₽'))
     end
 
     it 'processes messages and calls LLM ask method' do
@@ -75,9 +73,9 @@ RSpec.describe Telegram::WebhookController, type: :telegram_bot_controller do
       # Simulate LLM error in complete method
       allow(chat).to receive(:complete).and_raise(StandardError, 'LLM API error')
 
-      expect { dispatch_message('Сообщение с ошибкой') }.
-        to make_telegram_request(bot, :sendMessage).
-        with(hash_including(text: 'Извините, произошла ошибка. Попробуйте еще раз.'))
+      expect { dispatch_message('Сообщение с ошибкой') }
+        .to make_telegram_request(bot, :sendMessage)
+        .with(hash_including(text: 'Извините, произошла ошибка. Попробуйте еще раз.'))
     end
   end
 end

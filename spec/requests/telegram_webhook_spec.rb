@@ -2,24 +2,13 @@ require 'rails_helper'
 require 'telegram/bot/rspec/integration/rails'
 
 RSpec.describe Telegram::WebhookController, telegram_bot: :rails do
-  # Note: Telegram client is already stubbed in config/initializers for test mode
+  # NOTE: Telegram client is already stubbed in config/initializers for test mode
 
   let(:from_id) { 12345 }
-  let(:chat_id) { 12345 }
-
-  # Load fixtures
-  fixtures :all
-
   # Используем фикстуры вместо создания записей вручную
   let(:telegram_user) { TelegramUser.create!(id: from_id, first_name: "Иван", last_name: "Петров") }
   let(:model) { models(:deepseek) }
   let(:chat) { Chat.create!(telegram_user: telegram_user, model: model) }
-
-  # Мокаем find_or_create_by! чтобы возвращать наш chat с моделью
-  before do
-    allow(Chat).to receive(:find_or_create_by!).with(telegram_user: telegram_user).and_return(chat)
-  end
-
   # Переопределяем default_message_options чтобы использовать наши chat_id и from
   let(:default_message_options) do
     {
@@ -27,30 +16,37 @@ RSpec.describe Telegram::WebhookController, telegram_bot: :rails do
       chat: { id: chat_id }
     }
   end
+  let(:chat_id) { 12345 }
 
-  # Мокируем complete метод, но оставляем ask для сохранения сообщений
+  # Load fixtures
+  fixtures :all
+
+  # Мокаем find_or_create_by! чтобы возвращать наш chat с моделью
   before do
+    allow(Chat).to receive(:find_or_create_by!).with(telegram_user: telegram_user).and_return(chat)
     allow(chat).to receive(:complete).and_return("Test response")
   end
+
+  # Мокируем complete метод, но оставляем ask для сохранения сообщений
 
   describe '#start!' do
     subject { -> { dispatch_command(:start) } }
 
-    it { should respond_with_message(/Здравствуйте/) }
+    it { is_expected.to respond_with_message(/Здравствуйте/) }
   end
 
   it 'handles /start command and sends welcome message' do
-    expect { dispatch_command(:start) }.
-      to make_telegram_request(bot, :sendMessage).
-      with(hash_including(text: /Здравствуйте/))
+    expect { dispatch_command(:start) }
+      .to make_telegram_request(bot, :sendMessage)
+      .with(hash_including(text: /Здравствуйте/))
   end
 
   describe '#message' do
     context "когда пользователь отправляет сообщение о кузовном ремонте" do
       it "сохраняет сообщение в базе данных через ruby_llm" do
-        expect {
+        expect do
           dispatch_message "сколько стоит убрать вмятину на двери?"
-        }.to change(Message, :count).by(1)
+        end.to change(Message, :count).by(1)
 
         # Проверяем, что сообщение сохранено с правильным содержимым
         saved_message = Message.last
@@ -79,9 +75,9 @@ RSpec.describe Telegram::WebhookController, telegram_bot: :rails do
 
     context "когда пользователь отправляет обычное сообщение" do
       it "также сохраняет сообщение в базе данных" do
-        expect {
+        expect do
           dispatch_message "привет"
-        }.to change(Message, :count).by(1)
+        end.to change(Message, :count).by(1)
 
         saved_message = Message.last
         expect(saved_message.content).to eq("привет")

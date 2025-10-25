@@ -48,7 +48,9 @@
       "Bash(rails console:*)",
       "Bash(./docs/scripts/documentation-audit.sh:*)",
       "Bash(dos2unix:*)",
-      "Bash(bin/brakeman:*)"
+      "Bash(bin/brakeman:*)",
+      "WebFetch(domain:brakemanscanner.org)",
+      "Bash(bundle exec brakeman:*)"
     ],
     "deny": [],
     "ask": []

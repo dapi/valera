@@ -4,4 +4,10 @@ require "bundler/setup"
 
 ARGV.unshift("--ensure-latest")
 
+# Use custom ignore configuration if it exists
+config_file = File.join(File.dirname(__FILE__), '..', 'config', 'brakeman.yml')
+if File.exist?(config_file)
+  ARGV.unshift("--ignore-config", config_file)
+end
+
 load Gem.bin_path("brakeman", "brakeman")

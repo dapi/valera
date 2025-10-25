@@ -50,9 +50,9 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
       initial_count = Booking.count
 
       invalid_parameters = {
-        customer_name: '',  # Пустое имя
-        customer_phone: '123',  # Невалидный телефон
-        car_info: nil  # Отсутствует информация об авто
+        customer_name: '', # Пустое имя
+        customer_phone: '123', # Невалидный телефон
+        car_info: nil # Отсутствует информация об авто
       }
 
       result = BookingCreatorTool.call(
@@ -84,7 +84,7 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
 
         parameters = booking_parameters.merge(customer_phone: phone_format)
 
-        result = BookingCreatorTool.call(
+        BookingCreatorTool.call(
           parameters: parameters,
           context: {
             telegram_user: telegram_user,
@@ -133,7 +133,7 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
 
   describe 'System prompt integration' do
     it 'contains booking creator instructions' do
-      system_prompt = File.read(Rails.root.join('data', 'system-prompt.md'))
+      system_prompt = File.read(Rails.root.join("data/system-prompt.md"))
 
       expect(system_prompt).to include('Создание записи на осмотр через Booking Creator Tool')
       expect(system_prompt).to include('Когда использовать booking_creator tool')
@@ -143,7 +143,7 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
     end
 
     it 'specifies correct time slots' do
-      system_prompt = File.read(Rails.root.join('data', 'system-prompt.md'))
+      system_prompt = File.read(Rails.root.join("data/system-prompt.md"))
 
       expect(system_prompt).to include('**Утро:** 10:00-11:00')
       expect(system_prompt).to include('**День:** 14:00-15:00')
@@ -155,82 +155,82 @@ RSpec.describe 'Booking Flow Integration', type: :integration do
   end
 
   describe 'Database relationships and constraints' do
-      let(:booking_parameters) do
-        {
-          customer_name: 'Иван Петров',
-          customer_phone: '+79161234567',
-          car_info: { brand: 'Toyota', model: 'Camry', year: 2018 },
-          preferred_date: '2025-10-27',
-          preferred_time: '10:00'
+    let(:booking_parameters) do
+      {
+        customer_name: 'Иван Петров',
+        customer_phone: '+79161234567',
+        car_info: { brand: 'Toyota', model: 'Camry', year: 2018 },
+        preferred_date: '2025-10-27',
+        preferred_time: '10:00'
+      }
+    end
+
+    it 'maintains proper relationships between booking, user and chat' do
+      allow(BookingNotificationJob).to receive(:perform_later)
+
+      initial_count = Booking.count
+      initial_user_bookings = Booking.where(telegram_user: telegram_user).count
+
+      # Create booking for first chat
+      BookingCreatorTool.call(
+        parameters: booking_parameters,
+        context: {
+          telegram_user: telegram_user,
+          chat: chat
         }
-      end
+      )
 
-      it 'maintains proper relationships between booking, user and chat' do
-        allow(BookingNotificationJob).to receive(:perform_later)
+      # Create second booking for same user, different chat
+      chat2 = chats(:two)
+      BookingCreatorTool.call(
+        parameters: booking_parameters.merge(customer_name: 'Петр Иванов'),
+        context: {
+          telegram_user: telegram_user,
+          chat: chat2
+        }
+      )
 
-        initial_count = Booking.count
-        initial_user_bookings = Booking.where(telegram_user: telegram_user).count
+      # Проверяем, что добавилось 2 записи
+      expect(Booking.count).to eq(initial_count + 2)
+      expect(Booking.where(telegram_user: telegram_user).count).to eq(initial_user_bookings + 2)
 
-        # Create booking for first chat
-        result1 = BookingCreatorTool.call(
-          parameters: booking_parameters,
-          context: {
-            telegram_user: telegram_user,
-            chat: chat
-          }
-        )
+      # Verify specific relationships
+      booking1 = Booking.joins(:chat).where(chats: { id: chat.id }).last
+      booking2 = Booking.joins(:chat).where(chats: { id: chat2.id }).last
 
-        # Create second booking for same user, different chat
-        chat2 = chats(:two)
-        result2 = BookingCreatorTool.call(
-          parameters: booking_parameters.merge(customer_name: 'Петр Иванов'),
-          context: {
-            telegram_user: telegram_user,
-            chat: chat2
-          }
-        )
-
-        # Проверяем, что добавилось 2 записи
-        expect(Booking.count).to eq(initial_count + 2)
-        expect(Booking.where(telegram_user: telegram_user).count).to eq(initial_user_bookings + 2)
-
-        # Verify specific relationships
-        booking1 = Booking.joins(:chat).where(chats: { id: chat.id }).last
-        booking2 = Booking.joins(:chat).where(chats: { id: chat2.id }).last
-
-        expect(booking1.chat).to eq(chat)
-        expect(booking2.chat).to eq(chat2)
-        expect(booking1.telegram_user).to eq(booking2.telegram_user)
-      end
+      expect(booking1.chat).to eq(chat)
+      expect(booking2.chat).to eq(chat2)
+      expect(booking1.telegram_user).to eq(booking2.telegram_user)
+    end
   end
 
   describe 'Error handling and logging' do
-      let(:booking_parameters) do
-        {
-          customer_name: 'Иван Петров',
-          customer_phone: '+79161234567',
-          car_info: { brand: 'Toyota', model: 'Camry', year: 2018 },
-          preferred_date: '2025-10-27',
-          preferred_time: '10:00'
+    let(:booking_parameters) do
+      {
+        customer_name: 'Иван Петров',
+        customer_phone: '+79161234567',
+        car_info: { brand: 'Toyota', model: 'Camry', year: 2018 },
+        preferred_date: '2025-10-27',
+        preferred_time: '10:00'
+      }
+    end
+
+    it 'handles errors gracefully and logs them' do
+      allow(Rails.logger).to receive(:error)
+      allow(Bugsnag).to receive(:notify)
+
+      # Force an error by passing invalid context (nil telegram_user)
+      result = BookingCreatorTool.call(
+        parameters: booking_parameters,
+        context: {
+          telegram_user: nil,
+          chat: chat
         }
-      end
+      )
 
-      it 'handles errors gracefully and logs them' do
-        allow(Rails.logger).to receive(:error)
-        allow(Bugsnag).to receive(:notify)
-
-        # Force an error by passing invalid context (nil telegram_user)
-        result = BookingCreatorTool.call(
-          parameters: booking_parameters,
-          context: {
-            telegram_user: nil,
-            chat: chat
-          }
-        )
-
-        # Verify error handling
-        expect(result[:success]).to be false
-        expect(result[:message]).to include('Не удалось создать запись')
-      end
+      # Verify error handling
+      expect(result[:success]).to be false
+      expect(result[:message]).to include('Не удалось создать запись')
+    end
   end
 end
