@@ -166,9 +166,10 @@
 ## 🔗 Связанные документы
 
 - **Product Requirements:** [PR-001-text-only-interaction.md](../product/PR-001-text-only-interaction.md) *(КРИТИЧЕСКОЕ ТРЕБОВАНИЕ)*
-- **User Stories:** [US-001-telegram-auto-greeting.md](../user-stories/US-001-telegram-auto-greeting.md)
-- **Technical Specification:** [TS-001-telegram-webhook-handling.md](../specifications/TS-001-telegram-webhook-handling.md)
-- **Implementation Plan:** [protocol-telegram-welcome.md](../../.protocols/protocol-telegram-welcome.md)
+- **Реализовано через:** Системные промпты в [`valera-personality-prompts.md`](../prompts/valera-personality-prompts.md)
+- **User Stories:** Смотри [`user-stories/`](user-stories/) для доступных историй
+- **Technical approach:** Описан в [`FLOW.md`](../../FLOW.md)
+- **Implementation:** В соответствии с [FLOW.md](../../FLOW.md)
 - **Telegram Documentation:** [../../gems/telegram-bot/README.md](../../gems/telegram-bot/README.md)
 
 ## 📋 Open Questions

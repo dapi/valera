@@ -43,9 +43,9 @@
 
 ## 🔗 Связанные документы
 
-- **User Story:** [US-002-telegram-service-booking.md](../user-stories/US-002-telegram-service-booking.md) (MVP база)
-- **Technical Specification:** [TS-003-photo-analysis-engine.md](../specifications/TS-003-photo-analysis-engine.md) (будет создан)
-- **Implementation Plan:** [protocol-telegram-photo-analysis.md](../../.protocols/protocol-telegram-photo-analysis.md) (будет создан)
+- **User Story:** [US-002b-telegram-recording-booking.md](US-002b-telegram-recording-booking.md) (MVP база)
+- **Technical Design Document:** [../../tdd/TDD-003-telegram-photo-damage-assessment.md](../../tdd/TDD-003-telegram-photo-damage-assessment.md)
+- **Implementation:** В соответствии с [FLOW.md](../../FLOW.md)
 
 ## 🚫 Исключения (Edge Cases)
 

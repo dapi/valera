@@ -286,7 +286,7 @@ AI-ассистент в Telegram для кузовного ремонта и п
 - **Product Constitution:** [../product/constitution.md](../product/constitution.md) - **ОБЯЗАТЕЛЬНО К СОБЛЮДЕНИЮ**
 - **User Story:** [US-002-telegram-service-booking.md](../user-stories/US-002-telegram-service-booking.md)
 - **Technical Specification:** [TS-002-telegram-booking-engine.md](../specifications/TS-002-telegram-booking-engine.md) (будет создан)
-- **Implementation Plan:** [protocol-telegram-service-booking.md](../../.protocols/protocol-telegram-service-booking.md) (будет создан)
+- **Implementation:** В соответствии с [FLOW.md](../../FLOW.md)
 - **API Documentation:** [api-telegram-booking-v1.md](../api/api-telegram-booking-v1.md) (будет создан)
 
 ## 📋 Open Questions (кузовной ремонт)

@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_25_160006) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_25_184516) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "bookings", force: :cascade do |t|
+    t.bigint "chat_id"
+    t.datetime "created_at", null: false
+    t.jsonb "meta", default: {}, null: false
+    t.bigint "telegram_user_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_id"], name: "index_bookings_on_chat_id"
+    t.index ["telegram_user_id"], name: "index_bookings_on_telegram_user_id"
+  end
 
   create_table "chats", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -83,6 +93,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_25_160006) do
     t.index ["tool_call_id"], name: "index_tool_calls_on_tool_call_id", unique: true
   end
 
+  add_foreign_key "bookings", "chats"
+  add_foreign_key "bookings", "telegram_users"
   add_foreign_key "chats", "models"
   add_foreign_key "chats", "telegram_users"
   add_foreign_key "messages", "chats"

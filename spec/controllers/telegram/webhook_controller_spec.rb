@@ -2,8 +2,6 @@ require 'rails_helper'
 require 'telegram/bot/updates_controller/rspec_helpers'
 
 RSpec.describe Telegram::WebhookController, type: :telegram_bot_controller do
-  # for old RSpec:
-  # include_context 'telegram/bot/updates_controller'
 
   let(:from_id) { 12345 }
   let(:chat_id) { 12345 }

@@ -238,8 +238,8 @@
 ## 🔗 Связанные документы
 
 - **Product Constitution:** `../product/constitution.md`
-- **User Story US-001:** `../requirements/user-stories/US-001-telegram-auto-greeting.md`
-- **Technical Specification TS-001:** `../requirements/specifications/TS-001-telegram-webhook-handling.md`
+- **FLOW.md:** `../FLOW.md` - основной рабочий процесс
+- **Доступные User Stories:** `../requirements/user-stories/`
 
 ## 📋 Правила использования
 

@@ -320,7 +320,6 @@ As a developer I want to view bot logs so that I can debug issues
 
 ### Рабочие документы:
 - `docs/requirements/user-stories/` - Здесь создаются User Stories
-- `.protocols/` - Здесь создаются Implementation Plans (не зона агента)
 
 ---
 

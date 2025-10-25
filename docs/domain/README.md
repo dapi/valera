@@ -72,7 +72,7 @@
 
 - **Product Constitution:** `../product/constitution.md` - Фундаментальные требования
 - **Requirements:** `../requirements/` - User Stories для бота
-- **Implementation:** `../../.protocols/` - Планы разработки
+- **Implementation:** В соответствии с [`../FLOW.md`](../FLOW.md)
 
 ---
 

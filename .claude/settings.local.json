@@ -33,7 +33,21 @@
       "Bash(cat:*)",
       "Bash(RAILS_ENV=test bin/rails:*)",
       "Bash(bin/rspec:*)",
-      "Read(//home/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/gems/**)"
+      "Read(//home/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/gems/**)",
+      "Bash(mv:*)",
+      "Bash(test:*)",
+      "Bash(for:*)",
+      "Bash(do:*)",
+      "Bash(if [ -f \"docs/$file\" ])",
+      "Bash(then)",
+      "Bash(echo:*)",
+      "Bash(else)",
+      "Bash(fi:*)",
+      "Bash(done:*)",
+      "Bash(if [ -f \"$file\" ])",
+      "Bash(rails console:*)",
+      "Bash(./docs/scripts/documentation-audit.sh:*)",
+      "Bash(dos2unix:*)"
     ],
     "deny": [],
     "ask": []

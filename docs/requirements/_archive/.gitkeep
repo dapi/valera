@@ -1,0 +1,39 @@
+# Архив документации
+
+Эта директория содержит архивную документацию, которая была удалена в ходе реорганизации 25.10.2025.
+
+## Удаленные документы:
+
+### FIP документы:
+- FIP-002a-telegram-basic-consultation.md
+- FIP-002b-telegram-recording-booking.md
+
+### User Stories:
+- US-001-telegram-auto-greeting.md
+
+### Technical Specifications:
+- TS-001-telegram-welcome-experience.md
+- TS-002-telegram-booking-engine.md
+- TS-002a-telegram-basic-consultation.md
+
+### Technical Solutions:
+- TSOL-002-telegram-damage-assessment-solution.md
+- TSOL-002-telegram-user-chat-architecture.md
+
+### Flow документы:
+- MIGRATION-PLAN.md
+- HYBRID-MIGRATION-PLAN.md
+- HYBRID-APPROACH-EXAMPLES.md
+- CENTRAL-FLOW-MODEL.md
+
+### README файлы:
+- README-user-stories.md
+- README-TEAM-GUIDE.md
+- README-AI-AGENTS.md
+
+### Templates:
+- feature-implementation-plan-template.md
+- technical-solution-template.md
+
+## Примечание:
+Содержимое важных документов было перенесено в Memory Bank (.claude/memory-bank.md).

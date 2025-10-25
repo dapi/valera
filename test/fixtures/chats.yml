@@ -1,7 +1,5 @@
 one:
   telegram_user: one
-  model: one
 
 two:
   telegram_user: two
-  model: two
