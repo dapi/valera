@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod:*)",
+      "Bash(bundle install:*)",
+      "Bash(rm:*)",
+      "Bash(rails runner:*)",
+      "Bash(bundle exec rails runner:*)",
+      "Bash(ruby:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

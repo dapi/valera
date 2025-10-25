@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+# Pre-commit hook for RuboCop
+# This script runs RuboCop on staged files and prevents commit if there are offenses
+
+require 'json'
+
+def get_staged_files
+  output = `git diff --cached --name-only --diff-filter=ACM`
+  files = output.split("\n")
+  files.select { |file| file.end_with?('.rb') }
+end
+
+def run_rubocop(files)
+  return true if files.empty?
+
+  command = "bundle exec rubocop --format json #{files.join(' ')}"
+  output = `#{command} 2>&1`
+  exit_status = $?.exitstatus
+
+  begin
+    result = JSON.parse(output)
+    offenses = result['files'].flat_map { |file| file['offenses'] }
+    offenses.reject { |offense| offense['corrected'] }
+  rescue JSON::ParserError
+    puts "Error parsing RuboCop output:"
+    puts output
+    return false
+  end
+end
+
+def main
+  staged_files = get_staged_files
+
+  if staged_files.empty?
+    puts "No Ruby files to check. Proceeding with commit."
+    exit 0
+  end
+
+  puts "Running RuboCop on staged Ruby files..."
+  puts "Files: #{staged_files.join(', ')}"
+
+  offenses = run_rubocop(staged_files)
+
+  if offenses.empty?
+    puts "✅ All Ruby files conform to RuboCop standards!"
+    exit 0
+  else
+    puts "❌ RuboCop found offenses in staged files:"
+    offenses.each do |offense|
+      puts "  #{offense['location']} #{offense['cop_name']}: #{offense['message']}"
+    end
+    puts
+    puts "Please fix the offenses before committing, or run 'bundle exec rubocop -a' to auto-correct."
+    exit 1
+  end
+end
+
+main if __FILE__ == $0
