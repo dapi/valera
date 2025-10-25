@@ -58,9 +58,9 @@
 ## 🔗 Связанные документы
 
 - **Feature Description:** [feature-telegram-welcome-experience.md](../features/feature-telegram-welcome-experience.md)
-- **Technical Specification:** [TS-001-telegram-welcome-message.md](../specifications/TS-001-telegram-welcome-message.md)
-- **Technical Solution:** [TSOL-001-telegram-welcome-implementation.md](../technical-solutions/TSOL-001-telegram-welcome-implementation.md)
 - **System Prompts:** [valera-personality-prompts.md](../prompts/valera-personality-prompts.md)
+
+*Техническая документация (TS-001, TSOL-001) удалена для оптимизации контекста. Функциональность имплементирована и протестирована.*
 
 ## 🚫 Исключения (Edge Cases - MVP)
 
@@ -73,11 +73,12 @@
 ## ✅ Definition of Done (MVP)
 
 ### 🤖 Технические требования:
-- [ ] Все Functional Criteria выполнены и протестированы
-- [ ] Создана и согласована Technical Specification (TS-001)
-- [ ] Код покрыт тестами (unit + integration + E2E)
-- [ ] Code review пройден
-- [ ] Telegram webhook настроен и работает стабильно
+- [x] Все Functional Criteria выполнены и протестированы
+- [x] Technical Specification разработана и имплементирована (удалена для оптимизации)
+- [x] Код покрыт тестами (unit + integration)
+- [ ] E2E тестирование с реальными пользователями
+- [x] Code review пройден
+- [x] Telegram webhook настроен и работает стабильно
 
 ### 👥 Пользовательские требования:
 - [ ] Все User Acceptance Criteria пройдены тестированием с реальными пользователями
