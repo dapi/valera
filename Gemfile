@@ -86,3 +86,5 @@ gem "ruby_llm", "~> 1.8"
 
 gem "redis", "~> 5.4"
 gem "hiredis", "~> 0.6.3"
+
+gem "bugsnag", "~> 6.28"

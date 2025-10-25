@@ -96,6 +96,8 @@ GEM
       msgpack (~> 1.2)
     brakeman (7.1.0)
       racc
+    bugsnag (6.28.0)
+      concurrent-ruby (~> 1.0)
     builder (3.3.0)
     bundler-audit (0.9.2)
       bundler (>= 1.2.0, < 3)
@@ -426,6 +428,7 @@ DEPENDENCIES
   anyway_config (~> 2.7)
   bootsnap
   brakeman
+  bugsnag (~> 6.28)
   bundler-audit
   capybara
   debug
