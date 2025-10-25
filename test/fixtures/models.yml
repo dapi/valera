@@ -32,3 +32,20 @@ two:
   metadata: {}
   knowledge_cutoff: 2024-04-01
   model_created_at: 2024-03-04
+
+deepseek:
+  provider: deepseek
+  model_id: deepseek-chat
+  name: deepseek-chat
+  family: deepseek
+  context_window: 64000
+  max_output_tokens: 4096
+  capabilities: ["chat"]
+  modalities:
+    text: true
+  pricing:
+    input: 0.000001
+    output: 0.000002
+  metadata: {}
+  knowledge_cutoff: 2024-06-01
+  model_created_at: 2024-01-01

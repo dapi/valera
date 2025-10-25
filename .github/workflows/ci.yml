@@ -96,6 +96,17 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Run specs
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/valera_test
+          PARALLEL_WORKERS: 4
+          # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          # REDIS_URL: redis://localhost:6379/0
+        run: |
+          bin/rails db:test:prepare
+          bin/rspec
+
       - name: Run tests
         env:
           RAILS_ENV: test
@@ -105,8 +116,7 @@ jobs:
           # REDIS_URL: redis://localhost:6379/0
         run: |
           bin/rails db:test:prepare
-          bin/rails test
-          ./bin/rspec spec/ --tag telegram
+          bin/rake test
 
   system-test:
     runs-on: ubuntu-latest
@@ -149,7 +159,7 @@ jobs:
           SELENIUM_DRIVER: chrome
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test:system
+        run: bin/rails db:test:prepare ruby_llm:load_models test:system
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4

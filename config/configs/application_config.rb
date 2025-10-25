@@ -49,6 +49,16 @@ class ApplicationConfig < Anyway::Config
     webhook_port: :integer
   )
 
+  # Welcome message template support
+  def welcome_message_template
+    File.read welcome_message_path
+  rescue Errno::ENOENT => err
+    Bugsnag.notify err
+    I18n.t('telegram.welcome_message.default')
+  end
+
+  private
+
   # Declare required parameters using anyway_config's required method
   required :bot_token, :llm_provider, :llm_model
 

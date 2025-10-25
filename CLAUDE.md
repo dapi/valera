@@ -187,7 +187,6 @@ Tests are located in `test/` directory and use Minitest framework. Run with `rak
 - Do not read or use `.env*` files (per user instructions)
 - Use MCP context7 for studying Ruby gems
 - Service prices and implementation plans are referenced in CLAUDE.md for quick access
-- ВСЕГДА сохраняйте планы имплементации в `.protocols/` - это строгое правило
 - Спецификации сохраняйте в `./specs/`
 - The bot supports Russian language interface (car service context)
 - НЕ используются File.write и File.delete и прочие небезопасные методы в тестах
@@ -436,7 +435,7 @@ Claude готов к работе когда:
 1. **User Story** → описание с точки зрения пользователя
 2. **Feature Description** → детальное описание функции
 3. **Technical Specification** → технические детали реализации
-4. **Implementation Plan** → сохраняется в `.protocols/`
+4. Specification _
 
 **Шаблоны и примеры:**
 - Шаблоны в `docs/requirements/templates/`

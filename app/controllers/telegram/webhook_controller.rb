@@ -8,9 +8,11 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
   # This controller inherits from Telegram::Bot::UpdatesController
   # which provides all the basic functionality for handling bot updates
 
-  # Handle incoming messages with a simple response
+  # Handle incoming messages - передаем в LLM систему через ruby_llm
   def message(message)
-    respond_with :message, text: "Сообщение получено!"
+    # Создаем Chat запись, если ее нет
+    # ruby_llm автоматически обработает сообщение через acts_as_chat
+    # Ничего не делаем здесь - LLM система обрабатывает сообщения автоматически
   end
 
   # Handle callback queries from inline keyboards
@@ -18,9 +20,12 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
     answer_callback_query('Получено!')
   end
 
-  # Example command handler
+  # Command handler /start - отправка welcome message
   def start!(*args)
-    respond_with :message, text: "Привет! Я бот для автосервиса."
+    # Отправляем приветствие новому пользователю через WelcomeService
+    WelcomeService.new.send_welcome_message(telegram_user, self)
+
+    nil
   end
 
   private
