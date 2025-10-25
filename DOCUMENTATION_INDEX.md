@@ -115,6 +115,74 @@ Centralised index всех документов проекта Valera с быс�
 
 ---
 
+## 🎯 Сценарии использования (по ролям)
+
+### 👨‍💼 Новый разработчик / Onboarding (1-2 часа)
+
+**Цель:** Быстро разобраться в проекте и начать работу
+
+1. **10 минут - Product Constitution:** [docs/product/constitution.md](docs/product/constitution.md)
+   - Главные принципы: Dialogue-Only, AI-First
+
+2. **15 минут - Архитектура:** [.claude/memory-bank.md](.claude/memory-bank.md)
+   - Ключевые решения и team structure
+
+3. **20 минут - Практика:** [CLAUDE.md](CLAUDE.md)
+   - Основные команды, технологический стек
+
+4. **10 минут - Процесс разработки:** [docs/FLOW.md](docs/FLOW.md)
+   - Workflow User Story → TDD → Implementation
+
+5. **5 минут - Ссылки:** [docs/README.md](docs/README.md)
+   - Навигация по документации
+
+**✅ Результат:** Готов к первой задаче
+
+---
+
+### 🤖 AI Agent / Claude (инструкции)
+
+**Перед любой работой прочитай:**
+
+1. [.claude/memory-bank.md](.claude/memory-bank.md) - WHY (архитектура)
+2. [docs/product/constitution.md](docs/product/constitution.md) - КРИТИЧНЫЕ принципы
+3. [CLAUDE.md](CLAUDE.md) - HOW (практика)
+4. [docs/FLOW.md](docs/FLOW.md) - процесс
+
+**Проверяй перед разработкой:**
+- ✅ Соответствие Product Constitution
+- ✅ Правило WHY/HOW разделения
+- ✅ Single Source of Truth (нет дублей)
+
+---
+
+### 🛠️ Разработчик Telegram бота
+
+1. **Обязательно:** [.claude/telegram-bot-learning.md](.claude/telegram-bot-learning.md)
+2. **Reference:** [docs/gems/telegram-bot/api-reference.md](docs/gems/telegram-bot/api-reference.md)
+3. **Примеры:** [docs/gems/telegram-bot/examples/](docs/gems/telegram-bot/examples/)
+4. **Паттерны:** [docs/gems/telegram-bot/patterns.md](docs/gems/telegram-bot/patterns.md)
+
+---
+
+### 🤖 Разработчик AI/LLM функций
+
+1. **Обязательно:** [.claude/ruby_llm-learning.md](.claude/ruby_llm-learning.md)
+2. **API Reference:** [docs/gems/ruby_llm/api-reference.md](docs/gems/ruby_llm/api-reference.md)
+3. **Примеры:** [docs/gems/ruby_llm/examples/](docs/gems/ruby_llm/examples/)
+4. **Паттерны:** [docs/gems/ruby_llm/patterns.md](docs/gems/ruby_llm/patterns.md)
+
+---
+
+### 📋 Product Owner / Техлид
+
+1. **Стратегия:** [docs/ROADMAP.md](docs/ROADMAP.md)
+2. **Требования:** [docs/requirements/](docs/requirements/)
+3. **Процесс:** [docs/FLOW.md](docs/FLOW.md)
+4. **Архитектура:** [.claude/memory-bank.md](.claude/memory-bank.md)
+
+---
+
 ## 📊 Статистика документации
 
 - **Всего документов:** 40+
@@ -149,6 +217,15 @@ Centralised index всех документов проекта Valera с быс�
 
 ---
 
-**Последнее обновление:** 25.10.2025
+**Последнее обновление:** 26.10.2025
 **Ответственный:** Documentation System
-**Версия:** 1.0
+**Версия:** 1.1
+
+## 📈 Метрики использования
+
+- **Среднее время чтения:** ~10 минут
+- **Целевая аудитория:** Все члены команды, новые разработчики
+- **Частота обращений:** 1-3 раза в неделю
+- **Критичность:** 🟠 Средняя (навигация)
+- **Статус:** ✅ Актуально
+- **Следующий пересмотр:** 26.01.2026
