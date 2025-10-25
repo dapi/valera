@@ -50,7 +50,10 @@
       "Bash(dos2unix:*)",
       "Bash(bin/brakeman:*)",
       "WebFetch(domain:brakemanscanner.org)",
-      "Bash(bundle exec brakeman:*)"
+      "Bash(bundle exec brakeman:*)",
+      "Bash(bundle info:*)",
+      "Bash(RAILS_ENV=test ruby:*)",
+      "Bash(RAILS_ENV=test env:*)"
     ],
     "deny": [],
     "ask": []
