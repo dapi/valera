@@ -2,6 +2,7 @@
 
 # Tool для создания записи на осмотр через LLM tool calling mechanism
 class BookingCreatorTool
+  include ErrorLogger
   class << self
     def call(parameters:, context:)
       # Создание заявки согласно TDD-002b
@@ -37,8 +38,12 @@ class BookingCreatorTool
         error_response("Не удалось создать запись: #{booking.errors.full_messages.join(', ')}")
       end
     rescue => e
-      Rails.logger.error "BookingCreatorTool error: #{e.message}"
-      Bugsnag.notify(e)
+      self.log_error(e, {
+        tool: 'BookingCreatorTool',
+        parameters: parameters,
+        telegram_user_id: context[:telegram_user]&.id,
+        chat_id: context[:chat]&.id
+      })
       error_response("Произошла ошибка при создании записи. Попробуйте еще раз.")
     end
 

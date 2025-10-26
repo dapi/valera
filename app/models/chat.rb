@@ -1,4 +1,5 @@
 class Chat < ApplicationRecord
+  include ErrorLogger
   acts_as_chat
   belongs_to :telegram_user
   has_many :bookings, dependent: :destroy
@@ -75,13 +76,25 @@ class Chat < ApplicationRecord
 
   def setup_tool_handlers
     @chat.on_tool_call do |tool_call|
-      case tool_call.name
+      # Защита от неверного типа tool_call
+      tool_name = tool_call.respond_to?(:name) ? tool_call.name : "unknown"
+
+      case tool_name
       when 'booking_creator'
         handle_booking_creator(tool_call)
       else
-        Rails.logger.warn "Unknown tool called: #{tool_call.name}"
+        Rails.logger.warn "Unknown tool called: #{tool_name.inspect} (class: #{tool_call.class.name})"
       end
     end
+  rescue => e
+    log_error(e, {
+      model: self.class.name,
+      method: 'setup_tool_handlers',
+      chat_id: id,
+      tool_call_class: tool_call.class.name,
+      tool_call_inspect: tool_call.inspect[0..300]
+    })
+    raise
   end
 
   def handle_booking_creator(tool_call)
@@ -112,8 +125,13 @@ class Chat < ApplicationRecord
 
       Rails.logger.info "Booking creator tool executed successfully: #{result[:booking_id]}"
     rescue => e
-      Rails.logger.error "Error executing booking creator tool: #{e.message}"
-      Bugsnag.notify(e)
+      log_error(e, {
+        tool: 'booking_creator',
+        tool_call_id: tool_call.id,
+        telegram_user_id: telegram_user&.id,
+        chat_id: id,
+        parameters: parameters
+      })
 
       # Возвращаем ошибку в LLM
       @chat.add_message(

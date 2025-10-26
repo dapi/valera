@@ -2,6 +2,7 @@
 
 # Controller for handling Telegram bot webhooks
 class Telegram::WebhookController < Telegram::Bot::UpdatesController
+  include ErrorLogger
   before_action :find_or_create_telegram_user
   before_action :find_or_create_llm_chat
   # Basic webhook endpoint for Telegram bot
@@ -24,9 +25,14 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
     # Отправляем ответ клиенту через Telegram API
     respond_with :message, text: ai_response
   rescue => e
-    # Обработка ошибок AI
-    Bugsnag.notify(e)
-    Rails.logger.error "Error processing message: #{e.message}"
+    # Обработка ошибок AI с расширенным логированием
+    log_error(e, {
+      controller: self.class.name,
+      action: 'message',
+      message_text: message['text'],
+      telegram_user_id: telegram_user&.id,
+      chat_id: llm_chat&.id
+    })
     respond_with :message, text: "Извините, произошла ошибка. Попробуйте еще раз."
   end
 

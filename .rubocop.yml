@@ -15,6 +15,7 @@ AllCops:
     - '.git/**/*'
     - 'storage/**/*'
     - db/schema*.rb
+    - db/migrate/*.rb
 
 plugins:
   - rubocop-capybara

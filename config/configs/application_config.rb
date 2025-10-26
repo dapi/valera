@@ -52,7 +52,10 @@ class ApplicationConfig < Anyway::Config
   def welcome_message_template
     File.read welcome_message_path
   rescue Errno::ENOENT => err
-    Bugsnag.notify err
+    Rails.logger.error "Error reading welcome message template: #{err.message}"
+    Rails.logger.error "File path: #{welcome_message_path}"
+    Rails.logger.error "Backtrace: #{err.backtrace&.first(5)&.join("\n")}"
+    Bugsnag.notify(err)
     I18n.t('telegram.welcome_message.default')
   end
 

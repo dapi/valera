@@ -2,6 +2,7 @@
 
 # Job для асинхронной отправки уведомлений о новых заявках в менеджерский чат
 class BookingNotificationJob < ApplicationJob
+  include ErrorLogger
   queue_as :default
 
   retry_on StandardError, wait: :exponentially_longer, attempts: 3
@@ -11,8 +12,11 @@ class BookingNotificationJob < ApplicationJob
 
     send_notification_to_managers(booking)
   rescue => e
-    Rails.logger.error "BookingNotificationJob failed for booking #{booking.id}: #{e.message}"
-    Bugsnag.notify(e)
+    log_error(e, {
+      job: self.class.name,
+      booking_id: booking.id,
+      admin_chat_id: ApplicationConfig.admin_chat_id
+    })
     raise
   end
 
