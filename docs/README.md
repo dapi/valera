@@ -30,6 +30,7 @@
 ### 💎 [Gem'ы](gems/)
 - **[🤖 ruby_llm](gems/ruby_llm/)** - AI/LLM интеграция
 - **[📱 telegram-bot](gems/telegram-bot/)** - Telegram бот интеграция
+- **[📝 Markdown Parser Comparison](gems/markdown-parser-comparison.md)** - Анализ парсеров для Markdown очистки
 
 ## 🎯 Ключевые принципы разработки
 

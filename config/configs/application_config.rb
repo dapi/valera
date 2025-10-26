@@ -54,6 +54,11 @@ class ApplicationConfig < Anyway::Config
     File.read(system_prompt_path).presence || raise("No system prompt defined")
   end
 
+  def system_prompt_md5
+    @md5 ||= Digest::MD5.hexdigest system_prompt
+    # Альтернативный способ поднять последнее сообщение от LLM
+  end
+
   def company_info
     File.read(company_info_path).presence || raise("No company info defined")
   end

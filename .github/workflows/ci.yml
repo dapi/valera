@@ -96,17 +96,7 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Run specs
-        env:
-          RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/valera_test
-          PARALLEL_WORKERS: 4
-          # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-          # REDIS_URL: redis://localhost:6379/0
-        run: |
-          bin/rails db:test:prepare
-          bin/rspec
-
+      
       - name: Run tests
         env:
           RAILS_ENV: test

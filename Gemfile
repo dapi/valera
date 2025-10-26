@@ -46,6 +46,7 @@ gem "image_processing", "~> 1.2"
 
 group :development, :test do
   gem "vcr"
+  gem 'webmock'
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
@@ -58,17 +59,11 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
-  gem 'rubocop-rspec_rails'
-
   # Additional RuboCop extensions for better Rails integration
   gem "rubocop-rails", require: false
-  gem "rubocop-rspec", require: false
   gem "rubocop-factory_bot", require: false
   gem "rubocop-capybara", require: false
   gem "rubocop-performance", require: false
-
-  # RSpec for testing (used primarily for Telegram bot functionality)
-  gem "rspec-rails"
 end
 
 group :development do
@@ -88,9 +83,13 @@ gem "anyway_config", "~> 2.7"
 
 gem "semver2", "~> 3.4"
 
-gem "ruby_llm", "~> 1.8"
+gem 'ruby_llm', github: 'crmne/ruby_llm'
 
 gem "redis", "~> 5.4"
 gem "hiredis", "~> 0.6.3"
 
 gem "bugsnag", "~> 6.28"
+
+# Markdown processing for Telegram Bot API compatibility
+gem "kramdown", "~> 2.5"
+gem "sanitize", "~> 7.0"

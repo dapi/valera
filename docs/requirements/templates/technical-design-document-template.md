@@ -206,7 +206,7 @@ external_services:
     purpose: "Transactions"
 
 testing:
-  framework: "Minitest / RSpec"
+  framework: "Minitest"
   tools: "FactoryBot, Faker, WebMock"
 
 deployment:
@@ -240,7 +240,7 @@ utilities:
 ```yaml
 api_endpoints:
   focus: "Happy path, error scenarios, authentication"
-  tools: "RSpec API, Postman/Newman"
+  tools: "Rails testing helpers, Postman/Newman"
 
 database_operations:
   focus: "CRUD operations, transactions, constraints"

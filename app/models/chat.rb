@@ -43,18 +43,18 @@ class Chat < ApplicationRecord
 
   before_create do
     self.model ||= Model.find_by!(provider: ApplicationConfig.llm_provider, model_id: ApplicationConfig.llm_model)
-    with_tool BookingTool
+    #with_tool BookingTool
   end
 
   after_create do
     with_instructions SystemPromptService.system_prompt
-    with_tool BookingTool
+    #with_tool BookingTool
   end
 
   def reset!
     messages.destroy_all
     with_instructions SystemPromptService.system_prompt
-    with_tool BookingTool
+    #with_tool BookingTool
   end
 
   # Override the default persistence methods как в примере

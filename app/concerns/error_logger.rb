@@ -76,6 +76,7 @@ module ErrorLogger
 
   # Инстанс-методы для включения в классы
   def log_error(error, context = {})
+    debugger if Rails.env.test?
     self.class.log_error_with_backtrace(error, context)
   end
 end

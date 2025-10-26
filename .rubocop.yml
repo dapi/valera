@@ -20,5 +20,3 @@ AllCops:
 plugins:
   - rubocop-capybara
   - rubocop-rails
-  - rubocop-rspec
-  - rubocop-rspec_rails

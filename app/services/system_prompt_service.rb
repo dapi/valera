@@ -4,8 +4,10 @@
 class SystemPromptService
   def self.system_prompt
     ApplicationConfig.system_prompt
-      .gsub(/{COMPANY_INFO}/, ApplicationConfig.company_info)
-      .gsub(/{PRICE_LIST}/, ApplicationConfig.price_list)
-      .gsub(/{TOOLS_INSTRUCTION}/, ApplicationConfig.tools_instruction)
+      .gsub(/{{\s*COMPANY_INFO\s*}}/, ApplicationConfig.company_info)
+      .gsub(/{{\s*PRICE_LIST\s*}}/, ApplicationConfig.price_list)
+
+    # Антропик просит в system mesage добавлять, то попробуем пока так
+      #.gsub(/{TOOLS_INSTRUCTION}/, ApplicationConfig.tools_instruction)
   end
 end
