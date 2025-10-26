@@ -69,6 +69,12 @@ bin/rails test
 rake test
 # OR
 make test
+# Run rspec
+rake rspec
+
+
+# Run telegram web server in poller model (for development)
+./bin/rails telegram:bot:poller
 ```
 
 ### Code Quality and Security
@@ -100,6 +106,11 @@ bin/cable
 # Check cache status
 bin/rails cache:status
 ```
+
+## Журналирование (логи, logging)
+
+Журналирование в development - log/development.log
+Журналирование в test - log/test.log
 
 ## Application Architecture
 
