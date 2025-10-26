@@ -16,7 +16,7 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
   setup do
     @cassete = "#{self.class.name}/#{name}/#{ApplicationConfig.llm_model}/system-prompt-#{ApplicationConfig.system_prompt_md5}/"
     @help_chat = RubyLLM.chat
-    @help_chat.with_instructions File.read Rails.root.join('./test/user-system-prompt.txt')
+    @help_chat.with_instructions Rails.root.join('./test/user-system-prompt.txt').read
   end
 
   test "сразу к делу и через вопросы букаем" do
@@ -25,20 +25,19 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
 
       tool_calls_count = ToolCall.count
       counts = 0
-      while true
+      loop do
         puts
         puts "Пользователь >"
         puts user_text.gsub(/^/, "\t")
         post_message user_text
         assistent_question = latest_reply_text
         if ToolCall.count > tool_calls_count
-          counts +=1
+          counts += 1
           break if counts > 2
         end
         puts
         puts "Ассистент >"
         puts assistent_question.gsub(/^/, "\t")
-
 
         # Можно было бы прерваться после слов благодрност полоьзователя, но тогда мы получаем ошибку в ruby_llm
         user_response = @help_chat.ask assistent_question
@@ -46,7 +45,7 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
       end
 
       error_message = "Извините, произошла ошибка. Попробуйте еще раз."
-      refute_equal latest_reply_text, error_message
+      assert_not_equal latest_reply_text, error_message
     end
   end
 end

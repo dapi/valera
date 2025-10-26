@@ -3,7 +3,7 @@ class TelegramUser < ApplicationRecord
 
   # Returns user's name for welcome message interpolation
   def name
-    first_name.presence || ("@#{username}" if username).to_s || ('#' + id.to_s)
+    first_name.presence || ("@#{username}" if username).to_s || "##{id}"
   end
 
   def full_name

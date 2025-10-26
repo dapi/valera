@@ -13,3 +13,4 @@ test:
   bot_token: 123:fake
   llm_provider: 'deepseek'
   llm_model: 'deepseek-chat'
+  deepseek_api_key: 'fake'

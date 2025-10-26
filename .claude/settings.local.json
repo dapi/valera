@@ -62,7 +62,8 @@
       "Bash(gem:*)",
       "WebFetch(domain:core.telegram.org)",
       "Read(//home/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/gems/ruby_llm-1.8.2/lib/ruby_llm/**)",
-      "Read(//Users/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/**)"
+      "Read(//Users/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/**)",
+      "Bash(bin/rubocop:*)"
     ],
     "deny": [],
     "ask": []

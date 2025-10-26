@@ -80,27 +80,27 @@ class Chat < ApplicationRecord
   end
 
   def handle_booking_creator_persisted(tool_call)
-      # Извлекаем параметры из tool call
-      parameters = JSON.parse(tool_call.arguments || '{}')
+    # Извлекаем параметры из tool call
+    parameters = JSON.parse(tool_call.arguments || '{}')
 
-      # Вызываем BookingCreatorTool с нужным контекстом
-      result = BookingCreatorTool.call(
-        parameters: parameters,
-        context: {
-          telegram_user: telegram_user,
-          chat: self
-        }
-      )
+    # Вызываем BookingCreatorTool с нужным контекстом
+    result = BookingCreatorTool.call(
+      parameters: parameters,
+      context: {
+        telegram_user: telegram_user,
+        chat: self
+      }
+    )
 
-      Rails.logger.info "Booking creator tool executed successfully: #{result[:booking_id]}"
-    rescue => e
-      log_error(e, {
-                  tool: 'booking_creator',
-                  tool_call_id: tool_call.id,
-                  telegram_user_id: telegram_user&.id,
-                  chat_id: id,
-                  parameters: parameters
-                })
+    Rails.logger.info "Booking creator tool executed successfully: #{result[:booking_id]}"
+  rescue => e
+    log_error(e, {
+                tool: 'booking_creator',
+                tool_call_id: tool_call.id,
+                telegram_user_id: telegram_user&.id,
+                chat_id: id,
+                parameters: parameters
+              })
   end
 
   def find_tool_call_db_id(api_tool_call_id)
