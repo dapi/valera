@@ -46,6 +46,7 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
       end
 
       error_message = "Извините, произошла ошибка. Попробуйте еще раз."
+      debugger
       refute_equal latest_reply_text, error_message
     end
   end

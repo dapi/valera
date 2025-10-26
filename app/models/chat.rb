@@ -75,13 +75,20 @@ class Chat < ApplicationRecord
   def persist_message_completion(message)
     return unless message
 
+    # Find tool_call database ID if this is a tool result message
+    tool_call_db_id = find_tool_call_db_id(message.tool_call_id) if message.tool_call_id
+
     # Fill in attributes and save once we have content
     @message.assign_attributes(
+      role: message.role,
       content: message.content,
       model: Model.find_by(model_id: message.model_id),
       input_tokens: message.input_tokens,
       output_tokens: message.output_tokens
     )
+
+    # Set tool_call_id for tool result messages
+    @message.tool_call_id = tool_call_db_id if tool_call_db_id
 
     @message.save!
 
@@ -132,5 +139,14 @@ class Chat < ApplicationRecord
                   parameters: parameters
                 })
     end
+  end
+
+  def find_tool_call_db_id(api_tool_call_id)
+    # Find ToolCall record by API tool_call_id (e.g., "call_00_...")
+    # and return its database ID
+    tool_call_record = ToolCall.find_by(tool_call_id: api_tool_call_id)
+    db_id = tool_call_record&.id
+    Rails.logger.debug { "find_tool_call_db_id: api_id=#{api_tool_call_id}, db_id=#{db_id}, tool_call_record.id=#{tool_call_record&.id}" }
+    db_id
   end
 end

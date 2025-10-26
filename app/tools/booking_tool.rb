@@ -41,9 +41,8 @@ class BookingTool < RubyLLM::Tool
 
     RubyLLM::Content.new("Заявка под номером #{booking.id} отправлена администратору")
   rescue StandardError => e
-    debugger
     log_error e
-    { error: "Ошибка при обработке заявки: #{e.message}" }
+    RubyLLM::Content.new("Ошибка при обработке заявки: #{e.message}")
   end
 
   private
