@@ -58,7 +58,11 @@
       "Bash(git rm:*)",
       "Bash(git revert:*)",
       "Bash(git reset:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(./bin/rails:*)",
+      "WebFetch(domain:www.relishapp.com)",
+      "Bash(gem install:*)",
+      "Bash(gem:*)"
     ],
     "deny": [],
     "ask": []

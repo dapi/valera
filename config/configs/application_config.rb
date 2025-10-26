@@ -16,6 +16,7 @@ class ApplicationConfig < Anyway::Config
     system_prompt_path: './data/system-prompt.md',
     welcome_message_path: './data/welcome-message.md',
     price_list_path: './data/price.csv',
+    tools_instruction_path: './config/tools-instruction.md',
     company_info_path: './data/company-info.md',
     redis_cache_store_url: 'redis://localhost:6379/2',
 
@@ -48,15 +49,25 @@ class ApplicationConfig < Anyway::Config
     webhook_port: :integer
   )
 
-  # Welcome message template support
+  # System prompt
+  def system_prompt
+    File.read(system_prompt_path).presence || raise("No system prompt defined")
+  end
+
+  def company_info
+    File.read(company_info_path).presence || raise("No company info defined")
+  end
+
+  def price_list
+    File.read(price_list_path).presence || raise("No price list defined")
+  end
+
+  def tools_instruction
+    File.read(tools_instruction_path).presence || raise("No tools instruction defined")
+  end
+
   def welcome_message_template
-    File.read welcome_message_path
-  rescue Errno::ENOENT => err
-    Rails.logger.error "Error reading welcome message template: #{err.message}"
-    Rails.logger.error "File path: #{welcome_message_path}"
-    Rails.logger.error "Backtrace: #{err.backtrace&.first(5)&.join("\n")}"
-    Bugsnag.notify(err)
-    I18n.t('telegram.welcome_message.default')
+    File.read(welcome_message_path).presence || raise("No welcome message defined")
   end
 
   private

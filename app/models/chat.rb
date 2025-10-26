@@ -1,21 +1,12 @@
 class Chat < ApplicationRecord
-  include ErrorLogger
-  acts_as_chat
-  belongs_to :telegram_user
-  has_many :bookings, dependent: :destroy
-
-  # Используем дефолтную модель из ruby_llm
-  def model
-    Model.find_by(provider: ApplicationConfig.llm_provider, name: ApplicationConfig.llm_model)
-  end
+  # after_find :set_tenant_context
 
   # Регистрируем tools для LLM
-  def self.booking_tools
-    [
+  TOOLS = [
       {
         name: 'booking_creator',
         description: "Создает запись клиента на осмотр в автосервис через естественный диалог",
-        input_schema: {
+        parameters: {
           type: "object",
           properties: {
             customer_name: {
@@ -26,78 +17,97 @@ class Chat < ApplicationRecord
               type: "string",
               description: "Телефон клиента в формате +7(XXX)XXX-XX-XX"
             },
-            car_info: {
-              type: "object",
-              description: "Информация об автомобиле клиента",
-              properties: {
-                brand: { type: "string", description: "Марка автомобиля" },
-                model: { type: "string", description: "Модель автомобиля" },
-                year: { type: "integer", description: "Год выпуска автомобиля" },
-                car_class: { type: "integer", description: "Класс автомобиля (1/2/3)" }
-              },
-              required: ["brand", "model", "year"]
-            },
-            preferred_date: {
+            car_brand: {
               type: "string",
-              description: "Предпочтительная дата (LLM определяет из контекста диалога)"
+              description: "Марка автомобиля"
             },
-            preferred_time: {
+            car_model: {
               type: "string",
-              description: "Предпочтительное время (может быть точным '10:00' или примерным 'утром', LLM определяет из диалога)"
+              description: "Модель автомобиля"
+            },
+            car_year: {
+              type: "integer",
+              description: "Год выпуска автомобиля"
             }
           },
-          required: ["customer_name", "customer_phone", "car_info"]
+          required: ["customer_name", "customer_phone"]
         }
       }
     ]
+
+  include ErrorLogger
+  belongs_to :telegram_user
+  has_many :bookings, dependent: :destroy
+
+  acts_as_chat
+
+  before_create do
+    self.model ||= Model.find_by!(provider: ApplicationConfig.llm_provider, model_id: ApplicationConfig.llm_model)
+    with_tool BookingTool
   end
 
-  # Override to_llm method для автоматического добавления tools
-  def to_llm
-    model_record = model_association
-    @chat ||= (context || RubyLLM).chat(
-      model: model_record.model_id,
-      provider: model_record.provider.to_sym
-    )
-    @chat.reset_messages!
-
-    messages_association.each do |msg|
-      @chat.add_message(msg.to_llm)
-    end
-
-    # Добавляем booking tools и обработчик
-    @chat.with_tools(self.class.booking_tools)
-    setup_tool_handlers
-
-    setup_persistence_callbacks
+  after_create do
+    with_instructions SystemPromptService.system_prompt
+    with_tool BookingTool
   end
 
+  def reset!
+    messages.destroy_all
+    with_instructions SystemPromptService.system_prompt
+    with_tool BookingTool
+  end
+
+  # Override the default persistence methods как в примере
   private
 
-  def setup_tool_handlers
-    @chat.on_tool_call do |tool_call|
-      # Защита от неверного типа tool_call
-      tool_name = tool_call.respond_to?(:name) ? tool_call.name : "unknown"
+  def set_tenant_context
+    self.context = RubyLLM.context do |config|
+      config.openai_api_key = tenant.openai_api_key
+    end
+  end
 
-      case tool_name
-      when 'booking_creator'
-        handle_booking_creator(tool_call)
-      else
-        Rails.logger.warn "Unknown tool called: #{tool_name.inspect} (class: #{tool_call.class.name})"
-      end
+  def persist_new_message
+    # Create a new message object but don't save it yet
+    @message = messages.new(role: :assistant)
+  end
+
+  def persist_message_completion(message)
+    return unless message
+
+    # Fill in attributes and save once we have content
+    @message.assign_attributes(
+      content: message.content,
+      model: Model.find_by(model_id: message.model_id),
+      input_tokens: message.input_tokens,
+      output_tokens: message.output_tokens
+    )
+
+    @message.save!
+
+    # Handle tool calls if present
+    persist_tool_calls(message.tool_calls) if message.tool_calls.present?
+  end
+
+  def persist_tool_calls(tool_calls)
+    tool_calls.each_value do |tool_call|
+      attributes = tool_call.to_h
+      attributes[:tool_call_id] = attributes.delete(:id)
+      @message.tool_calls.create!(**attributes)
+
+      # Обрабатываем tool calls если это booking_creator
+      handle_booking_creator_persisted(tool_call) if tool_call.name == 'booking_creator'
     end
   rescue => e
     log_error(e, {
       model: self.class.name,
-      method: 'setup_tool_handlers',
+      method: 'persist_tool_calls',
       chat_id: id,
-      tool_call_class: tool_call.class.name,
-      tool_call_inspect: tool_call.inspect[0..300]
+      tool_call_data: tool_call&.to_h
     })
     raise
   end
 
-  def handle_booking_creator(tool_call)
+  def handle_booking_creator_persisted(tool_call)
     begin
       # Извлекаем параметры из tool call
       parameters = JSON.parse(tool_call.arguments || '{}')
@@ -111,18 +121,6 @@ class Chat < ApplicationRecord
         }
       )
 
-      # Возвращаем результат в LLM
-      tool_result = {
-        tool_call_id: tool_call.id,
-        result: result[:message]
-      }
-
-      @chat.add_message(
-        role: :tool,
-        content: tool_result[:result],
-        tool_call_id: tool_call.id
-      )
-
       Rails.logger.info "Booking creator tool executed successfully: #{result[:booking_id]}"
     rescue => e
       log_error(e, {
@@ -132,13 +130,6 @@ class Chat < ApplicationRecord
         chat_id: id,
         parameters: parameters
       })
-
-      # Возвращаем ошибку в LLM
-      @chat.add_message(
-        role: :tool,
-        content: "Ошибка при создании записи: #{e.message}",
-        tool_call_id: tool_call.id
-      )
     end
   end
 end
