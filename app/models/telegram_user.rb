@@ -14,7 +14,7 @@ class TelegramUser < ApplicationRecord
   end
 
   def full_name
-    [first_name, last_name].compact.join(' ').strip
+    [ first_name, last_name ].compact.join(' ').strip
   end
 
   def self.find_or_create_by_telegram_data!(data)
