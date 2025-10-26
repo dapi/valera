@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Represents a car service booking created by a user through the chat
 class Booking < ApplicationRecord
   belongs_to :telegram_user
   belongs_to :chat

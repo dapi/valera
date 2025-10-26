@@ -1,12 +1,15 @@
-require_relative "boot"
+# frozen_string_literal: true
 
-require "rails/all"
+require_relative 'boot'
+
+require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
 module Valera
+  # Main Rails application configuration class
   class Application < Rails::Application
     # Configure the path for configuration classes that should be used before initialization
     # NOTE: path should be relative to the project root (Rails.root)

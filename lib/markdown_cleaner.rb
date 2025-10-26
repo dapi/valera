@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'kramdown'
 
+# Utility module for cleaning markdown text
 module MarkdownCleaner
   def self.clean(text)
     doc = Kramdown::Document.new text

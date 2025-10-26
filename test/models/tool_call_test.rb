@@ -1,7 +1,9 @@
-require "test_helper"
+# frozen_string_literal: true
+
+require 'test_helper'
 
 class ToolCallTest < ActiveSupport::TestCase
-  test "fixture is valid and persisted" do
+  test 'fixture is valid and persisted' do
     tool_call = tool_calls(:one)
     assert tool_call.valid?
     assert tool_call.persisted?

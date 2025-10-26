@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
-require "test_helper"
+require 'test_helper'
 
-class Telegram::WebhookControllerTest < ActionDispatch::IntegrationTest
-  test "message method exists" do
-    controller = Telegram::WebhookController.new
-    assert_respond_to controller, :message
-  end
+module Telegram
+  class WebhookControllerTest < ActionDispatch::IntegrationTest
+    test 'message method exists' do
+      controller = Telegram::WebhookController.new
+      assert_respond_to controller, :message
+    end
 
-  test "start! method exists" do
-    controller = Telegram::WebhookController.new
-    assert_respond_to controller, :start!
+    test 'start! method exists' do
+      controller = Telegram::WebhookController.new
+      assert_respond_to controller, :start!
+    end
   end
 end

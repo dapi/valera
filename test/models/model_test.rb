@@ -1,7 +1,9 @@
-require "test_helper"
+# frozen_string_literal: true
+
+require 'test_helper'
 
 class ModelTest < ActiveSupport::TestCase
-  test "fixture is valid and persisted" do
+  test 'fixture is valid and persisted' do
     model = models(:one)
     assert model.valid?
     assert model.persisted?

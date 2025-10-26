@@ -21,7 +21,7 @@ module ErrorLogger
 
     # Логирует базовую информацию об ошибке
     def log_basic_error_info(logger, error)
-      logger.error "=== ERROR DETAILS ==="
+      logger.error '=== ERROR DETAILS ==='
       logger.error "Error Class: #{error.class.name}"
       logger.error "Error Message: #{error.message}"
     end
@@ -40,20 +40,20 @@ module ErrorLogger
 
     # Логирует backtrace ошибки
     def log_error_backtrace(logger, error)
-      logger.error "Backtrace:"
+      logger.error 'Backtrace:'
       if error.backtrace
         error.backtrace.each_with_index do |line, index|
           logger.error "  #{index + 1}: #{line}"
         end
       else
-        logger.error "  No backtrace available"
+        logger.error '  No backtrace available'
       end
     end
 
     # Завершает логирование ошибки
     def finalize_error_log(logger)
-      logger.error "=== END ERROR DETAILS ==="
-      logger.error "" # пустая строка для читаемости
+      logger.error '=== END ERROR DETAILS ==='
+      logger.error '' # пустая строка для читаемости
     end
 
     # Отправляет ошибку в Bugsnag

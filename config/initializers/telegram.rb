@@ -15,7 +15,7 @@ if Rails.env.test?
 else
   Telegram.bots_config = {
     default: {
-      token: ApplicationConfig.bot_token,
+      token: ApplicationConfig.bot_token
     }
   }
 end

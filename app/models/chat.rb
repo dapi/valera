@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Represents a conversation between a user and the AI assistant
 class Chat < ApplicationRecord
   include ErrorLogger
 
@@ -69,7 +72,7 @@ class Chat < ApplicationRecord
       # Обрабатываем tool calls если это booking_creator
       handle_booking_creator_persisted(tool_call) if tool_call.name == 'booking_creator'
     end
-  rescue => e
+  rescue StandardError => e
     log_error(e, {
                 model: self.class.name,
                 method: 'persist_tool_calls',
@@ -93,7 +96,7 @@ class Chat < ApplicationRecord
     )
 
     Rails.logger.info "Booking creator tool executed successfully: #{result[:booking_id]}"
-  rescue => e
+  rescue StandardError => e
     log_error(e, {
                 tool: 'booking_creator',
                 tool_call_id: tool_call.id,

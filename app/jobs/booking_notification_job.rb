@@ -9,8 +9,8 @@ class BookingNotificationJob < ApplicationJob
   retry_on StandardError, wait: :exponentially_longer, attempts: 3
 
   def perform(booking)
-    unless ApplicationConfig.admin_chat_id.present?
-      Rails.logger.warn("Так как admin_chat_id не установлен - пропускаю уведомления админов")
+    if ApplicationConfig.admin_chat_id.blank?
+      Rails.logger.warn('Так как admin_chat_id не установлен - пропускаю уведомления админов')
       return
     end
 
@@ -20,7 +20,7 @@ class BookingNotificationJob < ApplicationJob
       text: MarkdownCleaner.clean(booking.details),
       parse_mode: 'Markdown'
     )
-  rescue => e
+  rescue StandardError => e
     log_error(e, {
                 job: self.class.name,
                 booking_id: booking.id

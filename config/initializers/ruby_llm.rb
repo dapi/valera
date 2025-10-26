@@ -27,3 +27,15 @@ RubyLLM.configure do |config|
   config.default_embedding_model = ApplicationConfig.llm_model # 'text-embedding-3-large'  # For RubyLLM.embed
   config.default_image_model = ApplicationConfig.llm_model # 'dall-e-3'              # For RubyLLM.paint
 end
+
+module RubyLLM
+  module Providers
+    # Anthropic Claude API integration.
+    class Anthropic < Provider
+      def api_base
+        ApplicationConfig.anthropic_base_url.presence || 'https://api.anthropic.com'
+      end
+    end
+  end
+end
+

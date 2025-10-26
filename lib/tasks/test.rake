@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 # Custom test task to run Minitest
-desc "Run all tests (Minitest)"
-task :all_tests do
-  puts "Running all tests..."
+desc 'Run all tests (Minitest)'
+task all_tests: :environment do
+  puts 'Running all tests...'
 
   # Run Minitest tests
   puts "\n=== Running Minitest tests ==="
-  minitest_success = system("bundle exec rails test")
+  minitest_success = system('bundle exec rails test')
 
   if minitest_success
-    puts "Minitest tests passed!"
+    puts 'Minitest tests passed!'
   else
-    puts "Minitest tests failed!"
+    puts 'Minitest tests failed!'
     exit 1
   end
 

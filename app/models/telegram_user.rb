@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Represents a Telegram user who interacts with the bot
 class TelegramUser < ApplicationRecord
   has_one :chat
 

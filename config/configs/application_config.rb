@@ -8,7 +8,7 @@ class ApplicationConfig < Anyway::Config
     # RubyLLM configuration
     # Telegram configuration
     :bot_token,
-    :admin_chat_id,  # ID чата для отправки уведомлений о заявках
+    :admin_chat_id, # ID чата для отправки уведомлений о заявках
     :llm_provider,
     :llm_model,
 
@@ -38,7 +38,7 @@ class ApplicationConfig < Anyway::Config
     rate_limit_period: 60,
 
     # Conversation management
-    max_history_size: 10,
+    max_history_size: 10
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -53,6 +53,8 @@ class ApplicationConfig < Anyway::Config
     company_info_path: :string,
     bot_token: :string,
     bugsnag_api_key: :string,
+
+    anthropic_base_url: :string,
 
     # LLM Provider API Keys
     openai_api_key: :string,
@@ -77,7 +79,7 @@ class ApplicationConfig < Anyway::Config
 
   # System prompt
   def system_prompt
-    File.read(system_prompt_path).presence || raise("No system prompt defined")
+    File.read(system_prompt_path).presence || raise('No system prompt defined')
   end
 
   def system_prompt_md5
@@ -86,22 +88,20 @@ class ApplicationConfig < Anyway::Config
   end
 
   def company_info
-    File.read(company_info_path).presence || raise("No company info defined")
+    File.read(company_info_path).presence || raise('No company info defined')
   end
 
   def price_list
-    File.read(price_list_path).presence || raise("No price list defined")
+    File.read(price_list_path).presence || raise('No price list defined')
   end
 
   def tools_instruction
-    File.read(tools_instruction_path).presence || raise("No tools instruction defined")
+    File.read(tools_instruction_path).presence || raise('No tools instruction defined')
   end
 
   def welcome_message_template
-    File.read(welcome_message_path).presence || raise("No welcome message defined")
+    File.read(welcome_message_path).presence || raise('No welcome message defined')
   end
-
-  private
 
   # Declare required parameters using anyway_config's required method
   required :bot_token, :llm_provider, :llm_model
