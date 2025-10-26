@@ -44,7 +44,7 @@
 4. Определить технические требования (Functional, Performance, Security)
 5. Оценить риски и зависимости
 6. Составить план реализации
-7. Сохранить как docs/tdd/TDD-XXX-название.md
+7. Сохранить как docs/requirements/tdd/TDD-XXX-название.md
 ```
 
 **Результат:** Полный технический план для реализации
@@ -101,13 +101,14 @@
 
 ```
 docs/
-├── user-stories/          # User Stories (US-XXX)
+├── user-stories/              # User Stories (US-XXX)
 │   └── US-XXX-название.md
-├── tdd/                   # Technical Design Documents (TDD-XXX)
-│   └── TDD-XXX-название.md
-└── requirements/templates/  # Шаблоны
-    ├── user-story-hybrid-template.md
-    └── technical-design-document-template.md
+└── requirements/
+    ├── tdd/                   # Technical Design Documents (TDD-XXX)
+    │   └── TDD-XXX-название.md
+    └── templates/             # Шаблоны
+        ├── user-story-hybrid-template.md
+        └── technical-design-document-template.md
 ```
 
 ## ✅ Quick Checklist
