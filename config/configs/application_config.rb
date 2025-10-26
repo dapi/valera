@@ -12,6 +12,19 @@ class ApplicationConfig < Anyway::Config
     :llm_provider,
     :llm_model,
 
+    # LLM Provider API Keys
+    :openai_api_key,
+    :anthropic_api_key,
+    :gemini_api_key,
+    :deepseek_api_key,
+    :perplexity_api_key,
+    :openrouter_api_key,
+    :mistral_api_key,
+
+    # Google Cloud (VertexAI) configuration
+    :vertexai_location,
+    :vertexai_project_id,
+
     # File paths
     system_prompt_path: './data/system-prompt.md',
     welcome_message_path: './data/welcome-message.md',
@@ -40,9 +53,22 @@ class ApplicationConfig < Anyway::Config
     company_info_path: :string,
     bot_token: :string,
     bugsnag_api_key: :string,
-    admin_chat_id: :integer,
+
+    # LLM Provider API Keys
+    openai_api_key: :string,
+    anthropic_api_key: :string,
+    gemini_api_key: :string,
+    deepseek_api_key: :string,
+    perplexity_api_key: :string,
+    openrouter_api_key: :string,
+    mistral_api_key: :string,
+
+    # Google Cloud
+    vertexai_location: :string,
+    vertexai_project_id: :string,
 
     # Integers
+    admin_chat_id: :integer,
     rate_limit_requests: :integer,
     rate_limit_period: :integer,
     max_history_size: :integer,
