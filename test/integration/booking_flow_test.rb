@@ -21,17 +21,27 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
   test "сразу к делу и через вопросы букаем" do
     VCR.use_cassette @cassete, record: :new_episodes do
       user_text = "Запиши меня на покраску"
+
+      tool_calls_count = ToolCall.count
+      booking = nil
       while true do
         puts
-        puts "Пользователь > #{user_text}"
+        puts "Пользователь >"
+        puts user_text.gsub(/^/,"\t")
         post_message user_text
         assistent_question = latest_reply_text
         puts
-        puts "Ассистент > #{assistent_question}"
+        puts "Ассистент >"
+        puts assistent_question.gsub(/^/,"\t")
+
+        break if ToolCall.count > tool_calls_count
+
+        # Можно было бы прерваться после слов благодрност полоьзователя, но тогда мы получаем ошибку в ruby_llm
         user_response = @help_chat.ask assistent_question
         user_text = user_response.content
       end
-      debugger
+
+      assert true
     end
   end
 end

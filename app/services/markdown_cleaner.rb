@@ -55,8 +55,16 @@ class MarkdownCleaner
     return '' if text.nil? || text.empty?
 
     begin
-      # 1. Безопасный парсинг Markdown через Kramdown
-      html = safe_parse_markdown(text)
+      # 0. Проверяем нужно ли исправление (более консервативный подход)
+      # Только если есть очевидные проблемы, применяем исправление
+      if has_obvious_broken_formatting?(text)
+        preprocessed_text = fix_broken_formatting(text)
+        # 1. Безопасный парсинг Markdown через Kramdown
+        html = safe_parse_markdown(preprocessed_text)
+      else
+        # Если проблем нет, парсим как есть
+        html = safe_parse_markdown(text)
+      end
 
       # 2. Очистка HTML через Sanitize gem
       clean_html = sanitize_html(html)
@@ -135,6 +143,90 @@ class MarkdownCleaner
 
     # Убираем лишние пробелы и переносы
     result.strip.gsub(/\n{3,}/, "\n\n")
+  end
+
+  # Предварительная обработка и исправление сломанного markdown форматирования
+  # Исправляет незакрытые теги, сломанные ссылки и другие проблемы
+  # Более консервативный подход - исправляем только очевидные проблемы
+  #
+  # @param text [String] исходный markdown текст
+  # @return [String] исправленный markdown текст
+  def self.fix_broken_formatting(text)
+    return '' if text.nil? || text.empty?
+
+    result = text.dup
+
+    # 1. Исправляем сломанные ссылки [text]()
+    result.gsub!(/\[([^\]]*)\]\(\s*\)/) do |match|
+      text = $1
+      text.empty? ? '' : text # Возвращаем только текст если ссылка сломана
+    end
+
+    # 2. Исправляем множественные *** (common mistake)
+    result.gsub!(/\*{3,}/) { '**' } # Превращаем *** в **bold**
+
+    # 3. Исправляем очевидно незакрытые теги только в конце текста
+    # Это консервативный подход - не испортим правильный markdown
+    result = fix_unclosed_tags_at_end(result)
+
+    # 4. Удаляем standalone символы форматирования
+    result.gsub!(/\*\s*\*/, '') # standalone **
+    result.gsub!(/\*\s*\*/, '') # standalone *
+    result.gsub!(/__\s*__/, '') # standalone __
+    result.gsub!(/`\s*`/, '') # standalone `
+
+    result.strip
+  end
+
+  # Исправление незакрытых тегов только в конце текста (более безопасный подход)
+  def self.fix_unclosed_tags_at_end(text)
+    result = text.dup
+
+    # Проверяем конец текста на незакрытые теги
+    # Используем count для точного определения незакрытых тегов
+    bold_count = result.scan(/\*\*/).length
+    asterisk_count = result.scan(/\*(?!\*)/).length
+    underscore_count = result.scan(/__/).length
+    backtick_count = result.scan(/`/).length
+
+    # Добавляем закрывающие теги только если нечетное количество
+    if bold_count.odd?
+      result += '**'
+    end
+    if asterisk_count.odd?
+      result += '*'
+    end
+    if underscore_count.odd?
+      result += '__'
+    end
+    if backtick_count.odd?
+      result += '`'
+    end
+
+    result
+  end
+
+  # Проверка наличия очевидных проблем в markdown
+  # Только очевидные проблемы: незакрытые теги в конце, сломанные ссылки
+  #
+  # @param text [String] markdown текст
+  # @return [Boolean] true если есть очевидные проблемы
+  def self.has_obvious_broken_formatting?(text)
+    return false if text.nil? || text.empty?
+
+    # 1. Незакрытые теги в самом конце текста
+    return true if text.end_with?('**') && text.count('**') == 1
+    return true if text.end_with?('*') && text.count('*') == 1
+    return true if text.end_with?('__') && text.count('__') == 1
+    return true if text.end_with?('`') && text.count('`') == 1
+
+    # 2. Сломанные ссылки
+    return true if text.match?(/\[[^\]]*\]\(\s*\)/)
+
+    # 3. Множественные звезды
+    return true if text.match?(/\*{3,}/)
+
+    false
   end
 
   # Усечение сообщения до лимита Telegram (4096 символов)
