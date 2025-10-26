@@ -3,7 +3,7 @@ class TelegramUser < ApplicationRecord
 
   # Returns user's name for welcome message interpolation
   def name
-    first_name.presence || ("@#{username}" if username).to_s || '#' + id.to_s
+    first_name.presence || ("@#{username}" if username).to_s || ('#' + id.to_s)
   end
 
   def full_name
@@ -14,7 +14,7 @@ class TelegramUser < ApplicationRecord
     tu = create_with(
       data.slice('first_name', 'last_name', 'username', 'photo_url')
     )
-      .find_or_create_by!(id: data.fetch('id'))
+         .find_or_create_by!(id: data.fetch('id'))
 
     tu.update_from_chat! data
     tu

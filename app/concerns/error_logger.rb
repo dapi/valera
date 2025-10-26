@@ -44,9 +44,9 @@ module ErrorLogger
       target_logger.error "" # пустая строка для читаемости
 
       # Отправляем в Bugsnag если нужно и если доступен
-      if send_to_bugsnag && defined?(Bugsnag) && context.empty?
-        Bugsnag.notify(error)
-      end
+      return unless send_to_bugsnag && defined?(Bugsnag) && context.empty?
+
+      Bugsnag.notify(error)
     end
 
     # Безопасное выполнение блока с автоматическим логированием ошибок
@@ -55,8 +55,8 @@ module ErrorLogger
     # @yield блок кода для безопасного выполнения
     def safe_execute_with_logging(context = {}, logger = nil)
       yield
-    rescue => error
-      log_error_with_backtrace(error, context, logger)
+    rescue StandardError => e
+      log_error_with_backtrace(e, context, logger)
       raise # пробрасываем ошибку дальше
     end
 
@@ -68,8 +68,8 @@ module ErrorLogger
     # @return результат блока или default_value
     def safe_execute_with_default(default_value = nil, context = {}, logger = nil)
       yield
-    rescue => error
-      log_error_with_backtrace(error, context, logger)
+    rescue StandardError => e
+      log_error_with_backtrace(e, context, logger)
       default_value
     end
   end

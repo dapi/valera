@@ -4,11 +4,12 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
   include TelegramSupport
 
   def message(text = 'test message')
-    from = {"id":943084337,"is_bot":false,"first_name":"Danil","last_name":"Pismenny","username":"pismenny","language_code":"en","is_premium":true}
-    chat = {"id":943084337,"first_name":"Danil","last_name":"Pismenny","username":"pismenny","type":"private"}
+    from = { id: 943_084_337, is_bot: false, first_name: "Danil", last_name: "Pismenny", username: "pismenny",
+             language_code: "en", is_premium: true }
+    chat = { id: 943_084_337, first_name: "Danil", last_name: "Pismenny", username: "pismenny", type: "private" }
     {
-      "update_id":178271355,
-      "message":{"message_id":323, "from": from, "chat": chat, "date":1761379722,"text": text }
+      update_id: 178_271_355,
+      message: { message_id: 323, from: from, chat: chat, date: 1_761_379_722, text: text }
     }
   end
 
@@ -23,16 +24,15 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
       user_text = "Запиши меня на покраску"
 
       tool_calls_count = ToolCall.count
-      booking = nil
-      while true do
+      while true
         puts
         puts "Пользователь >"
-        puts user_text.gsub(/^/,"\t")
+        puts user_text.gsub(/^/, "\t")
         post_message user_text
         assistent_question = latest_reply_text
         puts
         puts "Ассистент >"
-        puts assistent_question.gsub(/^/,"\t")
+        puts assistent_question.gsub(/^/, "\t")
 
         break if ToolCall.count > tool_calls_count
 

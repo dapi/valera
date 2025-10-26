@@ -6,6 +6,7 @@ module Telegram
   # Отрабатываем ошибки телеграма
   module RescueErrors
     extend ActiveSupport::Concern
+
     included do
       rescue_from Telegram::Bot::Forbidden, with: :bot_forbidden
       rescue_from Telegram::Bot::Error, with: :bot_error

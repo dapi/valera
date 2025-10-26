@@ -3,6 +3,7 @@
 # Service for sending welcome messages to new Telegram users
 class WelcomeService
   include ErrorLogger
+
   def send_welcome_message(telegram_user, controller)
     message = interpolate_template(ApplicationConfig.welcome_message_template, telegram_user)
 

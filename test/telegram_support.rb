@@ -20,11 +20,9 @@ module TelegramSupport
       post telegram_webhook_path, params: message(text)
     end
 
-    # rubocop:disable Naming/MethodName
     def latest_reply_text
       Telegram.bot.requests.fetch(:sendMessage).last.fetch(:text)
     end
-    # rubocop:enable Naming/MethodName
 
     # Matcher to check response. Make sure to define `let(:chat_id)`.
     def respond_with_message(expected = Regexp.new(''))

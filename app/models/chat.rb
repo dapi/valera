@@ -3,39 +3,40 @@ class Chat < ApplicationRecord
 
   # Регистрируем tools для LLM
   TOOLS = [
-      {
-        name: 'booking_creator',
-        description: "Создает запись клиента на осмотр в автосервис через естественный диалог",
-        parameters: {
-          type: "object",
-          properties: {
-            customer_name: {
-              type: "string",
-              description: "Полное имя клиента"
-            },
-            customer_phone: {
-              type: "string",
-              description: "Телефон клиента в формате +7(XXX)XXX-XX-XX"
-            },
-            car_brand: {
-              type: "string",
-              description: "Марка автомобиля"
-            },
-            car_model: {
-              type: "string",
-              description: "Модель автомобиля"
-            },
-            car_year: {
-              type: "integer",
-              description: "Год выпуска автомобиля"
-            }
+    {
+      name: 'booking_creator',
+      description: "Создает запись клиента на осмотр в автосервис через естественный диалог",
+      parameters: {
+        type: "object",
+        properties: {
+          customer_name: {
+            type: "string",
+            description: "Полное имя клиента"
           },
-          required: ["customer_name", "customer_phone"]
-        }
+          customer_phone: {
+            type: "string",
+            description: "Телефон клиента в формате +7(XXX)XXX-XX-XX"
+          },
+          car_brand: {
+            type: "string",
+            description: "Марка автомобиля"
+          },
+          car_model: {
+            type: "string",
+            description: "Модель автомобиля"
+          },
+          car_year: {
+            type: "integer",
+            description: "Год выпуска автомобиля"
+          }
+        },
+        required: ["customer_name", "customer_phone"]
       }
-    ]
+    }
+  ]
 
   include ErrorLogger
+
   belongs_to :telegram_user
   has_many :bookings, dependent: :destroy
 
@@ -43,18 +44,18 @@ class Chat < ApplicationRecord
 
   before_create do
     self.model ||= Model.find_by!(provider: ApplicationConfig.llm_provider, model_id: ApplicationConfig.llm_model)
-    #with_tool BookingTool
+    # with_tool BookingTool
   end
 
   after_create do
     with_instructions SystemPromptService.system_prompt
-    #with_tool BookingTool
+    # with_tool BookingTool
   end
 
   def reset!
     messages.destroy_all
     with_instructions SystemPromptService.system_prompt
-    #with_tool BookingTool
+    # with_tool BookingTool
   end
 
   # Override the default persistence methods как в примере
@@ -99,11 +100,11 @@ class Chat < ApplicationRecord
     end
   rescue => e
     log_error(e, {
-      model: self.class.name,
-      method: 'persist_tool_calls',
-      chat_id: id,
-      tool_call_data: tool_call&.to_h
-    })
+                model: self.class.name,
+                method: 'persist_tool_calls',
+                chat_id: id,
+                tool_call_data: tool_call&.to_h
+              })
     raise
   end
 
@@ -124,12 +125,12 @@ class Chat < ApplicationRecord
       Rails.logger.info "Booking creator tool executed successfully: #{result[:booking_id]}"
     rescue => e
       log_error(e, {
-        tool: 'booking_creator',
-        tool_call_id: tool_call.id,
-        telegram_user_id: telegram_user&.id,
-        chat_id: id,
-        parameters: parameters
-      })
+                  tool: 'booking_creator',
+                  tool_call_id: tool_call.id,
+                  telegram_user_id: telegram_user&.id,
+                  chat_id: id,
+                  parameters: parameters
+                })
     end
   end
 end

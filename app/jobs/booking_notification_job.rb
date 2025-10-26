@@ -3,6 +3,7 @@
 # Job для асинхронной отправки уведомлений о новых заявках в менеджерский чат
 class BookingNotificationJob < ApplicationJob
   include ErrorLogger
+
   queue_as :default
 
   retry_on StandardError, wait: :exponentially_longer, attempts: 3
@@ -21,9 +22,9 @@ class BookingNotificationJob < ApplicationJob
     )
   rescue => e
     log_error(e, {
-      job: self.class.name,
-      booking_id: booking.id
-    })
+                job: self.class.name,
+                booking_id: booking.id
+              })
     raise e
   end
 end

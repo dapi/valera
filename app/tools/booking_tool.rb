@@ -16,10 +16,13 @@ class BookingTool < RubyLLM::Tool
   param :car_class, desc: "Класс автомаобиля", required: false
   param :car_mileage, desc: "Пробег автомобиля", required: false
   param :required_services, desc: "Перечень необходимых работ", required: false
-  #param :total_cost_to_user, desc: "Последняя названная пользователю общая стоимость услуг", required: false
-  param :cost_calculation, desc: "Последний названный пользователю расчет стоимости услуг (общая стоимость услуг)", required: false
-  param :dialog_context, desc: "Контекст диалога для понимания ситуации (включает данные о клиете, дате и времени записи и об услуге которые пользователь запрашивал и получал от ассистента)", required: true
-  param :details, desc: 'Детали записи в формате Markdown включающие все необходимые данные о пользователе, услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную переписку, номер заявки', required: true
+  # param :total_cost_to_user, desc: "Последняя названная пользователю общая стоимость услуг", required: false
+  param :cost_calculation, desc: "Последний названный пользователю расчет стоимости услуг (общая стоимость услуг)",
+                           required: false
+  param :dialog_context,
+        desc: "Контекст диалога для понимания ситуации (включает данные о клиете, дате и времени записи и об услуге которые пользователь запрашивал и получал от ассистента)", required: true
+  param :details,
+        desc: 'Детали записи в формате Markdown включающие все необходимые данные о пользователе, услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную переписку, номер заявки', required: true
 
   def initialize(telegram_user:, chat:)
     @telegram_user = telegram_user
@@ -27,16 +30,16 @@ class BookingTool < RubyLLM::Tool
   end
 
   def execute(**meta)
-    booking = Booking.
-      create!(
-        meta:,
-        telegram_user: @telegram_user,
-        chat: @chat,
-        details: meta[:details],
-        context: meta[:dialog_context]
-      )
+    booking = Booking
+              .create!(
+                meta:,
+                telegram_user: @telegram_user,
+                chat: @chat,
+                details: meta[:details],
+                context: meta[:dialog_context]
+              )
 
-    RubyLLM::Content.new( "Заявка под номером #{booking.id} отправлена администратору" )
+    RubyLLM::Content.new("Заявка под номером #{booking.id} отправлена администратору")
   rescue StandardError => e
     debugger
     log_error e
@@ -46,6 +49,6 @@ class BookingTool < RubyLLM::Tool
   private
 
   def send_to_admin_chat(request_info, username, name, admin_chat_id)
-    # TODO perform BookingNotificationJob
+    # TODO: perform BookingNotificationJob
   end
 end

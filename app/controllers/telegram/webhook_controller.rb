@@ -3,6 +3,7 @@
 # Controller for handling Telegram bot webhooks
 class Telegram::WebhookController < Telegram::Bot::UpdatesController
   include ErrorLogger
+
   before_action :find_or_create_telegram_user
   before_action :find_or_create_llm_chat
 
@@ -22,12 +23,11 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
 
     # Проверяем есть ли незавершенные tool calls
     # Хотя откуда одни? Бага?
-    #if llm_chat.pending_tool_calls?
-      #debugger
-      ## Очищаем состояние перед новым сообщением
-      #llm_chat.clear_pending_tool_calls
-    #end
-
+    # if llm_chat.pending_tool_calls?
+    # debugger
+    ## Очищаем состояние перед новым сообщением
+    # llm_chat.clear_pending_tool_calls
+    # end
 
     # Передаем сообщение в LLM через chat.ask
     # ruby_llm автоматически:
@@ -36,11 +36,11 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
     # 3. Сгенерирует AI ответ
 
     llm_chat.with_tool(BookingTool.new(telegram_user:, chat: llm_chat))
-      .on_tool_call do |tool_call|
-        # Called when the AI decides to use a tool
-        Rails.logger.debug "Calling tool: #{tool_call.name}"
-        Rails.logger.debug "Arguments: #{tool_call.arguments}"
-      end
+            .on_tool_call do |tool_call|
+      # Called when the AI decides to use a tool
+      Rails.logger.debug { "Calling tool: #{tool_call.name}" }
+      Rails.logger.debug { "Arguments: #{tool_call.arguments}" }
+    end
       .on_tool_result do |result|
         # Called after the tool returns its result
         Rails.logger.debug "Tool returned: #{result}"
@@ -49,12 +49,12 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
     ai_response = llm_chat.say(message['text'])
 
     # Альтернативный способ поднять последнее сообщение от LLM
-    #assistant_message_record = chat_record.messages.last
-    #puts assistant_message_record.content # => "The capital of France is Paris."
+    # assistant_message_record = chat_record.messages.last
+    # puts assistant_message_record.content # => "The capital of France is Paris."
 
     # Отправляем ответ клиенту через Telegram API
     content = ai_response.content
-    Rails.logger.debug("AI Response: #{content}")
+    Rails.logger.debug { "AI Response: #{content}" }
     respond_with :message, text: MarkdownCleaner.clean(content), parse_mode: 'Markdown'
   end
 
@@ -86,11 +86,11 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
       Rails.logger.error error
     else # ActiveRecord::ActiveRecordError
       log_error(error, {
-        controller: self.class.name,
-        update: update,
-        telegram_user_id: telegram_user&.id,
-        chat_id: llm_chat&.id
-      })
+                  controller: self.class.name,
+                  update: update,
+                  telegram_user_id: telegram_user&.id,
+                  chat_id: llm_chat&.id
+                })
       respond_with :message, text: "Извините, произошла ошибка. Попробуйте еще раз."
     end
   end
