@@ -57,7 +57,8 @@
       "Bash(RAILS_ENV=development bin/rails runner:*)",
       "Bash(git rm:*)",
       "Bash(git revert:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []
