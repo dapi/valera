@@ -67,7 +67,9 @@
       "Bash(bin/ci:*)",
       "Bash(ln:*)",
       "Bash(git mv:*)",
-      "Bash(./test/scripts/prompt_v2_test_script.rb:*)"
+      "Bash(./test/scripts/prompt_v2_test_script.rb:*)",
+      "Bash(git checkout:*)",
+      "Bash(git rebase:*)"
     ],
     "deny": [],
     "ask": []

@@ -31,6 +31,60 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 > **Подробнее о технологическом стеке и командах разработки** см. ниже в этом документе.
 
+---
+
+## 🤖 Автоматическое обучение Claude (для AI-агентов)
+
+> **Важно:** Эта информация для AI-агентов, работающих с ПРОЕКТОМ Valera.
+
+### Как работает система обучения
+
+**Автоматическое обнаружение задач:**
+- Telegram-related задачи → изучение telegram-bot документации
+- LLM-related задачи → изучение ruby_llm документации
+- Требования и спецификации → изучение FLOW.md и requirements/
+
+**Обязательное изучение перед работой:**
+- Claude автоматически изучает релевантную документацию
+- Использует проверенные паттерны из docs/gems/
+- Гарантирует качество реализации
+
+### Статус обучения
+
+Claude отслеживает актуальность документации:
+- **Активная разработка**: обновление каждые 1 час
+- **Отладка**: обновление каждые 6 часов
+- **Поддержка**: обновление каждые 24 часа
+
+### Доступные инструменты для самообучения
+
+**Автоматический доступ:**
+```bash
+# Telegram Bot документация
+bin/docs telegram-bot patterns
+bin/docs telegram-bot examples photo-handling
+
+# Ruby LLM документация
+bin/docs ruby_llm patterns
+bin/docs ruby_llm examples visual-analysis
+
+# Поиск по документации
+bin/docs search "damage assessment"
+```
+
+**Ручной запуск обучения:**
+```bash
+ruby .claude/pre-work-hook.rb "add photo processing for damage assessment"
+ruby .claude/pre-work-hook.rb "implement AI damage analysis from photos"
+```
+
+**См. также:**
+- [Telegram Bot Learning](.claude/telegram-bot-learning.md)
+- [Ruby LLM Learning](.claude/ruby_llm-learning.md)
+- [Memory Bank](.claude/memory-bank.md)
+
+---
+
 ## Project Overview
 
 Valera is an AI-powered chatbot for car service automation built with Ruby on Rails 8.1. The application uses the `ruby_llm` gem to provide conversational AI capabilities and is designed to interface with Telegram for customer interactions around car services.
