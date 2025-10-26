@@ -139,54 +139,6 @@ Naming/RescuedExceptionsVariableName:
   Exclude:
     - 'config/configs/application_config.rb'
 
-# Offense count: 1
-  Exclude:
-    - 'spec/requests/telegram_webhook_spec.rb'
-
-# Offense count: 4
-# Configuration parameters: Prefixes, AllowedPatterns.
-# Prefixes: when, with, without
-  Exclude:
-    - 'spec/requests/telegram_webhook_spec.rb'
-    - 'spec/tools/booking_creator_tool_spec.rb'
-
-# Offense count: 1
-# Configuration parameters: IgnoredMetadata.
-  Exclude:
-    - 'spec/integration/booking_flow_spec.rb'
-
-# Offense count: 9
-# This cop supports unsafe autocorrection (--autocorrect-all).
-# Configuration parameters: SkipBlocks, EnforcedStyle, OnlyStaticConstants.
-# SupportedStyles: described_class, explicit
-  Exclude:
-    - 'spec/jobs/booking_notification_job_spec.rb'
-    - 'spec/requests/telegram_webhook_spec.rb'
-    - 'spec/tools/booking_creator_tool_spec.rb'
-
-# Offense count: 19
-# Configuration parameters: CountAsOne.
-  Max: 25
-
-# Offense count: 2
-  Exclude:
-    - 'spec/controllers/telegram/webhook_controller_spec.rb'
-    - 'spec/requests/telegram_webhook_spec.rb'
-
-# Offense count: 7
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: have_received, receive
-  Exclude:
-    - 'spec/jobs/booking_notification_job_spec.rb'
-    - 'spec/support/shared_examples/booking_examples.rb'
-    - 'spec/tools/booking_creator_tool_spec.rb'
-
-# Offense count: 24
-  Max: 9
-
-# Offense count: 7
-# Configuration parameters: AllowSubject.
-  Max: 6
 
 # Offense count: 2
 # Configuration parameters: AllowedPatterns.
