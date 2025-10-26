@@ -5,11 +5,10 @@ module Telegram
   # Handles incoming webhook updates from Telegram bot API and processes them through LLM
   class WebhookController < Telegram::Bot::UpdatesController
     include ErrorLogger
+    include RescueErrors
 
     before_action :telegram_user
     before_action :llm_chat
-
-    rescue_from StandardError, with: :handle_error
     # Basic webhook endpoint for Telegram bot
     # This controller inherits from Telegram::Bot::UpdatesController
     # which provides all the basic functionality for handling bot updates
@@ -79,24 +78,6 @@ module Telegram
     end
 
     private
-
-    def handle_error(error)
-      # Обработка ошибок AI с расширенным логированием
-      case error
-      when Telegram::Bot::Forbidden
-        Rails.logger.error error
-      else # ActiveRecord::ActiveRecordError
-        Rails.logger.error "ERROR DETAILS: #{error.class.name}: #{error.message}"
-        Rails.logger.error "BACKTRACE: #{error.backtrace&.first(5)&.join("\n")}"
-        log_error(error, {
-                    controller: self.class.name,
-                    update: update,
-                    telegram_user_id: telegram_user&.id,
-                    chat_id: llm_chat&.id
-                  })
-        respond_with :message, text: 'Извините, произошла ошибка. Попробуйте еще раз.'
-      end
-    end
 
     def telegram_user
       @telegram_user ||= TelegramUser.find_or_create_by_telegram_data! from

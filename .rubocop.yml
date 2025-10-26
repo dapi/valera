@@ -1,4 +1,6 @@
-inherit_from: .rubocop_todo.yml
+plugins:
+  - rubocop-capybara
+  - rubocop-rails
 
 AllCops:
   SuggestExtensions: false
@@ -17,6 +19,16 @@ AllCops:
     - db/schema*.rb
     - db/migrate/*.rb
 
-plugins:
-  - rubocop-capybara
-  - rubocop-rails
+Metrics/BlockLength:
+  Exclude:
+    - config/environments/*
+    - db/*schema.rb
+
+Metrics/MethodLength:
+    Max: 20 # Allows methods up to 20 lines
+    CountComments: false
+    CountAsOne: ['array', 'hash', 'heredoc', 'method_call']
+    AllowedMethods:
+      - context
+      - describe
+      - it

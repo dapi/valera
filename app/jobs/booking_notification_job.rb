@@ -21,10 +21,9 @@ class BookingNotificationJob < ApplicationJob
       parse_mode: 'Markdown'
     )
   rescue StandardError => e
-    log_error(e, {
-                job: self.class.name,
-                booking_id: booking.id
-              })
+    log_error(e,
+              job: self.class.name,
+              booking_id: booking.id)
     raise e
   end
 end

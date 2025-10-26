@@ -16,13 +16,22 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
   end
 
   setup do
-    @cassete = "#{self.class.name}/#{name}/#{ApplicationConfig.llm_model}/system-prompt-#{ApplicationConfig.system_prompt_md5}/"
     @help_chat = RubyLLM.chat
     @help_chat.with_instructions Rails.root.join('./test/user-system-prompt.txt').read
   end
 
+  def cassete_name
+    [
+      self.class.name.to_s,
+      name,
+      ApplicationConfig.llm_provider,
+      ApplicationConfig.llm_model,
+      "system-prompt-#{ApplicationConfig.system_prompt_md5}"
+    ].join('/')
+  end
+
   test 'сразу к делу и через вопросы букаем' do
-    VCR.use_cassette @cassete, record: :new_episodes do
+    VCR.use_cassette cassete_name, record: :new_episodes do
       user_text = 'Запиши меня на покраску'
 
       tool_calls_count = ToolCall.count

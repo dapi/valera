@@ -2,7 +2,7 @@
 
 # Represents a Telegram user who interacts with the bot
 class TelegramUser < ApplicationRecord
-  has_one :chat
+  has_one :chat, dependent: :delete
 
   # Returns user's name for welcome message interpolation
   def name

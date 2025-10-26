@@ -5,7 +5,7 @@
 module TelegramSupport
   extend ActiveSupport::Concern
 
-  included do
+  included do # rubocop:disable Metrics/BlockLength
     setup do
       @described_class = Telegram::WebhookController
       # route_name = Telegram::Bot::RoutesHelper.route_name_for_bot(@bot)

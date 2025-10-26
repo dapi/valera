@@ -5,7 +5,7 @@
 module ErrorLogger
   extend ActiveSupport::Concern
 
-  class_methods do
+  class_methods do # rubocop:disable Metrics/BlockLength
     # Логирует ошибку с полным backtrace и контекстом И отправляет в Bugsnag
     # @param error [Exception] - объект исключения
     # @param context [Hash] - дополнительный контекст (опционально)
@@ -28,11 +28,7 @@ module ErrorLogger
 
     # Логирует контекст ошибки и отправляет в Bugsnag если нужно
     def log_error_context(logger, context, error)
-      return if context.empty?
-
       logger.error "Context: #{context.inspect}"
-      return unless defined?(Bugsnag)
-
       Bugsnag.notify(error) do |report|
         context.each { |key, value| report.add_metadata(key, value) }
       end
