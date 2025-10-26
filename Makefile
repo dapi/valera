@@ -30,7 +30,9 @@ push-release:
 
 .PHONY: test
 test:
-	./bin/rails db:test:prepare test test:system
+	./bin/rails db:test:prepare test:system
+	./bin/rake test
+	SYSTEM_PROMPT_PATH=data/system-prompt-v2-optimized.md ./bin/rake test
 
 up:
 	./bin/dev
@@ -59,3 +61,5 @@ infra-view:
 list:
 	@${INFRA_GH} run list --workflow=${WORKFLOW} -L 3 -e workflow_dispatch
 
+test-all-providers:
+	PROVIDER=deepskeep ./bin/rails test

@@ -19,7 +19,7 @@
 
 ## 📊 Критические документы (🔴 Высокая критичность)
 
-### CLAUDE.md
+### CLAUDE.md {#claudemd}
 **Путь:** `/CLAUDE.md`
 **Тип:** HOW (Практические инструкции)
 
@@ -75,7 +75,7 @@
 
 ## 🟠 Важные документы (Средняя/Высокая критичность)
 
-### DOCUMENTATION_INDEX.md
+### DOCUMENTATION_INDEX.md {#documentation_indexmd}
 **Путь:** `/DOCUMENTATION_INDEX.md`
 **Тип:** Навигация
 
@@ -93,7 +93,7 @@
 
 ---
 
-### docs/requirements/README.md
+### docs/requirements/README.md {#docsrequirementsreadmemd}
 **Путь:** `/docs/requirements/README.md`
 **Тип:** HOW (Практические инструкции)
 

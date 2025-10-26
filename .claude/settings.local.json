@@ -64,7 +64,10 @@
       "Read(//home/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/gems/ruby_llm-1.8.2/lib/ruby_llm/**)",
       "Read(//Users/danil/.rbenv/versions/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/**)",
       "Bash(bin/rubocop:*)",
-      "Bash(bin/ci:*)"
+      "Bash(bin/ci:*)",
+      "Bash(ln:*)",
+      "Bash(git mv:*)",
+      "Bash(./test/scripts/prompt_v2_test_script.rb:*)"
     ],
     "deny": [],
     "ask": []

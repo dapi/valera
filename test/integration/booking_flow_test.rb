@@ -30,9 +30,9 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
     ].join('/')
   end
 
-  test 'сразу к делу и через вопросы букаем' do
+  def dialog(first_question)
     VCR.use_cassette cassete_name, record: :new_episodes do
-      user_text = 'Запиши меня на покраску'
+      user_text = first_question
 
       tool_calls_count = ToolCall.count
       counts = 0
@@ -58,5 +58,13 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
       error_message = 'Извините, произошла ошибка. Попробуйте еще раз.'
       assert_not_equal latest_reply_text, error_message
     end
+  end
+
+  test 'сразу к делу и через вопросы букаем' do
+    dialog 'Запиши меня на покраску'
+  end
+
+  test 'сколько стоит покрасить бампер' do
+    dialog 'Сколько стоит покрасить бампер?'
   end
 end

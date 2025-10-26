@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_26_124043) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_26_213240) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -123,14 +123,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_26_124043) do
     t.index ["tool_call_id"], name: "index_tool_calls_on_tool_call_id", unique: true
   end
 
-  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "bookings", "chats"
-  add_foreign_key "bookings", "telegram_users"
-  add_foreign_key "chats", "models"
-  add_foreign_key "chats", "telegram_users"
-  add_foreign_key "messages", "chats"
-  add_foreign_key "messages", "models"
-  add_foreign_key "messages", "tool_calls"
-  add_foreign_key "tool_calls", "messages"
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id", on_delete: :cascade
+  add_foreign_key "bookings", "chats", on_delete: :cascade
+  add_foreign_key "chats", "models", on_delete: :cascade
+  add_foreign_key "chats", "telegram_users", on_delete: :cascade
+  add_foreign_key "messages", "chats", on_delete: :cascade
+  add_foreign_key "tool_calls", "messages", on_delete: :cascade
 end
