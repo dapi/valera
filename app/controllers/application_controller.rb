@@ -1,10 +1,24 @@
 # frozen_string_literal: true
 
-# Base controller for the application. Provides common functionality for all controllers.
+# Базовый контроллер приложения
+#
+# Предоставляет общую функциональность для всех контроллеров системы,
+# включая поддержку современных браузеров и управление кэшированием.
+#
+# @author Danil Pismenny
+# @since 0.1.0
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
+  # Разрешает только современные браузеры с поддержкой webp, web push и других технологий
+  #
+  # Ограничивает доступ для устаревших браузеров, которые не поддерживают
+  # современные веб-технологии, что обеспечивает лучшую безопасность и UX.
+  #
+  # @see https://github.com/rails/browser_version для подробной информации
   allow_browser versions: :modern
 
-  # Changes to the importmap will invalidate the etag for HTML responses
+  # Инвалидирует ETag для HTML ответов при изменениях в importmap
+  #
+  # Автоматически обновляет кэш браузера при изменении JavaScript модулей,
+  # что гарантирует загрузку актуальной версии клиентского кода.
   stale_when_importmap_changes
 end

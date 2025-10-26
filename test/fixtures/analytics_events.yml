@@ -1,0 +1,37 @@
+one:
+  event_name: ai_dialog_started
+  chat_id: 943084337
+  properties:
+    platform: telegram
+    user_id: 1
+    message_type: general
+  occurred_at: <%= 1.hour.ago %>
+  session_id: test_session_1
+  platform: telegram
+
+two:
+  event_name: ai_response_time
+  chat_id: 943084338
+  properties:
+    duration_ms: 1500
+    model_used: deepseek-chat
+    timestamp: <%= 1.hour.ago.to_f %>
+  occurred_at: <%= 1.hour.ago %>
+  session_id: test_session_2
+  platform: telegram
+
+booking_event:
+  event_name: booking_request_created
+  chat_id: 943084339
+  properties:
+    booking_id: 1
+    services_count: 2
+    estimated_total: 15000
+    processing_time_ms: 200
+    user_segment: new
+    customer_name: Тестовый Клиент
+    car_brand: Toyota
+    car_model: Camry
+  occurred_at: <%= 30.minutes.ago %>
+  session_id: test_session_3
+  platform: telegram

@@ -205,6 +205,9 @@ GEM
       logger
     mini_mime (1.1.5)
     minitest (5.26.0)
+    minitest-stub_any_instance (1.0.3)
+    mocha (2.7.1)
+      ruby2_keywords (>= 0.0.5)
     msgpack (1.8.0)
     multipart-post (2.4.1)
     mutex_m (0.3.0)
@@ -311,6 +314,8 @@ GEM
     regexp_parser (2.11.3)
     reline (0.6.2)
       io-console (~> 0.5)
+    request_store (1.7.0)
+      rack (>= 1.4)
     rexml (3.4.4)
     rubocop (1.81.6)
       json (~> 2.3)
@@ -329,9 +334,6 @@ GEM
     rubocop-capybara (2.22.1)
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
-    rubocop-factory_bot (2.27.1)
-      lint_roller (~> 1.1)
-      rubocop (~> 1.72, >= 1.72.1)
     rubocop-performance (1.26.1)
       lint_roller (~> 1.1)
       rubocop (>= 1.75.0, < 2.0)
@@ -346,11 +348,16 @@ GEM
       rubocop (>= 1.72)
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
+    rubocop-yard (1.0.0)
+      lint_roller
+      rubocop (~> 1.72)
+      yard
     ruby-next-core (1.1.2)
     ruby-progressbar (1.13.0)
     ruby-vips (2.2.5)
       ffi (~> 1.12)
       logger
+    ruby2_keywords (0.0.5)
     rubyzip (3.2.1)
     sanitize (7.0.0)
       crass (~> 1.0.2)
@@ -405,6 +412,7 @@ GEM
     thruster (0.1.16-arm64-darwin)
     thruster (0.1.16-x86_64-linux)
     tilt (2.6.1)
+    timecop (0.9.10)
     timeout (0.4.3)
     tsort (0.2.0)
     turbo-rails (2.0.17)
@@ -435,6 +443,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yard (0.9.37)
     zeitwerk (2.7.3)
 
 PLATFORMS
@@ -461,16 +470,19 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kramdown (~> 2.5)
+  minitest-stub_any_instance
+  mocha
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.0)
   redis (~> 5.4)
+  request_store
   rubocop-capybara
-  rubocop-factory_bot
   rubocop-performance
   rubocop-rails
   rubocop-rails-omakase
+  rubocop-yard
   ruby_llm!
   sanitize (~> 7.0)
   selenium-webdriver
@@ -483,11 +495,13 @@ DEPENDENCIES
   tailwindcss-rails
   telegram-bot!
   thruster
+  timecop
   turbo-rails
   tzinfo-data
   vcr
   web-console
   webmock
+  yard
 
 BUNDLED WITH
    2.7.2

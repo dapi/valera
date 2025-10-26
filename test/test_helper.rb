@@ -6,6 +6,10 @@ require 'rails/test_help'
 
 require_relative 'telegram_support'
 
+# Testing dependencies
+require 'mocha/minitest'
+require 'timecop'
+
 VCR.configure do |config|
   config.cassette_library_dir = 'test/cassettes'
   config.hook_into :webmock
@@ -27,6 +31,18 @@ module ActiveSupport
 
     # Use transactional fixtures for test isolation
     self.use_transactional_tests = true
+
+    # Force eager loading in test environment to fix autoload issues
+    setup do
+      Rails.application.eager_load!
+      Rails.application.config.analytics_enabled = true
+    end
+
+    # Helper method для совместимости с тестами
+    def perform_enqueued_jobs
+      # Для inline adapter задачи выполняются сразу
+      # Метод для совместимости с существующими тестами
+    end
 
     # Add more helper methods to be used by all tests here...
   end

@@ -34,5 +34,8 @@ module Valera
     # Set default locale to Russian
     config.i18n.default_locale = :ru
     config.i18n.available_locales = [ :ru ]
+
+    # Analytics configuration
+    config.analytics_enabled = ENV.fetch('ANALYTICS_ENABLED', 'true') == 'true'
   end
 end

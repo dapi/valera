@@ -59,12 +59,15 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem 'rubocop-rails-omakase', require: false
+  gem 'rubocop-yard', require: false
 
   # Additional RuboCop extensions for better Rails integration
   gem 'rubocop-capybara', require: false
-  gem 'rubocop-factory_bot', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
+
+  # YARD Documentation generation
+  gem 'yard', require: false
 end
 
 group :development do
@@ -76,6 +79,11 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem 'capybara'
   gem 'selenium-webdriver'
+
+  # Testing dependencies for analytics
+  gem 'mocha'
+  gem 'timecop'
+  gem 'minitest-stub_any_instance'
 end
 
 gem 'slim-rails', '~> 3.7'
@@ -90,6 +98,8 @@ gem 'hiredis', '~> 0.6.3'
 gem 'redis', '~> 5.4'
 
 gem 'bugsnag', '~> 6.28'
+
+gem 'request_store'
 
 # Markdown processing for Telegram Bot API compatibility
 gem 'kramdown', '~> 2.5'

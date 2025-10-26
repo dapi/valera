@@ -69,7 +69,13 @@
       "Bash(git mv:*)",
       "Bash(./test/scripts/prompt_v2_test_script.rb:*)",
       "Bash(git checkout:*)",
-      "Bash(git rebase:*)"
+      "Bash(git rebase:*)",
+      "Bash(ANALYTICS_ENABLED=true bin/rails runner:*)",
+      "Bash(ENV['FORCE_ANALYTICS']=true bin/rails runner \"\nputs ''Analytics enabled: '' + Rails.application.config.analytics_enabled.to_s\nputs ''Tracking enabled: '' + AnalyticsService.send(:tracking_enabled?).to_s\nputs ''FORCE_ANALYTICS: '' + ENV[''FORCE_ANALYTICS''].to_s\n\nAnalyticsService.track(\n  AnalyticsService::Events::DIALOG_STARTED,\n  chat_id: 12345,\n  properties: { platform: ''telegram'', user_id: 1 }\n)\nputs ''Event tracked!''\nputs ''Total events: '' + AnalyticsEvent.count.to_s\n\")",
+      "WebFetch(domain:playbooks.com)",
+      "Bash(npm install:*)",
+      "Bash(yardmcp:*)",
+      "Bash(bundle exec yard:*)"
     ],
     "deny": [],
     "ask": []

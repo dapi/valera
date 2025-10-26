@@ -1,0 +1,40 @@
+# Docker Compose для Metabase Analytics Dashboard
+version: '3.8'
+
+services:
+  metabase:
+    image: metabase/metabase:latest
+    container_name: valera-metabase
+    ports:
+      - "3001:3000"
+    environment:
+      - MB_DB_TYPE=postgres
+      - MB_DB_DBNAME=valera_development
+      - MB_DB_PORT=5432
+      - MB_DB_USER=valera
+      - MB_DB_PASS=password
+      - MB_DB_HOST=host.docker.internal
+      - MB_DB_CONNECTIONPOOL_SIZE=5
+      - MB_SITE_URL=http://localhost:3001
+    volumes:
+      - ./metabase-data:/metabase-data
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    container_name: valera-postgres-metabase
+    environment:
+      - POSTGRES_DB=valera_development
+      - POSTGRES_USER=valera
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  metabase-data:

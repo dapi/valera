@@ -1,0 +1,13 @@
+# YARD configuration for Valera project
+# Usage: yard doc [options] [source_files [extra_files]]
+--markup markdown
+--embed-mixins
+--protected
+--no-private
+--title "Valera - AI Chatbot for Car Service"
+--output-dir doc/yard
+--readme README.md
+--charset utf-8
+app/**/*.rb
+lib/**/*.rb
+-

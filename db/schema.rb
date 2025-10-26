@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_26_213240) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_26_214408) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,25 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_26_213240) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "analytics_events", force: :cascade do |t|
+    t.bigint "chat_id", null: false
+    t.datetime "created_at", null: false
+    t.string "event_name", limit: 50, null: false
+    t.datetime "occurred_at", precision: nil, null: false
+    t.string "platform", limit: 20, default: "telegram"
+    t.jsonb "properties", default: {}, null: false
+    t.string "session_id", limit: 64
+    t.datetime "updated_at", null: false
+    t.index ["chat_id", "event_name", "occurred_at"], name: "idx_analytics_funnel"
+    t.index ["chat_id"], name: "index_analytics_events_on_chat_id"
+    t.index ["event_name", "occurred_at"], name: "idx_analytics_events_by_type"
+    t.index ["event_name"], name: "index_analytics_events_on_event_name"
+    t.index ["occurred_at", "event_name"], name: "idx_analytics_timeline"
+    t.index ["occurred_at"], name: "index_analytics_events_on_occurred_at"
+    t.index ["properties"], name: "index_analytics_events_on_properties", using: :gin
+    t.index ["session_id"], name: "index_analytics_events_on_session_id"
   end
 
   create_table "bookings", force: :cascade do |t|

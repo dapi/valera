@@ -1,6 +1,25 @@
 # frozen_string_literal: true
 
-# Represents a conversation between a user and the AI assistant
+# Модель диалога между пользователем и AI ассистентом
+#
+# Управляет разговором с AI, хранит сообщения, обрабатывает tool calls
+# и обеспечивает персистентность контекста диалога.
+#
+# @attr [Integer] telegram_user_id ID пользователя Telegram
+# @attr [Integer] model_id ID используемой AI модели
+# @attr [Hash] context контекст диалога (например, API ключи)
+# @attr [DateTime] created_at время создания
+# @attr [DateTime] updated_at время обновления
+#
+# @example Создание нового диалога
+#   chat = Chat.create!(telegram_user: user)
+#   chat.say("Привет, как дела?")
+#
+# @see Message для отдельных сообщений
+# @see ToolCall для вызовов инструментов
+# @see ruby_llm gem документация
+# @author Danil Pismenny
+# @since 0.1.0
 class Chat < ApplicationRecord
   include ErrorLogger
 
@@ -9,36 +28,54 @@ class Chat < ApplicationRecord
 
   acts_as_chat
 
+  # Устанавливает модель AI по умолчанию перед созданием
+  #
+  # @return [void]
+  # @note Использует модель из конфигурации приложения
+  # @see ApplicationConfig для настроек LLM
   before_create do
     self.model ||= Model.find_by!(provider: ApplicationConfig.llm_provider, model_id: ApplicationConfig.llm_model)
-    # with_tool BookingTool
   end
 
+  # Устанавливает системные инструкции после создания
+  #
+  # @return [void]
+  # @note Использует SystemPromptService для получения инструкций
+  # @see SystemPromptService
   after_create do
     with_instructions SystemPromptService.system_prompt
-    # with_tool BookingTool
   end
 
+  # Сбрасывает диалог к начальному состоянию
+  #
+  # Удаляет все сообщения и устанавливает системные инструкции заново.
+  # Используется для очистки контекста диалога.
+  #
+  # @return [void]
+  # @example
+  #   chat.reset!
+  #   #=> все сообщения удалены, инструкции установлены заново
+  # @note Также можно использовать для очистки контекста при ошибках
   def reset!
     messages.destroy_all
     with_instructions SystemPromptService.system_prompt
-    # with_tool BookingTool
   end
 
-  # Override the default persistence methods как в примере
   private
 
-  def set_tenant_context
-    self.context = RubyLLM.context do |config|
-      config.openai_api_key = tenant.openai_api_key
-    end
-  end
-
+  # Сохраняет новое сообщение без контента (заготовка)
+  #
+  # @return [Message] новое сообщение с ролью :assistant
+  # @api private
   def persist_new_message
-    # Create a new message object but don't save it yet
     @message = messages.new(role: :assistant)
   end
 
+  # Сохраняет завершение сообщения с контентом и токенами
+  #
+  # @param message [RubyLLM::Message] сообщение от LLM
+  # @return [void]
+  # @api private
   def persist_message_completion(message)
     return unless message
 
@@ -63,6 +100,12 @@ class Chat < ApplicationRecord
     persist_tool_calls(message.tool_calls) if message.tool_calls.present?
   end
 
+  # Обрабатывает и сохраняет tool calls из сообщения
+  #
+  # @param tool_calls [Hash] хеш с tool calls
+  # @return [void]
+  # @raise [StandardError] при ошибке сохранения tool calls
+  # @api private
   def persist_tool_calls(tool_calls)
     tool_calls.each_value do |tool_call|
       attributes = tool_call.to_h
@@ -82,6 +125,11 @@ class Chat < ApplicationRecord
     raise e
   end
 
+  # Обрабатывает tool call для создания заявки
+  #
+  # @param tool_call [RubyLLM::ToolCall] tool call с именем 'booking_creator'
+  # @return [void]
+  # @api private
   def handle_booking_creator_persisted(tool_call)
     # Извлекаем параметры из tool call
     parameters = JSON.parse(tool_call.arguments || '{}')
@@ -106,9 +154,12 @@ class Chat < ApplicationRecord
               })
   end
 
+  # Находит ID записи tool call в базе данных по API ID
+  #
+  # @param api_tool_call_id [String] ID tool call от API (например, "call_00_...")
+  # @return [Integer, nil] ID записи в базе данных или nil если не найден
+  # @api private
   def find_tool_call_db_id(api_tool_call_id)
-    # Find ToolCall record by API tool_call_id (e.g., "call_00_...")
-    # and return its database ID
     tool_call_record = ToolCall.find_by(tool_call_id: api_tool_call_id)
     tool_call_record&.id
   end
