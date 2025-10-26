@@ -9,10 +9,11 @@ class BookingTool < RubyLLM::Tool
 
   description "Определяет является ли сообщение клиента заявкой на услугу и отправляет ее в административный чат"
 
-  param :user_name, desc: "Имя пользователя", required: false
-  param :phone, desc: "Телефон пользователя", required: false
+  param :customer_name, desc: "Полное имя клиента", required: false
+  param :customer_phone, desc: "Телефон клиента в формате +7(XXX)XXX-XX-XX", required: false
   param :car_brand, desc: "Марка автомобиля", required: false
   param :car_model, desc: "Модель автомобиля", required: false
+  param :car_year, desc: "Год выпуска автомобиля", required: false
   param :car_class, desc: "Класс автомаобиля", required: false
   param :car_mileage, desc: "Пробег автомобиля", required: false
   param :required_services, desc: "Перечень необходимых работ", required: false

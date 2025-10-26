@@ -1,40 +1,4 @@
 class Chat < ApplicationRecord
-  # after_find :set_tenant_context
-
-  # Регистрируем tools для LLM
-  TOOLS = [
-    {
-      name: 'booking_creator',
-      description: "Создает запись клиента на осмотр в автосервис через естественный диалог",
-      parameters: {
-        type: "object",
-        properties: {
-          customer_name: {
-            type: "string",
-            description: "Полное имя клиента"
-          },
-          customer_phone: {
-            type: "string",
-            description: "Телефон клиента в формате +7(XXX)XXX-XX-XX"
-          },
-          car_brand: {
-            type: "string",
-            description: "Марка автомобиля"
-          },
-          car_model: {
-            type: "string",
-            description: "Модель автомобиля"
-          },
-          car_year: {
-            type: "integer",
-            description: "Год выпуска автомобиля"
-          }
-        },
-        required: ["customer_name", "customer_phone"]
-      }
-    }
-  ]
-
   include ErrorLogger
 
   belongs_to :telegram_user
@@ -112,11 +76,10 @@ class Chat < ApplicationRecord
                 chat_id: id,
                 tool_call_data: tool_call&.to_h
               })
-    raise
+    raise e
   end
 
   def handle_booking_creator_persisted(tool_call)
-    begin
       # Извлекаем параметры из tool call
       parameters = JSON.parse(tool_call.arguments || '{}')
 
@@ -138,15 +101,12 @@ class Chat < ApplicationRecord
                   chat_id: id,
                   parameters: parameters
                 })
-    end
   end
 
   def find_tool_call_db_id(api_tool_call_id)
     # Find ToolCall record by API tool_call_id (e.g., "call_00_...")
     # and return its database ID
     tool_call_record = ToolCall.find_by(tool_call_id: api_tool_call_id)
-    db_id = tool_call_record&.id
-    Rails.logger.debug { "find_tool_call_db_id: api_id=#{api_tool_call_id}, db_id=#{db_id}, tool_call_record.id=#{tool_call_record&.id}" }
-    db_id
+    tool_call_record&.id
   end
 end
