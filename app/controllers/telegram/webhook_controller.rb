@@ -55,7 +55,7 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
     # Отправляем ответ клиенту через Telegram API
     content = ai_response.content
     Rails.logger.debug("AI Response: #{content}")
-    respond_with :message, text: content #, parse_mode: 'Markdown'
+    respond_with :message, text: MarkdownCleaner.clean(content), parse_mode: 'Markdown'
   end
 
   # Handle callback queries from inline keyboards

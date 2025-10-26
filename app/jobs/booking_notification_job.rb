@@ -16,7 +16,7 @@ class BookingNotificationJob < ApplicationJob
     # Используем Telegram API для отправки сообщения в менеджерский чат
     Telegram.bot.send_message(
       chat_id: ApplicationConfig.admin_chat_id,
-      text: booking.details,
+      text: MarkdownCleaner.clean(booking.details),
       parse_mode: 'Markdown'
     )
   rescue => e
