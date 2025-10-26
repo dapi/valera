@@ -96,10 +96,10 @@ class Telegram::WebhookController < Telegram::Bot::UpdatesController
   end
 
   def find_or_create_telegram_user
-    @find_or_create_telegram_user ||= TelegramUser.find_or_create_by_telegram_data! from
+    @telegram_user ||= TelegramUser.find_or_create_by_telegram_data! from
   end
 
   def find_or_create_llm_chat
-    @find_or_create_llm_chat ||= Chat.find_or_create_by!(telegram_user: telegram_user)
+    @llm_chat ||= Chat.find_or_create_by!(telegram_user: telegram_user)
   end
 end
