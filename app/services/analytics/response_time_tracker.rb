@@ -12,7 +12,7 @@ module Analytics
       # @param chat_id [Integer] ID чата
       # @param operation [String] Тип операции
       # @param model_used [String] Используемая модель
-      # @param block [Proc] Блок кода для измерения
+      # @yield Блок кода для измерения времени выполнения
       # @return [Object] Результат выполнения блока
       def measure(chat_id, operation, model_used = 'deepseek-chat')
         start_time = Time.current

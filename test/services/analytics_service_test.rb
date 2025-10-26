@@ -20,7 +20,7 @@ class AnalyticsServiceTest < ActiveSupport::TestCase
     AnalyticsEvent.delete_all # Очищаем базу между тестами
   end
 
-  test "tracks valid event successfully" do
+  test 'tracks valid event successfully' do
     assert_difference 'AnalyticsJob.queue_adapter.enqueued_jobs.count', 1 do
       AnalyticsService.track(
         AnalyticsService::Events::DIALOG_STARTED,
@@ -30,7 +30,7 @@ class AnalyticsServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test "does not track invalid event without required properties" do
+  test 'does not track invalid event without required properties' do
     assert_no_difference 'AnalyticsEvent.count' do
       AnalyticsService.track(
         AnalyticsService::Events::BOOKING_CREATED,
@@ -40,13 +40,13 @@ class AnalyticsServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test "tracks response time event correctly" do
+  test 'tracks response time event correctly' do
     assert_difference 'AnalyticsJob.queue_adapter.enqueued_jobs.count', 1 do
       AnalyticsService.track_response_time(@chat_id, 1500, 'deepseek-chat')
     end
   end
 
-  test "tracks conversion event correctly" do
+  test 'tracks conversion event correctly' do
     conversion_data = {
       booking_id: 42,
       services_count: 2,
@@ -64,7 +64,7 @@ class AnalyticsServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test "tracks error event correctly" do
+  test 'tracks error event correctly' do
     error = StandardError.new('Test error')
     context = { chat_id: @chat_id, context: 'test_context' }
 
@@ -73,7 +73,7 @@ class AnalyticsServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test "validates event properties correctly" do
+  test 'validates event properties correctly' do
     # DIALOG_STARTED with missing required properties should be invalid
     assert_not AnalyticsService.send(:validate_event_data,
       AnalyticsService::Events::DIALOG_STARTED, {})

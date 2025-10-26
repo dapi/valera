@@ -44,7 +44,7 @@ class AnalyticsPipelineTest < ActionDispatch::IntegrationTest
     ].join('/')
   end
 
-  test "complete analytics pipeline from webhook to event storage" do
+  test 'complete analytics pipeline from webhook to event storage' do
     # Ensure clean state
     AnalyticsEvent.delete_all
 

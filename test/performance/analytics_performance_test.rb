@@ -12,7 +12,7 @@ class AnalyticsPerformanceTest < ActiveSupport::TestCase
     AnalyticsEvent.delete_all
   end
 
-  test "handles high volume events efficiently" do
+  test 'handles high volume events efficiently' do
     start_time = Time.current
 
     500.times do |i|
@@ -38,13 +38,13 @@ class AnalyticsPerformanceTest < ActiveSupport::TestCase
     assert_equal 500, AnalyticsEvent.count
   end
 
-  test "analytics queries are performant with large dataset" do
+  test 'analytics queries are performant with large dataset' do
     # Create test data with reduced size for faster execution
     10.times do |day|
       50.times do |event|
         AnalyticsEvent.create!(
-          event_name: [AnalyticsService::Events::DIALOG_STARTED,
-                      AnalyticsService::Events::BOOKING_CREATED].sample,
+          event_name: [ AnalyticsService::Events::DIALOG_STARTED,
+                      AnalyticsService::Events::BOOKING_CREATED ].sample,
           chat_id: rand(1..500),
           properties: { test: 'data', day: day },
           occurred_at: day.days.ago + rand(24).hours,
@@ -102,7 +102,7 @@ class AnalyticsPerformanceTest < ActiveSupport::TestCase
     assert_equal 'test_session', created_event.session_id
   end
 
-  test "memory usage stays reasonable with many events" do
+  test 'memory usage stays reasonable with many events' do
     # Check memory before
     initial_objects = ObjectSpace.count_objects
 
@@ -132,7 +132,7 @@ class AnalyticsPerformanceTest < ActiveSupport::TestCase
     assert object_increase < 8000, "Too many objects created: #{object_increase}"
   end
 
-  test "database indexes improve query performance" do
+  test 'database indexes improve query performance' do
     # Create data for index testing
     1000.times do |i|
       AnalyticsEvent.create!(
@@ -168,7 +168,7 @@ class AnalyticsPerformanceTest < ActiveSupport::TestCase
     assert query_duration < 0.1.seconds, "Timeline query too slow: #{query_duration} seconds"
   end
 
-  test "concurrent analytics processing" do
+  test 'concurrent analytics processing' do
     threads = []
     events_per_thread = 50
 

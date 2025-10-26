@@ -51,7 +51,7 @@ class TelegramUser < ApplicationRecord
   #   user.full_name #=> "Иван Иванов"
   #   user.full_name #=> "Иван"
   def full_name
-    [first_name, last_name].compact.join(' ').strip
+    [ first_name, last_name ].compact.join(' ').strip
   end
 
   # Возвращает chat_id для совместимости с аналитикой

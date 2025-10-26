@@ -15,12 +15,12 @@ begin
   namespace :doc do
     desc "Generate YARD documentation"
     YARD::Rake::YardocTask.new(:generate) do |t|
-      t.files = ['app/**/*.rb', 'lib/**/*.rb', '-', 'README.md']
-      t.options = ['--output-dir', 'doc/yard', '--markup', 'markdown', '--title', 'Valera API Documentation']
+      t.files = [ 'app/**/*.rb', 'lib/**/*.rb', '-', 'README.md' ]
+      t.options = [ '--output-dir', 'doc/yard', '--markup', 'markdown', '--title', 'Valera API Documentation' ]
     end
 
     desc "Regenerate documentation with cache reset"
-    task :regenerate => ['doc:clean', 'doc:generate']
+    task regenerate: [ 'doc:clean', 'doc:generate' ]
 
     desc "Clean generated documentation"
     task :clean do
@@ -39,7 +39,7 @@ begin
     end
 
     desc "Generate complete documentation with coverage report"
-    task :complete => [:generate, :coverage]
+    task complete: [ :generate, :coverage ]
 
     desc "Check documentation quality"
     task :quality do
@@ -71,9 +71,9 @@ begin
   end
 
   # Add shorthand aliases
-  task :yard => 'doc:generate'
-  task :yard_server => 'doc:serve'
-  task :yard_clean => 'doc:clean'
+  task yard: 'doc:generate'
+  task yard_server: 'doc:serve'
+  task yard_clean: 'doc:clean'
 
 rescue LoadError
   puts "⚠️  YARD gem not found. Add it to your Gemfile and run bundle install"

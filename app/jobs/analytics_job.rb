@@ -34,8 +34,8 @@ class AnalyticsJob < ApplicationJob
 
   # Проверка является ли событие критическим
   #
-   # @param event_name [String] Тип события
-   # @return [Boolean] true если событие критическое
+  # @param event_name [String] Тип события
+  # @return [Boolean] true если событие критическое
   def critical_event?(event_name)
     [
       AnalyticsService::Events::BOOKING_CREATED,

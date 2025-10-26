@@ -9,7 +9,7 @@ module Analytics
       name: 'ai_dialog_started',
       description: 'Начало диалога с AI ассистентом',
       category: 'dialog',
-      properties: [:platform, :user_id, :message_type]
+      properties: [ :platform, :user_id, :message_type ]
     }.freeze
 
     # События предложений услуг
@@ -17,21 +17,21 @@ module Analytics
       name: 'service_suggested',
       description: 'AI предложил услугу пользователю',
       category: 'service',
-      properties: [:service_name, :confidence_score, :suggestion_type, :context]
+      properties: [ :service_name, :confidence_score, :suggestion_type, :context ]
     }.freeze
 
     SERVICE_ADDED = {
       name: 'service_added',
       description: 'Пользователь добавил услугу в заявку',
       category: 'service',
-      properties: [:service_name, :quantity, :price, :total_price]
+      properties: [ :service_name, :quantity, :price, :total_price ]
     }.freeze
 
     SUGGESTION_ACCEPTED = {
       name: 'ai_suggestion_accepted',
       description: 'Пользователь принял предложение AI',
       category: 'service',
-      properties: [:service_name, :booking_id, :acceptance_type]
+      properties: [ :service_name, :booking_id, :acceptance_type ]
     }.freeze
 
     # События конверсии
@@ -39,14 +39,14 @@ module Analytics
       name: 'cart_confirmed',
       description: 'Пользователь подтвердил состав заявки',
       category: 'conversion',
-      properties: [:services_count, :total_amount, :confirmation_type]
+      properties: [ :services_count, :total_amount, :confirmation_type ]
     }.freeze
 
     BOOKING_CREATED = {
       name: 'booking_request_created',
       description: 'Создана заявка на обслуживание',
       category: 'conversion',
-      properties: [:booking_id, :services_count, :estimated_total, :processing_time_ms, :user_segment]
+      properties: [ :booking_id, :services_count, :estimated_total, :processing_time_ms, :user_segment ]
     }.freeze
 
     # События производительности
@@ -54,7 +54,7 @@ module Analytics
       name: 'ai_response_time',
       description: 'Время ответа AI системы',
       category: 'performance',
-      properties: [:duration_ms, :model_used, :timestamp]
+      properties: [ :duration_ms, :model_used, :timestamp ]
     }.freeze
 
     # События ошибок
@@ -62,7 +62,7 @@ module Analytics
       name: 'error_occurred',
       description: 'Произошла ошибка в системе',
       category: 'error',
-      properties: [:error_class, :error_message, :context, :timestamp]
+      properties: [ :error_class, :error_message, :context, :timestamp ]
     }.freeze
 
     # Все события в виде хеша для удобного доступа

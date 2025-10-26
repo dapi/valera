@@ -1,15 +1,16 @@
 # frozen_string_literal: true
+
 require 'test_helper'
 
 # Тесты для AnalyticsJob
 #
 # Проверяет корректность фоновой обработки аналитических событий
 class AnalyticsJobTest < ActiveSupport::TestCase
-  test "uses correct queue" do
-    assert_equal "analytics", AnalyticsJob.queue_name
+  test 'uses correct queue' do
+    assert_equal 'analytics', AnalyticsJob.queue_name
   end
 
-  test "creates analytics event successfully" do
+  test 'creates analytics event successfully' do
     event_data = {
       event_name: 'dialog_started',
       chat_id: 12345,
