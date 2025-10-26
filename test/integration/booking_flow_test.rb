@@ -24,24 +24,29 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
       user_text = "Запиши меня на покраску"
 
       tool_calls_count = ToolCall.count
+      counts = 0
       while true
         puts
         puts "Пользователь >"
         puts user_text.gsub(/^/, "\t")
         post_message user_text
         assistent_question = latest_reply_text
+        if ToolCall.count > tool_calls_count
+          counts +=1
+          break if counts > 2
+        end
         puts
         puts "Ассистент >"
         puts assistent_question.gsub(/^/, "\t")
 
-        break if ToolCall.count > tool_calls_count
 
         # Можно было бы прерваться после слов благодрност полоьзователя, но тогда мы получаем ошибку в ruby_llm
         user_response = @help_chat.ask assistent_question
         user_text = user_response.content
       end
 
-      assert true
+      error_message = "Извините, произошла ошибка. Попробуйте еще раз."
+      refute_equal latest_reply_text, error_message
     end
   end
 end
