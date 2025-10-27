@@ -76,14 +76,15 @@
       "Bash(npm install:*)",
       "Bash(yardmcp:*)",
       "Bash(bundle exec yard:*)",
-      "Read(//Users/danil/code/samochat/**)",
-      "Read(//Users/danil/.config/**)",
-      "Read(//Users/danil/code/**)",
-      "Read(//Users/danil/Library/Application Support/Claude/**)",
-      "Read(//Users/danil/Library/**)",
-      "Read(//Users/danil/**)",
       "Bash(ls:*)",
-      "WebFetch(domain:support.yclients.com)"
+      "WebFetch(domain:support.yclients.com)",
+      "Bash(lsblk:*)",
+      "Bash(sudo:*)",
+      "Bash(mount:*)",
+      "Read(///**)",
+      "Read(//var/lib/**)",
+      "Bash(systemctl status:*)",
+      "Read(//etc/**)"
     ],
     "deny": [],
     "ask": []

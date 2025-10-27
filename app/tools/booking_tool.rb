@@ -25,6 +25,7 @@
 # @since 0.1.0
 class BookingTool < RubyLLM::Tool
   include ErrorLogger
+  include DevelopmentWarning
 
   description 'Определяет является ли сообщение клиента заявкой на услугу и отправляет ее в административный чат'
 
@@ -113,7 +114,14 @@ class BookingTool < RubyLLM::Tool
       }
     )
 
-    RubyLLM::Content.new("Заявка под номером #{booking.id} отправлена администратору")
+    response_text = "Заявка под номером #{booking.id} отправлена администратору"
+
+    # Добавляем предупреждение о development режиме
+    if development_warnings_enabled?
+      response_text += "\n\n#{I18n.t('development_warning.booking_suffix')}"
+    end
+
+    RubyLLM::Content.new(response_text)
   rescue StandardError => e
     log_error e
     AnalyticsService.track_error(e, {

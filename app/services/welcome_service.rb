@@ -15,11 +15,13 @@
 # @since 0.1.0
 class WelcomeService
   include ErrorLogger
+  include DevelopmentWarning
 
   # Отправляет приветственное сообщение пользователю
   #
   # Использует шаблон из конфигурации и подставляет в него имя пользователя.
   # Отправка происходит через контроллер с помощью respond_with.
+  # В development режиме дополнительно отправляет предупреждение о тестовом статусе.
   #
   # @param telegram_user [TelegramUser] пользователь для приветствия
   # @param controller [Telegram::WebhookController] контроллер для отправки
@@ -28,12 +30,15 @@ class WelcomeService
   # @example
   #   service = WelcomeService.new
   #   service.send_welcome_message(user, controller)
-  #   #=> Пользователь получит приветственное сообщение
+  #   #=> Пользователь получит приветственное сообщение + предупреждение в development
   def send_welcome_message(telegram_user, controller)
     message = interpolate_template(ApplicationConfig.welcome_message_template, telegram_user)
 
-    # Отправка через respond_with из контроллера
+    # Отправка приветственного сообщения
     controller.respond_with :message, text: message
+
+    # Отправка предупреждения о development режиме (отдельным сообщением)
+    send_development_warning(controller)
   end
 
   private

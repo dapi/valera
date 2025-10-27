@@ -38,7 +38,10 @@ class ApplicationConfig < Anyway::Config
     rate_limit_period: 60,
 
     # Conversation management
-    max_history_size: 10
+    max_history_size: 10,
+
+    # Development warnings
+    development_warning: true
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -74,7 +77,10 @@ class ApplicationConfig < Anyway::Config
     rate_limit_requests: :integer,
     rate_limit_period: :integer,
     max_history_size: :integer,
-    webhook_port: :integer
+    webhook_port: :integer,
+
+    # Booleans
+    development_warning: :boolean
   )
 
   # System prompt
