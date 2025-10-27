@@ -196,7 +196,7 @@ ruby test/scripts/prompt_test_script.rb
 ruby test/scripts/prompt_test_script.rb
 
 # Проверка Product Constitution
-./docs/scripts/check-product-constitution.sh
+# Вручную проверить соответствие требованиям в ../product/constitution.md
 ```
 
 ### Перед релизом
@@ -324,7 +324,6 @@ when /дорого|много/i
 - **[Product Constitution](../product/constitution.md)** - Обязательные требования
 - **[System Prompt Template](../product/data-examples/system-prompt.md)** - Базовый шаблон
 - **[FLOW.md](../FLOW.md)** - Процесс работы
-- **[Documentation Scripts](../scripts/README.md)** - Скрипты проверки документации
 
 ---
 

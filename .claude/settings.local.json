@@ -87,7 +87,14 @@
       "mcp__serena__think_about_collected_information",
       "mcp__serena__list_dir",
       "mcp__serena__activate_project",
-      "mcp__serena__search_for_pattern"
+      "mcp__serena__search_for_pattern",
+      "Bash(cp:*)",
+      "mcp__serena__get_current_config",
+      "mcp__serena__list_memories",
+      "Read(//home/danil/.claude/**)",
+      "Read(//home/danil/.config/**)",
+      "Read(//home/danil/**)",
+      "Bash(claude:*)"
     ],
     "deny": [],
     "ask": []

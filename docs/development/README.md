@@ -34,7 +34,7 @@ bin/dev
 1. [CLAUDE.md](CLAUDE.md) - инструкции и архитектура
 2. [Product Constitution](docs/product/constitution.md) - требования к продукту
 3. [FLOW.md](docs/FLOW.md) - процесс разработки
-4. [Глоссарий](docs/glossary.md) - терминология проекта
+4. [Глоссарий](docs/domain/glossary.md) - терминология проекта
 
 ---
 
