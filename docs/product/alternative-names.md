@@ -110,7 +110,7 @@
 **Документация:**
 - [ ] Обновить README.md
 - [ ] Обновить docs/saas/ (4 файла)
-- [ ] Обновить docs/product/ (constitution.md, business-goals.md)
+- [ ] Обновить docs/product/ (constitution.md, business-metrics.md)
 - [ ] Обновить docs/requirements/ (все User Stories и FIP)
 - [ ] Обновить CLAUDE.md
 - [ ] Обновить DOCUMENTATION_INDEX.md

@@ -39,7 +39,6 @@
       "Bash(done:*)",
       "Bash(if [ -f \"$file\" ])",
       "Bash(rails console:*)",
-      "Bash(./docs/scripts/documentation-audit.sh:*)",
       "Bash(dos2unix:*)",
       "Bash(bin/brakeman:*)",
       "WebFetch(domain:brakemanscanner.org)",
@@ -94,7 +93,8 @@
       "Read(//home/danil/.claude/**)",
       "Read(//home/danil/.config/**)",
       "Read(//home/danil/**)",
-      "Bash(claude:*)"
+      "Bash(claude:*)",
+      "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": [],
     "ask": []

@@ -193,7 +193,7 @@ attr_config :development_warning # boolean, default: true
 ### **Technical Documentation:**
 - **[CLAUDE.md](../../CLAUDE.md)** - Инструкции для разработки
 - **[FLOW.md](../../FLOW.md)** - Процесс работы
-- **[Memory Bank](../../.claude/memory-bank.md)** - Архитектурные принципы
+- **[Memory Bank](../architecture/decisions.md)** - Архитектурные принципы
 
 ### **Dependencies:**
 - **Ruby on Rails 8.1** (основной framework)

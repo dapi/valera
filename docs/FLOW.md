@@ -78,7 +78,7 @@
 ## 🔗 Связанные документы
 
 - **[Product Constitution](product/constitution.md)** - ОБЯЗАТЕЛЬНО перед началом
-- **[Memory Bank](../.claude/memory-bank.md)** - Архитектурные решения
+- **[Architecture Decisions](architecture/decisions.md)** - Архитектурные решения
 - **[Gems Documentation](gems/)** - ruby_llm и telegram-bot
 - **[Requirements Overview](requirements/README.md)** - Детали структуры
 

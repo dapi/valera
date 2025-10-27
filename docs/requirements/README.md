@@ -7,7 +7,7 @@
 
 1. **[Product Constitution](../product/constitution.md)** - ОБЯЗАТЕЛЬНО! Dialogue-Only Interaction, AI-First Approach
 2. **[FLOW.md](../FLOW.md)** - КРИТИЧЕСКИ ВАЖНО! Полный процесс разработки
-3. **[Memory Bank](../.claude/memory-bank.md)** - Архитектурные решения и принципы
+3. **[Architecture Decisions](../architecture/decisions.md)** - Архитектурные решения и принципы
 
 ## 📂 Структура каталогов
 

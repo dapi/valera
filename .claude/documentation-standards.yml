@@ -1,0 +1,216 @@
+---
+# Shared Documentation Standards Registry
+# Общий реестр стандартов документации для documentation-creator и documentation-auditor
+
+version: "1.0"
+last_updated: "2025-10-27"
+maintained_by: ["documentation-creator", "documentation-auditor"]
+
+# Структура метаданных YAML Front Matter
+metadata_schema:
+  required_fields:
+    - title
+    - target_audience
+    - complexity
+    - concepts
+    - last_updated
+    - version
+
+  optional_fields:
+    - reading_time
+    - dependencies
+    - author
+
+  target_audience_values:
+    - "ai-agents"
+    - "developers"
+    - "product-owner"
+    - "devops"
+    - "testers"
+
+  complexity_values:
+    - "beginner"
+    - "intermediate"
+    - "advanced"
+    - "expert"
+
+# Стандарты качества документации
+quality_gates:
+  completeness:
+    min_score: 85
+    required_sections:
+      - "tldr"
+      - "context"
+      - "main_content"
+      - "examples"
+
+  consistency:
+    naming_convention: "kebab-case"
+    date_format: "YYYY-MM-DD"
+    language: "russian"
+
+  ai_optimization:
+    min_semantic_markup: 3
+    required_cross_references: 2
+    metadata_completeness: 90
+
+# Правила навигации и cross-references
+navigation_rules:
+  max_depth: 3
+  required_link_types:
+    - "defines"
+    - "relates_to"
+    - "part_of"
+
+  reference_format:
+    internal: "[text](path/to/file.md)"
+    external: "[text](url)"
+    concept: "`concept`{.concept-markup}"
+
+# Структура документа
+document_structure:
+  required_order:
+    1. "yaml_front_matter"
+    2. "tldr_section"
+    3. "context_section"
+    4. "main_content"
+    5. "examples_section"
+    6. "cross_references_section"
+
+  section_templates:
+    tldr:
+      header: "## 🎯 TL;DR"
+      max_length: 300
+      style: "concise_summary"
+
+    context:
+      header: "## 📍 Контекст документа"
+      required_elements: ["previous_docs", "next_docs", "related_concepts"]
+
+    examples:
+      header: "## 💡 Примеры использования"
+      min_examples: 1
+      max_examples: 5
+      code_blocks_required: true
+
+# Zero дублирование правила
+zero_duplication_rules:
+  principle: "один концепт - одно место"
+  violation_penalty: 20
+  allowed_references:
+    - "direct_links"
+    - "concept_definitions"
+    - "api_references"
+
+  red_flags:
+    - "copied_sections"
+    - "duplicate_definitions"
+    - "redundant_explanations"
+
+# Product Constitution соответствие
+product_constitution:
+  required_principles:
+    - "dialogue_only" # для продуктовой документации
+    - "ai_first" # для технической документации
+    - "realistic_metrics"
+
+  validation_rules:
+    business_docs: "dialogue_only_required"
+    technical_docs: "ai_first_required"
+    all_docs: "realistic_metrics_required"
+
+# Шаблоны для разных типов документов
+document_templates:
+  gem_integration:
+    path: "docs/gems/{gem-name}/"
+    required_sections: ["technology_overview", "configuration", "usage_patterns", "integration_points"]
+
+  technical_pattern:
+    path: "docs/patterns/"
+    required_sections: ["problem_description", "solution", "implementation", "anti_patterns"]
+
+  api_reference:
+    path: "docs/api/"
+    required_sections: ["overview", "methods", "examples", "error_handling"]
+
+# Автоматическая интеграция
+integration_settings:
+  auto_audit:
+    enabled: true
+    trigger: "document_creation"
+    audit_mode: "validation_only"
+
+  feedback_loop:
+    enabled: true
+    response_format: "structured_report"
+    improvement_tracking: true
+
+# Метрики качества
+quality_metrics:
+  weightings:
+    completeness: 0.3
+    consistency: 0.25
+    ai_optimization: 0.2
+    zero_duplication: 0.15
+    product_constitution: 0.1
+
+  scoring:
+    excellent: 90-100
+    good: 75-89
+    needs_improvement: 60-74
+    poor: 0-59
+
+# Валидация ссылок
+link_validation:
+  internal_links:
+    check_existence: true
+    check_permissions: true
+    timeout: 5
+
+  external_links:
+    check_availability: false
+    check_ssl: false
+
+  concept_references:
+    verify_glossary: true
+    check_definition: true
+
+# Языковые стандарты
+language_standards:
+  primary: "russian"
+  fallback: "english"
+  terminology:
+    source: "docs/domain/glossary.md"
+    consistency_check: true
+
+  style_guide:
+    tone: "professional_technical"
+    formality: "formal"
+    audience: "technical_experts"
+
+# Версионирование документации
+versioning:
+  format: "semantic" # major.minor.patch
+  auto_increment:
+    major: "breaking_changes"
+    minor: "feature_additions"
+    patch: "corrections_improvements"
+
+  changelog_required: true
+  changelog_location: "section_footer"
+
+# Интеграция с Git workflow
+git_integration:
+  auto_commit_enabled: false
+  branch_naming: "docs/{document-type}/{short-description}"
+
+  commit_message_format: |
+    docs: {action} {document-title}
+
+    {description}
+
+    🤖 Generated by documentation-creator
+    📊 Quality score: {score}
+    📋 Reviewed by: documentation-auditor
+
+...

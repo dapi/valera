@@ -2,29 +2,31 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 📋 Правило разделения документации
-
-**WHY → [.claude/memory-bank.md](.claude/memory-bank.md)** | **HOW → CLAUDE.md**
-
 ## 🚀 Quick Start
 
-**Основная документация:** [docs/README.md](docs/README.md) | **Архитектура:** [.claude/memory-bank.md](.claude/memory-bank.md) | **Разработка:** [docs/development/README.md](docs/development/README.md)
+**Основная документация:** [docs/README.md](docs/README.md) | **Архитектура:** [docs/architecture/decisions.md](docs/architecture/decisions.md) | **Разработка:** [docs/development/README.md](docs/development/README.md) | **Продукт:** [docs/product/constitution.md](docs/product/constitution.md)
 
 ## Project Overview
 
-Valera - AI-powered чат-бот для автоматизации автосервиса на Ruby on Rails 8.1 с использованием `ruby_llm` и интеграцией с Telegram.
+**Valera** - AI-powered чат-бот для автоматизации автосервиса на Ruby on Rails 8.1 с использованием `ruby_llm` и интеграцией с Telegram.
 
-## 🚨 ErrorLogger (КРИТИЧЕСКИ ВАЖНО)
+### 🎯 Ключевая концепция
+- **ПРОЕКТ:** Open-source репозиторий для владельцев автосервисов
+- **ПРОДУКТ:** Telegram бот для клиентов автосервиса
+- **ПОДХОД:** Dialogue-only взаимодействие через AI
 
-**КРИТИЧЕСКИ ВАЖНО:** ВСЕГДА использовать `log_error(e, context)` вместо `Bugsnag.notify(e)`!
+### 🏗️ Технологический стек
+- **Backend:** Ruby on Rails 8.1
+- **AI:** ruby_llm gem
+- **Database:** PostgreSQL
+- **Integration:** Telegram Bot API
+- **Configuration:** anyway_config
 
-```ruby
-include ErrorLogger
+## 🛡️ Error Handling
 
-rescue => e
-  log_error(e, { user_id: user.id, action: "process_booking" })
-end
-```
+**КРИТИЧЕСКИ ВАЖНО:** Используй централизованную систему обработки ошибок через `ErrorLogger`
+
+**Основной источник:** [docs/patterns/error-handling.md](docs/patterns/error-handling.md) - полная документация по паттернам обработки ошибок
 
 ## 🏗️ Архитектура
 
@@ -43,10 +45,18 @@ end
 ## ⚙️ Критические правила разработки
 
 **🚨 КРИТИЧЕСКИ ВАЖНО:**
-- ВСЕГДА используй `rails generate model` для создания моделей
-- Используй `ErrorLogger` вместо `Bugsnag.notify()`
-- Не использовать `.env*` файлы
-- В тестах не использовать File.write/File.delete и не изменять ENV
+- **Models:** ВСЕГДА используй `rails generate model` для создания моделей и миграций одновременно
+- **Error Handling:** Используй `ErrorLogger` вместо `Bugsnag.notify()`
+- **Configuration:** Не использовать `.env*` файлы, только `anyway_config`
+- **Testing:** В тестах не использовать File.write/File.delete и не изменять ENV
+- **Documentation:** Документация создается для AI-агентов в первую очередь
+- **AI Architecture:** User Stories разделяются по уровням system prompt, не по бизнес-функциям
+
+**Подробнее:** [docs/development/stack.md](docs/development/stack.md) и [docs/development/README.md](docs/development/README.md)
+
+### 🎯 Архитектурные принципы
+Подробная информация в [docs/architecture/decisions.md](docs/architecture/decisions.md)
+
 
 ## 📚 Полезные ссылки
 
@@ -55,6 +65,8 @@ end
 - **[FLOW.md](docs/FLOW.md)** - процесс работы с требованиями
 - **[Гемы](docs/gems/README.md)** - документация по ключевым gem'ам
 - **[Тестирование](docs/development/README.md#testing)** - правила тестирования
+- **[Технологический стек](docs/development/stack.md)** - полный стек технологий
+- **[Обработка ошибок](docs/patterns/error-handling.md)** - паттерны ErrorLogger
 
 ---
 **Версия:** 3.0 | **Последнее обновление:** 27.10.2025

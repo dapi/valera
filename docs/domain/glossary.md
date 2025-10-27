@@ -91,10 +91,10 @@
 **Определение:** Документ, объясняющий архитектурные решения, принципы и рациональность выбора.
 
 **Примеры:**
-- [Memory Bank](../.claude/memory-bank.md) - архитектурные решения проекта
+- [Architecture Decisions](../architecture/decisions.md) - архитектурные решения проекта
 - [Product Constitution](product/constitution.md) - требования к продукту
 
-**Правило:** WHY информация хранится в memory-bank.md и constitution.md, не дублируется в HOW документах.
+**Правило:** WHY информация хранится в architecture/decisions.md и constitution.md, не дублируется в HOW документах.
 
 ---
 
@@ -178,7 +178,7 @@
 | Документ | Путь | Тип |
 |----------|------|-----|
 | Product Constitution | `docs/product/constitution.md` | WHY |
-| Memory Bank | `.claude/memory-bank.md` | WHY |
+| Architecture Decisions | `architecture/decisions.md` | WHY |
 | CLAUDE.md | `CLAUDE.md` | HOW |
 | FLOW | `docs/FLOW.md` | HOW |
 | Требования | `docs/requirements/README.md` | HOW |

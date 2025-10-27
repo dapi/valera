@@ -1219,7 +1219,7 @@ TELEGRAM_AUTH_EXPIRATION=300 # 5 минут
 ### **Internal Documentation:**
 - **[Product Constitution](../product/constitution.md)** - Базовые принципы
 - **[CLAUDE.md](../../CLAUDE.md)** - Правило про `rails generate model`
-- **[Memory Bank](../../.claude/memory-bank.md)** - Архитектурные решения
+- **[Memory Bank](../architecture/decisions.md)** - Архитектурные решения
 - **[FLOW.md](../FLOW.md)** - Процесс работы
 
 ### **External Documentation:**

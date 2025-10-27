@@ -31,10 +31,10 @@ bin/dev
 
 ### Первые шаги
 
-1. [CLAUDE.md](CLAUDE.md) - инструкции и архитектура
-2. [Product Constitution](docs/product/constitution.md) - требования к продукту
-3. [FLOW.md](docs/FLOW.md) - процесс разработки
-4. [Глоссарий](docs/domain/glossary.md) - терминология проекта
+1. [../CLAUDE.md](../CLAUDE.md) - инструкции и архитектура
+2. [Product Constitution](../product/constitution.md) - требования к продукту
+3. [FLOW.md](../FLOW.md) - процесс разработки
+4. [Глоссарий](../domain/glossary.md) - терминология проекта
 
 ---
 
@@ -96,7 +96,7 @@ ruby .claude/pre-work-hook.rb "your task description"
 2. Реализация (следовать Product Constitution)
 3. Code Review (`bin/ci`)
 
-**См. подробнее:** [FLOW.md](docs/FLOW.md)
+**См. подробнее:** [../FLOW.md](../FLOW.md)
 
 ---
 
@@ -115,6 +115,18 @@ bin/rails test test/models/chat_test.rb
 bin/rails test test/models/chat_test.rb:12
 ```
 
+### Критические правила разработки
+
+🚨 **КРИТИЧЕСКИ ВАЖНО:**
+- **Models:** ВСЕГДА используй `rails generate model` для создания моделей и миграций одновременно
+- **Error Handling:** Используй `ErrorLogger` вместо `Bugsnag.notify()`
+- **Configuration:** Не использовать `.env*` файлы, только `anyway_config`
+- **Testing:** В тестах не использовать File.write/File.delete и не изменять ENV
+- **Documentation:** Документация создается для AI-агентов в первую очередь
+- **AI Architecture:** User Stories разделяются по уровням system prompt, не по бизнес-функциям
+
+**Подробнее об ErrorLogger:** [docs/patterns/error-handling.md](../patterns/error-handling.md)
+
 ### Правила тестирования
 
 ⚠️ **ВАЖНО:**
@@ -122,7 +134,7 @@ bin/rails test test/models/chat_test.rb:12
 - ❌ НЕ изменять ENV переменные
 - ❌ Логирование НЕ мокается и НЕ проверяется
 
-**Подробнее:** [CLAUDE.md](CLAUDE.md#testing)
+**Подробнее:** [../../CLAUDE.md](../../CLAUDE.md#testing)
 
 ---
 
@@ -145,11 +157,11 @@ bin/rails test test/models/chat_test.rb:12
 
 ## 📚 Полезные ссылки
 
-- [CLAUDE.md](CLAUDE.md) - Инструкции
-- [Product Constitution](docs/product/constitution.md) - Требования к продукту
-- [FLOW.md](docs/FLOW.md) - Процесс
-- [ROADMAP.md](docs/ROADMAP.md) - План
-- [Глоссарий](docs/glossary.md) - Терминология
+- [../CLAUDE.md](../CLAUDE.md) - Инструкции
+- [Product Constitution](../product/constitution.md) - Требования к продукту
+- [FLOW.md](../FLOW.md) - Процесс
+- [ROADMAP.md](../ROADMAP.md) - План
+- [Глоссарий](../domain/glossary.md) - Терминология
 - [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md) - Навигация
 
 ---
