@@ -45,7 +45,10 @@
 
 ## 🔗 Связанные документы
 
-- **User Story:** [US-003-telegram-photo-damage-assessment.md](../user-stories/US-003-telegram-photo-damage-assessment.md) ( prerequisite)
+- **User Stories:**
+  - [US-002a-telegram-basic-consultation.md](../user-stories/US-002a-telegram-basic-consultation.md) (базовая консультация)
+  - [US-002b-telegram-recording-booking.md](../user-stories/US-002b-telegram-recording-booking.md) (запись на сервис)
+  - [US-003-telegram-photo-damage-assessment.md](../user-stories/US-003-telegram-photo-damage-assessment.md) (prerequisite - фото оценка)
 - **Technical Design Document:** [../tsd/TSD-004-telegram-insurance-automation.md](../tsd/TSD-004-telegram-insurance-automation.md)
 - **Implementation:** В соответствии с [../../FLOW.md](../../FLOW.md)
 

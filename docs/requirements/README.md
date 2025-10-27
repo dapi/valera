@@ -59,6 +59,14 @@
 ### 📂 `/user-stories/` - User Stories
 Формат: `US-XXX-короткое-название.md`
 
+**📋 Текущие User Stories:**
+- **US-001** - Telegram Auto Greeting (базовое приветствие)
+- **US-002a** - Telegram Basic Consultation (консультация по стоимости)
+- **US-002b** - Telegram Recording + Booking (запись на сервис)
+- **US-003** - Telegram Photo Damage Assessment (оценка повреждений по фото)
+- **US-004** - Telegram Insurance Automation (автоматизация страховки)
+- **US-005** - Telegram Booking Confirmation (подтверждение записи)
+
 ### 📂 `/templates/` - FLOW шаблоны
 - `user-story-template.md` - **ОСНОВНОЙ шаблон User Story**
 - `user-story-examples.md` - Примеры User Story по типам функций

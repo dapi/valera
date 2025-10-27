@@ -43,7 +43,9 @@
 
 ## 🔗 Связанные документы
 
-- **User Story:** [US-002b-telegram-recording-booking.md](US-002b-telegram-recording-booking.md) (MVP база)
+- **User Stories:**
+  - [US-002a-telegram-basic-consultation.md](US-002a-telegram-basic-consultation.md) (консультация - основа)
+  - [US-002b-telegram-recording-booking.md](US-002b-telegram-recording-booking.md) (запись - MVP база)
 - **Technical Design Document:** [../tsd/TSD-003-telegram-photo-damage-assessment.md](../tsd/TSD-003-telegram-photo-damage-assessment.md)
 - **Implementation:** В соответствии с [../../FLOW.md](../../FLOW.md)
 
