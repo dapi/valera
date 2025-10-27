@@ -1,4 +1,4 @@
-# Technical Design Document: TDD-XXX - [Название]
+# Technical Specification Document: TSD-XXX - [Название]
 
 **Статус:** Draft/Ready/In Progress/Done
 **Сложность:** Simple/Medium/Complex
@@ -287,7 +287,7 @@ security_testing:
 
 ## 🔗 Связанные документы
 - **User Story:** [US-XXX-название.md](US-XXX-название.md)
-- **Dependencies:** [TDD-YYY, TDD-ZZZ]
+- **Dependencies:** [TSD-XXX-название.md](TSD-XXX-название.md)
 - **External documentation:** [API docs, gem documentation]
 - **Architecture decisions:** [ссылки на ADRs]
 

@@ -81,7 +81,7 @@ AnalyticsService::Events::USER_ENGAGEMENT     # Вовлечение польз�
 
 ## 🔗 Связанные документы
 - **Analytics Implementation:** [FIP-001-analytics-system.md](../FIP-001-analytics-system.md)
-- **Technical Design:** [TDD-001-analytics-system.md](../tdd/TDD-001-analytics-system.md)
+- **Technical Design:** [TSD-001-analytics-system.md](../tdd/TSD-001-analytics-system.md)
 - **Dependent User Stories:** US-002a (консультация), US-002b (запись)
 - **Business Metrics:** [../../business-metrics.md](../../business-metrics.md)
 - **Product Constitution:** [../../docs/product/constitution.md](../../docs/product/constitution.md)

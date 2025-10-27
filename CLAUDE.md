@@ -58,20 +58,6 @@ Claude отслеживает актуальность документации:
 
 ### Доступные инструменты для самообучения
 
-**Автоматический доступ:**
-```bash
-# Telegram Bot документация
-bin/docs telegram-bot patterns
-bin/docs telegram-bot examples photo-handling
-
-# Ruby LLM документация
-bin/docs ruby_llm patterns
-bin/docs ruby_llm examples visual-analysis
-
-# Поиск по документации
-bin/docs search "damage assessment"
-```
-
 **Ручной запуск обучения:**
 ```bash
 ruby .claude/pre-work-hook.rb "add photo processing for damage assessment"
@@ -198,7 +184,7 @@ rake doc:quality
 #   result = service.execute
 #   puts result
 #
-# @author Valera Team
+# @author Danil Pismenny
 # @since 0.1.0
 class MyClass
   # Краткое описание метода одной строкой
@@ -373,10 +359,31 @@ include ErrorLogger
 ## Application Architecture
 
 ### Core Models
+
+**AI & Conversation:**
 - **Chat** - Main conversation entity using `acts_as_chat` from ruby_llm
 - **Message** - Individual messages with attachment support via `has_many_attached :attachments`
 - **ToolCall** - LLM tool/function call tracking using `acts_as_tool_call`
 - **Model** - AI model configuration and management
+
+**Business Domain:**
+- **Booking** - Car service booking/appointment management
+  - Связь с Chat через belongs_to :chat
+  - Статусы: pending, confirmed, completed, cancelled
+  - Хранит детали заявки (тип услуги, дата, время, описание проблемы)
+
+**User Management:**
+- **TelegramUser** - Telegram user profiles and authentication
+  - Связь с Chat через has_many :chats
+  - Хранит telegram_id, username, first_name, last_name
+  - Управление настройками и предпочтениями пользователя
+
+**Analytics & Monitoring:**
+- **AnalyticsEvent** - Event tracking for analytics and monitoring
+  - Типы событий: dialog_started, message_sent, booking_created, etc.
+  - Связь с Chat через belongs_to :chat (optional)
+  - Хранит event_name, properties (jsonb), user_id, chat_id
+  - Используется через AnalyticsService для tracking
 
 ### Configuration Management
 The application uses `anyway_config` for sophisticated configuration handling:
@@ -444,9 +451,9 @@ Tests are located in `test/` directory and use Minitest framework. Run with `rak
 - Do not read or use `.env*` files (per user instructions)
 - Use MCP context7 for studying Ruby gems
 - Service prices and implementation plans are referenced in CLAUDE.md for quick access
-- **🚀 НОВЫЙ ПОДХОД:** Использовать Feature Implementation Plans (FIP) вместо раздельных документов
+- **🚀 НОВЫЙ ПОДХОД:** Использовать Feature Implementation Plans (FIP) и User Stories + Technical Specification Documents (TSD)
 - FIP создаются в `docs/requirements/` с форматом `FIP-XXX-название.md`
-- Small tasks (< 2 часов) реализуются сразу без FIP
+- US+TSD создаются в паре: `US-XXX-название.md` + `TSD-XXX-название.md`
 - The bot supports Russian language interface (car service context)
 - НЕ используются File.write и File.delete и прочие небезопасные методы в тестах
 - НЕ изменеются ENV-ы в тестах
@@ -556,7 +563,7 @@ AI агент имеет доступ к подробной документац
 
 **Quick Reference:**
 - **User Stories:** `docs/requirements/user-stories/US-XXX.md` (As a/I want/So that)
-- **Technical Design:** `docs/requirements/tdd/TDD-XXX.md` (техническая реализация)
+- **Technical Specification:** `docs/requirements/tdd/TSD-XXX.md` (техническая реализация)
 - **Templates:** `docs/requirements/templates/` (шаблоны для создания документов)
 
 **Автоматическое обнаружение:** Агент активируется при ключевых словах "user story", "спецификация", "требование", "feature" или работе с файлах в `docs/requirements/`.

@@ -56,7 +56,7 @@ rake doc:regenerate
 #   result = service.execute
 #   puts result
 #
-# @author Valera Team
+# @author Danil Pismenny
 # @since 0.1.0
 class MyService
   # Описание метода одной строкой
@@ -85,7 +85,7 @@ end
 **Для всех новых классов/модулей:**
 - Краткое описание (1 строка)
 - Подробное описание
-- `@author Valera Team`
+- `@author Danil Pismenny`
 - `@since 0.1.0`
 - Минимум один `@example`
 - `@see` для связанных классов

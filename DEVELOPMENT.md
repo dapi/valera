@@ -42,23 +42,6 @@ bin/dev
 
 ### Документация gems
 
-**Быстрый доступ:**
-```bash
-# Telegram Bot
-bin/docs telegram-bot patterns
-bin/docs telegram-bot examples photo-handling
-bin/docs telegram-bot api-reference
-
-# Ruby LLM
-bin/docs ruby_llm patterns
-bin/docs ruby_llm examples visual-analysis
-bin/docs ruby_llm api-reference
-
-# Поиск
-bin/docs search "damage assessment"
-bin/docs list
-```
-
 **Структура:**
 - `docs/gems/telegram-bot/` - Telegram интеграция
 - `docs/gems/ruby_llm/` - AI/LLM интеграция
@@ -198,7 +181,6 @@ bin/rails test
 
 **Telegram Bot:**
 - Проверить `config/configs/application_config.rb`
-- `bin/docs telegram-bot troubleshooting`
 
 ---
 

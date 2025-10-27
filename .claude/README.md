@@ -68,10 +68,6 @@ Claude MUST complete the learning protocol before ANY telegram-related work:
 ```bash
 # Run pre-work hook manually
 ruby .claude/pre-work-hook.rb "telegram bot command implementation"
-
-# Access documentation quickly
-bin/docs telegram-bot patterns
-bin/docs ruby_llm examples tool-calls
 ```
 
 #### Knowledge Refresh:

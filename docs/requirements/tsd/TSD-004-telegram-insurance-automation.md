@@ -1,4 +1,4 @@
-# Technical Design Document: TDD-004 - Автоматизация страховых случаев (ОСАГО/КАСКО)
+# Technical Specification Document: TSD-004 - Автоматизация страховых случаев (ОСАГО/КАСКО)
 
 **Статус:** Draft
 **Сложность:** Complex

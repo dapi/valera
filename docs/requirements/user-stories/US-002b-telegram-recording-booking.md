@@ -87,8 +87,8 @@ AnalyticsService::Events::MANAGER_NOTIFICATION   # Уведомление мен
 
 ## 🔗 Связанные документы
 - **Analytics Implementation:** [FIP-001-analytics-system.md](../FIP-001-analytics-system.md)
-- **Technical Design:** [TDD-001-analytics-system.md](../tdd/TDD-001-analytics-system.md)
-- **Specific TDD:** [../tdd/TDD-002b-telegram-recording-booking.md](../tdd/TDD-002b-telegram-recording-booking.md)
+- **Technical Design:** [TSD-001-analytics-system.md](../tdd/TSD-001-analytics-system.md)
+- **Specific TDD:** [../tdd/TSD-002b-telegram-recording-booking.md](../tdd/TSD-002b-telegram-recording-booking.md)
 - **Business Metrics:** [../../business-metrics.md](../../business-metrics.md)
 - **Dependencies:** US-001 (приветствие), US-002a (консультация)
 

@@ -39,7 +39,7 @@
 #
 # @see Telegram::MessageHandler Для обработки различных типов сообщений
 # @see Telegram::AuthService Для аутентификации запросов
-# @author Valera Team
+# @author Danil Pismenny
 # @since 0.1.0
 class Telegram::WebhookController < ApplicationController
   # Обрабатывает входящие вебхуки от Telegram
@@ -79,7 +79,7 @@ end
 # @see Chat модель для хранения диалогов
 # @see Message модель для хранения сообщений
 # @see ruby_llm документация по AI интеграции
-# @author Valera Team
+# @author Danil Pismenny
 # @since 0.1.0
 class DialogueService
   # Обрабатывает входящее сообщение от пользователя
@@ -132,7 +132,7 @@ end
 #
 # @see Chat диалоги пользователя
 # @see UserPreference предпочтения пользователя
-# @author Valera Team
+# @author Danil Pismenny
 # @since 0.1.0
 class TelegramUser < ApplicationRecord
   # Находит пользователя по Telegram ID или создает нового
@@ -177,7 +177,7 @@ end
 #
 # @see Service доступные услуги
 # @see BookingSlot доступные слоты времени
-# @author Valera Team
+# @author Danil Pismenny
 # @since 0.1.0
 class BookingTool < BaseTool
   # Выполняет бронирование услуги
@@ -230,7 +230,7 @@ end
 | Тег | Назначение | Пример |
 |-----|------------|--------|
 | `@since` | Версия добавления | `@since 0.1.0` |
-| `@author` | Автор кода | `@author Valera Team` |
+| `@author` | Автор кода | `@author Danil Pismenny` |
 | `@deprecated` | Устаревший код | `@deprecated 0.2.0 Используйте NewService` |
 | `@see` | Ссылки на связанный код | `@see OtherClass#method` |
 | `@api` | Уровень доступа API | `@api private` |
@@ -361,7 +361,7 @@ end
 # Предоставляет CRUD операции для управления пользовательскими
 # аккаунтами, включая валидацию данных и уведомления.
 #
-# @author Valera Team
+# @author Danil Pismenny
 # @since 0.1.0
 class UserService
   # Обновляет данные существующего пользователя

@@ -1,4 +1,4 @@
-# TDD-003: MarkdownCleaner Implementation
+# TSD-003: MarkdownCleaner Implementation
 
 **Дата создания:** 26.10.2025
 **Статус:** 🟡 Ready for Implementation

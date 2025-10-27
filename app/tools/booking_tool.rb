@@ -21,7 +21,7 @@
 # @see US-002b User Story по созданию заявок
 # @see TDD-002b Техническая реализация
 # @see AnalyticsService для отслеживания событий
-# @author Valera Team
+# @author Danil Pismenny
 # @since 0.1.0
 class BookingTool < RubyLLM::Tool
   include ErrorLogger

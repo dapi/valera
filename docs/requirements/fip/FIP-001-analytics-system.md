@@ -228,7 +228,7 @@ Telegram Webhook → AnalyticsService → PostgreSQL → Metabase Dashboard
 - **[Product Constitution](../product/constitution.md)** - Базовые принципы
 
 ### **Техническая документация:**
-- **[TDD-001-analytics-system.md](tdd/TDD-001-analytics-system.md)** - Технический дизайн (будет создан)
+- **[TSD-001-analytics-system.md](tdd/TSD-001-analytics-system.md)** - Технический дизайн (будет создан)
 - **[CLAUDE.md](../../CLAUDE.md)** - Инструкции для разработки
 - **[FLOW.md](../../FLOW.md)** - Процесс работы
 
@@ -248,7 +248,7 @@ Telegram Webhook → AnalyticsService → PostgreSQL → Metabase Dashboard
 - [x] **Stakeholders:** ROI и timeline ✅
 
 ### **Выполненные шаги:**
-1. ✅ Создана TDD-001 документация
+1. ✅ Создана TSD-001 документация
 2. ✅ Реализован Day 1-3 plan (завершен за 1 день)
 3. ✅ Ежедневные status updates в team channel
 4. ✅ Final demo и dashboard presentation проведены
@@ -268,6 +268,6 @@ Telegram Webhook → AnalyticsService → PostgreSQL → Metabase Dashboard
 **Тип документа:** Feature Implementation Plan (FIP) - COMPLETED
 **Статус реализации:** ✅ **УСПЕШНО ЗАВЕРШЕНО (100%)**
 **Связанные документы:**
-- [TDD-001-analytics-system.md](tdd/TDD-001-analytics-system.md) ✅
+- [TSD-001-analytics-system.md](tdd/TSD-001-analytics-system.md) ✅
 - [docs/analytics/README.md](../../analytics/README.md) - система готова к использованию
 - [docs/archive/analytics-implementation-summary-2025-10-27.md](../../archive/analytics-implementation-summary-2025-10-27.md) - результаты внедрения

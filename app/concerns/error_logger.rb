@@ -11,10 +11,12 @@ module ErrorLogger
     # @param context [Hash] - дополнительный контекст (опционально)
     def log_error_with_backtrace(error, context = {})
       log_basic_error_info(Rails.logger, error)
-      log_error_context(Rails.logger, context, error)
+      Rails.logger.error "Context: #{context.inspect}"
       log_error_backtrace(Rails.logger, error)
       finalize_error_log(Rails.logger)
-      send_to_bugsnag_service(error, context)
+      Bugsnag.notify(error) do |b|
+        b.metadata = context
+      end
     end
 
     private
@@ -26,13 +28,6 @@ module ErrorLogger
       logger.error "Error Message: #{error.message}"
     end
 
-    # Логирует контекст ошибки и отправляет в Bugsnag если нужно
-    def log_error_context(logger, context, error)
-      logger.error "Context: #{context.inspect}"
-      Bugsnag.notify(error) do |report|
-        context.each { |key, value| report.add_metadata(key, value) }
-      end
-    end
 
     # Логирует backtrace ошибки
     def log_error_backtrace(logger, error)
@@ -50,13 +45,6 @@ module ErrorLogger
     def finalize_error_log(logger)
       logger.error '=== END ERROR DETAILS ==='
       logger.error '' # пустая строка для читаемости
-    end
-
-    # Отправляет ошибку в Bugsnag
-    def send_to_bugsnag_service(error, context)
-      return unless defined?(Bugsnag) && context.empty?
-
-      Bugsnag.notify(error)
     end
 
     # Безопасное выполнение блока с автоматическим логированием ошибок

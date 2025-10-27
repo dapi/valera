@@ -1,4 +1,4 @@
-# Technical Design Document: TDD-001 - Analytics System Architecture
+# Technical Specification Document: TSD-001 - Analytics System Architecture
 
 **Статус:** Draft
 **Приоритет:** High

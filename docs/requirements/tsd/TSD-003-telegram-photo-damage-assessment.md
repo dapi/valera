@@ -1,4 +1,4 @@
-# Technical Design Document: TDD-003 - Визуальная оценка повреждений по фото
+# Technical Specification Document: TSD-003 - Визуальная оценка повреждений по фото
 
 **Статус:** Draft
 **Сложность:** Medium

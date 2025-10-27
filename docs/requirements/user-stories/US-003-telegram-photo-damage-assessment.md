@@ -44,7 +44,7 @@
 ## 🔗 Связанные документы
 
 - **User Story:** [US-002b-telegram-recording-booking.md](US-002b-telegram-recording-booking.md) (MVP база)
-- **Technical Design Document:** [../../tdd/TDD-003-telegram-photo-damage-assessment.md](../../tdd/TDD-003-telegram-photo-damage-assessment.md)
+- **Technical Design Document:** [../../tsd/TSD-003-telegram-photo-damage-assessment.md](../../tsd/TSD-003-telegram-photo-damage-assessment.md)
 - **Implementation:** В соответствии с [FLOW.md](../../FLOW.md)
 
 ## 🚫 Исключения (Edge Cases)

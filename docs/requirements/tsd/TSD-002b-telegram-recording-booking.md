@@ -1,4 +1,4 @@
-# Technical Design Document: TDD-002b - Telegram Recording + Booking
+# Technical Specification Document: TSD-002b - Telegram Recording + Booking
 
 **Статус:** Draft
 **Сложность:** Simple
