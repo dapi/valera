@@ -27,10 +27,11 @@
 - [ ] **Delivery time:** < 5 секунд для доставки заявок менеджерам
 
 ### 📈 Analytics Criteria (Требования к аналитике)
-- [ ] **Given** клиент выражает намерение записаться **When** бот начинает сбор данных **Then** событие `booking_initiated` отслеживается в аналитике
 - [ ] **Given** заявка создана **When** она отправляется менеджерам **Then** событие `booking_request_created` сохраняется с детальной информацией
 - [ ] **Given** диалог продолжается **When** клиент предоставит данные **Then** время диалога и этапы воронки отслеживаются
 - [ ] **Given** процесс записи завершен **When** клиент получил подтверждение **Then** полная метрика конверсии сохраняется в аналитике
+
+**📝 Примечание:** Событие `booking_initiated` признано избыточным. Достаточно отслеживать `booking_created` для анализа конверсии.
 
 ## 🎯 Business Value
 - **Проблема:** Клиенты получив консультацию не всегда переходят к записи из-за сложности процесса или необходимости звонить
@@ -53,11 +54,9 @@
 ### **Analytics Events to Track:**
 ```ruby
 # Для US-002b отслеживаем:
-AnalyticsService::Events::BOOKING_INITIATED     # Начало процесса записи
-AnalyticsService::Events::SERVICE_ADDED          # Добавление услуги в заявку
-AnalyticsService::Events::CART_CONFIRMED        # Подтверждение данных
-AnalyticsService::Events::BOOKING_CREATED        # Создание заявки
-AnalyticsService::Events::MANAGER_NOTIFICATION   # Уведомление менеджера
+AnalyticsService::Events::BOOKING_CREATED        # Создание заявки (основное событие)
+# Примечание: booking_initiated, service_added, cart_confirmed избыточны
+# Цель US-002b - простая запись на осмотр, не полноценная корзина услуг
 ```
 
 ### **Success Benchmarks (Phase 1 MVP):**
@@ -140,6 +139,8 @@ admin_chat_id: ${ADMIN_CHAT_ID}
 | 25.10.2025 | 1.1 | Removed FIP-002b reference, updated links per FLOW.md | Claude Code Assistant |
 | 27.10.2025 | 1.2 | Added analytics criteria and FIP-001 integration | Claude Code Assistant |
 | 27.10.2025 | 1.3 | Added deployment configuration notes for admin_chat_id | Claude Code Assistant |
+| 27.10.2025 | 1.4 | Removed booking_initiated event as redundant, kept booking_created only | Claude Code Assistant |
+| 27.10.2025 | 1.5 | Simplified analytics: removed service_added, cart_confirmed - focus on booking only | Claude Code Assistant |
 
 ---
 

@@ -1,0 +1,70 @@
+# Prometheus Configuration for Valera Production Monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'valera-app'
+    static_configs:
+      - targets: ['app:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+
+recording_rules:
+  - name: valera.rules
+    rules:
+      - record: valera:requests_per_second
+        expr: rate(http_requests_total[5m])
+
+      - record: valera:request_duration_seconds
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+
+      - record: valera:error_rate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])
+
+      - record: valera:active_users
+        expr: count(active_sessions)
+
+      - record: valera:ai_requests_per_second
+        expr: rate(ai_requests_total[5m])
+
+      - record: valera:ai_request_duration
+        expr: histogram_quantile(0.95, rate(ai_request_duration_seconds_bucket[5m]))
