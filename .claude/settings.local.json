@@ -96,7 +96,10 @@
       "Bash(claude:*)",
       "mcp__sequential-thinking__sequentialthinking",
       "SlashCommand(/sc:load)",
-      "Bash(rails test:*)"
+      "Bash(rails test:*)",
+      "mcp__magic__21st_magic_component_builder",
+      "Bash(bundle check:*)",
+      "Bash(bundle exec rails test:*)"
     ],
     "deny": [],
     "ask": []

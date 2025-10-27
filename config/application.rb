@@ -28,7 +28,8 @@ module Valera
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # Set timezone to Moscow (Europe/Moscow) - can be overridden via environment
+    config.time_zone = ENV.fetch('TIMEZONE', 'Europe/Moscow')
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Set default locale to Russian

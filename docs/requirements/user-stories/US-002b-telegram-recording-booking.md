@@ -1,6 +1,6 @@
 # User Story: US-002b - Telegram Recording + Booking
 
-**Статус:** Updated with Analytics ✅
+**Статус:** Completed ✅
 **Приоритет:** High
 **Story Points:** 5
 **Создан:** 25.10.2025
@@ -110,12 +110,36 @@ AnalyticsService::Events::MANAGER_NOTIFICATION   # Уведомление мен
 
 ---
 
+## 🔧 Production Deployment Configuration
+
+**⚠️ ВАЖНО: `admin_chat_id` настраивается через ENV переменную при деплойменте**
+
+```bash
+# Пример установки ENV переменной для production
+export ADMIN_CHAT_ID=-123456789  # ID Telegram чата менеджеров
+
+# В deployment скриптах:
+admin_chat_id: ${ADMIN_CHAT_ID}
+```
+
+**Как найти ID чата:**
+1. Добавить `@userinfobot` в ваш менеджерский Telegram чат
+2. Отправить любое сообщение в чат
+3. Bot покажет `chat_id: -123456789`
+4. Использовать этот ID как `ADMIN_CHAT_ID`
+
+**Current Status:**
+- ✅ **Development:** Уведомления логируются (admin_chat_id не требуется)
+- ⚙️ **Production:** Требуется установка `ADMIN_CHAT_ID` ENV переменной
+- 🧪 **Testing:** Использует `admin_chat_id: 123_456` (mock значение)
+
 **Change log:**
 | Дата | Версия | Изменение | Автор |
 |------|--------|-----------|-------|
 | 25.10.2025 | 1.0 | Initial version from FIP-002b conversion | Claude Code Assistant |
 | 25.10.2025 | 1.1 | Removed FIP-002b reference, updated links per FLOW.md | Claude Code Assistant |
 | 27.10.2025 | 1.2 | Added analytics criteria and FIP-001 integration | Claude Code Assistant |
+| 27.10.2025 | 1.3 | Added deployment configuration notes for admin_chat_id | Claude Code Assistant |
 
 ---
 

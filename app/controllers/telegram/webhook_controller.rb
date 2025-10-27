@@ -153,7 +153,8 @@ module Telegram
     def send_response_to_user(ai_response)
       content = ai_response.content
       Rails.logger.debug { "AI Response: #{content}" }
-      respond_with :message, text: MarkdownCleaner.clean(content), parse_mode: 'Markdown'
+      cleaned_content = MarkdownCleanerService.clean_with_line_breaks(content)
+      respond_with :message, text: cleaned_content, parse_mode: 'Markdown'
     end
 
     # Обрабатывает callback запросы от inline клавиатур

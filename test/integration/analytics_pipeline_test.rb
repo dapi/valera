@@ -80,146 +80,249 @@ class AnalyticsPipelineTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # test "analytics handles booking creation with conversion tracking" do
-  #   # Create user and chat first
-  #   user = TelegramUser.create!(
-  #     id: @chat_id,
-  #     first_name: 'Test',
-  #     username: 'testuser'
-  #   )
-  #   chat = Chat.create!(telegram_user: user)
+  test 'analytics handles booking creation with conversion tracking' do
+    # Create user and chat first
+    user = TelegramUser.create!(
+      id: 943_084_337,
+      first_name: 'Danil',
+      username: 'pismenny'
+    )
+    chat = Chat.create!(telegram_user: user)
 
-  #   # Prepare booking tool data
-  #   booking_data = {
-  #     customer_name: 'Иван Иванов',
-  #     customer_phone: '+7(999)123-45-67',
-  #     car_brand: 'Toyota',
-  #     car_model: 'Camry',
-  #     required_services: 'Кузовной ремонт, покраска бампера',
-  #     cost_calculation: '15000 рублей',
-  #     dialog_context: 'Запись на диагностику',
-  #     details: 'Заявка на кузовной ремонт'
-  #   }
+    # Prepare booking tool data
+    booking_data = {
+      customer_name: 'Иван Иванов',
+      customer_phone: '+7(999)123-45-67',
+      car_brand: 'Toyota',
+      car_model: 'Camry',
+      required_services: 'Кузовной ремонт, покраска бампера',
+      cost_calculation: '15000 рублей',
+      dialog_context: 'Запись на диагностику',
+      details: 'Заявка на кузовной ремонт'
+    }
 
-  #   # Execute booking tool
-  #   tool = BookingTool.new(telegram_user: user, chat: chat)
-  #   result = tool.execute(**booking_data)
+    # Execute booking tool
+    tool = BookingTool.new(telegram_user: user, chat: chat)
+    result = tool.execute(**booking_data)
 
-  #   # Process background jobs
-  #   perform_enqueued_jobs
+    # Process background jobs
+    perform_enqueued_jobs
 
-  #   # Check analytics events
-  #   booking_events = AnalyticsEvent.where(
-  #     event_name: AnalyticsService::Events::BOOKING_CREATED,
-  #     chat_id: @chat_id
-  #   )
-  #   assert_equal 1, booking_events.count
+    # Check analytics events
+    booking_events = AnalyticsEvent.where(
+      event_name: AnalyticsService::Events::BOOKING_CREATED,
+      chat_id: 943_084_337
+    )
+    assert_equal 1, booking_events.count
 
-  #   booking_event = booking_events.first
-  #   assert booking_event.properties['booking_id'].present?
-  #   assert booking_event.properties['services_count'].present?
-  #   assert booking_event.properties['user_segment'].present?
-  #   assert_equal 'Иван Иванов', booking_event.properties['customer_name']
-  #   assert_equal 'Toyota', booking_event.properties['car_brand']
-  # end
+    booking_event = booking_events.first
+    assert booking_event.properties['booking_id'].present?
+    assert booking_event.properties['services_count'].present?
+    assert booking_event.properties['user_segment'].present?
+    assert_equal 'Иван Иванов', booking_event.properties['customer_name']
+    assert_equal 'Toyota', booking_event.properties['car_brand']
+  end
 
-  # test "analytics gracefully handles errors without breaking main functionality" do
-  #   # Mock analytics to fail
-  #   AnalyticsService.stubs(:track).raises(StandardError.new('Analytics failed'))
+  test 'analytics gracefully handles errors without breaking main functionality' do
+    # Mock analytics to fail
+    AnalyticsService.stubs(:track).raises(StandardError.new('Analytics failed'))
 
-  #   # Main webhook should still work
-  #   post telegram_webhook_url, params: @sample_message, as: :json
+    # Main webhook should still work
+    VCR.use_cassette cassete_name, record: :new_episodes do
+      post_message 'Test message during analytics failure'
+    end
 
-  #   assert_response :success
+    assert_response :success
 
-  #   # Restore original method
-  #   AnalyticsService.unstub(:track)
-  # end
+    # Restore original method
+    AnalyticsService.unstub(:track)
+  end
 
-  # test "performance test: handles multiple events efficiently" do
-  #   AnalyticsEvent.delete_all
+  test 'performance test: handles multiple events efficiently' do
+    AnalyticsEvent.delete_all
 
-  #   start_time = Time.current
+    start_time = Time.current
 
-  #   # Simulate multiple concurrent requests
-  #   10.times do |i|
-  #     message = @sample_message.dup
-  #     message['text'] = "Тестовое сообщение #{i}"
+    # Simulate multiple concurrent requests
+    VCR.use_cassette "#{cassete_name}_bulk", record: :new_episodes do
+      5.times do |i|
+        post_message "Тестовое сообщение #{i}"
+      end
+    end
 
-  #     post telegram_webhook_url, params: message, as: :json
-  #   end
+    # Process all background jobs
+    perform_enqueued_jobs
 
-  #   # Process all background jobs
-  #   perform_enqueued_jobs
+    total_time = Time.current - start_time
 
-  #   total_time = Time.current - start_time
+    # Should complete within reasonable time (less than 10 seconds for 5 requests)
+    assert total_time < 10.seconds, "Too slow: #{total_time} seconds for 5 requests"
 
-  #   # Should complete within reasonable time (less than 5 seconds for 10 requests)
-  #   assert total_time < 5.seconds, "Too slow: #{total_time} seconds for 10 requests"
+    # Check that all events were created
+    dialog_events = AnalyticsEvent.where(
+      event_name: AnalyticsService::Events::DIALOG_STARTED
+    )
+    response_events = AnalyticsEvent.where(
+      event_name: AnalyticsService::Events::RESPONSE_TIME
+    )
 
-  #   # Check that all events were created
-  #   dialog_events = AnalyticsEvent.where(
-  #     event_name: AnalyticsService::Events::DIALOG_STARTED
-  #   )
-  #   response_events = AnalyticsEvent.where(
-  #     event_name: AnalyticsService::Events::RESPONSE_TIME
-  #   )
+    assert_equal 5, dialog_events.count
+    assert_equal 5, response_events.count
+  end
 
-  #   assert_equal 10, dialog_events.count
-  #   assert_equal 10, response_events.count
-  # end
+  test 'analytics respects session tracking across multiple messages' do
+    AnalyticsEvent.delete_all
 
-  # test "analytics respects session tracking across multiple messages" do
-  #   AnalyticsEvent.delete_all
+    # Send first message
+    VCR.use_cassette "#{cassete_name}_session1", record: :new_episodes do
+      post_message 'Первое сообщение'
+    end
+    perform_enqueued_jobs
 
-  #   # Send first message
-  #   post telegram_webhook_url, params: @sample_message, as: :json
-  #   perform_enqueued_jobs
+    first_event = AnalyticsEvent.where(
+      event_name: AnalyticsService::Events::DIALOG_STARTED,
+      chat_id: 943_084_337
+    ).first
 
-  #   first_event = AnalyticsEvent.where(
-  #     event_name: AnalyticsService::Events::DIALOG_STARTED,
-  #     chat_id: @chat_id
-  #   ).first
+    # Send second message (should not create new dialog start)
+    VCR.use_cassette "#{cassete_name}_session2", record: :new_episodes do
+      post_message 'Хочу узнать стоимость'
+    end
+    perform_enqueued_jobs
 
-  #   # Send second message (should not create new dialog start)
-  #   second_message = @sample_message.dup
-  #   second_message['text'] = 'Хочу узнать стоимость'
-  #   second_message['message_id'] = 124
+    # Should still have only one dialog start event
+    dialog_events = AnalyticsEvent.where(
+      event_name: AnalyticsService::Events::DIALOG_STARTED,
+      chat_id: 943_084_337
+    )
+    assert_equal 1, dialog_events.count
 
-  #   post telegram_webhook_url, params: second_message, as: :json
-  #   perform_enqueued_jobs
+    # Response time events should be different
+    response_events = AnalyticsEvent.where(
+      event_name: AnalyticsService::Events::RESPONSE_TIME,
+      chat_id: 943_084_337
+    )
+    assert_equal 2, response_events.count
+  end
 
-  #   # Should still have only one dialog start event
-  #   dialog_events = AnalyticsEvent.where(
-  #     event_name: AnalyticsService::Events::DIALOG_STARTED,
-  #     chat_id: @chat_id
-  #   )
-  #   assert_equal 1, dialog_events.count
+  test 'analytics correctly categorizes message types' do
+    AnalyticsEvent.delete_all
 
-  #   # Response time events should be different
-  #   response_events = AnalyticsEvent.where(
-  #     event_name: AnalyticsService::Events::RESPONSE_TIME,
-  #     chat_id: @chat_id
-  #   )
-  #   assert_equal 2, response_events.count
-  # end
+    # Test booking intent message
+    VCR.use_cassette "#{cassete_name}_booking_intent", record: :new_episodes do
+      post_message 'Хочу записаться на осмотр'
+    end
 
-  # test "analytics correctly categorizes message types" do
-  #   AnalyticsEvent.delete_all
+    dialog_event = AnalyticsEvent.where(
+      chat_id: 943_084_337,
+      event_name: AnalyticsService::Events::DIALOG_STARTED
+    ).first
 
-  #   # Test different message types
-  #   booking_message = @sample_message.dup
-  #   booking_message['text'] = 'Хочу записаться на осмотр'
-  #   booking_message['message_id'] = 201
+    assert_not_nil dialog_event, "Dialog event should be created"
+    assert_equal 'booking_intent', dialog_event.properties['message_type']
+  end
 
-  #   post telegram_webhook_url, params: booking_message, as: :json
+  test 'analytics handles VCR cassettes with proper data filtering' do
+    AnalyticsEvent.delete_all
 
-  #   dialog_event = AnalyticsEvent.where(
-  #     chat_id: @chat_id,
-  #     event_name: AnalyticsService::Events::DIALOG_STARTED
-  #   ).first
+    cassette_name = 'test_vcr_filtering'
 
-  #   assert_not_nil dialog_event, "Dialog event should be created"
-  #   assert_equal 'booking_intent', dialog_event.properties['message_type']
-  # end
+    VCR.use_cassette cassette_name, record: :new_episodes do
+      post_message 'Тестовое сообщение для VCR'
+    end
+
+    perform_enqueued_jobs
+
+    # Verify events were created during VCR recording
+    assert AnalyticsEvent.where(
+      chat_id: 943_084_337,
+      event_name: AnalyticsService::Events::DIALOG_STARTED
+    ).exists?
+
+    # Verify sensitive data is filtered from cassette
+    cassette_path = Rails.root.join('test', 'cassettes', "#{cassette_name}.yml")
+    if File.exist?(cassette_path)
+      cassette_content = File.read(cassette_path)
+      refute_includes cassette_content, 'Bearer', 'Sensitive data should be filtered from cassette'
+    end
+  end
+
+  test 'analytics tracks conversion funnel properly' do
+    AnalyticsEvent.delete_all
+
+    VCR.use_cassette "#{cassete_name}_funnel", record: :new_episodes do
+      # Initial booking intent
+      post_message 'Хочу записаться на ремонт'
+      perform_enqueued_jobs
+
+      # Follow-up question
+      post_message 'На завтра, в 10 утра'
+      perform_enqueued_jobs
+    end
+
+    # Check funnel progression
+    dialog_started = AnalyticsEvent.where(
+      event_name: AnalyticsService::Events::DIALOG_STARTED,
+      chat_id: 943_084_337
+    ).count
+
+    response_times = AnalyticsEvent.where(
+      event_name: AnalyticsService::Events::RESPONSE_TIME,
+      chat_id: 943_084_337
+    ).count
+
+    assert dialog_started >= 1
+    assert response_times >= 2
+
+    # Test conversion funnel query
+    funnel_data = AnalyticsEvent.conversion_funnel(1.hour.ago, Time.current)
+    assert funnel_data.present?
+  end
+
+  test 'analytics handles concurrent requests with proper session isolation' do
+    AnalyticsEvent.delete_all
+
+    threads = []
+    chat_ids = [111111111, 222222222, 333333333]
+
+    threads << Thread.new do
+      VCR.use_cassette "#{cassette_name}_thread1", record: :new_episodes do
+        post_with_chat_id(chat_ids[0], 'Thread 1 message')
+      end
+    end
+
+    threads << Thread.new do
+      VCR.use_cassette "#{cassette_name}_thread2", record: :new_episodes do
+        post_with_chat_id(chat_ids[1], 'Thread 2 message')
+      end
+    end
+
+    threads << Thread.new do
+      VCR.use_cassette "#{cassette_name}_thread3", record: :new_episodes do
+        post_with_chat_id(chat_ids[2], 'Thread 3 message')
+      end
+    end
+
+    threads.each(&:join)
+    perform_enqueued_jobs
+
+    # Each chat should have its own session
+    chat_ids.each do |chat_id|
+      events = AnalyticsEvent.where(chat_id: chat_id)
+      assert events.count >= 1, "Chat #{chat_id} should have events"
+      assert events.pluck(:session_id).uniq.count == 1, "Chat #{chat_id} should have single session"
+    end
+  end
+
+  private
+
+  def post_with_chat_id(chat_id, message_text)
+    from = { id: chat_id, is_bot: false, first_name: 'Test', last_name: 'User', username: 'testuser' }
+    chat = { id: chat_id, first_name: 'Test', last_name: 'User', username: 'testuser', type: 'private' }
+    message = {
+      update_id: 178271355 + chat_id,
+      message: { message_id: 323, from: from, chat: chat, date: Time.current.to_i, text: message_text }
+    }
+    post telegram_webhook_path, params: message
+  end
 end

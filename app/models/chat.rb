@@ -98,6 +98,9 @@ class Chat < ApplicationRecord
 
     # Handle tool calls if present
     persist_tool_calls(message.tool_calls) if message.tool_calls.present?
+
+    # Compact context if needed to prevent token bloat
+    ContextCompactionService.compact_if_needed(self)
   end
 
   # Обрабатывает и сохраняет tool calls из сообщения
