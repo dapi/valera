@@ -94,7 +94,9 @@
       "Read(//home/danil/.config/**)",
       "Read(//home/danil/**)",
       "Bash(claude:*)",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "SlashCommand(/sc:load)",
+      "Bash(rails test:*)"
     ],
     "deny": [],
     "ask": []

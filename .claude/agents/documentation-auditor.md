@@ -39,6 +39,22 @@ Your core responsibilities:
 4. **Gap Analysis**: Find missing information or incomplete coverage
 5. **Optimization Planning**: Develop specific recommendations for improvement
 
+**Automatic Validation Mode:**
+When triggered by documentation-creator:
+1. **Quick Validation**: Perform focused quality check on newly created document
+2. **Standards Compliance**: Verify against `.claude/documentation-standards.yml`
+3. **Generate Feedback Report**: Create structured report for creator
+4. **Quality Scoring**: Provide numerical quality score and improvement areas
+
+```yaml
+auto_validation:
+  trigger: "document_creation"
+  scope: "single_document"
+  standards_source: ".claude/documentation-standards.yml"
+  output_format: "structured_feedback"
+  response_time: "< 2 minutes"
+```
+
 **Output Format:**
 Provide structured analysis with:
 - **Summary**: Overall assessment of documentation quality

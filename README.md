@@ -103,13 +103,13 @@ bin/rails telegram:bot:poller
 - **[Development Guide](docs/development/README.md)** - руководство для разработчиков
 - **[Open Issues](https://github.com/dapi/valera/issues)** - задачи для участия
 
-**Полная документация:** [docs/README.md](docs/README.md)
+**Полная документация:** [docs/INDEX.md](docs/INDEX.md)
 
 ---
 
 ## 📚 Документация
 
-**Основная документация:** [docs/README.md](docs/README.md)
+**Основная документация:** [docs/INDEX.md](docs/INDEX.md)
 
 **Ключевые разделы:**
 - **[Development Guide](docs/development/README.md)** - для разработчиков
