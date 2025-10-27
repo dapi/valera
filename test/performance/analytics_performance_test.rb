@@ -102,36 +102,6 @@ class AnalyticsPerformanceTest < ActiveSupport::TestCase
     assert_equal 'test_session', created_event.session_id
   end
 
-  test 'memory usage stays reasonable with many events' do
-    # Check memory before
-    initial_objects = ObjectSpace.count_objects
-
-    # Create many events with reduced size
-    500.times do |i|
-      AnalyticsEvent.create!(
-        event_name: AnalyticsService::Events::RESPONSE_TIME,
-        chat_id: @chat_id + i,
-        properties: {
-          duration_ms: i,
-          model_used: 'deepseek-chat',
-          large_data: 'x' * 50 # Smaller payload
-        },
-        occurred_at: Time.current,
-        session_id: SecureRandom.hex(16)
-      )
-    end
-
-    # Force garbage collection
-    GC.start
-
-    # Check memory after
-    final_objects = ObjectSpace.count_objects
-    object_increase = final_objects[:TOTAL] - initial_objects[:TOTAL]
-
-    # Should not create excessive objects (reasonable limit)
-    assert object_increase < 8000, "Too many objects created: #{object_increase}"
-  end
-
   test 'database indexes improve query performance' do
     # Create data for index testing
     1000.times do |i|

@@ -108,13 +108,8 @@ class BookingTool < RubyLLM::Tool
       @telegram_user.chat_id,
       {
         booking_id: booking.id,
-        services_count: extract_services_count(meta),
-        estimated_total: extract_estimated_total(meta),
         processing_time_ms: ((Time.current - start_time) * 1000).to_i,
         user_segment: determine_user_segment(@telegram_user.chat_id),
-        customer_name: meta[:customer_name],
-        car_brand: meta[:car_brand],
-        car_model: meta[:car_model]
       }
     )
 
@@ -131,64 +126,6 @@ class BookingTool < RubyLLM::Tool
 
   private
 
-  # Отправляет информацию о заявке в административный чат
-  #
-  # @param request_info [String] информация о заявке
-  # @param username [String] username клиента
-  # @param name [String] имя клиента
-  # @param admin_chat_id [Integer] ID административного чата
-  # @return [void]
-  # @todo Реализовать через BookingNotificationJob
-  # @api private
-  def send_to_admin_chat(request_info, username, name, admin_chat_id)
-    # TODO: perform BookingNotificationJob
-  end
-
-  # Извлекает количество услуг из метаданных заявки
-  #
-  # Анализирует текстовый список услуг и определяет их количество.
-  # Если список пуст, возвращает 1 (базовая услуга).
-  #
-  # @param meta [Hash] метаданные заявки
-  # @return [Integer] количество услуг (от 1 до 10)
-  # @example
-  #   extract_services_count({ required_services: "Замена масла, диагностика" }) #=> 2
-  #   extract_services_count({ required_services: "" }) #=> 1
-  # @api private
-  def extract_services_count(meta)
-    return 1 if meta[:required_services].blank?
-
-    # Попытка посчитать количество услуг в тексте
-    services_text = meta[:required_services].to_s
-    services_count = services_text.scan(/,|\n|и/).count + 1
-    services_count <= 10 ? services_count : 1 # Ограничим разумным числом
-  end
-
-  # Извлекает предполагаемую стоимость из текстового описания
-  #
-  # Ищет числовые значения в тексте расчета стоимости и возвращает
-  # последнее найденное число как предполагаемую общую стоимость.
-  #
-  # @param meta [Hash] метаданные заявки
-  # @return [Integer, nil] предполагаемая стоимость или nil если не найдена
-  # @example
-  #   extract_estimated_total({ cost_calculation: "Итого: 5000 рублей" }) #=> 5000
-  #   extract_estimated_total({ cost_calculation: "" }) #=> nil
-  # @api private
-  def extract_estimated_total(meta)
-    return nil if meta[:cost_calculation].blank?
-
-    # Попытка извлечь числовое значение из текста стоимости
-    cost_text = meta[:cost_calculation].to_s
-    # Ищем числа в тексте (рубли, тысячи и т.д.)
-    numbers = cost_text.scan(/(\d+(?:\s?\d+)*)/)
-    return nil if numbers.empty?
-
-    # Берем последнее найденное число как общую стоимость
-    last_number = numbers.last&.first&.delete(' ')
-    last_number&.to_i
-  end
-
   # Определяет сегмент пользователя на основе истории взаимодействий
   #
   # Анализирует количество предыдущих событий для классификации
@@ -202,7 +139,7 @@ class BookingTool < RubyLLM::Tool
   #   determine_user_segment(67890) #=> 'engaged'
   # @note В тестовой среде всегда возвращает 'new'
   # @api private
-  def determine_user_segment(chat_id)
+  def determine_user_segment(chat_id) # TODO Вынести в Chat?
     return 'new' if Rails.env.test? # Для тестов
 
     events_count = AnalyticsEvent.by_chat(chat_id).count
