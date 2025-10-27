@@ -75,7 +75,15 @@
       "WebFetch(domain:playbooks.com)",
       "Bash(npm install:*)",
       "Bash(yardmcp:*)",
-      "Bash(bundle exec yard:*)"
+      "Bash(bundle exec yard:*)",
+      "Read(//Users/danil/code/samochat/**)",
+      "Read(//Users/danil/.config/**)",
+      "Read(//Users/danil/code/**)",
+      "Read(//Users/danil/Library/Application Support/Claude/**)",
+      "Read(//Users/danil/Library/**)",
+      "Read(//Users/danil/**)",
+      "Bash(ls:*)",
+      "WebFetch(domain:support.yclients.com)"
     ],
     "deny": [],
     "ask": []

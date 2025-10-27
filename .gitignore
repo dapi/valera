@@ -41,3 +41,4 @@
 /config/credentials/local.*
 
 .backup
+.DS_Store
