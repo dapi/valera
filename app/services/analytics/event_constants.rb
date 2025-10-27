@@ -12,6 +12,20 @@ module Analytics
       properties: [ :platform, :user_id, :message_type ]
     }.freeze
 
+    GREETING_SENT = {
+      name: 'greeting_sent',
+      description: 'Приветствие отправлено пользователю',
+      category: 'dialog',
+      properties: [ :user_id, :user_type, :delivery_time_ms, :template_used ]
+    }.freeze
+
+    USER_ENGAGEMENT = {
+      name: 'user_engagement',
+      description: 'Пользователь продолжил диалог после приветствия',
+      category: 'dialog',
+      properties: [ :user_id, :time_to_engagement_ms, :message_count, :engagement_type ]
+    }.freeze
+
     # События предложений услуг
     SERVICE_SUGGESTED = {
       name: 'service_suggested',
@@ -68,6 +82,8 @@ module Analytics
     # Все события в виде хеша для удобного доступа
     ALL_EVENTS = {
       dialog_started: DIALOG_STARTED,
+      greeting_sent: GREETING_SENT,
+      user_engagement: USER_ENGAGEMENT,
       service_suggested: SERVICE_SUGGESTED,
       service_added: SERVICE_ADDED,
       suggestion_accepted: SUGGESTION_ACCEPTED,

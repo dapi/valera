@@ -18,6 +18,8 @@ class AnalyticsService
   # Event constants for consistency - use EventConstants module
   module Events
     DIALOG_STARTED = Analytics::EventConstants.event_name(:dialog_started)
+    GREETING_SENT = Analytics::EventConstants.event_name(:greeting_sent)
+    USER_ENGAGEMENT = Analytics::EventConstants.event_name(:user_engagement)
     SERVICE_SUGGESTED = Analytics::EventConstants.event_name(:service_suggested)
     SERVICE_ADDED = Analytics::EventConstants.event_name(:service_added)
     CART_CONFIRMED = Analytics::EventConstants.event_name(:cart_confirmed)

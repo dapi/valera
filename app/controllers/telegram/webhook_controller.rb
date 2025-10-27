@@ -239,7 +239,7 @@ module Telegram
     def first_message_today?(chat_id)
       return true if Rails.env.test?
 
-      AnalyticsEvent
+      !AnalyticsEvent
         .by_chat(chat_id)
         .by_event(AnalyticsService::Events::DIALOG_STARTED)
         .where('occurred_at >= ?', Date.current)
