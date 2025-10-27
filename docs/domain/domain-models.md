@@ -282,8 +282,7 @@ transferred → resumed → archived
 
 ## 🔗 Связанные документы
 
-- **Ubiquitous Language:** `ubiquitous-language.md` - Терминология
-- **Business Rules:** `business-rules.md` - Детальные правила
+- **Terminology:** `terminology.md` - Объединенная терминология и бизнес-правила
 - **Bounded Contexts:** `bounded-contexts.md` - Контекстуальные границы
 
 ---

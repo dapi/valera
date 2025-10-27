@@ -195,7 +195,6 @@
 - **[ROADMAP.md](ROADMAP.md)** - План развития по фазам
 - **[Feature: Telegram Booking](requirements/features/feature-telegram-service-booking.md)** - Детальная функциональность
 - **[User Stories](requirements/user-stories/)** - Требования и метрики по функциям
-- **[docs-usage-metrics.md](docs-usage-metrics.md)** - Метрики использования документации
 
 ---
 

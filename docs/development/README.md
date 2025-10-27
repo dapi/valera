@@ -89,23 +89,12 @@ ruby .claude/pre-work-hook.rb "your task description"
 
 ## 📋 Процесс разработки
 
-### Workflow новой функции
+Подробный процесс разработки: **[../FLOW.md](../FLOW.md)**
 
-1. **User Story** (опционально)
-   - Шаблон: `docs/requirements/templates/`
-
-2. **Technical Design Document**
-   - Шаблон: `docs/requirements/templates/`
-
-3. **Реализация**
-   - Следовать [Product Constitution](docs/product/constitution.md)
-   - Использовать паттерны из `docs/gems/`
-   - TDD подход
-
-4. **Code Review**
-   ```bash
-   bin/ci  # Запустить локально
-   ```
+### Краткий workflow:
+1. User Story + Technical Design (согласно шаблонов)
+2. Реализация (следовать Product Constitution)
+3. Code Review (`bin/ci`)
 
 **См. подробнее:** [FLOW.md](docs/FLOW.md)
 
