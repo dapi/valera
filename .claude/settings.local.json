@@ -15,7 +15,7 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:rubygems.org)",
       "Bash(bundle show:*)",
-        "Bash(tree:*)",
+      "Bash(tree:*)",
       "Bash(find:*)",
       "Bash(rails generate:*)",
       "Bash(bundle exec rails generate:*)",
@@ -83,7 +83,9 @@
       "Read(///**)",
       "Read(//var/lib/**)",
       "Bash(systemctl status:*)",
-      "Read(//etc/**)"
+      "Read(//etc/**)",
+      "mcp__serena__think_about_collected_information",
+      "mcp__serena__list_dir"
     ],
     "deny": [],
     "ask": []

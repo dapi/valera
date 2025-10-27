@@ -46,8 +46,8 @@
 ## 🔗 Связанные документы
 
 - **User Story:** [US-003-telegram-photo-damage-assessment.md](../user-stories/US-003-telegram-photo-damage-assessment.md) ( prerequisite)
-- **Technical Design Document:** [../../tsd/TSD-004-telegram-insurance-automation.md](../../tsd/TSD-004-telegram-insurance-automation.md)
-- **Implementation:** В соответствии с [FLOW.md](../../FLOW.md)
+- **Technical Design Document:** [../tsd/TSD-004-telegram-insurance-automation.md](../tsd/TSD-004-telegram-insurance-automation.md)
+- **Implementation:** В соответствии с [../../FLOW.md](../../FLOW.md)
 
 ## 🚫 Исключения (Edge Cases)
 

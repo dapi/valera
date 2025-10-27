@@ -11,9 +11,9 @@
 
 ## 🚀 Критически важные документы (Обязательно к прочтению)
 
-### 1. **Product Constitution** (`../docs/product/constitution.md`)
+### 1. **Product Constitution** (`../product/constitution.md`)
 **ОБЯЗАТЕЛЬНО К ИЗУЧЕНИЮ!** Критичные принципы: Dialogue-Only Interaction, AI-First Approach.
-→ [Полная информация](../docs/product/constitution.md)
+→ [Полная информация](../product/constitution.md)
 
 ### 2. **🔄 FLOW** (`../FLOW.md`) - **КРИТИЧЕСКИ ВАЖНО**
 - **Двухдокументный подход:** User Story + Technical Specification Document
@@ -30,7 +30,7 @@
 
 ### 📂 **Текущая структура:**
 
-#### 📝 **User Stories** (`docs/requirements/user-stories/`)
+#### 📝 **User Stories** (`user-stories/`)
 Фокус на потребностях пользователя:
 - User Story (As a... I want... So that...)
 - User Acceptance Criteria (3 типа)
@@ -38,7 +38,7 @@
 - Definition of Done
 - 🔗 Связь с TSD-XXX
 
-#### 🏗️ **Technical Specification Documents** (`docs/requirements/tsd/`)
+#### 🏗️ **Technical Specification Documents** (`tsd/`)
 Фокус на технической реализации:
 - Технические требования (Functional, Performance, Security)
 - Архитектура и компоненты
@@ -49,15 +49,19 @@
 
 #### 📂 **Остальные каталоги:**
 - **Templates** (`templates/`) - FLOW шаблоны
+- **Analysis** (`analysis/`) - аналитические документы и исследования
 - **API** (`api/`) - API документация
 - **Features** (`features/`) - описания функций
 - **Backlog** (`backlog/`) - бэклог задач
+- **Archive** (`_archive/`) - архивные документы
+- **FIP** (`fip/`) - Feature Implementation Plans
 
 ### 📂 `/user-stories/` - User Stories
 Формат: `US-XXX-короткое-название.md`
 
 ### 📂 `/templates/` - FLOW шаблоны
-- `user-story-hybrid-template.md` - **ОСНОВНОЙ шаблон User Story**
+- `user-story-template.md` - **ОСНОВНОЙ шаблон User Story**
+- `user-story-examples.md` - Примеры User Story по типам функций
 - `technical-specification-document-template.md` - **ОСНОВНОЙ шаблон TSD**
 
 ## 🔄 Процесс разработки функции
@@ -65,8 +69,8 @@
 **🚀 ПОЛНЫЙ ПРОЦЕСС:** [FLOW.md](../FLOW.md) - **читай это перед созданием новой функции!**
 
 Процесс разработки состоит из трех этапов:
-1. **User Story** (1-2 часа) → `docs/requirements/user-stories/US-XXX.md` - фокус на потребностях пользователя
-2. **Technical Specification** (2-3 часа) → `docs/requirements/tsd/TSD-XXX.md` - техническая реализация
+1. **User Story** (1-2 часа) → `user-stories/US-XXX.md` - фокус на потребностях пользователя
+2. **Technical Specification** (2-3 часа) → `tsd/TSD-XXX.md` - техническая реализация
 3. **Implementation** - разработка согласно плану в TSD
 
 **Исключения (без US+TDD):** Simple bug fixes (< 1 часа), Documentation updates, Configuration changes, Small refactors (< 2 часов)
@@ -81,7 +85,7 @@
 - Требует контекстной документации для будущей поддержки
 - Implementation Plan встроен в FIP
 
-**Формат:** `FIP-XXX-название.md` в `docs/requirements/`
+**Формат:** `FIP-XXX-название.md` в корне `docs/requirements/`
 
 ### US+TSD (User Story + Technical Specification)
 Используется для пользовательских историй с четкой бизнес-ценностью.
@@ -90,8 +94,8 @@
 - TSD включает Implementation Plan
 
 **Формат:**
-- `US-XXX-название.md` в `docs/requirements/user-stories/`
-- `TSD-XXX-название.md` в `docs/requirements/tsd/`
+- `US-XXX-название.md` в `user-stories/`
+- `TSD-XXX-название.md` в `tsd/`
 
 ### Decision Tree
 ```
@@ -110,7 +114,7 @@
 
 - [CLAUDE.md](../../CLAUDE.md) - Основная документация проекта
 - [Gems Documentation](../gems/) - Документация по technical gems
-- [Technical Solutions](./technical-solutions/) - Технические решения
+- [Technical Solutions](../technical-solutions/) - Технические решения
 - [Project Repository](../../) - Основной код проекта
 
 ---

@@ -5,7 +5,7 @@
 **Приоритет:** Medium
 **Создан:** 25.10.2025
 **Обновлен:** 25.10.2025
-**User Story:** [../requirements/user-stories/US-003-telegram-photo-damage-assessment.md](../requirements/user-stories/US-003-telegram-damage-assessment.md)
+**User Story:** [../user-stories/US-003-telegram-photo-damage-assessment.md](../user-stories/US-003-telegram-photo-damage-assessment.md)
 
 ## 🎯 User Story
 

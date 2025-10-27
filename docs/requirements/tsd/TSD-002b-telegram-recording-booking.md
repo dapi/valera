@@ -5,7 +5,7 @@
 **Приоритет:** High
 **Создан:** 25.10.2025
 **Обновлен:** 25.10.2025
-**User Story:** [../user_stories/US-002b-telegram-recording-booking.md](../user_stories/US-002b-telegram-recording-booking.md)
+**User Story:** [../user-stories/US-002b-telegram-recording-booking.md](../user-stories/US-002b-telegram-recording-booking.md)
 
 ## 🎯 User Story
 
@@ -514,7 +514,7 @@ end
 ```
 
 ## 🔗 Связанные документы
-- **User Story:** [../user_stories/US-002b-telegram-recording-booking.md](../user_stories/US-002b-telegram-recording-booking.md)
+- **User Story:** [../user-stories/US-002b-telegram-recording-booking.md](../user-stories/US-002b-telegram-recording-booking.md)
 - **Dependencies:** US-001, US-002a
 - **External documentation:**
   - [ruby_llm gem documentation](../gems/ruby_llm/)

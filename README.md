@@ -188,7 +188,7 @@ bin/rails telegram:bot:poller
 
 ### Навигация
 
-- **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Полный указатель документации
+- **[docs/README.md](docs/README.md)** - Основная документация проекта
 
 ---
 

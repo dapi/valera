@@ -5,7 +5,7 @@
 **Приоритет:** Low
 **Создан:** 25.10.2025
 **Обновлен:** 25.10.2025
-**User Story:** [../requirements/user-stories/US-004-telegram-insurance-automation.md](../requirements/user-stories/US-004-telegram-insurance-automation.md)
+**User Story:** [../user-stories/US-004-telegram-insurance-automation.md](../user-stories/US-004-telegram-insurance-automation.md)
 
 ## 🎯 User Story
 
