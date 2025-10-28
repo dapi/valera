@@ -82,46 +82,11 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
-  config.hosts = [
-    ENV.fetch('APPLICATION_HOST', 'localhost'),
-    /.*\.#{ENV.fetch('APPLICATION_DOMAIN', 'localhost')}/
-  ]
-
+  # config.hosts = [
+  #   "example.com",     # Allow requests from example.com
+  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
+  # ]
+  #
   # Skip DNS rebinding protection for the default health check endpoint.
-  config.host_authorization = {
-    exclude: ->(request) { request.path == '/up' || request.path.start_with?('/health') }
-  }
-
-  # Security headers configuration
-  config.action_dispatch.default_headers = {
-    'X-Frame-Options' => 'DENY',
-    'X-Content-Type-Options' => 'nosniff',
-    'X-XSS-Protection' => '1; mode=block',
-    'Referrer-Policy' => 'strict-origin-when-cross-origin'
-  }
-
-  # Rate limiting configuration
-  config.action_dispatch.rescue_responses['ActionController::RoutingError'] = :not_found
-
-  # Production-specific performance optimizations
-  config.middleware.use ActionDispatch::Cookies
-  config.middleware.use ActionDispatch::Session::CookieStore
-
-  # Enable detailed error logging for monitoring
-  config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'info')
-
-  # Error reporting configuration
-  if ENV['SENTRY_DSN'].present?
-    require 'sentry-ruby'
-    require 'sentry-rails'
-
-    Sentry.init do |config|
-      config.dsn = ENV['SENTRY_DSN']
-      config.breadcrumbs_logger = [ :active_support_logger, :http_logger ]
-      config.environment = Rails.env
-      config.release = ENV['GIT_COMMIT_SHA'] || `git rev-parse HEAD`.strip
-      config.traces_sample_rate = ENV.fetch('SENTRY_TRACES_SAMPLE_RATE', 0.1).to_f
-      config.send_default_pii = false
-    end
-  end
+  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end

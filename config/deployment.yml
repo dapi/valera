@@ -1,0 +1,92 @@
+# Production Deployment Configuration
+# Environment variables for production deployment
+
+# Application Configuration
+APPLICATION_HOST: valera.yourdomain.com
+APPLICATION_DOMAIN: yourdomain.com
+RAILS_ENV: production
+RAILS_LOG_LEVEL: info
+RAILS_SERVE_STATIC_FILES: true
+
+# Database Configuration
+DATABASE_URL: postgresql://username:password@host:5432/database_name
+DATABASE_POOL_SIZE: 5
+DATABASE_TIMEOUT: 5000
+
+# Redis Configuration (if used)
+REDIS_URL: redis://host:6379/0
+
+# Telegram Bot Configuration
+TELEGRAM_BOT_TOKEN: your_telegram_bot_token
+TELEGRAM_WEBHOOK_URL: https://valera.yourdomain.com/telegram/webhook
+
+# AI/LLM Provider Configuration
+LLM_PROVIDER: deepseek
+LLM_MODEL: deepseek-chat
+DEEPSEEK_API_KEY: your_deepseek_api_key
+LLM_TIMEOUT: 30
+LLM_MAX_RETRIES: 3
+
+# Security Configuration
+SECRET_KEY_BASE: your_secret_key_base
+RAILS_MASTER_KEY: your_rails_master_key
+SENTRY_DSN: your_sentry_dsn
+SENTRY_TRACES_SAMPLE_RATE: 0.1
+
+# SSL/TLS Configuration
+FORCE_SSL: true
+SSL_OPTIONS:
+
+# Cache Configuration
+CACHE_STORE: solid_cache_store
+SOLID_CACHE_PATH: tmp/cache
+
+# Queue Configuration
+ACTIVE_JOB_QUEUE_ADAPTER: solid_queue
+SOLID_QUEUE_CONNECTS_TO: database: { writing: :queue }
+
+# Performance Configuration
+WEB_CONCURRENCY: 2
+RAILS_MAX_THREADS: 5
+RAILS_MIN_THREADS: 2
+
+# Monitoring Configuration
+NEW_RELIC_LICENSE_KEY: your_new_relic_license_key
+NEW_RELIC_APP_NAME: Valera Production
+
+# Backup Configuration
+BACKUP_SCHEDULE: daily
+BACKUP_RETENTION_DAYS: 30
+S3_BACKUP_BUCKET: valera-backups
+AWS_ACCESS_KEY_ID: your_aws_access_key
+AWS_SECRET_ACCESS_KEY: your_aws_secret_key
+AWS_REGION: us-east-1
+
+# Logging Configuration
+LOG_LEVEL: info
+LOG_TO_STDOUT: true
+RAILS_LOG_TO_STDOUT: true
+
+# Timezone Configuration
+TIMEZONE: Europe/Moscow
+
+# Analytics Configuration
+ANALYTICS_ENABLED: true
+ANALYTICS_PROVIDER: google
+GOOGLE_ANALYTICS_ID: your_google_analytics_id
+
+# Email Configuration (optional)
+SMTP_HOST: smtp.gmail.com
+SMTP_PORT: 587
+SMTP_USERNAME: your_email@gmail.com
+SMTP_PASSWORD: your_email_password
+SMTP_DOMAIN: gmail.com
+EMAIL_FROM: noreply@yourdomain.com
+
+# Rate Limiting Configuration
+RATE_LIMIT_REQUESTS_PER_MINUTE: 60
+RATE_LIMIT_BURST: 10
+
+# Health Check Configuration
+HEALTH_CHECK_ENABLED: true
+HEALTH_CHECK_PATH: /health

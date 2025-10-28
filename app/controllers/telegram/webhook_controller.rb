@@ -100,9 +100,12 @@ module Telegram
     # @see BookingTool для реализации создания заявок
     # @note Tools используются AI для выполнения действий в реальном мире
     def setup_chat_tools
-      llm_chat.with_tool(BookingTool.new(telegram_user:, chat: llm_chat))
-              .on_tool_call { |tool_call| handle_tool_call(tool_call) }
-              .on_tool_result { |result| handle_tool_result(result) }
+      llm_chat
+        .with_tool(BookingTool.new(telegram_user:, chat: llm_chat))
+        .with_temperature(0.5) # TODO Вынести в конфигурацию
+        .with_instructions(SystemPromptService.system_prompt, replace: true)
+        .on_tool_call { |tool_call| handle_tool_call(tool_call) }
+        .on_tool_result { |result| handle_tool_result(result) }
     end
 
     # Обрабатывает вызов инструмента со стороны AI
@@ -153,7 +156,8 @@ module Telegram
     def send_response_to_user(ai_response)
       content = ai_response.content
       Rails.logger.debug { "AI Response: #{content}" }
-      respond_with :message, text: MarkdownCleaner.clean(content), parse_mode: 'Markdown'
+      cleaned_content = MarkdownCleanerService.clean_with_line_breaks(content)
+      respond_with :message, text: cleaned_content, parse_mode: 'Markdown'
     end
 
     # Обрабатывает callback запросы от inline клавиатур

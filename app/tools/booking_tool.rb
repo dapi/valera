@@ -110,7 +110,7 @@ class BookingTool < RubyLLM::Tool
       {
         booking_id: booking.id,
         processing_time_ms: ((Time.current - start_time) * 1000).to_i,
-        user_segment: determine_user_segment(@telegram_user.chat_id),
+        user_segment: UserSegmentationService.determine_segment_for_user(@telegram_user)
       }
     )
 
@@ -130,37 +130,5 @@ class BookingTool < RubyLLM::Tool
       booking_data: meta
     })
     RubyLLM::Content.new("Ошибка при обработке заявки: #{e.message}")
-  end
-
-  private
-
-  # Определяет сегмент пользователя на основе истории взаимодействий
-  #
-  # Анализирует количество предыдущих событий для классификации
-  # пользователя по сегментам вовлеченности.
-  #
-  # @param chat_id [Integer] ID чата пользователя
-  # @return [String] сегмент пользователя ('new', 'engaged', 'returning', 'unknown')
-  # @example В тестовой среде
-  #   determine_user_segment(12345) #=> 'new'
-  # @example Для активного пользователя
-  #   determine_user_segment(67890) #=> 'engaged'
-  # @note В тестовой среде всегда возвращает 'new'
-  # @api private
-  def determine_user_segment(chat_id) # TODO Вынести в Chat?
-    return 'new' if Rails.env.test? # Для тестов
-
-    events_count = AnalyticsEvent.by_chat(chat_id).count
-
-    case events_count
-    when 1..2
-      'new'
-    when 3..10
-      'engaged'
-    else
-      'returning'
-    end
-  rescue
-    'unknown' # Если произошла ошибка при определении
   end
 end

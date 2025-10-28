@@ -38,7 +38,7 @@ class MarkdownCleanerService
     /^\* (.+)$/m => '• \1', # Bullet points
     /^\d+\.?\s*(.+)$/m => '\1', # Numbered lists
     /^> (.+)$/m => '\1', # Blockquotes
-    /^\|.*\|$/m => '', # Remove table lines
+    /^\|.*\|$/m => '' # Remove table lines
   }.freeze
 
   class << self

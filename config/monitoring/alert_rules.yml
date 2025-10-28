@@ -1,0 +1,187 @@
+# Alert Rules for Valera Production Monitoring
+
+groups:
+  - name: valera_app_alerts
+    rules:
+      - alert: ApplicationDown
+        expr: up{job="valera-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Valera application is down"
+          description: "Valera application has been down for more than 1 minute."
+
+      - alert: HighErrorRate
+        expr: valera:error_rate > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes."
+
+      - alert: HighResponseTime
+        expr: valera:request_duration_seconds > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s for the last 5 minutes."
+
+      - alert: LowActiveUsers
+        expr: valera:active_users < 10
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: "Low user activity detected"
+          description: "Only {{ $value }} active users detected for the last 10 minutes."
+
+  - name: ai_service_alerts
+    rules:
+      - alert: AIServiceDown
+        expr: ai_requests_total == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "AI service is not responding"
+          description: "No AI requests processed for the last 5 minutes."
+
+      - alert: HighAIResponseTime
+        expr: valera:ai_request_duration > 30
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High AI response time"
+          description: "AI response time is {{ $value }}s for the last 3 minutes."
+
+      - alert: AIErrorRate
+        expr: rate(ai_requests_failed_total[5m]) / rate(ai_requests_total[5m]) > 0.2
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High AI error rate"
+          description: "AI error rate is {{ $value | humanizePercentage }} for the last 5 minutes."
+
+  - name: database_alerts
+    rules:
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "PostgreSQL database has been down for more than 1 minute."
+
+      - alert: DatabaseConnectionHigh
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connections"
+          description: "{{ $value }} active database connections for the last 5 minutes."
+
+      - alert: DatabaseSlowQueries
+        expr: rate(pg_stat_statements_mean_time_seconds[5m]) > 2
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query time is {{ $value }}s for the last 5 minutes."
+
+  - name: redis_alerts
+    rules:
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been down for more than 1 minute."
+
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage is high"
+          description: "Redis memory usage is {{ $value | humanizePercentage }}."
+
+  - name: system_alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}% for the last 5 minutes."
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | humanizePercentage }}."
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is {{ $value | humanizePercentage }} available."
+
+  - name: ssl_alerts
+    rules:
+      - alert: SSLCertificateExpiring
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 7
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate expires in {{ $value | humanizeDuration }}."
+
+      - alert: SSLCertificateExpired
+        expr: probe_ssl_earliest_cert_expiry - time() <= 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SSL certificate expired"
+          description: "SSL certificate has expired."
+
+  - name: telegram_alerts
+    rules:
+      - alert: TelegramWebhookFailing
+        expr: telegram_webhook_errors_total / telegram_webhook_requests_total > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Telegram webhook failing"
+          description: "Telegram webhook error rate is {{ $value | humanizePercentage }}."
+
+      - alert: TelegramBotNotResponding
+        expr: telegram_bot_is_responding == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Telegram bot not responding"
+          description: "Telegram bot has not been responding for the last 1 minute."

@@ -25,9 +25,12 @@ class SystemPromptService
   #   #=> "Ты AI ассистент автосервиса 'Валера'..."
   # @note Результат используется для инициализации AI чата
   def self.system_prompt
+    current_time = Time.current.in_time_zone.strftime('%d.%m.%Y %H:%M (%Z)')
+
     ApplicationConfig.system_prompt
                      .gsub(/{{\s*COMPANY_INFO\s*}}/, ApplicationConfig.company_info)
                      .gsub(/{{\s*PRICE_LIST\s*}}/, ApplicationConfig.price_list)
+                     .gsub(/{{\s*CURRENT_TIME\s*}}/, current_time)
 
     # Антропик просит в system mesage добавлять, то попробуем пока так
     # .gsub(/{TOOLS_INSTRUCTION}/, ApplicationConfig.tools_instruction)

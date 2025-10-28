@@ -37,15 +37,6 @@ class Chat < ApplicationRecord
     self.model ||= Model.find_by!(provider: ApplicationConfig.llm_provider, model_id: ApplicationConfig.llm_model)
   end
 
-  # Устанавливает системные инструкции после создания
-  #
-  # @return [void]
-  # @note Использует SystemPromptService для получения инструкций
-  # @see SystemPromptService
-  after_create do
-    with_instructions SystemPromptService.system_prompt
-  end
-
   # Сбрасывает диалог к начальному состоянию
   #
   # Удаляет все сообщения и устанавливает системные инструкции заново.
@@ -58,7 +49,6 @@ class Chat < ApplicationRecord
   # @note Также можно использовать для очистки контекста при ошибках
   def reset!
     messages.destroy_all
-    with_instructions SystemPromptService.system_prompt
   end
 
   private
@@ -98,6 +88,9 @@ class Chat < ApplicationRecord
 
     # Handle tool calls if present
     persist_tool_calls(message.tool_calls) if message.tool_calls.present?
+
+    # Compact context if needed to prevent token bloat
+    ContextCompactionService.compact_if_needed(self)
   end
 
   # Обрабатывает и сохраняет tool calls из сообщения
