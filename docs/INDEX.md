@@ -18,7 +18,7 @@
 #### **🚀 Quick Start**
 - **[Main README](../README.md)** - Project overview and setup
 - **[Development Guide](development/README.md)** - Developer setup and workflows
-- **[Tech Stack](development/stack.md)** - Complete technology overview
+- **[Tech Stack](development/tech-stack.md)** - Complete technology overview
 
 #### **🏗️ Architecture & Design**
 - **[Architecture Decisions](architecture/decisions.md)** - System design rationale

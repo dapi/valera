@@ -7,7 +7,7 @@
 
 ## 📋 Executive Summary
 
-Valera трансформируется из продукта для одного автосервиса в **SaaS-платформу** с subscription-based моделью монетизации после внедрения multi-tenancy (FIP-002).
+Valera трансформируется из продукта для одного автосервиса в **SaaS-платформу** с subscription-based моделью монетизации после внедрения multi-tenancy (FIP-004).
 
 ### Бизнес-модель:
 - **SaaS (Software as a Service)** - ежемесячная подписка
@@ -248,8 +248,8 @@ QRR: 975,000₽
 ## 🚀 Go-to-Market Timeline
 
 ### Месяц 0: Pre-Launch
-- [ ] Реализация FIP-002 (Multi-Tenancy)
-- [ ] Реализация FIP-003 (BossBot авторизация)
+- [ ] Реализация FIP-004 (Multi-Tenancy)
+- [ ] Реализация FIP-005 (BossBot авторизация)
 - [ ] Подготовка landing page
 - [ ] Создание demo аккаунта
 
@@ -370,7 +370,7 @@ QRR: 975,000₽
 
 - **[business-value.md](business-value.md)** - Детальная бизнес-ценность
 - **[saas-overview.md](saas-overview.md)** - Общие сведения SaaS
-- **[../requirements/FIP-002-multitenancy.md](../requirements/FIP-002-multitenancy.md)** - Multi-tenancy техническая реализация
+- **[../requirements/fip/FIP-004-multitenancy.md](../requirements/fip/FIP-004-multitenancy.md)** - Multi-tenancy техническая реализация
 - **[../requirements/ROADMAP.md](../requirements/ROADMAP.md)** - Продуктовый roadmap
 
 ---

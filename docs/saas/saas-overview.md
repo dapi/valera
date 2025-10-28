@@ -446,8 +446,8 @@ Year 3: 100 clients, 1.8M MRR, 21.6M ARR
 ## 🎯 Success Criteria
 
 ### Phase 1 (Month 1-3):
-- [ ] Multi-tenancy реализован (FIP-002)
-- [ ] BossBot авторизация работает (FIP-003)
+- [ ] Multi-tenancy реализован (FIP-004)
+- [ ] BossBot авторизация работает (FIP-005)
 - [ ] 3-5 pilot клиентов
 - [ ] MRR > 50,000₽
 
@@ -470,8 +470,8 @@ Year 3: 100 clients, 1.8M MRR, 21.6M ARR
 
 - **[monetization-strategy.md](monetization-strategy.md)** - Стратегия монетизации
 - **[business-value.md](business-value.md)** - Бизнес-ценность
-- **[../requirements/FIP-002-multitenancy.md](../requirements/FIP-002-multitenancy.md)** - Multi-tenancy реализация
-- **[../requirements/FIP-003-memberships-boss-bot.md](../requirements/FIP-003-memberships-boss-bot.md)** - BossBot авторизация
+- **[../requirements/fip/FIP-004-multitenancy.md](../requirements/fip/FIP-004-multitenancy.md)** - Multi-tenancy реализация
+- **[../requirements/fip/FIP-005-memberships-boss-bot.md](../requirements/fip/FIP-005-memberships-boss-bot.md)** - BossBot авторизация
 - **[../requirements/ROADMAP.md](../requirements/ROADMAP.md)** - Roadmap
 
 ---

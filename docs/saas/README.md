@@ -43,8 +43,8 @@
 
 ## 🔗 Связанные документы
 
-- **[../requirements/FIP-002-multitenancy.md](../requirements/FIP-002-multitenancy.md)** - Техническая реализация multi-tenancy
-- **[../requirements/FIP-003-memberships-boss-bot.md](../requirements/FIP-003-memberships-boss-bot.md)** - Авторизация владельцев
+- **[../requirements/fip/FIP-004-multitenancy.md](../requirements/fip/FIP-004-multitenancy.md)** - Техническая реализация multi-tenancy
+- **[../requirements/fip/FIP-005-memberships-boss-bot.md](../requirements/fip/FIP-005-memberships-boss-bot.md)** - Авторизация владельцев
 - **[../requirements/ROADMAP.md](../requirements/ROADMAP.md)** - План разработки продукта
 - **[../business-metrics.md](../business-metrics.md)** - Целевые метрики
 
