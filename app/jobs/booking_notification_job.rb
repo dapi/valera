@@ -19,9 +19,6 @@ class BookingNotificationJob < ApplicationJob
 
   queue_as :default
 
-  # Повторяет выполнение при стандартных ошибках
-  retry_on StandardError, wait: :exponentially_longer, attempts: 3
-
   # Выполняет отправку уведомления о новой заявке
   #
   # @param booking [Booking] созданная заявка для уведомления
