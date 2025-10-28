@@ -683,7 +683,7 @@ gem 'request_store', '~> 1.5'
 **Версия:** 1.0
 **Дата создания:** 27.10.2025
 **Тип документа:** Feature Implementation Plan (FIP)
-**Статус:** Draft - ready for review
+**Статус:** Draft
 
 **Основные решения:**
 - ✅ TelegramUser - глобальный (БЕЗ account_id)

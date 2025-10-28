@@ -1244,7 +1244,7 @@ TELEGRAM_AUTH_EXPIRATION=300 # 5 минут
 **Версия:** 1.0
 **Дата создания:** 27.10.2025 02:00
 **Тип документа:** Feature Implementation Plan (FIP)
-**Статус:** Draft - ready for review
+**Статус:** Draft
 
 **Основные решения:**
 - ✅ Два типа ботов: Service Bots (для клиентов) и BossBot (для владельцев)

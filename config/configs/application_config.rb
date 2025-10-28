@@ -40,6 +40,9 @@ class ApplicationConfig < Anyway::Config
     # Conversation management
     max_history_size: 10,
 
+    # LLM configuration
+    llm_temperature: 0.5,
+
     # Development warnings
     development_warning: true
   )
@@ -78,6 +81,9 @@ class ApplicationConfig < Anyway::Config
     rate_limit_period: :integer,
     max_history_size: :integer,
     webhook_port: :integer,
+
+    # Floats
+    llm_temperature: :float,
 
     # Booleans
     development_warning: :boolean

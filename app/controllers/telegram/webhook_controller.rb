@@ -102,7 +102,7 @@ module Telegram
     def setup_chat_tools
       llm_chat
         .with_tool(BookingTool.new(telegram_user:, chat: llm_chat))
-        .with_temperature(0.5) # TODO Вынести в конфигурацию
+        .with_temperature(ApplicationConfig.llm_temperature)
         .with_instructions(SystemPromptService.system_prompt, replace: true)
         .on_tool_call { |tool_call| handle_tool_call(tool_call) }
         .on_tool_result { |result| handle_tool_result(result) }

@@ -50,17 +50,15 @@ class MarkdownCleanerService
     def clean_for_telegram(text, preserve_line_breaks: false)
       return '' if text.blank?
 
-      cleaned_text = text.dup
+      # Оптимизированная версия с минимальным созданием временных строк
+      text = apply_basic_replacements(text)
+      text = handle_code_blocks(text)
+      text = handle_formatting(text)
+      text = handle_lists_optimized(text)
+      text = clean_extra_whitespace(text)
+      text = handle_line_breaks(text, preserve_line_breaks)
 
-      # Apply transformations
-      cleaned_text = apply_basic_replacements(cleaned_text)
-      cleaned_text = handle_code_blocks(cleaned_text)
-      cleaned_text = handle_formatting(cleaned_text)
-      cleaned_text = handle_lists(cleaned_text)
-      cleaned_text = clean_extra_whitespace(cleaned_text)
-      cleaned_text = handle_line_breaks(cleaned_text, preserve_line_breaks)
-
-      cleaned_text.strip
+      text.strip
     rescue StandardError => e
       log_error(e, { text: text, service: 'MarkdownCleanerService' })
       text # Return original text if cleaning fails
@@ -154,7 +152,19 @@ class MarkdownCleanerService
       text
     end
 
-    # Обрабатывает списки
+    # Обрабатывает списки (оптимизированная версия)
+    #
+    # @param text [String] текст для обработки
+    # @return [String] обработанный текст
+    def handle_lists_optimized(text)
+      # Используем gsub! для работы с одной строкой вместо split/map/join
+      text.gsub!(/^\* (.+)$/, '• \1')
+      text.gsub!(/^\d+\.?\s*(.+)$/, '\1')
+      text.gsub!(/^-\s*(.+)$/, '• \1')
+      text
+    end
+
+    # Обрабатывает списки (оригинальная версия для сложных случаев)
     #
     # @param text [String] текст для обработки
     # @return [String] обработанный текст
