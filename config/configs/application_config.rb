@@ -109,6 +109,17 @@ class ApplicationConfig < Anyway::Config
     File.read(welcome_message_path).presence || raise('No welcome message defined')
   end
 
+  # Возвращает ID бота из токена (цифры до двоеточия)
+  def bot_id
+    @bot_id ||= begin
+      return nil if bot_token.blank?
+      # Токен выглядит как '1231232113:asdsadsas', где цифра до : - это bot_id
+      bot_token.split(':').first.to_i
+    rescue
+      nil
+    end
+  end
+
   # Declare required parameters using anyway_config's required method
   required :bot_token, :llm_provider, :llm_model
 

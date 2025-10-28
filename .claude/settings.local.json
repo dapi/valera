@@ -115,7 +115,17 @@
       "Bash(./bin/serena-no-lsp:*)",
       "mcp__tavily__tavily-search",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "Bash(bash:*)",
+      "mcp__tavily__tavily-extract",
+      "Bash(ruby-lsp:*)",
+      "Bash(git show:*)",
+      "Bash(netstat:*)",
+      "Bash(lsof:*)",
+      "Bash(awk:*)",
+      "Bash(xargs kill:*)",
+      "Bash(source:*)",
+      "Bash(exec:*)"
     ],
     "deny": [],
     "ask": []

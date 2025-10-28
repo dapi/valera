@@ -200,6 +200,46 @@ module Telegram
       respond_with :message, text: 'Ваши данные и диалоги удалены из базы данных. Можно начинать сначала'
     end
 
+    # Обработчик добавления новых участников в чат
+    #
+    # Проверяет, что добавлен именно наш бот по ID, и отправляет
+    # уведомление с chat_id для настройки бота в группе.
+    #
+    # @param message [Hash] данные сообщения о добавлении участников
+    # @return [void] запускает ChatIdNotificationJob для отправки уведомления
+    # @see ApplicationConfig#bot_id для получения ID бота из токена
+    # @see ChatIdNotificationJob для отправки уведомления
+    # @example При добавлении бота в группу
+    #   new_chat_members(message)
+    #   #=> Владелец получит сообщение с chat_id группы
+    def new_chat_members(message)
+      chat_id = message.dig('chat', 'id')
+      new_members = message['new_chat_members']
+
+      # Проверяем что добавлен ИМЕННО НАШ бот по ID
+      bot_added = new_members&.any? do |member|
+        member['is_bot'] && member['id'] == ApplicationConfig.bot_id
+      end
+
+      ChatIdNotificationJob.perform_later(chat_id) if bot_added
+    end
+
+    # Обработчик миграции группы в супергруппу
+    #
+    # Когда группа мигрирует в супергруппу, меняется chat_id.
+    # Отправляет уведомление с новым chat_id для обновления настроек.
+    #
+    # @param message [Hash] данные сообщения о миграции
+    # @return [void] запускает ChatIdNotificationJob для отправки уведомления
+    # @see ChatIdNotificationJob для отправки уведомления
+    # @example При миграции группы в супергруппу
+    #   migrate_to_supergroup(message)
+    #   #=> Владелец получит сообщение с новым chat_id
+    def migrate_to_supergroup(message)
+      new_chat_id = message.dig('chat', 'id')
+      ChatIdNotificationJob.perform_later(new_chat_id)
+    end
+
     private
 
     # Находит или создает пользователя Telegram по данным из запроса
