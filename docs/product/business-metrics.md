@@ -165,17 +165,22 @@
 
 ### **Ключевые события для отслеживания:**
 - `ai_dialog_started` - Начало диалога с консультацией (feature:226)
+- `greeting_sent` - Приветствие отправлено (US-001)
+- `user_engagement` - Пользователь продолжил диалог (US-001)
 - `service_suggested` - AI предложил услугу (feature:227)
-- `service_added` - Услуга добавлена в корзину (feature:228)
-- `cart_confirmed` - Корзина подтверждена клиентом (feature:229)
-- `booking_request_created` - Заявка создана (feature:230)
 - `ai_suggestion_accepted` - Предложение AI принято (feature:231)
+- `booking_request_created` - Заявка создана (US-002b)
+- `ai_response_time` - Время ответа AI системы
+- `error_occurred` - Ошибки системы
 
-### **Воронка событий:**
+### **Упрощенная воронка событий (для простого бронирования):**
 ```
-Контакт → ai_dialog_started → service_suggested → service_added
-→ cart_confirmed → booking_request_created → Подтверждение → Посещение
+Контакт → ai_dialog_started → greeting_sent → user_engagement
+→ booking_request_created → Подтверждение → Посещение
 ```
+
+**Примечание:** Удалены избыточные события `service_added`, `cart_confirmed`
+для упрощения под простое бронирование на осмотр (US-002b).
 
 ---
 

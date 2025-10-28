@@ -122,13 +122,16 @@ class AnalyticsService
   # Event constants for consistency
   module Events
     DIALOG_STARTED = 'ai_dialog_started'
+    GREETING_SENT = 'greeting_sent'
+    USER_ENGAGEMENT = 'user_engagement'
     SERVICE_SUGGESTED = 'service_suggested'
-    SERVICE_ADDED = 'service_added'
-    CART_CONFIRMED = 'cart_confirmed'
-    BOOKING_CREATED = 'booking_request_created'
     SUGGESTION_ACCEPTED = 'ai_suggestion_accepted'
+    BOOKING_CREATED = 'booking_request_created'
     RESPONSE_TIME = 'ai_response_time'
     ERROR_OCCURRED = 'error_occurred'
+
+    # Note: SERVICE_ADDED, CART_CONFIRMED, BOOKING_INITIATED, MANAGER_NOTIFICATION
+    # are removed as redundant for current simple booking workflow (US-002b)
   end
 
   # Properties validation schema

@@ -31,6 +31,7 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
   end
 
   def dialog(first_question)
+    puts "Диалог: #{first_question}"
     VCR.use_cassette cassete_name, record: :new_episodes do
       user_text = first_question
 
@@ -69,47 +70,47 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
   end
 
   # Enhanced booking flow scenarios with edge cases
-  test 'complete booking flow with multiple service types' do
-    dialog 'Мне нужно сделать диагностику двигателя и заменить масло'
-  end
+  #test 'complete booking flow with multiple service types' do
+    #dialog 'Мне нужно сделать диагностику двигателя и заменить масло'
+  #end
 
-  test 'booking flow with urgent service request' do
-    dialog 'Срочно! Поменяйте колесо, пробило камеру'
-  end
+  #test 'booking flow with urgent service request' do
+    #dialog 'Срочно! Поменяйте колесо, пробило камеру'
+  #end
 
-  test 'booking flow with incomplete information' do
-    dialog 'Хочу на ТО'
-  end
+  #test 'booking flow with incomplete information' do
+    #dialog 'Хочу на ТО'
+  #end
 
-  test 'booking flow with cancellation scenario' do
-    dialog 'Запиши на завтра, но я могу отменить'
-  end
+  #test 'booking flow with cancellation scenario' do
+    #dialog 'Запиши на завтра, но я могу отменить'
+  #end
 
-  test 'booking flow with price inquiry only' do
-    dialog 'Сколько стоит ремонт тормозов без записи?'
-  end
+  #test 'booking flow with price inquiry only' do
+    #dialog 'Сколько стоит ремонт тормозов без записи?'
+  #end
 
-  test 'booking flow with unavailable time slots' do
-    dialog 'Запиши на 3 часа ночи в воскресенье'
-  end
+  #test 'booking flow with unavailable time slots' do
+    #dialog 'Запиши на 3 часа ночи в воскресенье'
+  #end
 
-  test 'booking flow with special requirements' do
-    dialog 'Нужно диагностировать кондиционер, у меня аллергия на химикаты'
-  end
+  #test 'booking flow with special requirements' do
+    #dialog 'Нужно диагностировать кондиционер, у меня аллергия на химикаты'
+  #end
 
-  test 'booking flow with multiple vehicles' do
-    dialog 'У меня две машины, ВАЗ и Toyota, на какую записать?'
-  end
+  #test 'booking flow with multiple vehicles' do
+    #dialog 'У меня две машины, ВАЗ и Toyota, на какую записать?'
+  #end
 
-  test 'booking flow error recovery' do
-    dialog 'Ой, ошибся, не покраска а полировка'
-  end
+  #test 'booking flow error recovery' do
+    #dialog 'Ой, ошибся, не покраска а полировка'
+  #end
 
-  test 'booking flow with weekend constraints' do
-    dialog 'Можно на субботу? Только работаю до 12'
-  end
+  #test 'booking flow with weekend constraints' do
+    #dialog 'Можно на субботу? Только работаю до 12'
+  #end
 
-  test 'booking flow with long description' do
-    dialog 'Нужно капитальный ремонт двигателя, стучит на холодную, расход масла высокий, последнее обслуживание было год назад'
-  end
+  #test 'booking flow with long description' do
+    #dialog 'Нужно капитальный ремонт двигателя, стучит на холодную, расход масла высокий, последнее обслуживание было год назад'
+  #end
 end

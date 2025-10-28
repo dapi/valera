@@ -51,11 +51,42 @@
 ### **Analytics Events to Track:**
 ```ruby
 # Для US-001 отслеживаем:
-AnalyticsService::Events::DIALOG_STARTED      # Начало диалога
+AnalyticsService::Events::DIALOG_STARTED      # Начало диалога (включая пост-бронинговые)
 AnalyticsService::Events::GREETING_SENT        # Отправка приветствия
 AnalyticsService::Events::RESPONSE_TIME        # Время ответа AI
 AnalyticsService::Events::USER_ENGAGEMENT     # Вовлечение пользователя
 ```
+
+### **DIALOG_STARTED - Типы диалогов:**
+**1. Первичный диалог:**
+- Первое сообщение дня от пользователя
+- Цель: Консультация или запись
+
+**2. Пост-бронинговый диалог (новый):**
+- Через 30+ минут после создания заявки
+- Цель: Вопросы по заявке, статусу, документам
+
+**3. Сервисный диалог:**
+- После консультации, но до записи
+- Цель: Уточнение деталей по услугам
+
+### **Новые свойства для DIALOG_STARTED:**
+```ruby
+properties: {
+  platform: 'telegram',                    # Платформа
+  user_id: 12345,                        # ID пользователя
+  message_type: 'text',                   # Тип сообщения
+  dialog_context: 'post_booking',         # Тип диалога: 'primary', 'post_booking', 'service'
+  has_recent_booking: true,               # Есть ли недавняя заявка (< 2 часов)
+  time_since_last_message: 1800           # Секунд с последующего сообщения
+}
+```
+
+### **Бизнес-ценность пост-бронинговых диалогов:**
+- **Customer Satisfaction:** Клиенты доверьваются задавать вопросы
+- **Conversion Rate:** Дополнительные продажи/услуги
+- **Support Efficiency:** Снижение нагрузки на менеджеров
+- **Service Quality:** Понимание узких мест в процессе
 
 ### **Success Benchmarks:**
 - **Response time performance:** 95% < 3 секунд
