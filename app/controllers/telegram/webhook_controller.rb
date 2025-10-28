@@ -100,9 +100,12 @@ module Telegram
     # @see BookingTool для реализации создания заявок
     # @note Tools используются AI для выполнения действий в реальном мире
     def setup_chat_tools
-      llm_chat.with_tool(BookingTool.new(telegram_user:, chat: llm_chat))
-              .on_tool_call { |tool_call| handle_tool_call(tool_call) }
-              .on_tool_result { |result| handle_tool_result(result) }
+      llm_chat
+        .with_tool(BookingTool.new(telegram_user:, chat: llm_chat))
+        .with_temperature(0.5) # TODO Вынести в конфигурацию
+        .with_instructions(SystemPromptService.system_prompt, replace: true)
+        .on_tool_call { |tool_call| handle_tool_call(tool_call) }
+        .on_tool_result { |result| handle_tool_result(result) }
     end
 
     # Обрабатывает вызов инструмента со стороны AI

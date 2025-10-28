@@ -9,7 +9,7 @@ module Analytics
       name: 'ai_dialog_started',
       description: 'Начало диалога с AI ассистентом',
       category: 'dialog',
-      properties: [ :platform, :user_id, :message_type ]
+      properties: [ :platform, :user_id, :message_type, :dialog_context, :has_recent_booking ]
     }.freeze
 
     GREETING_SENT = {

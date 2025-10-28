@@ -110,7 +110,7 @@ class BookingTool < RubyLLM::Tool
       {
         booking_id: booking.id,
         processing_time_ms: ((Time.current - start_time) * 1000).to_i,
-        user_segment: UserSegmentationService.determine_segment_for_user(@telegram_user),
+        user_segment: UserSegmentationService.determine_segment_for_user(@telegram_user)
       }
     )
 
@@ -131,5 +131,4 @@ class BookingTool < RubyLLM::Tool
     })
     RubyLLM::Content.new("Ошибка при обработке заявки: #{e.message}")
   end
-
-  private
+end

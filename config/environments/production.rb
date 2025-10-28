@@ -89,7 +89,7 @@ Rails.application.configure do
 
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = {
-    exclude: ->(request) { request.path == "/up" || request.path.start_with?("/health") }
+    exclude: ->(request) { request.path == '/up' || request.path.start_with?('/health') }
   }
 
   # Security headers configuration
@@ -101,7 +101,7 @@ Rails.application.configure do
   }
 
   # Rate limiting configuration
-  config.action_dispatch.rescue_responses["ActionController::RoutingError"] = :not_found
+  config.action_dispatch.rescue_responses['ActionController::RoutingError'] = :not_found
 
   # Production-specific performance optimizations
   config.middleware.use ActionDispatch::Cookies
@@ -117,7 +117,7 @@ Rails.application.configure do
 
     Sentry.init do |config|
       config.dsn = ENV['SENTRY_DSN']
-      config.breadcrumbs_logger = [:active_support_logger, :http_logger]
+      config.breadcrumbs_logger = [ :active_support_logger, :http_logger ]
       config.environment = Rails.env
       config.release = ENV['GIT_COMMIT_SHA'] || `git rev-parse HEAD`.strip
       config.traces_sample_rate = ENV.fetch('SENTRY_TRACES_SAMPLE_RATE', 0.1).to_f

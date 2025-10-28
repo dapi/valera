@@ -31,9 +31,13 @@ module DevelopmentWarning
   #   send_development_warning(controller)
   #   #=> Пользователь получит отдельное сообщение с предупреждением
   def send_development_warning(controller)
-    return unless ApplicationConfig.development_warning
+    return unless development_warnings_enabled?
 
     controller.respond_with :message, text: development_warning_text, parse_mode: 'Markdown'
+  end
+
+  def development_warnings_enabled?
+    ApplicationConfig.development_warning
   end
 
   # Возвращает текст предупреждения о разработке

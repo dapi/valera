@@ -42,3 +42,5 @@
 
 .backup
 .DS_Store
+.ctags*
+.tags
