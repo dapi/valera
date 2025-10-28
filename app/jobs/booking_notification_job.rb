@@ -41,8 +41,8 @@ class BookingNotificationJob < ApplicationJob
     Telegram.bot.send_message(
       chat_id: ApplicationConfig.admin_chat_id,
       text: booking.details
-      #text: MarkdownCleaner.clean(booking.details),
-      #parse_mode: 'Markdown'
+      # text: MarkdownCleaner.clean(booking.details),
+      # parse_mode: 'Markdown'
     )
   rescue StandardError => e
     log_error(e,
