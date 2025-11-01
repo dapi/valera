@@ -1,0 +1,96 @@
+version: 1
+swarm:
+  name: "KassaAdmin Rails Development Team"
+  main: architect
+
+  mcps:
+    - name: rails
+      type: stdio
+      command: rails-mcp-server
+      args: []
+      env:
+        RAILS_ENV: development
+
+  instances:
+    architect:
+      description: "Rails architect coordinating full-stack development for KassaAdmin"
+      directory: .
+      model: glm-4.6
+      connections: [models, controllers, views, services, jobs, tests, devops]
+      prompt_file: .claude-on-rails/prompts/architect.md
+      vibe: true
+
+
+    models:
+      description: "ActiveRecord models, migrations, and database optimization specialist"
+      directory: ./app/models
+      model: glm-4.6
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/models.md
+
+
+
+    controllers:
+      description: "Rails controllers, routing, and request handling specialist"
+      directory: ./app/controllers
+      model: glm-4.6
+
+
+
+
+      connections: [services]
+
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/controllers.md
+
+
+
+    views:
+      description: "Rails views, layouts, partials, and asset pipeline specialist"
+      directory: ./app/views
+      model: glm-4.6
+
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/views.md
+
+
+
+
+
+
+    services:
+      description: "Service objects, business logic, and design patterns specialist"
+      directory: ./app/services
+      model: glm-4.6
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/services.md
+
+
+
+    jobs:
+      description: "Background jobs, ActiveJob, and async processing specialist"
+      directory: ./app/jobs
+      model: glm-4.6
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/jobs.md
+
+
+
+
+
+    tests:
+      description: "RSpec testing, factories, and test coverage specialist"
+      directory: ./test
+      model: glm-4.6
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/tests.md
+
+
+
+
+    devops:
+      description: "Deployment, Docker, CI/CD, and production configuration specialist"
+      directory: ./config
+      model: glm-4.6
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/devops.md

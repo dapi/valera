@@ -1,6 +1,6 @@
 # Technical Design Document: TSD-002a - Telegram Basic Consultation
 
-**Статус:** Ready for Development
+**Статус:** Ready
 **Версия:** 2.0 (адаптированная под текущую архитектуру)
 **Приоритет:** High
 **Оценка времени:** 2-4 часа (минимальные изменения)

@@ -1,6 +1,6 @@
 # Technical Specification Document: TSD-001 - Analytics System Architecture
 
-**Статус:** Draft
+**Статус:** SystemAnalyzes
 **Приоритет:** High
 **Версия:** 1.0
 **Создан:** 27.10.2025

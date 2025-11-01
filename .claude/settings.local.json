@@ -130,7 +130,17 @@
       "Bash(bundler-audit:*)",
       "Bash(brakeman:*)",
       "Bash(bundle exec rails test:units:*)",
-      "Bash(RAILS_ENV=test bundle exec rails:*)"
+      "Bash(RAILS_ENV=test bundle exec rails:*)",
+      "Bash(while:*)",
+      "Bash([ ! -f \"docs/$link\" ])",
+      "Bash([[ \"$link\" == ../* ]])",
+      "Bash(then echo \"Broken: $link\")",
+      "SlashCommand(/sc:help)",
+      "SlashCommand(/sc:index)",
+      "SlashCommand(/requirements)",
+      "Bash(python3:*)",
+      "Bash(nc:*)",
+      "Bash(kill:*)"
     ],
     "deny": [],
     "ask": []

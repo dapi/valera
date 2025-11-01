@@ -44,3 +44,8 @@
 .DS_Store
 .ctags*
 .tags
+
+# ClaudeOnRails
+.claude-on-rails/sessions/
+.claude-swarm/
+claude-swarm.log

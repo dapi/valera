@@ -1,6 +1,6 @@
 # User Story: US-001 - Telegram Auto Greeting для кузовного ремонта
 
-**Статус:** Ready for Development ✅
+**Статус:** Ready
 **Приоритет:** High
 **Story Points:** 3
 **Создан:** 27.10.2025
