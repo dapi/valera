@@ -1,10 +1,10 @@
 SEMVER_BIN=./bin/semver
 SEMVER=$(shell ${SEMVER_BIN})
-STAGE ?= stage2
+STAGE ?= production
 # Версия из последнего git tag без префикса 'v' (для Docker образов)
 TAG ?= $(shell git describe --tags --abbrev=0 | sed 's/^v//')
-# Default registry (can be overridden)
-REGISTRY ?= cr.selcloud.ru/brandmint
+# Registry from environment variable (required)
+REGISTRY ?= $(REGISTRY)
 
 # Default target
 release: patch-release 
@@ -89,6 +89,7 @@ docker-build: ## Build Docker image with version tags
 	@VERSION=$$(${SEMVER_BIN}); \
 	VERSION=$${VERSION#v}; \
 	docker build \
+		--build-arg VERSION=$$VERSION \
 		--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 		--build-arg GIT_SHA=$$(git rev-parse HEAD) \
 		-t valera:dev -t valera:$$VERSION \
