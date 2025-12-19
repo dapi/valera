@@ -7,8 +7,8 @@ class Client < ApplicationRecord
   belongs_to :telegram_user
 
   has_many :vehicles, dependent: :destroy
-  has_many :chats, dependent: :nullify
-  has_many :bookings, dependent: :nullify
+  has_many :chats, dependent: :destroy
+  has_many :bookings, dependent: :destroy
 
   validates :telegram_user_id, uniqueness: { scope: :tenant_id }
 

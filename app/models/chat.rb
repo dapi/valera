@@ -5,14 +5,15 @@
 # Управляет разговором с AI, хранит сообщения, обрабатывает tool calls
 # и обеспечивает персистентность контекста диалога.
 #
-# @attr [Integer] telegram_user_id ID пользователя Telegram
+# @attr [Integer] tenant_id ID арендатора (автосервиса)
+# @attr [Integer] client_id ID клиента
 # @attr [Integer] model_id ID используемой AI модели
 # @attr [Hash] context контекст диалога (например, API ключи)
 # @attr [DateTime] created_at время создания
 # @attr [DateTime] updated_at время обновления
 #
 # @example Создание нового диалога
-#   chat = Chat.create!(telegram_user: user)
+#   chat = Chat.create!(tenant: tenant, client: client)
 #   chat.say("Привет, как дела?")
 #
 # @see Message для отдельных сообщений

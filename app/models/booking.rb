@@ -3,10 +3,12 @@
 # Модель заявки на автосервис
 #
 # Представляет заявку на обслуживание, созданную пользователем через чат.
-# Связывает пользователя, чат и детали заявки, отправляет уведомления.
+# Связывает tenant, client, чат и детали заявки, отправляет уведомления.
 #
-# @attr [Integer] telegram_user_id ID пользователя Telegram
+# @attr [Integer] tenant_id ID арендатора (автосервиса)
+# @attr [Integer] client_id ID клиента
 # @attr [Integer] chat_id ID чата
+# @attr [Integer] vehicle_id ID автомобиля (опционально)
 # @attr [Hash] meta метаданные заявки (данные клиента, авто, услуги)
 # @attr [String] details детали заявки в формате Markdown
 # @attr [Hash] context контекст диалога
@@ -15,7 +17,8 @@
 #
 # @example Создание новой заявки
 #   booking = Booking.create!(
-#     telegram_user: user,
+#     tenant: tenant,
+#     client: client,
 #     chat: chat,
 #     meta: { customer_name: "Иван", car_brand: "Toyota" },
 #     details: "Заявка на ТО для Toyota Camry",

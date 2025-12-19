@@ -101,7 +101,7 @@ module Telegram
     # @note Tools используются AI для выполнения действий в реальном мире
     def setup_chat_tools
       llm_chat
-        .with_tool(BookingTool.new(telegram_user:, chat: llm_chat))
+        .with_tool(BookingTool.new(chat: llm_chat))
         .with_temperature(ApplicationConfig.llm_temperature)
         .with_instructions(SystemPromptService.system_prompt, replace: true)
         .on_tool_call { |tool_call| handle_tool_call(tool_call) }
@@ -256,7 +256,7 @@ module Telegram
     # @api private
     # @note Временная реализация до полной интеграции multi-tenancy (FIP-004b)
     def llm_chat
-      @llm_chat ||= Chat.find_or_create_by!(client: current_client)
+      @llm_chat ||= Chat.find_or_create_by!(tenant: current_tenant, client: current_client)
     end
 
     # Находит или создает клиента для текущего telegram_user и tenant
@@ -274,22 +274,13 @@ module Telegram
     # Возвращает текущий tenant
     #
     # @return [Tenant] текущий tenant
+    # @raise [RuntimeError] если tenant не найден
     # @api private
-    # @note Временная реализация - возвращает первый tenant или создает дефолтный
+    # @note Временная реализация - возвращает первый tenant
     #       В FIP-004b будет использоваться Current.tenant из webhook routing
     def current_tenant
-      @current_tenant ||= Current.tenant || Tenant.first || create_default_tenant
-    end
-
-    # Создает дефолтный tenant для совместимости
-    #
-    # @return [Tenant] созданный tenant
-    # @api private
-    def create_default_tenant
-      Tenant.create!(
-        name: 'Default AutoService',
-        bot_token: ApplicationConfig.telegram_token
-      )
+      @current_tenant ||= Current.tenant || Tenant.first ||
+        raise('No tenant configured. Please create a tenant in the database.')
     end
 
     # Устанавливает контекст аналитики для отслеживания запроса
