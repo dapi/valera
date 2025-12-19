@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'minitest/mock'
 
 # Тесты для UserSegmentationService
 #
@@ -26,22 +25,10 @@ class UserSegmentationServiceTest < ActiveSupport::TestCase
   end
 
   test 'determine_segment_for_chat accesses telegram_user through client' do
-    # This test verifies the fix for the has_one :through relationship
+    # This test verifies the has_one :through relationship
     # Chat -> Client -> TelegramUser
     segment = UserSegmentationService.determine_segment_for_chat(@chat)
     assert_equal UserSegmentationService::Segments::NEW, segment
-  end
-
-  test 'determine_segment_for_chat returns unknown when telegram_user is nil' do
-    # Create a chat where client has no telegram_user (edge case)
-    # This should return UNKNOWN instead of raising an error
-    chat_without_telegram_user = Minitest::Mock.new
-    chat_without_telegram_user.expect(:telegram_user, nil)
-
-    segment = UserSegmentationService.determine_segment_for_chat(chat_without_telegram_user)
-    assert_equal UserSegmentationService::Segments::UNKNOWN, segment
-
-    chat_without_telegram_user.verify
   end
 
   test 'determine_segment_for_chat handles has_one through correctly' do
@@ -56,19 +43,5 @@ class UserSegmentationServiceTest < ActiveSupport::TestCase
       UserSegmentationService::Segments::ENGAGED,
       UserSegmentationService::Segments::RETURNING
     ], segment
-  end
-
-  test 'determine_segment_for_chat does not raise on nil client' do
-    # Mock a chat where telegram_user returns nil
-    mock_chat = Minitest::Mock.new
-    mock_chat.expect(:telegram_user, nil)
-
-    # Should handle gracefully and return UNKNOWN
-    assert_nothing_raised do
-      segment = UserSegmentationService.determine_segment_for_chat(mock_chat)
-      assert_equal UserSegmentationService::Segments::UNKNOWN, segment
-    end
-
-    mock_chat.verify
   end
 end

@@ -121,7 +121,7 @@ class BookingTool < RubyLLM::Tool
   rescue StandardError => e
     log_error e
     AnalyticsService.track_error(e, {
-      chat_id: telegram_user&.chat_id,
+      chat_id: @chat.id,
       context: 'booking_tool_execution',
       booking_data: meta
     })

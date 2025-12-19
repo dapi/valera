@@ -21,17 +21,17 @@ class BookingToolTest < ActiveSupport::TestCase
     tool = BookingTool.new(chat: @chat)
 
     # Mock the analytics to avoid side effects
-    AnalyticsService.stub(:track_conversion, nil) do
-      result = tool.execute(
-        customer_name: 'Test Customer',
-        customer_phone: '+7(900)123-45-67',
-        car_brand: 'Toyota',
-        dialog_context: { date: '2024-12-01' },
-        details: 'Test booking details'
-      )
+    AnalyticsService.stubs(:track_conversion).returns(nil)
 
-      assert_match(/Заявка под номером \d+ отправлена/, result.text)
-    end
+    result = tool.execute(
+      customer_name: 'Test Customer',
+      customer_phone: '+7(900)123-45-67',
+      car_brand: 'Toyota',
+      dialog_context: { date: '2024-12-01' },
+      details: 'Test booking details'
+    )
+
+    assert_match(/Заявка под номером \d+ отправлена/, result.text)
 
     # Verify booking was created with correct associations
     booking = Booking.last

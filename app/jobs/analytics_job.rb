@@ -8,7 +8,7 @@
 class AnalyticsJob < ApplicationJob
   queue_as :analytics
 
-  retry_on StandardError, wait: :exponentially_longer, attempts: 3
+  retry_on StandardError, wait: :polynomially_longer, attempts: 3
 
   # Выполнение задачи по сохранению аналитического события
   #
@@ -19,7 +19,8 @@ class AnalyticsJob < ApplicationJob
       chat_id: event_data[:chat_id],
       properties: event_data[:properties],
       occurred_at: event_data[:occurred_at],
-      session_id: event_data[:session_id]
+      session_id: event_data[:session_id],
+      tenant_id: event_data[:tenant_id]
     )
 
     # Optional: Real-time alerts for critical events
