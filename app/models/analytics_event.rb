@@ -12,6 +12,8 @@
 # @see TDD-001-analytics-system.md - Technical Design Document
 # @see AnalyticsService - Сервис для трекинга событий
 class AnalyticsEvent < ApplicationRecord
+  belongs_to :tenant
+
   # Validations
   validates :event_name, presence: true, length: { maximum: 50 }
   validates :chat_id, presence: true, numericality: { only_integer: true }

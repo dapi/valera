@@ -23,7 +23,11 @@
 class Chat < ApplicationRecord
   include ErrorLogger
 
-  belongs_to :telegram_user
+  belongs_to :tenant
+  belongs_to :client
+
+  has_one :telegram_user, through: :client
+
   has_many :bookings, dependent: :destroy
 
   acts_as_chat

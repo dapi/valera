@@ -27,8 +27,12 @@
 # @author Danil Pismenny
 # @since 0.1.0
 class Booking < ApplicationRecord
-  belongs_to :telegram_user
   belongs_to :chat
+  belongs_to :tenant
+  belongs_to :client
+  belongs_to :vehicle, optional: true
+
+  has_one :telegram_user, through: :client
 
   # Сортирует заявки по времени создания (новые первые)
   scope :recent, -> { order(created_at: :desc) }

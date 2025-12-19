@@ -254,8 +254,42 @@ module Telegram
     #
     # @return [Chat] найденный или созданный чат
     # @api private
+    # @note Временная реализация до полной интеграции multi-tenancy (FIP-004b)
     def llm_chat
-      @llm_chat ||= Chat.find_or_create_by!(telegram_user: telegram_user)
+      @llm_chat ||= Chat.find_or_create_by!(client: current_client)
+    end
+
+    # Находит или создает клиента для текущего telegram_user и tenant
+    #
+    # @return [Client] найденный или созданный клиент
+    # @api private
+    # @note Временная реализация до полной интеграции multi-tenancy (FIP-004b)
+    def current_client
+      @current_client ||= Client.find_or_create_by!(
+        tenant: current_tenant,
+        telegram_user: telegram_user
+      )
+    end
+
+    # Возвращает текущий tenant
+    #
+    # @return [Tenant] текущий tenant
+    # @api private
+    # @note Временная реализация - возвращает первый tenant или создает дефолтный
+    #       В FIP-004b будет использоваться Current.tenant из webhook routing
+    def current_tenant
+      @current_tenant ||= Current.tenant || Tenant.first || create_default_tenant
+    end
+
+    # Создает дефолтный tenant для совместимости
+    #
+    # @return [Tenant] созданный tenant
+    # @api private
+    def create_default_tenant
+      Tenant.create!(
+        name: 'Default AutoService',
+        bot_token: ApplicationConfig.telegram_token
+      )
     end
 
     # Устанавливает контекст аналитики для отслеживания запроса

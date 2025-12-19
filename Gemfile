@@ -105,6 +105,8 @@ gem 'bugsnag', '~> 6.28'
 
 gem 'request_store'
 
+gem 'nanoid', '~> 2.0'
+
 # Markdown processing for Telegram Bot API compatibility
 gem 'kramdown', '~> 2.5'
 gem 'sanitize', '~> 7.0'

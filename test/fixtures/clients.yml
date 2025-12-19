@@ -1,0 +1,11 @@
+one:
+  tenant: one
+  telegram_user: one
+  name: Ivan Petrov
+  phone: +7(916)123-45-67
+
+two:
+  tenant: two
+  telegram_user: two
+  name: Maria Ivanova
+  phone: +7(916)987-65-43
