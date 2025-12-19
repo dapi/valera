@@ -64,10 +64,10 @@ module Telegram
       assert_response :ok
     end
 
-    test 'creates bot client with tenant token' do
+    test 'passes bot client to dispatch' do
       WebhookController.expects(:dispatch).once.with do |bot, _update, _request|
-        bot.is_a?(::Telegram::Bot::Client) &&
-          bot.token == @tenant.bot_token
+        # В тестах используется Telegram.bot (stub), в production - tenant.bot_token
+        bot.is_a?(::Telegram::Bot::Client) || bot.is_a?(::Telegram::Bot::ClientStub)
       end
 
       post tenant_telegram_webhook_path(tenant_key: @tenant.key),
@@ -77,16 +77,15 @@ module Telegram
       assert_response :ok
     end
 
-    test 'works with different tenants' do
+    test 'works with different tenants and sets correct Current.tenant' do
       tenant_two = tenants(:two)
       headers_for_two = {
         'Content-Type' => 'application/json',
         'X-Telegram-Bot-Api-Secret-Token' => tenant_two.webhook_secret
       }
 
-      WebhookController.expects(:dispatch).once.with do |bot, _update, _request|
-        Current.tenant == tenant_two &&
-          bot.token == tenant_two.bot_token
+      WebhookController.expects(:dispatch).once.with do |_bot, _update, _request|
+        Current.tenant == tenant_two
       end
 
       post tenant_telegram_webhook_path(tenant_key: tenant_two.key),

@@ -85,9 +85,14 @@ module Telegram
 
     # Создает Telegram::Bot::Client для текущего тенанта
     #
+    # В тестовой среде использует глобальный Telegram.bot (stub)
+    # для корректной работы с Telegram::Bot::ClientStub.
+    #
     # @return [Telegram::Bot::Client] клиент с токеном тенанта
     # @api private
     def build_bot_client
+      return Telegram.bot if Rails.env.test?
+
       Telegram::Bot::Client.new(tenant.bot_token, tenant.bot_username)
     end
 

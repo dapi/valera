@@ -273,25 +273,14 @@ module Telegram
 
     # Возвращает текущий tenant
     #
+    # Current.tenant устанавливается в MultiTenantWebhookController
+    # перед вызовом dispatch.
+    #
     # @return [Tenant] текущий tenant
     # @raise [RuntimeError] если tenant не установлен
     # @api private
-    # @note В FIP-004b будет устанавливаться через webhook routing
     def current_tenant
-      @current_tenant ||= Current.tenant || resolve_tenant_from_request
-    end
-
-    # Временное разрешение tenant до реализации FIP-004b
-    # TODO: Удалить после реализации webhook routing
-    #
-    # @return [Tenant] найденный tenant
-    # @raise [RuntimeError] если tenant не найден
-    # @api private
-    def resolve_tenant_from_request
-      # В тестовой среде используем первый tenant
-      return Tenant.first if Rails.env.test?
-
-      raise('Current.tenant is not set. Configure webhook routing.')
+      @current_tenant ||= Current.tenant or raise('Current.tenant is not set')
     end
 
     # Устанавливает контекст аналитики для отслеживания запроса
@@ -320,6 +309,7 @@ module Telegram
       return true if Rails.env.test?
 
       !AnalyticsEvent
+        .where(tenant: current_tenant)
         .by_chat(chat_id)
         .by_event(AnalyticsService::Events::DIALOG_STARTED)
         .where('occurred_at >= ?', Date.current)

@@ -38,6 +38,7 @@ class AnalyticsService
     # @param occurred_at [Time] Время события (по умолчанию текущее)
     def track(event_name, chat_id:, properties: {}, occurred_at: Time.current)
       return unless tracking_enabled?
+      return unless Current.tenant # Skip tracking if no tenant context
 
       # Validate event data
       return unless validate_event_data(event_name, properties)
@@ -48,7 +49,8 @@ class AnalyticsService
         chat_id: chat_id,
         properties: properties,
         occurred_at: occurred_at,
-        session_id: generate_session_id(chat_id)
+        session_id: generate_session_id(chat_id),
+        tenant_id: Current.tenant&.id
       )
     rescue => e
       # Never break main functionality due to analytics errors
