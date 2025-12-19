@@ -15,10 +15,12 @@
 default: &default
   adapter: postgresql
   encoding: unicode
+  <% if ENV.key? 'VALERA_DATABASE_HOST' %>
+  host: <%= ENV.fetch('VALERA_DATABASE_HOST') %>
+  <% end %>
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-
 
 development:
   <<: *default
