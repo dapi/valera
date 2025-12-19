@@ -4,7 +4,12 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Telegram bot webhook using the telegram_webhook helper
+  # Legacy single-tenant webhook (for backward compatibility during migration)
   telegram_webhook Telegram::WebhookController
+
+  # Multi-tenant webhook endpoint
+  # Each tenant has their own webhook URL: /telegram/webhook/:tenant_key
+  post 'telegram/webhook/:tenant_key', to: 'telegram/multi_tenant_webhook#create', as: :tenant_telegram_webhook
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
