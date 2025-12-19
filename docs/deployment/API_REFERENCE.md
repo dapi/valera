@@ -200,9 +200,12 @@ The AI system has access to a booking creation tool that can:
 ## 🔧 Configuration API
 
 ### Environment Variables
+
+**Полный список:** [CONFIG.md](../CONFIG.md)
+
 ```bash
 # Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN=your_bot_token_here
+BOT_TOKEN=your_bot_token_here
 
 # LLM Configuration
 LLM_PROVIDER=deepseek
@@ -211,9 +214,6 @@ DEEPSEEK_API_KEY=your_deepseek_api_key
 
 # Database Configuration
 DATABASE_URL=postgresql://user:pass@localhost/valera_development
-
-# Analytics Configuration
-ANALYTICS_ENABLED=true
 
 # Monitoring Configuration
 BUGSNAG_API_KEY=your_bugsnag_api_key

@@ -214,11 +214,13 @@ volumes:
 
 ### 1. Environment variables
 ```bash
-# .env.production
+# .env.production (см. docs/CONFIG.md для полного списка)
 POSTGRES_PASSWORD=your_secure_password
 SECRET_KEY_BASE=your_secret_key_base
-TELEGRAM_BOT_TOKEN=your_bot_token
-OPENAI_API_KEY=your_openai_key
+BOT_TOKEN=your_bot_token
+LLM_PROVIDER=deepseek
+LLM_MODEL=deepseek-chat
+DEEPSEEK_API_KEY=your_key
 ```
 
 ### 2. SSL/TLS с Nginx

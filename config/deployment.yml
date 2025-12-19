@@ -17,8 +17,8 @@ DATABASE_TIMEOUT: 5000
 REDIS_URL: redis://host:6379/0
 
 # Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN: your_telegram_bot_token
-TELEGRAM_WEBHOOK_URL: https://valera.yourdomain.com/telegram/webhook
+BOT_TOKEN: your_telegram_bot_token
+# TELEGRAM_WEBHOOK_URL: https://valera.yourdomain.com/telegram/webhook  # Not used by ApplicationConfig
 
 # AI/LLM Provider Configuration
 LLM_PROVIDER: deepseek
@@ -30,8 +30,6 @@ LLM_MAX_RETRIES: 3
 # Security Configuration
 SECRET_KEY_BASE: your_secret_key_base
 RAILS_MASTER_KEY: your_rails_master_key
-SENTRY_DSN: your_sentry_dsn
-SENTRY_TRACES_SAMPLE_RATE: 0.1
 
 # SSL/TLS Configuration
 FORCE_SSL: true

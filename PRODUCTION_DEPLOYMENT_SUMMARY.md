@@ -25,7 +25,7 @@ The Valera AI-powered auto service chatbot has been comprehensively prepared for
 ### **Production Environment**
 - **File:** `config/environments/production.rb`
 - **Features:** Performance optimizations, security hardening, error tracking
-- **Monitoring:** Sentry integration, structured logging
+- **Monitoring:** Bugsnag integration, structured logging
 
 ## 🔒 Security Implementation
 
@@ -57,7 +57,7 @@ The Valera AI-powered auto service chatbot has been comprehensively prepared for
 - **Severity Levels:** Critical, warning, info with appropriate thresholds
 
 ### **Error Tracking**
-- **Sentry Integration:** Production error monitoring
+- **Bugsnag Integration:** Production error monitoring
 - **Structured Logging:** JSON format with correlation IDs
 - **Error Patterns:** Comprehensive error handling with context
 
@@ -242,7 +242,7 @@ sudo ./scripts/deploy.sh rollback
 ### **Monitoring Dashboards**
 - **Application Metrics:** Grafana at port 3001
 - **System Metrics:** Prometheus at port 9090
-- **Error Tracking:** Sentry configured in production
+- **Error Tracking:** Bugsnag configured in production
 
 ### **Troubleshooting**
 - **Logs:** `docker-compose logs -f app`

@@ -165,10 +165,12 @@ heroku addons:create heroku-postgresql:hobby-dev
 # Добавить Redis для Sidekiq
 heroku addons:create heroku-redis:hobby-dev
 
-# Настроить переменные окружения
+# Настроить переменные окружения (см. docs/CONFIG.md)
 heroku config:set \
-  TELEGRAM_BOT_TOKEN=your_token \
-  OPENAI_API_KEY=your_key \
+  BOT_TOKEN=your_token \
+  LLM_PROVIDER=deepseek \
+  LLM_MODEL=deepseek-chat \
+  DEEPSEEK_API_KEY=your_key \
   RAILS_ENV=production
 ```
 
@@ -201,14 +203,16 @@ heroku run rails telegram_bot:webhook:set
 
 ### Переменные окружения
 
+**Полный список:** [CONFIG.md](../CONFIG.md)
+
 ```bash
 # Telegram Bot
-TELEGRAM_BOT_TOKEN=your_bot_token
-TELEGRAM_WEBHOOK_URL=https://your-domain.com/telegram/webhook
+BOT_TOKEN=your_bot_token
 
-# AI/LLM
-OPENAI_API_KEY=your_openai_key
-ANTHROPIC_API_KEY=your_anthropic_key
+# AI/LLM (выберите один провайдер)
+LLM_PROVIDER=deepseek
+LLM_MODEL=deepseek-chat
+DEEPSEEK_API_KEY=your_key
 
 # Database
 DATABASE_URL=postgresql://user:pass@host:5432/dbname

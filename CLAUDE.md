@@ -7,7 +7,7 @@
 ## ⚙️ Critical Rules
 
 🚨 **Models:** ВСЕГДА `rails generate model` (модель + миграция вместе)
-🚨 **Error Handling:** `ErrorLogger` вместо `Bugsnag.notify()`
+🚨 **Error Handling:** `ErrorLogger` вместо `Bugsnag.notify()` — проект использует Bugsnag для error tracking
 🚨 **Configuration:** Только `anyway_config`, никаких `.env*` файлов
 🚨 **Documentation:** НЕ архивировать FIP/US/TSD документы из `docs/requirements/`
 🚨 **Testing:** Без `File.write/File.delete` и изменения ENV в тестах
