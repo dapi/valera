@@ -1,5 +1,10 @@
 SEMVER_BIN=./bin/semver
-SEMVER=`${SEMVER_BIN}`
+SEMVER=$(shell ${SEMVER_BIN})
+STAGE ?= stage2
+# Версия из последнего git tag без префикса 'v' (для Docker образов)
+TAG ?= $(shell git describe --tags --abbrev=0 | sed 's/^v//')
+# Default registry (can be overridden)
+REGISTRY ?= cr.selcloud.ru/brandmint
 
 # Default target
 release: patch-release 
@@ -63,3 +68,40 @@ list:
 
 test-all-providers:
 	PROVIDER=deepskeep ./bin/rails test
+
+# Проверка существования git tag (ищем v$(TAG) так как теги с префиксом v)
+guard-tag-exists:
+	@git rev-parse "v$(TAG)" >/dev/null 2>&1 || \
+		(echo "Error: Tag 'v$(TAG)' does not exist in git" && exit 1)
+
+deploy: guard-tag-exists
+	@test -n "$(INFRA_DIR)" || (echo "Error: INFRA_DIR is not set" && exit 1)
+	@test -n "$(STAGE)" || (echo "Error: STAGE is not set" && exit 1)
+	@echo "Deploying valera $(TAG) to $(STAGE)..."
+	cd $(INFRA_DIR) && direnv exec . $(MAKE) app-deploy APP=valera STAGE=$(STAGE) TAG=$(TAG)
+	@echo ""
+	@echo "✓ Deploy completed!"
+	@echo "  Image: $(REGISTRY)/valera:$(TAG)"
+	@echo "  Stage: $(STAGE)"
+
+docker-build: ## Build Docker image with version tags
+	@echo "Building Docker image..."
+	@VERSION=$$(${SEMVER_BIN}); \
+	VERSION=$${VERSION#v}; \
+	docker build \
+		--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+		--build-arg GIT_SHA=$$(git rev-parse HEAD) \
+		-t valera:dev -t valera:$$VERSION \
+		-t $(REGISTRY)/valera:latest -t $(REGISTRY)/valera:$$VERSION .; \
+	echo "✓ Docker image built: valera:dev, valera:$$VERSION, $(REGISTRY)/valera:latest, $(REGISTRY)/valera:$$VERSION"
+
+docker-push: ## Push Docker image to registry
+	@echo "Pushing Docker image to $(REGISTRY)..."
+	@VERSION=$$(${SEMVER_BIN}); \
+	VERSION=$${VERSION#v}; \
+	docker push $(REGISTRY)/valera:latest && \
+	docker push $(REGISTRY)/valera:$$VERSION; \
+	echo "✓ Docker images pushed: $(REGISTRY)/valera:latest, $(REGISTRY)/valera:$$VERSION"
+
+build-and-push: docker-build docker-push deploy ## Build, push and deploy
+	@echo "✓ Build, push and deploy completed!"
