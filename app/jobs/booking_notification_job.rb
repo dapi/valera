@@ -5,13 +5,16 @@
 # Асинхронно отправляет детали созданных заявок в административный чат
 # Telegram для обработки менеджерами.
 #
+# В multi-tenant режиме использует tenant.admin_chat_id и tenant.bot_token
+# для отправки через правильного бота, с fallback на глобальные настройки.
+#
 # @example Использование задачи
 #   BookingNotificationJob.perform_later(booking)
 #   #=> Уведомление будет отправлено асинхронно
 #
 # @see Booking для модели заявки
-# @see ApplicationConfig для настройки admin_chat_id
-# @see MarkdownCleaner для очистки форматирования
+# @see Tenant для настроек admin_chat_id
+# @see ApplicationConfig для глобальной конфигурации
 # @author Danil Pismenny
 # @since 0.1.0
 class BookingNotificationJob < ApplicationJob
@@ -29,22 +32,53 @@ class BookingNotificationJob < ApplicationJob
   #   BookingNotificationJob.perform_later(booking)
   #   #=> Уведомление будет отправлено асинхронно
   def perform(booking)
-    if ApplicationConfig.admin_chat_id.blank?
+    admin_chat_id = resolve_admin_chat_id(booking)
+
+    if admin_chat_id.blank?
       Rails.logger.warn('Так как admin_chat_id не установлен - пропускаю уведомления админов')
       return
     end
 
+    bot_client = resolve_bot_client(booking)
+
     # Используем Telegram API для отправки сообщения в менеджерский чат
-    Telegram.bot.send_message(
-      chat_id: ApplicationConfig.admin_chat_id,
+    bot_client.send_message(
+      chat_id: admin_chat_id,
       text: booking.details
-      # text: MarkdownCleaner.clean(booking.details),
-      # parse_mode: 'Markdown'
     )
   rescue StandardError => e
     log_error(e,
               job: self.class.name,
-              booking_id: booking.id)
+              booking_id: booking.id,
+              tenant_id: booking.tenant_id)
     raise e
+  end
+
+  private
+
+  # Определяет admin_chat_id для уведомления
+  #
+  # Приоритет: booking.tenant.admin_chat_id -> ApplicationConfig.admin_chat_id
+  #
+  # @param booking [Booking] заявка
+  # @return [Integer, nil] ID чата для уведомлений
+  # @api private
+  def resolve_admin_chat_id(booking)
+    tenant_chat_id = booking.tenant&.admin_chat_id
+    return tenant_chat_id if tenant_chat_id.present?
+
+    ApplicationConfig.admin_chat_id
+  end
+
+  # Определяет Telegram Bot клиент для отправки
+  #
+  # Приоритет: tenant bot -> глобальный Telegram.bot
+  #
+  # @param booking [Booking] заявка
+  # @return [Telegram::Bot::Client] клиент бота
+  # @api private
+  def resolve_bot_client(booking)
+    tenant = booking.tenant
+    tenant&.bot_token.present? ? tenant.bot_client : Telegram.bot
   end
 end

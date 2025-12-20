@@ -5,12 +5,17 @@
 # Управляет отправкой персонализированных приветственных сообщений
 # пользователям, которые впервые взаимодействуют с ботом.
 #
+# В multi-tenant режиме использует Current.tenant.welcome_message,
+# с fallback на глобальный шаблон из ApplicationConfig.
+#
 # @example Использование сервиса
+#   Current.tenant = tenant
 #   service = WelcomeService.new
 #   service.send_welcome_message(user, controller)
 #
 # @see ApplicationConfig для шаблона приветственного сообщения
 # @see TelegramUser для работы с данными пользователя
+# @see Current для multi-tenancy контекста
 # @author Danil Pismenny
 # @since 0.1.0
 class WelcomeService
@@ -19,7 +24,7 @@ class WelcomeService
 
   # Отправляет приветственное сообщение пользователю
   #
-  # Использует шаблон из конфигурации и подставляет в него имя пользователя.
+  # Использует шаблон из текущего тенанта или конфигурации и подставляет в него имя пользователя.
   # Отправка происходит через контроллер с помощью respond_with.
   # В development режиме дополнительно отправляет предупреждение о тестовом статусе.
   #
@@ -32,7 +37,7 @@ class WelcomeService
   #   service.send_welcome_message(user, controller)
   #   #=> Пользователь получит приветственное сообщение + предупреждение в development
   def send_welcome_message(telegram_user, controller)
-    message = interpolate_template(ApplicationConfig.welcome_message_template, telegram_user)
+    message = interpolate_template(welcome_message_template, telegram_user)
 
     # Измерение времени доставки приветствия
     start_time = Time.current
@@ -53,6 +58,19 @@ class WelcomeService
   end
 
   private
+
+  # Возвращает шаблон приветственного сообщения
+  #
+  # Приоритет: Current.tenant.welcome_message -> ApplicationConfig.welcome_message_template
+  #
+  # @return [String] шаблон приветственного сообщения
+  # @api private
+  def welcome_message_template
+    tenant_welcome = Current.tenant&.welcome_message
+    return tenant_welcome if tenant_welcome.present?
+
+    ApplicationConfig.welcome_message_template
+  end
 
   # Выполняет интерполяцию шаблона с данными пользователя
   #
@@ -81,8 +99,7 @@ class WelcomeService
       properties: {
         user_id: telegram_user.id,
         user_type: determine_user_type(telegram_user),
-        delivery_time_ms: delivery_time_ms,
-        template_used: 'default'
+        delivery_time_ms: delivery_time_ms
       }
     )
   end

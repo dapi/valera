@@ -86,13 +86,8 @@ class TenantWebhookService
 
   attr_reader :tenant
 
-  # Создает Telegram Bot клиент для тенанта
-  #
-  # @return [Telegram::Bot::Client]
-  # @api private
-  def bot_client
-    @bot_client ||= Telegram::Bot::Client.new(tenant.bot_token, tenant.bot_username)
-  end
+  # Делегируем метод bot_client тенанту
+  delegate :bot_client, to: :tenant
 
   # Формирует URL webhook для тенанта
   #
