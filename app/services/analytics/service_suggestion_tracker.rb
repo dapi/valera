@@ -9,13 +9,15 @@ module Analytics
     class << self
       # Трекинг предложения услуги от AI
       #
+      # @param tenant [Tenant] Тенант для трекинга
       # @param chat_id [Integer] ID чата
       # @param service_name [String] Название услуги
       # @param confidence_score [Float] Уверенность AI в предложении
       # @param context [Hash] Контекст предложения
-      def track_suggestion(chat_id, service_name, confidence_score, context = {})
+      def track_suggestion(tenant:, chat_id:, service_name:, confidence_score:, context: {})
         AnalyticsService.track(
           AnalyticsService::Events::SERVICE_SUGGESTED,
+          tenant: tenant,
           chat_id: chat_id,
           properties: {
             service_name: service_name,
@@ -30,12 +32,14 @@ module Analytics
 
       # Трекинг принятия предложения услуги
       #
+      # @param tenant [Tenant] Тенант для трекинга
       # @param chat_id [Integer] ID чата
       # @param service_name [String] Название услуги
       # @param booking_id [Integer] ID созданной заявки
-      def track_acceptance(chat_id, service_name, booking_id = nil)
+      def track_acceptance(tenant:, chat_id:, service_name:, booking_id: nil)
         AnalyticsService.track(
           AnalyticsService::Events::SUGGESTION_ACCEPTED,
+          tenant: tenant,
           chat_id: chat_id,
           properties: {
             service_name: service_name,
@@ -48,13 +52,15 @@ module Analytics
 
       # Трекинг добавления услуги в корзину/заявку
       #
+      # @param tenant [Tenant] Тенант для трекинга
       # @param chat_id [Integer] ID чата
       # @param service_name [String] Название услуги
       # @param quantity [Integer] Количество (по умолчанию 1)
       # @param price [Float] Цена услуги
-      def track_service_added(chat_id, service_name, quantity = 1, price = nil)
+      def track_service_added(tenant:, chat_id:, service_name:, quantity: 1, price: nil)
         AnalyticsService.track(
           AnalyticsService::Events::SERVICE_ADDED,
+          tenant: tenant,
           chat_id: chat_id,
           properties: {
             service_name: service_name,
@@ -68,12 +74,14 @@ module Analytics
 
       # Трекинг подтверждения корзины/заказа
       #
+      # @param tenant [Tenant] Тенант для трекинга
       # @param chat_id [Integer] ID чата
       # @param services_count [Integer] Количество услуг
       # @param total_amount [Float] Общая сумма
-      def track_cart_confirmation(chat_id, services_count, total_amount)
+      def track_cart_confirmation(tenant:, chat_id:, services_count:, total_amount:)
         AnalyticsService.track(
           AnalyticsService::Events::CART_CONFIRMED,
+          tenant: tenant,
           chat_id: chat_id,
           properties: {
             services_count: services_count,

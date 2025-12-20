@@ -92,6 +92,7 @@ class WelcomeService
   def track_greeting_sent(telegram_user, delivery_time_ms)
     AnalyticsService.track(
       AnalyticsService::Events::GREETING_SENT,
+      tenant: tenant,
       chat_id: telegram_user.chat_id,
       properties: {
         user_id: telegram_user.id,

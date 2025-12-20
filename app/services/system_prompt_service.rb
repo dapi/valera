@@ -38,34 +38,13 @@ class SystemPromptService
   def system_prompt
     current_time = Time.current.in_time_zone.strftime('%d.%m.%Y %H:%M (%Z)')
 
-    base_prompt
-      .gsub(/{{\s*COMPANY_INFO\s*}}/, company_info)
-      .gsub(/{{\s*PRICE_LIST\s*}}/, price_list)
+    tenant.system_prompt.to_s
+      .gsub(/{{\s*COMPANY_INFO\s*}}/, tenant.company_info.to_s)
+      .gsub(/{{\s*PRICE_LIST\s*}}/, tenant.price_list.to_s)
       .gsub(/{{\s*CURRENT_TIME\s*}}/, current_time)
   end
 
   private
 
   attr_reader :tenant
-
-  # Возвращает базовый шаблон системного промпта
-  #
-  # @return [String] шаблон системного промпта
-  def base_prompt
-    tenant.system_prompt.to_s
-  end
-
-  # Возвращает информацию о компании
-  #
-  # @return [String] информация о компании
-  def company_info
-    tenant.company_info.to_s
-  end
-
-  # Возвращает прайс-лист услуг
-  #
-  # @return [String] прайс-лист услуг
-  def price_list
-    tenant.price_list.to_s
-  end
 end

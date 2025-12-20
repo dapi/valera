@@ -8,7 +8,6 @@ class ApplicationConfig < Anyway::Config
     # RubyLLM configuration
     # Telegram configuration
     :bot_token,
-    :admin_chat_id, # ID чата для отправки уведомлений о заявках
     :llm_provider,
     :llm_model,
 
@@ -76,7 +75,6 @@ class ApplicationConfig < Anyway::Config
     vertexai_project_id: :string,
 
     # Integers
-    admin_chat_id: :integer,
     rate_limit_requests: :integer,
     rate_limit_period: :integer,
     max_history_size: :integer,

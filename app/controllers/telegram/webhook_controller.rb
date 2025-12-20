@@ -47,6 +47,7 @@ module Telegram
       if first_message_today?(chat_id)
         AnalyticsService.track(
           AnalyticsService::Events::DIALOG_STARTED,
+          tenant: current_tenant,
           chat_id: chat_id,
           properties: {
             message_type: message_type(message),
@@ -59,9 +60,10 @@ module Telegram
       # Measure AI response time with new tracker
       begin
         ai_response = Analytics::ResponseTimeTracker.measure(
-          chat_id,
-          'telegram_message_processing',
-          'deepseek-chat'
+          tenant: current_tenant,
+          chat_id: chat_id,
+          operation: 'telegram_message_processing',
+          model_used: 'deepseek-chat'
         ) do
           setup_chat_tools
           process_message(message['text'])
@@ -70,7 +72,7 @@ module Telegram
         send_response_to_user(ai_response)
 
       rescue => e
-        AnalyticsService.track_error(e, {
+        AnalyticsService.track_error(e, tenant: current_tenant, context: {
           chat_id: chat_id,
           context: 'webhook_processing',
           user_id: telegram_user.id
