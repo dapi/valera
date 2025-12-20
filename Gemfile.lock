@@ -291,7 +291,7 @@ GEM
     minitest (6.0.0)
       prism (~> 1.5)
     minitest-stub_any_instance (1.0.3)
-    mocha (2.7.1)
+    mocha (3.0.1)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.8.0)
     multipart-post (2.4.1)
