@@ -76,8 +76,9 @@ RUN groupadd --system --gid 1000 rails && \
 USER 1000:1000
 
 # Copy built artifacts: gems, application
-COPY --link --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --link --chown=rails:rails --from=build /rails /rails
+# Use numeric UID:GID to avoid buildx --link --chown resolution bug
+COPY --link --chown=1000:1000 --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+COPY --link --chown=1000:1000 --from=build /rails /rails
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
