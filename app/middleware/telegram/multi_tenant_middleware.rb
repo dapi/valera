@@ -45,8 +45,8 @@ module Telegram
       verify_webhook_secret!(request, tenant)
       Current.tenant = tenant
 
-      bot = build_bot_client(tenant)
       update = request.request_parameters
+      bot = Rails.env.test? ? Telegram.bot : tenant.bot_client
       controller.dispatch(bot, update, request)
 
       [ 200, {}, [ '' ] ]
@@ -91,19 +91,6 @@ module Telegram
       return if ActiveSupport::SecurityUtils.secure_compare(provided_secret, tenant.webhook_secret)
 
       raise UnauthorizedError
-    end
-
-    # Создает Telegram::Bot::Client для текущего тенанта
-    #
-    # В тестовой среде использует глобальный Telegram.bot (stub)
-    # для корректной работы с Telegram::Bot::ClientStub.
-    #
-    # @param tenant [Tenant]
-    # @return [Telegram::Bot::Client] клиент с токеном тенанта
-    def build_bot_client(tenant)
-      return Telegram.bot if Rails.env.test?
-
-      Telegram::Bot::Client.new(tenant.bot_token, tenant.bot_username)
     end
   end
 end

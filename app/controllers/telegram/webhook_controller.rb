@@ -63,7 +63,7 @@ module Telegram
           tenant: current_tenant,
           chat_id: chat_id,
           operation: 'telegram_message_processing',
-          model_used: 'deepseek-chat'
+          model_used: ApplicationConfig.llm_model
         ) do
           setup_chat_tools
           process_message(message['text'])
