@@ -1,0 +1,12 @@
+h1 style="margin: 0 0 24px; font-size: 24px; text-align: center;" Admin Login
+
+= form_with url: admin_login_path, method: :post, local: true do |f|
+  .field style="margin-bottom: 16px;"
+    = label_tag :email, 'Email', style: "display: block; margin-bottom: 4px; font-weight: 500;"
+    = email_field_tag :email, params[:email], autofocus: true, autocomplete: 'email', required: true, style: "width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+
+  .field style="margin-bottom: 24px;"
+    = label_tag :password, 'Password', style: "display: block; margin-bottom: 4px; font-weight: 500;"
+    = password_field_tag :password, nil, autocomplete: 'current-password', required: true, style: "width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+
+  = submit_tag 'Log in', style: "width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;"
