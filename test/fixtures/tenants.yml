@@ -1,9 +1,9 @@
 one:
   key: tenant01
   name: AutoService One
-  bot_token: token_one_123
+  bot_token: "111111111:ABCdefGHIjklMNOpqrsTUVwxyz_one"
   bot_username: autoservice_one_bot
-  webhook_secret: secret_one_abc123
+  webhook_secret: secret_one_abc123secret_one_abc123secret_one_abc123secret_one_abc123
   admin_chat_id: 123456789
   owner: one
   system_prompt: Test system prompt
@@ -14,9 +14,9 @@ one:
 two:
   key: tenant02
   name: AutoService Two
-  bot_token: token_two_456
+  bot_token: "222222222:ABCdefGHIjklMNOpqrsTUVwxyz_two"
   bot_username: autoservice_two_bot
-  webhook_secret: secret_two_def456
+  webhook_secret: secret_two_def456secret_two_def456secret_two_def456secret_two_def456
   admin_chat_id: 987654321
   owner: two
   system_prompt: Test system prompt 2
