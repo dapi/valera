@@ -39,7 +39,8 @@ module Telegram
     # @return [Array] Rack response [status, headers, body]
     def call(env)
       request = ActionDispatch::Request.new(env)
-      tenant = find_tenant(env)
+      tenant_key = extract_tenant_key(env)
+      tenant = Tenant.find_by!(key: tenant_key)
 
       verify_webhook_secret!(request, tenant)
       Current.tenant = tenant
@@ -49,9 +50,11 @@ module Telegram
       controller.dispatch(bot, update, request)
 
       [ 200, {}, [ '' ] ]
-    rescue ActiveRecord::RecordNotFound
+    rescue ActiveRecord::RecordNotFound => e
+      log_error(e, service: self.class.name, tenant_key: tenant_key, ip: request.remote_ip)
       [ 404, { 'Content-Type' => 'text/plain' }, [ 'Tenant not found' ] ]
-    rescue UnauthorizedError
+    rescue UnauthorizedError => e
+      log_error(e, service: self.class.name, tenant_key: tenant_key, ip: request.remote_ip)
       [ 401, { 'Content-Type' => 'text/plain' }, [ 'Unauthorized' ] ]
     end
 
@@ -64,14 +67,12 @@ module Telegram
 
     private
 
-    # Извлекает tenant_key из URL и находит тенант
+    # Извлекает tenant_key из URL path parameters
     #
     # @param env [Hash] Rack environment
-    # @return [Tenant]
-    # @raise [ActiveRecord::RecordNotFound] если тенант не найден
-    def find_tenant(env)
-      tenant_key = env['action_dispatch.request.path_parameters'][:tenant_key]
-      Tenant.find_by!(key: tenant_key)
+    # @return [String] ключ тенанта
+    def extract_tenant_key(env)
+      env['action_dispatch.request.path_parameters'][:tenant_key]
     end
 
     # Верифицирует X-Telegram-Bot-Api-Secret-Token заголовок
@@ -87,10 +88,9 @@ module Telegram
     def verify_webhook_secret!(request, tenant)
       provided_secret = request.headers['X-Telegram-Bot-Api-Secret-Token'].to_s
 
-      unless ActiveSupport::SecurityUtils.secure_compare(provided_secret, tenant.webhook_secret)
-        log_unauthorized_attempt(request, tenant)
-        raise UnauthorizedError
-      end
+      return if ActiveSupport::SecurityUtils.secure_compare(provided_secret, tenant.webhook_secret)
+
+      raise UnauthorizedError
     end
 
     # Создает Telegram::Bot::Client для текущего тенанта
@@ -104,17 +104,6 @@ module Telegram
       return Telegram.bot if Rails.env.test?
 
       Telegram::Bot::Client.new(tenant.bot_token, tenant.bot_username)
-    end
-
-    # Логирует попытку неавторизованного доступа к webhook
-    #
-    # @param request [ActionDispatch::Request]
-    # @param tenant [Tenant]
-    def log_unauthorized_attempt(request, tenant)
-      Rails.logger.warn do
-        "[MultiTenantMiddleware] Unauthorized attempt for tenant: #{tenant.key}, " \
-          "IP: #{request.remote_ip}"
-      end
     end
   end
 end
