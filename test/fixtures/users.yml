@@ -1,0 +1,7 @@
+one:
+  email: owner1@example.com
+  name: Owner One
+
+two:
+  email: owner2@example.com
+  name: Owner Two

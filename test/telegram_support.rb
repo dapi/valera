@@ -8,16 +8,20 @@ module TelegramSupport
   included do # rubocop:disable Metrics/BlockLength
     setup do
       @described_class = Telegram::WebhookController
-      # route_name = Telegram::Bot::RoutesHelper.route_name_for_bot(@bot)
-      # @controller_path = Rails.application.routes.url_helpers.public_send("#{route_name}_path")
-      # @object = Class.new
-      # @object.extend Telegram::Actions::Message
+      @test_tenant = tenants(:one)
+      # Стабим bot_client на всех тенантах, чтобы использовать тестовый бот
+      Tenant.any_instance.stubs(:bot_client).returns(Telegram.bot)
     end
 
     private
 
     def post_message(text)
-      post telegram_webhook_path, params: message(text)
+      post tenant_telegram_webhook_path(tenant_key: @test_tenant.key),
+           params: message(text).to_json,
+           headers: {
+             'X-Telegram-Bot-Api-Secret-Token' => @test_tenant.webhook_secret,
+             'Content-Type' => 'application/json'
+           }
     end
 
     def latest_reply_text

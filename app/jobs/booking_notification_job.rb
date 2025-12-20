@@ -5,13 +5,15 @@
 # Асинхронно отправляет детали созданных заявок в административный чат
 # Telegram для обработки менеджерами.
 #
+# Использует tenant.admin_chat_id и tenant.bot_client для отправки
+# через правильного бота тенанта.
+#
 # @example Использование задачи
 #   BookingNotificationJob.perform_later(booking)
 #   #=> Уведомление будет отправлено асинхронно
 #
 # @see Booking для модели заявки
-# @see ApplicationConfig для настройки admin_chat_id
-# @see MarkdownCleaner для очистки форматирования
+# @see Tenant для настроек admin_chat_id и bot_token
 # @author Danil Pismenny
 # @since 0.1.0
 class BookingNotificationJob < ApplicationJob
@@ -24,27 +26,22 @@ class BookingNotificationJob < ApplicationJob
   # @param booking [Booking] созданная заявка для уведомления
   # @return [void] отправляет сообщение в административный чат
   # @raise [StandardError] при ошибке отправки (с retry логикой)
-  # @note Пропускает отправку если admin_chat_id не настроен
   # @example
   #   BookingNotificationJob.perform_later(booking)
   #   #=> Уведомление будет отправлено асинхронно
   def perform(booking)
-    if ApplicationConfig.admin_chat_id.blank?
-      Rails.logger.warn('Так как admin_chat_id не установлен - пропускаю уведомления админов')
-      return
-    end
+    tenant = booking.tenant
 
     # Используем Telegram API для отправки сообщения в менеджерский чат
-    Telegram.bot.send_message(
-      chat_id: ApplicationConfig.admin_chat_id,
+    tenant.bot_client.send_message(
+      chat_id: tenant.admin_chat_id,
       text: booking.details
-      # text: MarkdownCleaner.clean(booking.details),
-      # parse_mode: 'Markdown'
     )
   rescue StandardError => e
     log_error(e,
               job: self.class.name,
-              booking_id: booking.id)
+              booking_id: booking.id,
+              tenant_id: booking.tenant_id)
     raise e
   end
 end

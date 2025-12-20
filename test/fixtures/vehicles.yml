@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  client: one
+  brand: MyString
+  model: MyString
+  year: 1
+  vin: MyString
+  plate_number: MyString
+  notes: MyText
+
+two:
+  client: two
+  brand: MyString
+  model: MyString
+  year: 1
+  vin: MyString
+  plate_number: MyString
+  notes: MyText

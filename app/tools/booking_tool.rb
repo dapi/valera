@@ -7,7 +7,7 @@
 # автомобиле и услугах, отправляет уведомления и отслеживает аналитику.
 #
 # @example Базовое использование
-#   tool = BookingTool.new(telegram_user: user, chat: chat)
+#   tool = BookingTool.new(chat: chat)
 #   response = tool.execute(
 #     customer_name: "Иван Петров",
 #     customer_phone: "+7(900)123-45-67",
@@ -48,19 +48,14 @@ class BookingTool < RubyLLM::Tool
               'о пользователе, услуге, стоимости, автомобиле, последние сообщения ' \
               'пользователя и суммаризованную переписку, номер заявки', required: true
 
-  # Инициализирует инструмент с пользователем и чатом
+  # Инициализирует инструмент с чатом
   #
-  # @param telegram_user [TelegramUser] пользователь Telegram
-  # @param chat [Chat] чат для сохранения контекста
+  # @param chat [Chat] чат для сохранения контекста (содержит client и tenant)
   # @return [BookingTool] новый экземпляр инструмента
   # @example
-  #   tool = BookingTool.new(
-  #     telegram_user: TelegramUser.find(1),
-  #     chat: Chat.find(1)
-  #   )
-  def initialize(telegram_user:, chat:)
+  #   tool = BookingTool.new(chat: Chat.find(1))
+  def initialize(chat:)
     super()
-    @telegram_user = telegram_user
     @chat = chat
   end
 
@@ -97,7 +92,8 @@ class BookingTool < RubyLLM::Tool
     booking = Booking
               .create!(
                 meta:,
-                telegram_user: @telegram_user,
+                tenant: @chat.tenant,
+                client: @chat.client,
                 chat: @chat,
                 details: meta[:details],
                 context: meta[:dialog_context]
@@ -106,11 +102,12 @@ class BookingTool < RubyLLM::Tool
     # Track booking creation analytics
     AnalyticsService.track_conversion(
       AnalyticsService::Events::BOOKING_CREATED,
-      @telegram_user.chat_id,
-      {
+      tenant: @chat.tenant,
+      chat_id: telegram_user.chat_id,
+      conversion_data: {
         booking_id: booking.id,
         processing_time_ms: ((Time.current - start_time) * 1000).to_i,
-        user_segment: UserSegmentationService.determine_segment_for_user(@telegram_user)
+        user_segment: UserSegmentationService.determine_segment_for_chat(@chat)
       }
     )
 
@@ -124,11 +121,20 @@ class BookingTool < RubyLLM::Tool
     RubyLLM::Content.new(response_text)
   rescue StandardError => e
     log_error e
-    AnalyticsService.track_error(e, {
-      chat_id: @telegram_user.chat_id,
+    AnalyticsService.track_error(e, tenant: @chat.tenant, context: {
+      chat_id: @chat.id,
       context: 'booking_tool_execution',
       booking_data: meta
     })
     RubyLLM::Content.new("Ошибка при обработке заявки: #{e.message}")
+  end
+
+  private
+
+  # Возвращает telegram_user через chat.client
+  #
+  # @return [TelegramUser, nil] пользователь Telegram или nil
+  def telegram_user
+    @chat.telegram_user
   end
 end
