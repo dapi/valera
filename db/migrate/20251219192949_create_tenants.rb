@@ -4,7 +4,7 @@ class CreateTenants < ActiveRecord::Migration[8.1]
   def change
     create_table :tenants do |t|
       t.string :key, null: false
-      t.string :name
+      t.string :name, null: false
       t.string :bot_token, null: false
       t.string :bot_username, null: false
       t.string :webhook_secret, null: false
@@ -18,5 +18,6 @@ class CreateTenants < ActiveRecord::Migration[8.1]
       t.timestamps
     end
     add_index :tenants, :key, unique: true
+    add_index :tenants, :name, unique: true
   end
 end

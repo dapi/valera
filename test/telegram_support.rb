@@ -9,6 +9,8 @@ module TelegramSupport
     setup do
       @described_class = Telegram::WebhookController
       @test_tenant = tenants(:one)
+      # Стабим bot_client на всех тенантах, чтобы использовать тестовый бот
+      Tenant.any_instance.stubs(:bot_client).returns(Telegram.bot)
     end
 
     private

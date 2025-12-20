@@ -3,9 +3,10 @@
 require 'test_helper'
 
 module Telegram
-  class MultiTenantWebhookControllerTest < ActionDispatch::IntegrationTest
+  class MultiTenantMiddlewareTest < ActionDispatch::IntegrationTest
     setup do
       @tenant = tenants(:one)
+      @bot_stub = Telegram.bot
       @valid_headers = {
         'Content-Type' => 'application/json',
         'X-Telegram-Bot-Api-Secret-Token' => @tenant.webhook_secret
@@ -20,6 +21,8 @@ module Telegram
           text: 'Hello'
         }
       }
+      # Стабим bot_client на всех тенантах, чтобы использовать тестовый бот
+      Tenant.any_instance.stubs(:bot_client).returns(@bot_stub)
     end
 
     test 'returns 404 for non-existent tenant' do
@@ -28,6 +31,7 @@ module Telegram
            headers: @valid_headers
 
       assert_response :not_found
+      assert_equal 'Tenant not found', response.body
     end
 
     test 'returns 401 for invalid secret token' do
@@ -38,6 +42,7 @@ module Telegram
            headers: invalid_headers
 
       assert_response :unauthorized
+      assert_equal 'Unauthorized', response.body
     end
 
     test 'returns 401 for missing secret token' do
@@ -48,6 +53,7 @@ module Telegram
            headers: headers_without_secret
 
       assert_response :unauthorized
+      assert_equal 'Unauthorized', response.body
     end
 
     test 'sets Current.tenant for valid request' do
@@ -66,8 +72,8 @@ module Telegram
 
     test 'passes bot client to dispatch' do
       WebhookController.expects(:dispatch).once.with do |bot, _update, _request|
-        # В тестах используется Telegram.bot (stub), в production - tenant.bot_token
-        bot.is_a?(::Telegram::Bot::Client) || bot.is_a?(::Telegram::Bot::ClientStub)
+        # Проверяем что передается tenant.bot_client (застабленный в setup)
+        bot == @bot_stub
       end
 
       post tenant_telegram_webhook_path(tenant_key: @tenant.key),
@@ -107,6 +113,16 @@ module Telegram
            headers: @valid_headers
 
       assert_response :ok
+    end
+
+    test 'middleware has correct inspect representation' do
+      middleware = Telegram::MultiTenantMiddleware.new(Telegram::WebhookController)
+      assert_equal '#<Telegram::MultiTenantMiddleware(Telegram::WebhookController)>', middleware.inspect
+    end
+
+    test 'middleware handles nil controller gracefully in inspect' do
+      middleware = Telegram::MultiTenantMiddleware.new(nil)
+      assert_equal '#<Telegram::MultiTenantMiddleware()>', middleware.inspect
     end
   end
 end

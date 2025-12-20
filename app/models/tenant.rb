@@ -20,6 +20,13 @@ class Tenant < ApplicationRecord
   before_validation :generate_key, on: :create, if: -> { key.blank? }
   before_validation :generate_webhook_secret, on: :create, if: -> { webhook_secret.blank? }
 
+  # Возвращает Telegram Bot клиент для этого тенанта
+  #
+  # @return [Telegram::Bot::Client] клиент бота
+  def bot_client
+    @bot_client ||= Telegram::Bot::Client.new(bot_token, bot_username)
+  end
+
   private
 
   def generate_key
