@@ -15,10 +15,10 @@ class TenantIsolationTest < ActiveSupport::TestCase
 
   test 'clients are isolated between tenants' do
     # Создаем клиента для tenant_one
-    client_one = ClientResolver.resolve(tenant: @tenant_one, telegram_user: @telegram_user)
+    client_one = @tenant_one.clients.find_or_create_by!(telegram_user: @telegram_user)
 
     # Создаем клиента для tenant_two с тем же telegram_user
-    client_two = ClientResolver.resolve(tenant: @tenant_two, telegram_user: @telegram_user)
+    client_two = @tenant_two.clients.find_or_create_by!(telegram_user: @telegram_user)
 
     # Разные клиенты
     assert_not_equal client_one, client_two
@@ -41,11 +41,8 @@ class TenantIsolationTest < ActiveSupport::TestCase
   end
 
   test 'SystemPromptService uses correct tenant data' do
-    Current.tenant = @tenant_one
-    prompt_one = SystemPromptService.system_prompt
-
-    Current.tenant = @tenant_two
-    prompt_two = SystemPromptService.system_prompt
+    prompt_one = SystemPromptService.new(@tenant_one).system_prompt
+    prompt_two = SystemPromptService.new(@tenant_two).system_prompt
 
     # Каждый tenant имеет свой system_prompt
     if @tenant_one.system_prompt.present? && @tenant_two.system_prompt.present?

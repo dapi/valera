@@ -3,51 +3,45 @@
 require 'test_helper'
 
 class SystemPromptServiceTest < ActiveSupport::TestCase
-  teardown do
-    Current.tenant = nil
+  setup do
+    @tenant = tenants(:one)
   end
 
-  test 'uses ApplicationConfig when no tenant' do
-    Current.tenant = nil
-
-    prompt = SystemPromptService.system_prompt
-
-    assert_includes prompt, ApplicationConfig.company_info
-    assert_includes prompt, ApplicationConfig.price_list
+  test 'raises error when tenant is nil' do
+    assert_raises(ArgumentError) do
+      SystemPromptService.new(nil)
+    end
   end
 
-  test 'uses tenant system_prompt when available' do
-    tenant = tenants(:one)
-    tenant.update!(
+  test 'uses tenant system_prompt' do
+    @tenant.update!(
       system_prompt: 'Tenant prompt with {{COMPANY_INFO}} and {{PRICE_LIST}}',
       company_info: 'Tenant Company Info',
       price_list: 'Tenant Price List'
     )
-    Current.tenant = tenant
 
-    prompt = SystemPromptService.system_prompt
+    service = SystemPromptService.new(@tenant)
+    prompt = service.system_prompt
 
     assert_includes prompt, 'Tenant Company Info'
     assert_includes prompt, 'Tenant Price List'
   end
 
-  test 'falls back to ApplicationConfig for empty tenant fields' do
-    tenant = tenants(:one)
-    tenant.update!(system_prompt: nil, company_info: nil, price_list: nil)
-    Current.tenant = tenant
+  test 'returns empty string for blank tenant fields' do
+    @tenant.update!(system_prompt: '', company_info: nil, price_list: nil)
 
-    prompt = SystemPromptService.system_prompt
+    service = SystemPromptService.new(@tenant)
+    prompt = service.system_prompt
 
-    assert_includes prompt, ApplicationConfig.company_info
-    assert_includes prompt, ApplicationConfig.price_list
+    # Пустые поля заменяются на пустые строки
+    assert_equal '', prompt
   end
 
   test 'includes current time when placeholder present' do
-    tenant = tenants(:one)
-    tenant.update!(system_prompt: 'Current time: {{CURRENT_TIME}}')
-    Current.tenant = tenant
+    @tenant.update!(system_prompt: 'Current time: {{CURRENT_TIME}}')
 
-    prompt = SystemPromptService.system_prompt
+    service = SystemPromptService.new(@tenant)
+    prompt = service.system_prompt
 
     # Проверяем что время подставляется (формат dd.mm.yyyy HH:MM)
     assert_match(/\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}/, prompt)

@@ -50,7 +50,7 @@ class AnalyticsService
         properties: properties,
         occurred_at: occurred_at,
         session_id: generate_session_id(chat_id),
-        tenant_id: Current.tenant&.id
+        tenant_id: Current.tenant.id
       )
     rescue => e
       # Never break main functionality due to analytics errors

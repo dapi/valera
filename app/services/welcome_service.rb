@@ -5,26 +5,29 @@
 # Управляет отправкой персонализированных приветственных сообщений
 # пользователям, которые впервые взаимодействуют с ботом.
 #
-# В multi-tenant режиме использует Current.tenant.welcome_message,
-# с fallback на глобальный шаблон из ApplicationConfig.
-#
 # @example Использование сервиса
-#   Current.tenant = tenant
-#   service = WelcomeService.new
+#   service = WelcomeService.new(tenant)
 #   service.send_welcome_message(user, controller)
 #
-# @see ApplicationConfig для шаблона приветственного сообщения
 # @see TelegramUser для работы с данными пользователя
-# @see Current для multi-tenancy контекста
+# @see Tenant модель тенанта
 # @author Danil Pismenny
 # @since 0.1.0
 class WelcomeService
   include ErrorLogger
   include DevelopmentWarning
 
+  # @param tenant [Tenant] тенант для которого отправляется приветствие
+  # @raise [ArgumentError] если tenant не передан
+  def initialize(tenant)
+    raise ArgumentError, 'tenant is required' if tenant.nil?
+
+    @tenant = tenant
+  end
+
   # Отправляет приветственное сообщение пользователю
   #
-  # Использует шаблон из текущего тенанта или конфигурации и подставляет в него имя пользователя.
+  # Использует шаблон из тенанта и подставляет в него имя пользователя.
   # Отправка происходит через контроллер с помощью respond_with.
   # В development режиме дополнительно отправляет предупреждение о тестовом статусе.
   #
@@ -33,7 +36,7 @@ class WelcomeService
   # @return [void] отправляет сообщение через Telegram API
   # @raise [StandardError] при ошибке отправки сообщения
   # @example
-  #   service = WelcomeService.new
+  #   service = WelcomeService.new(tenant)
   #   service.send_welcome_message(user, controller)
   #   #=> Пользователь получит приветственное сообщение + предупреждение в development
   def send_welcome_message(telegram_user, controller)
@@ -59,17 +62,13 @@ class WelcomeService
 
   private
 
+  attr_reader :tenant
+
   # Возвращает шаблон приветственного сообщения
   #
-  # Приоритет: Current.tenant.welcome_message -> ApplicationConfig.welcome_message_template
-  #
   # @return [String] шаблон приветственного сообщения
-  # @api private
   def welcome_message_template
-    tenant_welcome = Current.tenant&.welcome_message
-    return tenant_welcome if tenant_welcome.present?
-
-    ApplicationConfig.welcome_message_template
+    tenant.welcome_message.to_s
   end
 
   # Выполняет интерполяцию шаблона с данными пользователя
@@ -80,7 +79,6 @@ class WelcomeService
   # @example
   #   interpolate_template("Привет, #{name}!", user)
   #   #=> "Привет, Иван!"
-  # @api private
   def interpolate_template(template, telegram_user)
     # Интерполяция #{name} -> telegram_user.name
     template.gsub(/\#{name\}/, telegram_user.name)
@@ -91,7 +89,6 @@ class WelcomeService
   # @param telegram_user [TelegramUser] пользователь получивший приветствие
   # @param delivery_time_ms [Float] время доставки в миллисекундах
   # @return [void]
-  # @api private
   def track_greeting_sent(telegram_user, delivery_time_ms)
     AnalyticsService.track(
       AnalyticsService::Events::GREETING_SENT,
@@ -109,7 +106,6 @@ class WelcomeService
   # @param telegram_user [TelegramUser] пользователь для анализа
   # @return [String] 'new' для новых пользователей, 'returning' для возвращающихся
   # @note Пользователь считается новым если создан менее 24 часов назад
-  # @api private
   def determine_user_type(telegram_user)
     # Пользователь считается новым если создан менее 24 часов назад
     time_since_creation = Time.current - telegram_user.created_at
