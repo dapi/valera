@@ -46,8 +46,7 @@ module Telegram
       Current.tenant = tenant
 
       update = request.request_parameters
-      bot = Rails.env.test? ? Telegram.bot : tenant.bot_client
-      controller.dispatch(bot, update, request)
+      controller.dispatch(tenant.bot_client, update, request)
 
       [ 200, {}, [ '' ] ]
     rescue ActiveRecord::RecordNotFound => e
@@ -90,7 +89,12 @@ module Telegram
 
       return if ActiveSupport::SecurityUtils.secure_compare(provided_secret, tenant.webhook_secret)
 
-      raise UnauthorizedError
+      error = UnauthorizedError.new("Invalid webhook secret for tenant #{tenant.key}")
+      Rails.logger.warn { "Webhook secret mismatch for tenant #{tenant.key} from IP #{request.remote_ip}" }
+      Bugsnag.notify(error) do |report|
+        report.add_metadata(:webhook, { tenant_key: tenant.key, ip: request.remote_ip })
+      end
+      raise error
     end
   end
 end

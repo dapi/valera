@@ -40,7 +40,7 @@ class WelcomeService
   #   service.send_welcome_message(user, controller)
   #   #=> Пользователь получит приветственное сообщение + предупреждение в development
   def send_welcome_message(telegram_user, controller)
-    message = interpolate_template(welcome_message_template, telegram_user)
+    message = interpolate_template(tenant.welcome_message.to_s, telegram_user)
 
     # Измерение времени доставки приветствия
     start_time = Time.current
@@ -63,13 +63,6 @@ class WelcomeService
   private
 
   attr_reader :tenant
-
-  # Возвращает шаблон приветственного сообщения
-  #
-  # @return [String] шаблон приветственного сообщения
-  def welcome_message_template
-    tenant.welcome_message.to_s
-  end
 
   # Выполняет интерполяцию шаблона с данными пользователя
   #

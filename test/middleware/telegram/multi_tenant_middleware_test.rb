@@ -6,6 +6,7 @@ module Telegram
   class MultiTenantMiddlewareTest < ActionDispatch::IntegrationTest
     setup do
       @tenant = tenants(:one)
+      @bot_stub = Telegram.bot
       @valid_headers = {
         'Content-Type' => 'application/json',
         'X-Telegram-Bot-Api-Secret-Token' => @tenant.webhook_secret
@@ -20,6 +21,8 @@ module Telegram
           text: 'Hello'
         }
       }
+      # Стабим bot_client на всех тенантах, чтобы использовать тестовый бот
+      Tenant.any_instance.stubs(:bot_client).returns(@bot_stub)
     end
 
     test 'returns 404 for non-existent tenant' do
@@ -69,8 +72,8 @@ module Telegram
 
     test 'passes bot client to dispatch' do
       WebhookController.expects(:dispatch).once.with do |bot, _update, _request|
-        # В тестах используется Telegram.bot (stub), в production - tenant.bot_token
-        bot.is_a?(::Telegram::Bot::Client) || bot.is_a?(::Telegram::Bot::ClientStub)
+        # Проверяем что передается tenant.bot_client (застабленный в setup)
+        bot == @bot_stub
       end
 
       post tenant_telegram_webhook_path(tenant_key: @tenant.key),
