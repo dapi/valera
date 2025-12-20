@@ -21,7 +21,8 @@
 # @author Danil Pismenny
 # @since 0.1.0
 class TelegramUser < ApplicationRecord
-  has_one :chat, dependent: :delete
+  has_many :clients, dependent: :destroy
+  has_many :chats, dependent: :destroy
 
   # Возвращает имя пользователя для отображения
   #

@@ -36,7 +36,7 @@ class AnalyticsEventTest < ActiveSupport::TestCase
     assert_equal 1, event.properties['booking_id']
     assert_equal 2, event.properties['services_count']
     assert_equal 15000, event.properties['estimated_total']
-    assert_equal 'Тестовый Клиент', event.properties['customer_name']
+    assert_equal 'Test Client', event.properties['customer_name']
   end
 
   test 'default platform is telegram' do

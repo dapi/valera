@@ -1,5 +1,7 @@
 one:
-  telegram_user: one
+  tenant: one
+  client: one
 
 two:
-  telegram_user: two
+  tenant: two
+  client: two

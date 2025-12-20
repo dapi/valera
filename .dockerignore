@@ -1,48 +1,112 @@
 # See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
 
-# Ignore git directory.
-/.git/
-/.gitignore
+init.sh
 
-# Ignore bundler config.
-/.bundle
+# Version control
+.git
+.gitignore
 
-# Ignore all environment files.
-/.env*
+# Environment and secrets
+.env*
+config/master.key
+config/credentials/*.key
 
-# Ignore all default key files.
-/config/master.key
-/config/credentials/*.key
+# Documentation and README
+README.md
+CHANGELOG.md
+LICENSE
+AGENTS.md
+doc/
+DEVELOPMENT.md
 
-# Ignore all logfiles and tempfiles.
-/log/*
-/tmp/*
+# Development and testing files
+.devcontainer
+.github
+.rspec
+.ruby-gemset
+.byebug_history
+coverage/
+.cypress
+spec/
+test/
+lib/tasks/dev/
+
+# Logs and temporary files
+log/*
+tmp/*
 !/log/.keep
 !/tmp/.keep
-
-# Ignore pidfiles, but keep the directory.
 /tmp/pids/*
 !/tmp/pids/.keep
 
-# Ignore storage (uploaded files in development and any SQLite databases).
-/storage/*
+# Database files
+db/*.sqlite3*
+storage/*
 !/storage/.keep
-/tmp/storage/*
+tmp/storage/*
 !/tmp/storage/.keep
 
-# Ignore assets.
-/node_modules/
-/app/assets/builds/*
+# Dependencies and build artifacts
+.bundle
+vendor/bundle/
+node_modules/
+.yarn-integrity
+app/assets/builds/*
 !/app/assets/builds/.keep
-/public/assets
+public/assets/
 
-# Ignore CI service files.
-/.github
+# Docker and deployment
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+config/deploy*.yml
+.kamal
+gems.tags
+tags
 
+# Development tools
+.vscode
+.idea
+.DS_Store
+*.swp
+*.swo
+*~
 
-# Ignore development files
-/.devcontainer
+# Protocols and documentation
+.protocols/
 
-# Ignore Docker-related files
-/.dockerignore
-/Dockerfile*
+# Cache and temporary directories
+.sentry-cli
+.venv
+venv/
+
+# Editor and OS files
+.DS_Store
+.Thumbs.db
+*.orig
+
+# Claude and AI tools
+.claude/
+.claude-on-rails/
+CLAUDE.md
+claude-swarm.yml
+
+# Ruby LSP (contains its own Gemfile, not needed in production)
+.ruby-lsp/
+
+# Code quality tools (not needed in production)
+.editorconfig
+.overcommit.yml
+.rubocop.yml
+.rubocop_todo.yml
+Gemfile.rubocop
+Gemfile.rubocop.lock
+Guardfile
+
+# Other development files
+.dockerdev/
+.gitmodules
+.qoder/
+.serena/
+TODO.md
+dip.yml

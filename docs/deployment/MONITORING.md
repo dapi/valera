@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
 1. **Application:** New Relic / DataDog
 2. **Infrastructure:** Prometheus + Grafana
 3. **Logs:** ELK Stack (Elasticsearch, Logstash, Kibana)
-4. **Error Tracking:** Sentry (в дополнение к ErrorLogger)
+4. **Error Tracking:** Bugsnag (через ErrorLogger)
 5. **Uptime:** UptimeRobot / Pingdom
 
 ### Basic Prometheus Metrics

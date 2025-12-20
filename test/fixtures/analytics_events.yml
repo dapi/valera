@@ -1,4 +1,5 @@
 one:
+  tenant: one
   event_name: ai_dialog_started
   chat_id: 943084337
   properties:
@@ -10,6 +11,7 @@ one:
   platform: telegram
 
 two:
+  tenant: one
   event_name: ai_response_time
   chat_id: 943084338
   properties:
@@ -21,6 +23,7 @@ two:
   platform: telegram
 
 booking_event:
+  tenant: one
   event_name: booking_request_created
   chat_id: 943084339
   properties:
@@ -29,7 +32,7 @@ booking_event:
     estimated_total: 15000
     processing_time_ms: 200
     user_segment: new
-    customer_name: Тестовый Клиент
+    customer_name: Test Client
     car_brand: Toyota
     car_model: Camry
   occurred_at: <%= 30.minutes.ago %>

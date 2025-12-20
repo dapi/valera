@@ -8,6 +8,7 @@ plugins:
   - rubocop-performance
 
 AllCops:
+  TargetRubyVersion: 3.4
   SuggestExtensions: false
   NewCops: enable
   Exclude:

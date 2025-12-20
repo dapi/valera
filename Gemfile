@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem 'rails', '~> 8.1.0'
+gem 'rails', '~> 8.1.1'
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem 'propshaft'
 # Use postgresql as the database for Active Record
@@ -104,6 +104,11 @@ gem 'redis', '~> 5.4'
 gem 'bugsnag', '~> 6.28'
 
 gem 'request_store'
+
+gem 'nanoid', '~> 2.0'
+
+# Email validation with format and disposable email checks
+gem 'valid_email2', '~> 7.0'
 
 # Markdown processing for Telegram Bot API compatibility
 gem 'kramdown', '~> 2.5'

@@ -18,13 +18,14 @@ WORKDIR /rails
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Set production environment variables and enable jemalloc for reduced memory usage and latency.
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development" \
+    BUNDLE_WITHOUT="development test" \
     LD_PRELOAD="/usr/local/lib/libjemalloc.so"
 
 # Throw-away build stage to reduce size of final image
@@ -33,14 +34,15 @@ FROM base AS build
 # Install packages needed to build gems
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-# Install application gems
-COPY Gemfile Gemfile.lock vendor ./
+# Install application gems with BuildKit cache for faster rebuilds
+COPY Gemfile Gemfile.lock ./
 
-RUN bundle install && \
+RUN --mount=type=cache,id=bundle,target=/usr/local/bundle/cache \
+    bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
-    # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
     bundle exec bootsnap precompile -j 1 --gemfile
 
 # Copy application code
@@ -53,11 +55,20 @@ RUN bundle exec bootsnap precompile -j 1 app/ lib/
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
-
-
-
 # Final stage for app image
 FROM base
+
+# Build arguments for metadata (must be declared after FROM to be available in this stage)
+ARG VERSION=0.1.0
+ARG BUILD_DATE
+ARG GIT_SHA
+
+# OCI image labels
+LABEL org.opencontainers.image.source="https://github.com/dapi/valera" \
+      org.opencontainers.image.description="Valera AI Bot" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.revision="${GIT_SHA}"
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \
@@ -65,8 +76,8 @@ RUN groupadd --system --gid 1000 rails && \
 USER 1000:1000
 
 # Copy built artifacts: gems, application
-COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --chown=rails:rails --from=build /rails /rails
+COPY --link --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+COPY --link --chown=rails:rails --from=build /rails /rails
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]

@@ -72,6 +72,7 @@
 - **SaaS модель:** `saas/saas-overview.md`
 
 ### 🚀 DevOps и операции {#devops}
+- **Конфигурация:** `CONFIG.md` — переменные окружения
 - **Развернуть проект:** `deployment/README.md`
 - **Docker настройка:** `deployment/DOCKER.md`
 - **Мониторинг:** `deployment/MONITORING.md`

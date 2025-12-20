@@ -1,8 +1,9 @@
 one:
-  telegram_user: one
+  tenant: one
+  client: one
   chat: one
   meta:
-    customer_name: 'Иван Петров'
+    customer_name: 'Ivan Petrov'
     customer_phone: '+7(916)123-45-67'
     car_info:
       brand: 'Toyota'

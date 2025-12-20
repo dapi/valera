@@ -71,6 +71,7 @@ class UserSegmentationService
     #
     # @param chat [Chat] чат пользователя
     # @return [String] сегмент пользователя
+    # @note Использует has_one :telegram_user, through: :client
     def determine_segment_for_chat(chat)
       determine_segment(chat_id: chat.telegram_user.chat_id)
     end

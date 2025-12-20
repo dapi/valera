@@ -11,12 +11,14 @@ class AnalyticsJobTest < ActiveSupport::TestCase
   end
 
   test 'creates analytics event successfully' do
+    tenant = tenants(:one)
     event_data = {
       event_name: 'dialog_started',
       chat_id: 12345,
       properties: { platform: 'telegram' },
       occurred_at: Time.current,
-      session_id: 'test_session_123'
+      session_id: 'test_session_123',
+      tenant_id: tenant.id
     }
 
     AnalyticsJob.perform_now(event_data)

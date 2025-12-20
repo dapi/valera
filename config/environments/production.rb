@@ -110,18 +110,5 @@ Rails.application.configure do
   # Enable detailed error logging for monitoring
   config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'info')
 
-  # Error reporting configuration
-  if ENV['SENTRY_DSN'].present?
-    require 'sentry-ruby'
-    require 'sentry-rails'
-
-    Sentry.init do |config|
-      config.dsn = ENV['SENTRY_DSN']
-      config.breadcrumbs_logger = [ :active_support_logger, :http_logger ]
-      config.environment = Rails.env
-      config.release = ENV['GIT_COMMIT_SHA'] || `git rev-parse HEAD`.strip
-      config.traces_sample_rate = ENV.fetch('SENTRY_TRACES_SAMPLE_RATE', 0.1).to_f
-      config.send_default_pii = false
-    end
-  end
+  # Error reporting: Bugsnag (configured via bugsnag initializer)
 end
