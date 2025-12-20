@@ -88,7 +88,8 @@ class ClientTest < ActiveSupport::TestCase
   test 'allows same telegram_user in different tenants' do
     other_tenant = Tenant.create!(
       name: 'Other Tenant',
-      bot_token: 'other_token_12345'
+      bot_token: 'other_token_12345',
+      bot_username: 'other_bot'
     )
 
     other_client = Client.new(

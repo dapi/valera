@@ -13,6 +13,7 @@ class Tenant < ApplicationRecord
 
   validates :name, presence: true
   validates :bot_token, presence: true, uniqueness: true
+  validates :bot_username, presence: true
   validates :key, presence: true, uniqueness: true, length: { is: KEY_LENGTH }
   validates :webhook_secret, presence: true
 

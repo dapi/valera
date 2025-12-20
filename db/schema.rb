@@ -153,17 +153,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_19_193913) do
 
   create_table "tenants", force: :cascade do |t|
     t.bigint "admin_chat_id"
-    t.string "bot_token"
-    t.string "bot_username"
+    t.string "bot_token", null: false
+    t.string "bot_username", null: false
     t.text "company_info"
     t.datetime "created_at", null: false
-    t.string "key"
+    t.string "key", null: false
     t.string "name"
     t.bigint "owner_id"
     t.text "price_list"
     t.text "system_prompt"
     t.datetime "updated_at", null: false
-    t.string "webhook_secret"
+    t.string "webhook_secret", null: false
     t.text "welcome_message"
     t.index ["key"], name: "index_tenants_on_key", unique: true
     t.index ["owner_id"], name: "index_tenants_on_owner_id"
@@ -202,19 +202,15 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_19_193913) do
     t.index ["client_id"], name: "index_vehicles_on_client_id"
   end
 
-  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id", on_delete: :cascade
   add_foreign_key "analytics_events", "tenants"
-  add_foreign_key "bookings", "chats", on_delete: :cascade
   add_foreign_key "bookings", "clients"
   add_foreign_key "bookings", "tenants"
   add_foreign_key "bookings", "vehicles"
   add_foreign_key "chats", "clients"
-  add_foreign_key "chats", "models", on_delete: :cascade
   add_foreign_key "chats", "tenants"
   add_foreign_key "clients", "telegram_users"
   add_foreign_key "clients", "tenants"
-  add_foreign_key "messages", "chats", on_delete: :cascade
+  add_foreign_key "messages", "chats"
   add_foreign_key "tenants", "users", column: "owner_id"
-  add_foreign_key "tool_calls", "messages", on_delete: :cascade
   add_foreign_key "vehicles", "clients"
 end
