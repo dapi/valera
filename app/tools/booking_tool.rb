@@ -102,8 +102,9 @@ class BookingTool < RubyLLM::Tool
     # Track booking creation analytics
     AnalyticsService.track_conversion(
       AnalyticsService::Events::BOOKING_CREATED,
-      telegram_user.chat_id,
-      {
+      tenant: @chat.tenant,
+      chat_id: telegram_user.chat_id,
+      conversion_data: {
         booking_id: booking.id,
         processing_time_ms: ((Time.current - start_time) * 1000).to_i,
         user_segment: UserSegmentationService.determine_segment_for_chat(@chat)
@@ -120,7 +121,7 @@ class BookingTool < RubyLLM::Tool
     RubyLLM::Content.new(response_text)
   rescue StandardError => e
     log_error e
-    AnalyticsService.track_error(e, {
+    AnalyticsService.track_error(e, tenant: @chat.tenant, context: {
       chat_id: @chat.id,
       context: 'booking_tool_execution',
       booking_data: meta

@@ -521,6 +521,9 @@ GEM
     unicode-emoji (4.1.0)
     uri (1.1.0)
     useragent (0.16.11)
+    valid_email2 (7.0.13)
+      activemodel (>= 6.0)
+      mail (~> 2.5)
     vcr (6.3.1)
       base64
     web-console (4.2.1)
@@ -600,6 +603,7 @@ DEPENDENCIES
   timecop
   turbo-rails
   tzinfo-data
+  valid_email2 (~> 7.0)
   vcr
   web-console
   webmock

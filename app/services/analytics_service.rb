@@ -33,10 +33,11 @@ class AnalyticsService
     # Основной метод для трекинга событий
     #
     # @param event_name [String] Тип события
+    # @param tenant [Tenant] Тенант для трекинга
     # @param chat_id [Integer] ID чата пользователя
     # @param properties [Hash] Дополнительные свойства события
     # @param occurred_at [Time] Время события (по умолчанию текущее)
-    def track(event_name, chat_id:, properties: {}, occurred_at: Time.current)
+    def track(event_name, tenant:, chat_id:, properties: {}, occurred_at: Time.current)
       return unless tracking_enabled?
 
       # Validate event data
@@ -48,7 +49,8 @@ class AnalyticsService
         chat_id: chat_id,
         properties: properties,
         occurred_at: occurred_at,
-        session_id: generate_session_id(chat_id)
+        session_id: generate_session_id(chat_id),
+        tenant_id: tenant.id
       )
     rescue => e
       # Never break main functionality due to analytics errors
@@ -61,12 +63,14 @@ class AnalyticsService
 
     # Трекинг времени ответа AI
     #
+    # @param tenant [Tenant] Тенант для трекинга
     # @param chat_id [Integer] ID чата
     # @param duration_ms [Integer] Длительность ответа в миллисекундах
     # @param model_used [String] Используемая модель AI
-    def track_response_time(chat_id, duration_ms, model_used)
+    def track_response_time(tenant:, chat_id:, duration_ms:, model_used:)
       track(
         Events::RESPONSE_TIME,
+        tenant: tenant,
         chat_id: chat_id,
         properties: {
           duration_ms: duration_ms,
@@ -79,19 +83,22 @@ class AnalyticsService
     # Трекинг конверсионных событий
     #
     # @param event_name [String] Тип события
+    # @param tenant [Tenant] Тенант для трекинга
     # @param chat_id [Integer] ID чата
     # @param conversion_data [Hash] Данные о конверсии
-    def track_conversion(event_name, chat_id, conversion_data)
-      track(event_name, chat_id: chat_id, properties: conversion_data)
+    def track_conversion(event_name, tenant:, chat_id:, conversion_data:)
+      track(event_name, tenant: tenant, chat_id: chat_id, properties: conversion_data)
     end
 
     # Трекинг ошибок системы
     #
     # @param error [Exception] Объект ошибки
+    # @param tenant [Tenant] Тенант для трекинга
     # @param context [Hash] Контекст ошибки
-    def track_error(error, context = {})
+    def track_error(error, tenant:, context: {})
       track(
         Events::ERROR_OCCURRED,
+        tenant: tenant,
         chat_id: context[:chat_id] || 0,
         properties: {
           error_class: error.class.name,

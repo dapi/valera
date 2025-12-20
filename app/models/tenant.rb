@@ -13,11 +13,19 @@ class Tenant < ApplicationRecord
 
   validates :name, presence: true
   validates :bot_token, presence: true, uniqueness: true
+  validates :bot_username, presence: true
   validates :key, presence: true, uniqueness: true, length: { is: KEY_LENGTH }
   validates :webhook_secret, presence: true
 
   before_validation :generate_key, on: :create, if: -> { key.blank? }
   before_validation :generate_webhook_secret, on: :create, if: -> { webhook_secret.blank? }
+
+  # Возвращает Telegram Bot клиент для этого тенанта
+  #
+  # @return [Telegram::Bot::Client] клиент бота
+  def bot_client
+    @bot_client ||= Telegram::Bot::Client.new(bot_token, bot_username)
+  end
 
   private
 

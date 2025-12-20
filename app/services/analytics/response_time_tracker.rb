@@ -9,12 +9,13 @@ module Analytics
     class << self
       # Измеряет время выполнения блока и трекирует его
       #
+      # @param tenant [Tenant] Тенант для трекинга
       # @param chat_id [Integer] ID чата
       # @param operation [String] Тип операции
       # @param model_used [String] Используемая модель
       # @yield Блок кода для измерения времени выполнения
       # @return [Object] Результат выполнения блока
-      def measure(chat_id, operation, model_used = 'deepseek-chat')
+      def measure(tenant:, chat_id:, operation:, model_used: 'deepseek-chat')
         start_time = Time.current
 
         result = yield
@@ -22,7 +23,12 @@ module Analytics
         duration_ms = ((Time.current - start_time) * 1000).to_i
 
         # Track response time
-        AnalyticsService.track_response_time(chat_id, duration_ms, model_used)
+        AnalyticsService.track_response_time(
+          tenant: tenant,
+          chat_id: chat_id,
+          duration_ms: duration_ms,
+          model_used: model_used
+        )
 
         # Log slow responses
         if duration_ms > 3000 # > 3 seconds
@@ -34,7 +40,7 @@ module Analytics
         duration_ms = ((Time.current - start_time) * 1000).to_i
 
         # Track error timing
-        AnalyticsService.track_error(e, {
+        AnalyticsService.track_error(e, tenant: tenant, context: {
           chat_id: chat_id,
           context: operation,
           duration_ms: duration_ms,

@@ -47,6 +47,7 @@ module Telegram
       if first_message_today?(chat_id)
         AnalyticsService.track(
           AnalyticsService::Events::DIALOG_STARTED,
+          tenant: current_tenant,
           chat_id: chat_id,
           properties: {
             message_type: message_type(message),
@@ -59,9 +60,10 @@ module Telegram
       # Measure AI response time with new tracker
       begin
         ai_response = Analytics::ResponseTimeTracker.measure(
-          chat_id,
-          'telegram_message_processing',
-          'deepseek-chat'
+          tenant: current_tenant,
+          chat_id: chat_id,
+          operation: 'telegram_message_processing',
+          model_used: ApplicationConfig.llm_model
         ) do
           setup_chat_tools
           process_message(message['text'])
@@ -70,7 +72,7 @@ module Telegram
         send_response_to_user(ai_response)
 
       rescue => e
-        AnalyticsService.track_error(e, {
+        AnalyticsService.track_error(e, tenant: current_tenant, context: {
           chat_id: chat_id,
           context: 'webhook_processing',
           user_id: telegram_user.id
@@ -103,7 +105,7 @@ module Telegram
       llm_chat
         .with_tool(BookingTool.new(chat: llm_chat))
         .with_temperature(ApplicationConfig.llm_temperature)
-        .with_instructions(SystemPromptService.system_prompt, replace: true)
+        .with_instructions(SystemPromptService.new(current_tenant).system_prompt, replace: true)
         .on_tool_call { |tool_call| handle_tool_call(tool_call) }
         .on_tool_result { |result| handle_tool_result(result) }
     end
@@ -181,7 +183,7 @@ module Telegram
     #   start!()
     #   #=> Пользователь получит приветственное сообщение
     def start!(*_args)
-      WelcomeService.new.send_welcome_message(telegram_user, self)
+      WelcomeService.new(current_tenant).send_welcome_message(telegram_user, self)
     end
 
     # Обработчик команды /reset - сброс диалога
@@ -273,25 +275,14 @@ module Telegram
 
     # Возвращает текущий tenant
     #
+    # Current.tenant устанавливается в MultiTenantWebhookController
+    # перед вызовом dispatch.
+    #
     # @return [Tenant] текущий tenant
     # @raise [RuntimeError] если tenant не установлен
     # @api private
-    # @note В FIP-004b будет устанавливаться через webhook routing
     def current_tenant
-      @current_tenant ||= Current.tenant || resolve_tenant_from_request
-    end
-
-    # Временное разрешение tenant до реализации FIP-004b
-    # TODO: Удалить после реализации webhook routing
-    #
-    # @return [Tenant] найденный tenant
-    # @raise [RuntimeError] если tenant не найден
-    # @api private
-    def resolve_tenant_from_request
-      # В тестовой среде используем первый tenant
-      return Tenant.first if Rails.env.test?
-
-      raise('Current.tenant is not set. Configure webhook routing.')
+      @current_tenant ||= Current.tenant or raise('Current.tenant is not set')
     end
 
     # Устанавливает контекст аналитики для отслеживания запроса
@@ -320,6 +311,7 @@ module Telegram
       return true if Rails.env.test?
 
       !AnalyticsEvent
+        .where(tenant: current_tenant)
         .by_chat(chat_id)
         .by_event(AnalyticsService::Events::DIALOG_STARTED)
         .where('occurred_at >= ?', Date.current)
