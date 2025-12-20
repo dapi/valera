@@ -86,10 +86,11 @@ class ClientTest < ActiveSupport::TestCase
   end
 
   test 'allows same telegram_user in different tenants' do
+    Telegram::Bot::Client.any_instance.stubs(:get_me).returns({ 'ok' => true, 'result' => { 'username' => 'other_bot' } })
+
     other_tenant = Tenant.create!(
       name: 'Other Tenant',
-      bot_token: 'other_token_12345',
-      bot_username: 'other_bot'
+      bot_token: '333333333:ABCdefGHIjklMNOpqrsTUVwxyz_other'
     )
 
     other_client = Client.new(

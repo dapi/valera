@@ -31,6 +31,14 @@
 ru:
   hello: "Привет, мир"
 
+  activerecord:
+    errors:
+      models:
+        tenant:
+          attributes:
+            bot_token:
+              invalid_format: "имеет неверный формат. Ожидается формат: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+
   # Development warnings
   development_warning:
     welcome: |
