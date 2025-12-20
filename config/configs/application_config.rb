@@ -6,8 +6,6 @@ class ApplicationConfig < Anyway::Config
 
   attr_config(
     # RubyLLM configuration
-    # Telegram configuration
-    :bot_token,
     :llm_provider,
     :llm_model,
 
@@ -56,7 +54,6 @@ class ApplicationConfig < Anyway::Config
     welcome_message_path: :string,
     price_list_path: :string,
     company_info_path: :string,
-    bot_token: :string,
     bugsnag_api_key: :string,
 
     anthropic_base_url: :string,
@@ -113,19 +110,8 @@ class ApplicationConfig < Anyway::Config
     File.read(welcome_message_path).presence || raise('No welcome message defined')
   end
 
-  # Возвращает ID бота из токена (цифры до двоеточия)
-  def bot_id
-    @bot_id ||= begin
-      return nil if bot_token.blank?
-      # Токен выглядит как '1231232113:asdsadsas', где цифра до : - это bot_id
-      bot_token.split(':').first.to_i
-    rescue
-      nil
-    end
-  end
-
   # Declare required parameters using anyway_config's required method
-  required :bot_token, :llm_provider, :llm_model
+  required :llm_provider, :llm_model
 
   class << self
     # Make it possible to access a singleton config instance

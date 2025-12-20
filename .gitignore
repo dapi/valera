@@ -50,3 +50,6 @@
 .claude-swarm/
 claude-swarm.log
 .claude/settings.local.json
+
+# Dip local overrides
+dip.override.yml

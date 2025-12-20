@@ -1,0 +1,150 @@
+version: '8.0'
+
+environment:
+  RAILS_ENV: development
+
+compose:
+  files:
+    - docker-compose.yml
+  project_name: valera
+
+interaction:
+  # === Infrastructure ===
+  up:
+    description: Start infrastructure (postgres, redis) in background
+    runner: docker_compose
+    compose:
+      method: up
+      run_options: [-d, postgres, redis]
+
+  down:
+    description: Stop all services
+    runner: docker_compose
+    compose:
+      method: down
+
+  # === Main commands ===
+  bash:
+    description: Open bash shell in app container
+    service: app
+    compose:
+      run_options: [no-deps, rm]
+
+  dev:
+    description: Start full dev stack (server + css + bot)
+    service: app
+    command: foreman start -f Procfile.dev
+    compose:
+      run_options: [service-ports, rm]
+
+  rails:
+    description: Run Rails commands
+    service: app
+    command: bundle exec rails
+    compose:
+      run_options: [rm]
+    subcommands:
+      s:
+        description: Start Rails server only
+        service: app
+        command: bundle exec rails server -b 0.0.0.0
+        compose:
+          run_options: [service-ports, rm]
+
+  rake:
+    description: Run Rake tasks
+    service: app
+    command: bundle exec rake
+    compose:
+      run_options: [rm]
+
+  bundle:
+    description: Run Bundler commands
+    service: app
+    command: bundle
+    compose:
+      run_options: [rm]
+
+  # === Testing and quality ===
+  test:
+    description: Run tests
+    service: app
+    command: bundle exec rails test
+    environment:
+      RAILS_ENV: test
+    compose:
+      run_options: [rm]
+
+  rubocop:
+    description: Run RuboCop
+    service: app
+    command: bundle exec rubocop
+    compose:
+      run_options: [rm]
+
+  brakeman:
+    description: Run security analysis
+    service: app
+    command: bundle exec brakeman
+    compose:
+      run_options: [rm]
+
+  ci:
+    description: Run full CI suite (tests + rubocop + brakeman)
+    service: app
+    command: bin/ci
+    compose:
+      run_options: [rm]
+
+  # === Telegram Bot ===
+  bot:
+    description: Run Telegram bot poller
+    service: app
+    command: bundle exec rake telegram:bot:poller
+    compose:
+      run_options: [rm]
+
+  # === Database ===
+  console:
+    description: Run Rails console
+    service: app
+    command: bundle exec rails console
+    compose:
+      run_options: [rm]
+
+  psql:
+    description: Run PostgreSQL console
+    service: postgres
+    command: psql -U valera -d valera_development
+
+  migrate:
+    description: Run database migrations
+    service: app
+    command: bundle exec rails db:migrate
+    compose:
+      run_options: [rm]
+
+  # === Utilities ===
+  logs:
+    description: Tail application logs
+    service: app
+    command: tail -f log/development.log
+    compose:
+      run_options: [rm]
+
+  clean:
+    description: Clean tmp and cache
+    service: app
+    command: bundle exec rails tmp:clear log:clear
+    compose:
+      run_options: [rm]
+
+provision:
+  # Idempotent setup - safe to run repeatedly
+  - dip compose build
+  - dip compose up -d postgres redis
+  # docker compose waits for healthcheck via depends_on: condition: service_healthy
+  - dip bundle install
+  - dip rails db:prepare
+  - echo ""
+  - echo "Provision complete! Run 'dip dev' to start development"

@@ -1,0 +1,62 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: .dockerdev/Dockerfile
+    volumes:
+      - .:/app:cached
+      - bundle:/usr/local/bundle
+      - rails_cache:/app/tmp/cache
+      - node_modules:/app/node_modules
+    tmpfs:
+      - /tmp:exec
+      - /app/tmp/pids
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgresql://valera:password@postgres:5432/valera_development
+      REDIS_URL: redis://redis:6379/0
+      HISTFILE: /app/log/.bash_history
+      EDITOR: vim
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: valera
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: valera_development
+    volumes:
+      - postgres_dev:/var/lib/postgresql/data
+    # Ports exposed only within docker network by default
+    # Uncomment to access from host (may conflict with local postgres)
+    # ports:
+    #   - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U valera"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: valkey/valkey:8-alpine
+    # Ports exposed only within docker network by default
+    # Uncomment to access from host (may conflict with local redis)
+    # ports:
+    #   - "6379:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_dev:
+  bundle:
+  rails_cache:
+  node_modules:
