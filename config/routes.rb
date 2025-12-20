@@ -5,7 +5,10 @@ Rails.application.routes.draw do
 
   # Multi-tenant webhook endpoint
   # Each tenant has their own webhook URL: /telegram/webhook/:tenant_key
-  post 'telegram/webhook/:tenant_key', to: 'telegram/multi_tenant_webhook#create', as: :tenant_telegram_webhook
+  # Uses Middleware instead of Controller for better integration with telegram-bot-rb gem
+  post 'telegram/webhook/:tenant_key',
+       to: Telegram::MultiTenantMiddleware.new(Telegram::WebhookController),
+       as: :tenant_telegram_webhook
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
