@@ -22,6 +22,9 @@ class ApplicationConfig < Anyway::Config
     :vertexai_location,
     :vertexai_project_id,
 
+    # Application branding
+    app_name: 'Супер Валера',
+
     # File paths
     system_prompt_path: './data/system-prompt.md',
     welcome_message_path: './data/welcome-message.md',
@@ -59,6 +62,7 @@ class ApplicationConfig < Anyway::Config
   # Type coercions to ensure proper data types from environment variables
   coerce_types(
     # Strings
+    app_name: :string,
     llm_provider: :string,
     llm_model: :string,
     openai_api_base: :string,

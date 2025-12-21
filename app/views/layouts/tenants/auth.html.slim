@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    title
+      = "Вход | #{current_tenant&.name}"
+    meta name="viewport" content="width=device-width,initial-scale=1"
+    = csrf_meta_tags
+    = csp_meta_tag
+
+    = stylesheet_link_tag :app, "data-turbo-track": "reload"
+    = javascript_importmap_tags
+
+  body.bg-gray-100.min-h-screen.flex.items-center.justify-center
+    .w-full.max-w-md.p-8
+      .bg-white.rounded-lg.shadow-lg.p-8
+        .text-center.mb-8
+          h1.text-2xl.font-bold.text-gray-800 = current_tenant&.name
+          p.text-gray-500.mt-2 Панель управления
+
+        = render 'tenants/shared/flash'
+
+        = yield

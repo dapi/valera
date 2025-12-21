@@ -18,14 +18,26 @@ Rails.application.routes.draw do
     end
   end
 
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Tenant dashboard and webhook (subdomain-based routing)
+  # Accessible at {tenant_key}.lvh.me (dev) or {tenant_key}.example.com (prod)
+  constraints Constraints::TenantSubdomainConstraint.new do
+    # Telegram webhook endpoint for this tenant
+    post 'telegram/webhook',
+         to: Telegram::MultiTenantMiddleware.new(Telegram::WebhookController),
+         as: :tenant_telegram_webhook
 
-  # Multi-tenant webhook endpoint
-  # Each tenant has their own webhook URL: /telegram/webhook/:tenant_key
-  # Uses Middleware instead of Controller for better integration with telegram-bot-rb gem
-  post 'telegram/webhook/:tenant_key',
-       to: Telegram::MultiTenantMiddleware.new(Telegram::WebhookController),
-       as: :tenant_telegram_webhook
+    # Tenant dashboard routes
+    scope module: :tenants, as: :tenant do
+      resource :session, only: %i[new create destroy]
+      resource :password, only: %i[new create]
+
+      root 'home#show'
+
+      resources :clients, only: %i[index show]
+      resources :bookings, only: %i[index show]
+      resource :settings, only: %i[edit update]
+    end
+  end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
