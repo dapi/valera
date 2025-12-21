@@ -38,5 +38,12 @@ module Valera
 
     # Analytics configuration
     config.analytics_enabled = ENV.fetch('ANALYTICS_ENABLED', 'true') == 'true'
+
+    # Configure TLD length for subdomain routing
+    # For '3010.brandymint.ru' -> tld_length=2 -> subdomain 'admin' (not 'admin.3010')
+    config.action_dispatch.tld_length = ApplicationConfig.tld_length
+
+    # Configure default URL options for route helpers and mailers
+    Rails.application.routes.default_url_options = ApplicationConfig.default_url_options
   end
 end

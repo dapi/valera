@@ -88,4 +88,13 @@ Rails.application.configure do
 
   # Process background jobs inline for development
   config.active_job.queue_adapter = :inline
+
+  # Allow subdomains for admin panel testing (configured via ALLOWED_HOSTS env var)
+  ApplicationConfig.allowed_hosts.each { |host| config.hosts << host }
+
+  # Web console permissions for local network access
+  # Configured via WEB_CONSOLE_PERMISSIONS in config/application.yml
+  if ApplicationConfig.web_console_permissions.any?
+    config.web_console.permissions = ApplicationConfig.web_console_permissions
+  end
 end

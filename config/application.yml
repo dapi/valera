@@ -1,11 +1,29 @@
 # frozen_string_literal: true
 
 default: &default
+  allowed_hosts: []
+  web_console_permissions: []
 
 development:
   <<: *default
   llm_provider: 'openai'
   llm_model: 'gpt-4o-mini'
+  host: '3010.brandymint.ru'
+  port: 443
+  protocol: 'https'
+  allowed_hosts:
+    - '.lvh.me'
+    - 'lvh.me'
+    - 'localhost'
+    - '.brandymint.ru'
+    - 'brandymint.ru'
+    - '.3010.brandymint.ru'
+    - '3010.brandymint.ru'
+  # Web console permissions - allow local networks
+  web_console_permissions:
+    - '192.168.0.0/16'
+    - '10.0.0.0/8'
+    - '172.16.0.0/12'
 
 production:
   <<: *default

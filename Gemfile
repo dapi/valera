@@ -28,6 +28,9 @@ gem 'telegram-bot', github: 'mprokopov/telegram-bot'
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem 'bcrypt', '~> 3.1.7'
 
+# Rails I18n locale data for common languages [https://github.com/svenfuchs/rails-i18n]
+gem 'rails-i18n', '~> 8.0'
+
 # Admin panel framework [https://github.com/thoughtbot/administrate]
 gem 'administrate', '~> 1.0'
 
