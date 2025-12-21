@@ -1,42 +1,42 @@
 # frozen_string_literal: true
 
 namespace :screenshots do
-  desc "Generate dashboard screenshot from running server"
+  desc 'Generate dashboard screenshot from running server'
   task dashboard: :environment do
-    require "fileutils"
+    require 'fileutils'
 
-    puts "Generating dashboard screenshot from live server..."
-    puts ""
-    puts "IMPORTANT: Server must be started with HOST=lvh.me:"
-    puts "  HOST=lvh.me bin/rails server"
-    puts ""
+    puts 'Generating dashboard screenshot from live server...'
+    puts ''
+    puts 'IMPORTANT: Server must be started with HOST=lvh.me:'
+    puts '  HOST=lvh.me bin/rails server'
+    puts ''
 
     tenant = Tenant.first
     unless tenant
-      puts "Error: No tenant found. Run db:seed first."
+      puts 'Error: No tenant found. Run db:seed first.'
       exit 1
     end
 
     # Убедимся, что у owner есть пароль
     owner = tenant.owner
     unless owner.password_digest.present?
-      puts "Setting password for tenant owner..."
-      owner.update!(password: "password123")
+      puts 'Setting password for tenant owner...'
+      owner.update!(password: 'password123')
     end
 
-    output_dir = Rails.root.join("docs", "screenshots")
+    output_dir = Rails.root.join('docs', 'screenshots')
     FileUtils.mkdir_p(output_dir)
 
-    js_path = Rails.root.join("tmp", "screenshot_live.js")
+    js_path = Rails.root.join('tmp', 'screenshot_live.js')
     File.write(js_path, screenshot_js(tenant, output_dir))
 
-    puts "Checking Playwright installation..."
-    unless system("npx playwright --version > /dev/null 2>&1")
-      puts "Installing Playwright..."
-      system("npm install playwright && npx playwright install chromium")
+    puts 'Checking Playwright installation...'
+    unless system('npx playwright --version > /dev/null 2>&1')
+      puts 'Installing Playwright...'
+      system('npm install playwright && npx playwright install chromium')
     end
 
-    puts "Taking screenshot..."
+    puts 'Taking screenshot...'
     puts "Tenant: #{tenant.name} (key: #{tenant.key})"
     puts "URL: http://#{tenant.key}.lvh.me:3000/"
 
@@ -44,8 +44,8 @@ namespace :screenshots do
     if result
       puts "Screenshots saved to #{output_dir}/"
     else
-      puts "Error: Failed to generate screenshot."
-      puts "Make sure Rails server is running with: HOST=lvh.me bin/rails server"
+      puts 'Error: Failed to generate screenshot.'
+      puts 'Make sure Rails server is running with: HOST=lvh.me bin/rails server'
       exit 1
     end
   end

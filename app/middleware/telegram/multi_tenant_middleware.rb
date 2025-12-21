@@ -49,10 +49,10 @@ module Telegram
       update = request.request_parameters
       controller.dispatch(tenant.bot_client, update, request)
 
-      [200, {}, ['']]
+      [ 200, {}, [ '' ] ]
     rescue UnauthorizedError => e
       log_error(e, service: self.class.name, tenant_key: tenant&.key, ip: request.remote_ip)
-      [401, { 'Content-Type' => 'text/plain' }, ['Unauthorized']]
+      [ 401, { 'Content-Type' => 'text/plain' }, [ 'Unauthorized' ] ]
     end
 
     # Возвращает читаемое представление для логов и отладки
