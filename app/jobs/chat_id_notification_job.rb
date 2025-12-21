@@ -29,8 +29,9 @@ class ChatIdNotificationJob < ApplicationJob
   def perform(chat_id)
     return if chat_id.blank?
 
+    chat = Chat.find chat_id
     # Используем Telegram API для отправки сообщения в чат
-    Telegram.bot.send_message(
+    chat.tenant.bot_client.send_message(
       chat_id: chat_id,
       text: I18n.t('chat_id_notification.message', chat_id: chat_id),
       parse_mode: 'Markdown'
