@@ -1,8 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { Chart, registerables } from "chart.js"
-
-// Регистрируем все компоненты Chart.js (эквивалент chart.js/auto)
-Chart.register(...registerables)
+import Chart from "chart.js/auto"
 
 // Контроллер для отображения графика активности на дашборде
 // Использует Chart.js для рендеринга line chart
