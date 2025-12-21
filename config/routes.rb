@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  # Admin panel with subdomain constraint (admin.*)
+  # Admin panel with subdomain constraint
   constraints subdomain: 'admin' do
     scope module: :admin, as: :admin do
       # Authentication

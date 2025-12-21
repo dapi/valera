@@ -41,7 +41,19 @@ class ApplicationConfig < Anyway::Config
     llm_temperature: 0.5,
 
     # Development warnings
-    development_warning: true
+    development_warning: true,
+
+    # Allowed hosts for subdomain routing (array or comma-separated string)
+    allowed_hosts: [],
+
+    # Web console permissions (IP addresses/networks)
+    # E.g., ['192.168.0.0/16', '10.0.0.0/8']
+    web_console_permissions: [],
+
+    # Host and port for URL generation and subdomain routing
+    host: 'localhost',
+    port: 3000,
+    protocol: 'http'
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -76,6 +88,11 @@ class ApplicationConfig < Anyway::Config
     rate_limit_period: :integer,
     max_history_size: :integer,
     webhook_port: :integer,
+    port: :integer,
+
+    # Host and protocol
+    host: :string,
+    protocol: :string,
 
     # Floats
     llm_temperature: :float,
@@ -108,6 +125,24 @@ class ApplicationConfig < Anyway::Config
 
   def welcome_message_template
     File.read(welcome_message_path).presence || raise('No welcome message defined')
+  end
+
+  # Вычисляет tld_length для корректной работы с поддоменами
+  # Для '3010.brandymint.ru' -> 2 (чтобы subdomain был 'admin', а не 'admin.3010')
+  # Для 'localhost' -> 1 (default)
+  def tld_length
+    dots = host.to_s.count('.')
+    dots.positive? ? dots : 1
+  end
+
+  # Опции для генерации URL в routes и mailers
+  def default_url_options
+    options = { host:, protocol: }
+    # Добавляем port только если он нестандартный
+    unless (port.to_s == '80' && protocol == 'http') || (port.to_s == '443' && protocol == 'https')
+      options[:port] = port
+    end
+    options
   end
 
   # Declare required parameters using anyway_config's required method
