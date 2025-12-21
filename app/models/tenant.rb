@@ -32,6 +32,10 @@ class Tenant < ApplicationRecord
     @bot_client ||= Telegram::Bot::Client.new(bot_token, bot_username)
   end
 
+  def bot_id
+    bot_token.split(':').to_i
+  end
+
   private
 
   def generate_key

@@ -220,7 +220,7 @@ module Telegram
 
       # Проверяем что добавлен ИМЕННО НАШ бот по ID
       bot_added = new_members&.any? do |member|
-        member['is_bot'] && member['id'] == ApplicationConfig.bot_id
+        member['is_bot'] && member['id'] == current_tenant.bot_id
       end
 
       ChatIdNotificationJob.perform_later(chat_id) if bot_added
