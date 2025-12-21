@@ -1,6 +1,23 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # Admin panel with subdomain constraint (admin.*)
+  constraints subdomain: 'admin' do
+    scope module: :admin, as: :admin do
+      # Authentication
+      get 'login', to: 'sessions#new', as: :login
+      post 'login', to: 'sessions#create'
+      delete 'logout', to: 'sessions#destroy', as: :logout
+
+      # Administrate resources
+      resources :tenants
+      resources :users
+      resources :admin_users
+
+      root to: 'tenants#index'
+    end
+  end
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Multi-tenant webhook endpoint

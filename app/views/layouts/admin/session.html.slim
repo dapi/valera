@@ -1,0 +1,19 @@
+doctype html
+html lang="en"
+  head
+    meta charset="utf-8"
+    meta name="viewport" content="width=device-width, initial-scale=1"
+    title Admin Login - Valera
+    = csrf_meta_tags
+    = csp_meta_tag
+    = stylesheet_link_tag "administrate/application", media: "all"
+
+  body style="background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;"
+    .login-container style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px;"
+      - if flash[:alert]
+        .flash--alert style="background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 4px; margin-bottom: 20px;"
+          = flash[:alert]
+      - if flash[:notice]
+        .flash--notice style="background: #d1fae5; color: #059669; padding: 12px; border-radius: 4px; margin-bottom: 20px;"
+          = flash[:notice]
+      = yield
