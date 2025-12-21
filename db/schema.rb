@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_21_145610) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_21_151716) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -207,8 +207,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_21_145610) do
     t.string "email"
     t.string "name"
     t.string "password_digest"
+    t.bigint "telegram_user_id"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["telegram_user_id"], name: "index_users_on_telegram_user_id", unique: true
   end
 
   create_table "vehicles", force: :cascade do |t|
@@ -234,5 +236,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_21_145610) do
   add_foreign_key "clients", "tenants"
   add_foreign_key "messages", "chats"
   add_foreign_key "tenants", "users", column: "owner_id"
+  add_foreign_key "users", "telegram_users"
   add_foreign_key "vehicles", "clients"
 end

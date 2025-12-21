@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # Auth Bot webhook (единый бот для авторизации и уведомлений владельцев)
+  # Доступен на любом домене без subdomain constraint
+  telegram_webhook Telegram::AuthBotController, :default, as: :auth_bot_webhook
+
   # Admin panel with subdomain constraint
   constraints subdomain: 'admin' do
     scope module: :admin, as: :admin do
@@ -30,6 +34,12 @@ Rails.application.routes.draw do
     scope module: :tenants, as: :tenant do
       resource :session, only: %i[new create destroy]
       resource :password, only: %i[new create]
+
+      # Telegram auth routes
+      scope :auth, as: :auth do
+        get 'telegram/login', to: 'telegram_auth#login', as: :telegram_login
+        get 'telegram/confirm', to: 'telegram_auth#confirm', as: :telegram_confirm
+      end
 
       root 'home#show'
 

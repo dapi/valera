@@ -22,6 +22,10 @@ class ApplicationConfig < Anyway::Config
     :vertexai_location,
     :vertexai_project_id,
 
+    # Auth Bot (единый бот для авторизации и уведомлений владельцев)
+    :auth_bot_token,
+    :auth_bot_username,
+
     # Application branding
     app_name: 'Супер Валера',
 
@@ -56,7 +60,10 @@ class ApplicationConfig < Anyway::Config
     # Host and port for URL generation and subdomain routing
     host: 'localhost',
     port: 3000,
-    protocol: 'http'
+    protocol: 'http',
+
+    # Telegram Auth settings
+    telegram_auth_expiration: 300  # TTL токенов в секундах (5 минут)
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -102,7 +109,12 @@ class ApplicationConfig < Anyway::Config
     llm_temperature: :float,
 
     # Booleans
-    development_warning: :boolean
+    development_warning: :boolean,
+
+    # Auth Bot
+    auth_bot_token: :string,
+    auth_bot_username: :string,
+    telegram_auth_expiration: :integer
   )
 
   # System prompt
