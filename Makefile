@@ -106,5 +106,5 @@ docker-push: ## Push Docker image to registry
 	docker push $(REGISTRY)/valera:$$VERSION; \
 	echo "✓ Docker images pushed: $(REGISTRY)/valera:latest, $(REGISTRY)/valera:$$VERSION"
 
-build-and-push: docker-build docker-push deploy ## Build, push and deploy
-	@echo "✓ Build, push and deploy completed!"
+build-and-push: docker-build docker-push ## Build, push and deploy
+	@echo "✓ Build and push completed!"
