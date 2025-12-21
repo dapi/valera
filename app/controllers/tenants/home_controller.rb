@@ -8,7 +8,6 @@ module Tenants
     # GET /
     def show
       # Phase 2 will add statistics
-      @tenant = Current.tenant
     end
   end
 end

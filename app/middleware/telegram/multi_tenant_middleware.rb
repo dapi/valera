@@ -3,8 +3,8 @@
 module Telegram
   # Middleware для обработки multi-tenant webhook запросов от Telegram
   #
-  # Определяет tenant по ключу из URL, верифицирует webhook secret,
-  # и передаёт обработку в WebhookController.
+  # Current.tenant устанавливается TenantSubdomainConstraint в routes.
+  # Middleware верифицирует webhook secret и передаёт обработку в WebhookController.
   #
   # Преимущества перед контроллером:
   # - Более идиоматичен для gem telegram-bot-rb
@@ -12,8 +12,10 @@ module Telegram
   # - Лучшая интеграция с фичами gem (UpdatesPoller, Async, instrumentation)
   #
   # @example Использование в routes.rb
-  #   post 'telegram/webhook/:tenant_key',
-  #        to: Telegram::MultiTenantMiddleware.new(WebhookController)
+  #   constraints Constraints::TenantSubdomainConstraint.new do
+  #     post 'telegram/webhook',
+  #          to: Telegram::MultiTenantMiddleware.new(WebhookController)
+  #   end
   #
   # @see Tenant для модели тенанта
   # @see TenantWebhookService для регистрации webhook
@@ -34,27 +36,23 @@ module Telegram
     end
 
     # Обрабатывает входящий Rack запрос
+    # Current.tenant уже установлен TenantSubdomainConstraint
     #
     # @param env [Hash] Rack environment
     # @return [Array] Rack response [status, headers, body]
     def call(env)
       request = ActionDispatch::Request.new(env)
-      tenant_key = extract_tenant_key(request)
-      tenant = Tenant.find_by!(key: tenant_key)
+      tenant = Current.tenant
 
       verify_webhook_secret!(request, tenant)
-      Current.tenant = tenant
 
       update = request.request_parameters
       controller.dispatch(tenant.bot_client, update, request)
 
-      [ 200, {}, [ '' ] ]
-    rescue ActiveRecord::RecordNotFound => e
-      log_error(e, service: self.class.name, tenant_key: tenant_key, ip: request.remote_ip)
-      [ 404, { 'Content-Type' => 'text/plain' }, [ 'Tenant not found' ] ]
+      [200, {}, ['']]
     rescue UnauthorizedError => e
-      log_error(e, service: self.class.name, tenant_key: tenant_key, ip: request.remote_ip)
-      [ 401, { 'Content-Type' => 'text/plain' }, [ 'Unauthorized' ] ]
+      log_error(e, service: self.class.name, tenant_key: tenant&.key, ip: request.remote_ip)
+      [401, { 'Content-Type' => 'text/plain' }, ['Unauthorized']]
     end
 
     # Возвращает читаемое представление для логов и отладки
@@ -65,14 +63,6 @@ module Telegram
     end
 
     private
-
-    # Извлекает tenant_key из subdomain
-    #
-    # @param request [ActionDispatch::Request]
-    # @return [String] ключ тенанта
-    def extract_tenant_key(request)
-      request.subdomain
-    end
 
     # Верифицирует X-Telegram-Bot-Api-Secret-Token заголовок
     #
@@ -91,9 +81,6 @@ module Telegram
 
       error = UnauthorizedError.new("Invalid webhook secret for tenant #{tenant.key}")
       Rails.logger.warn { "Webhook secret mismatch for tenant #{tenant.key} from IP #{request.remote_ip}" }
-      Bugsnag.notify(error) do |report|
-        report.add_metadata(:webhook, { tenant_key: tenant.key, ip: request.remote_ip })
-      end
       raise error
     end
   end

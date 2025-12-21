@@ -13,6 +13,7 @@ module Constraints
   #
   class TenantSubdomainConstraint
     # Checks if the request subdomain matches an existing tenant key.
+    # Sets Current.tenant if found, so subsequent code can use it.
     #
     # @param request [ActionDispatch::Request] the incoming request
     # @return [Boolean] true if tenant exists with this key
@@ -20,7 +21,11 @@ module Constraints
       subdomain = request.subdomain
       return false if subdomain.blank?
 
-      Tenant.exists?(key: subdomain)
+      tenant = Tenant.find_by(key: subdomain)
+      return false unless tenant
+
+      Current.tenant = tenant
+      true
     end
   end
 end

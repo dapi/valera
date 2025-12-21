@@ -4,27 +4,27 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
   / Clients card
   .bg-white.rounded-lg.shadow.p-6
     .text-sm.font-medium.text-gray-500 Клиенты
-    .text-3xl.font-bold.text-gray-800.mt-2 = @tenant.clients.count
+    .text-3xl.font-bold.text-gray-800.mt-2 = current_tenant.clients.count
     .text-sm.text-green-600.mt-1
-      | +#{@tenant.clients.where('created_at > ?', 24.hours.ago).count} за сегодня
+      | +#{current_tenant.clients.where('created_at > ?', 24.hours.ago).count} за сегодня
 
   / Bookings card
   .bg-white.rounded-lg.shadow.p-6
     .text-sm.font-medium.text-gray-500 Заявки
-    .text-3xl.font-bold.text-gray-800.mt-2 = @tenant.bookings.count
+    .text-3xl.font-bold.text-gray-800.mt-2 = current_tenant.bookings.count
     .text-sm.text-green-600.mt-1
-      | +#{@tenant.bookings.where('created_at > ?', 24.hours.ago).count} за сегодня
+      | +#{current_tenant.bookings.where('created_at > ?', 24.hours.ago).count} за сегодня
 
   / Chats card
   .bg-white.rounded-lg.shadow.p-6
     .text-sm.font-medium.text-gray-500 Активные чаты
-    .text-3xl.font-bold.text-gray-800.mt-2 = @tenant.chats.joins(:messages).where('messages.created_at > ?', 24.hours.ago).distinct.count
+    .text-3xl.font-bold.text-gray-800.mt-2 = current_tenant.chats.joins(:messages).where('messages.created_at > ?', 24.hours.ago).distinct.count
     .text-sm.text-gray-500.mt-1 за последние 24ч
 
   / Messages card
   .bg-white.rounded-lg.shadow.p-6
     .text-sm.font-medium.text-gray-500 Сообщений сегодня
-    - messages_today = Message.joins(chat: :tenant).where(chats: { tenant_id: @tenant.id }).where('messages.created_at > ?', Date.current.beginning_of_day).count
+    - messages_today = Message.joins(chat: :tenant).where(chats: { tenant_id: current_tenant.id }).where('messages.created_at > ?', Date.current.beginning_of_day).count
     .text-3xl.font-bold.text-gray-800.mt-2 = messages_today
 
 / Placeholder for future phases

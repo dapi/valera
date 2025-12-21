@@ -2,7 +2,8 @@
 
 module Tenants
   # Base controller for tenant dashboard.
-  # Sets Current.tenant from subdomain and authenticates owner.
+  # Current.tenant is set by TenantSubdomainConstraint in routes.
+  # Authenticates owner via session.
   #
   # @example Usage in child controller
   #   class Tenants::HomeController < Tenants::ApplicationController
@@ -12,26 +13,25 @@ module Tenants
   #   end
   #
   class ApplicationController < ::ApplicationController
-    before_action :set_tenant_from_subdomain
     before_action :authenticate_owner!
+
+    helper_method :current_user, :user_signed_in?, :current_tenant
 
     layout 'tenants'
 
     private
 
-    # Sets Current.tenant based on request subdomain.
-    # Tenant is already validated by TenantSubdomainConstraint in routes.
-    def set_tenant_from_subdomain
-      @tenant = Tenant.find_by!(key: request.subdomain)
-      Current.tenant = @tenant
-    rescue ActiveRecord::RecordNotFound
-      render 'tenants/errors/not_found', status: :not_found
+    # Returns current tenant from Current (set by TenantSubdomainConstraint).
+    #
+    # @return [Tenant]
+    def current_tenant
+      Current.tenant
     end
 
     # Ensures current user is the owner of the tenant.
     # Redirects to login if not authenticated or not the owner.
     def authenticate_owner!
-      return if current_user&.owned_tenants&.include?(Current.tenant)
+      return if current_tenant&.owner_id == current_user&.id
 
       redirect_to new_tenant_session_path
     end
@@ -44,7 +44,6 @@ module Tenants
 
       @current_user = User.find_by(id: session[:user_id])
     end
-    helper_method :current_user
 
     # Returns whether user is authenticated.
     #
@@ -52,6 +51,5 @@ module Tenants
     def user_signed_in?
       current_user.present?
     end
-    helper_method :user_signed_in?
   end
 end
