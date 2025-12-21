@@ -12,8 +12,10 @@ owner = User.find_or_create_by!(email: 'tenant@super-valera.ru') do |user|
 end
 Rails.logger.info "[Seeds] Owner user: #{owner.email} (id: #{owner.id})"
 
-# Создаём default tenant из ENV
-bot_token = ENV.fetch('BOT_TOKEN')
+# В multi-tenant режиме tenants создаются через UI/API с реальным bot_token
+# Для development можно создать tenant вручную:
+#   Tenant.create!(name: 'Dev Tenant', owner: owner, bot_token: 'YOUR_BOT_TOKEN')
+
 
 tenant = Tenant.create_with(name: 'Кузник', owner: owner).find_or_create_by!(bot_token: bot_token)
 

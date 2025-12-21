@@ -4,13 +4,14 @@ default: &default
 
 development:
   <<: *default
+  llm_provider: 'openai'
+  llm_model: 'gpt-4o-mini'
 
 production:
   <<: *default
 
 test:
   <<: *default
-  bot_token: 123:fake
   llm_provider: 'deepseek'
   llm_model: 'deepseek-chat'
   deepseek_api_key: 'fake'

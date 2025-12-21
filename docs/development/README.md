@@ -12,7 +12,24 @@
 
 ## 🚀 Быстрый старт для разработчиков
 
-### Установка окружения
+### Вариант 1: Docker (рекомендуется)
+
+```bash
+# Клонирование
+git clone <repo-url>
+cd valera
+
+# Установить dip (один раз)
+gem install dip
+
+# Полный setup
+dip provision
+
+# Запуск
+dip dev
+```
+
+### Вариант 2: Локальная установка
 
 ```bash
 # Клонирование
@@ -48,6 +65,31 @@ bin/dev
 - Каждый gem: README, API reference, patterns, examples
 
 ### Development команды
+
+#### Docker (dip)
+
+```bash
+# Инфраструктура
+dip up                     # Поднять postgres + redis
+dip down                   # Остановить всё
+
+# Разработка
+dip dev                    # Полный стек (server + css + bot)
+dip rails s                # Только Rails server
+dip rails c                # Console
+dip test                   # Тесты
+dip rubocop                # Code style
+dip ci                     # Все проверки
+
+# База данных
+dip migrate                # Миграции
+dip psql                   # PostgreSQL console
+
+# Telegram Bot
+dip bot                    # Polling режим
+```
+
+#### Локально (без Docker)
 
 ```bash
 # Разработка
