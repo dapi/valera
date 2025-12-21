@@ -53,3 +53,7 @@ claude-swarm.log
 
 # Dip local overrides
 dip.override.yml
+
+# Node.js (for Playwright screenshots)
+/node_modules/
+/package-lock.json

@@ -1,0 +1,112 @@
+# frozen_string_literal: true
+
+# Сервис для сбора статистики дашборда тенанта
+#
+# Собирает KPI метрики, данные для графика активности
+# и последние активные чаты для отображения на главной странице.
+#
+# @example Получение статистики
+#   stats = DashboardStatsService.new(tenant, period: 7).call
+#   stats.clients_total #=> 142
+#   stats.chart_data    #=> { labels: [...], values: [...] }
+#
+# @see Tenants::HomeController
+class DashboardStatsService
+  Result = Struct.new(
+    :clients_total,
+    :clients_today,
+    :clients_week,
+    :bookings_total,
+    :bookings_today,
+    :active_chats,
+    :messages_today,
+    :chart_data,
+    :recent_chats,
+    keyword_init: true
+  )
+
+  # @param tenant [Tenant] тенант для которого собирается статистика
+  # @param period [Integer] период для графика в днях (по умолчанию 7)
+  def initialize(tenant, period: 7)
+    raise ArgumentError, 'tenant is required' if tenant.nil?
+
+    @tenant = tenant
+    @period = period
+  end
+
+  # Собирает и возвращает все метрики дашборда
+  #
+  # @return [Result] структура со всеми метриками
+  def call
+    Result.new(
+      clients_total: clients.count,
+      clients_today: clients.where(created_at: today_range).count,
+      clients_week: clients.where(created_at: week_range).count,
+      bookings_total: bookings.count,
+      bookings_today: bookings.where(created_at: today_range).count,
+      active_chats: active_chats_count,
+      messages_today: messages_today_count,
+      chart_data: build_chart_data,
+      recent_chats: fetch_recent_chats
+    )
+  end
+
+  private
+
+  attr_reader :tenant, :period
+
+  def today_range
+    Date.current.all_day
+  end
+
+  def week_range
+    1.week.ago..Time.current
+  end
+
+  def clients
+    tenant.clients
+  end
+
+  def bookings
+    tenant.bookings
+  end
+
+  def active_chats_count
+    tenant.chats
+          .joins(:messages)
+          .where(messages: { created_at: 24.hours.ago.. })
+          .distinct
+          .count
+  end
+
+  def messages_today_count
+    Message.joins(:chat)
+           .where(chats: { tenant_id: tenant.id })
+           .where(created_at: today_range)
+           .count
+  end
+
+  def build_chart_data
+    raw_data = Message.joins(:chat)
+                      .where(chats: { tenant_id: tenant.id })
+                      .where(created_at: period.days.ago.beginning_of_day..)
+                      .group('DATE(messages.created_at)')
+                      .count
+
+    date_range = (period.days.ago.to_date..Date.current)
+    labels = date_range.map { |d| d.strftime('%d.%m') }
+    values = date_range.map { |d| raw_data[d] || 0 }
+
+    { labels: labels, values: values }
+  end
+
+  def fetch_recent_chats
+    tenant.chats
+          .joins(:messages)
+          .includes(:client, :messages)
+          .where(messages: { created_at: 7.days.ago.. })
+          .order('messages.created_at DESC')
+          .distinct
+          .limit(3)
+  end
+end

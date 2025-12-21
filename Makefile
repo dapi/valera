@@ -52,6 +52,8 @@ create_user:
 deps:
 	brew install terminal-notifier
 	brew install oven-sh/bun/bun
+	npm install
+	npx playwright install chromium
 	bundle install
 
 watch:

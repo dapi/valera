@@ -6,8 +6,11 @@ module Tenants
   #
   class HomeController < ApplicationController
     # GET /
+    # GET /?period=7|30
     def show
-      # Phase 2 will add statistics
+      @period = params[:period]&.to_i || 7
+      @period = 7 unless [ 7, 30 ].include?(@period)
+      @stats = DashboardStatsService.new(current_tenant, period: @period).call
     end
   end
 end

@@ -21,6 +21,7 @@ class Tenant < ApplicationRecord
   validates :webhook_secret, presence: true
 
   before_validation :generate_key, on: :create, if: -> { key.blank? }
+  before_validation :downcase_key, if: -> { key.present? }
   before_validation :generate_webhook_secret, on: :create, if: -> { webhook_secret.blank? }
   before_validation :fetch_bot_username, if: :should_fetch_bot_username?
   before_create :set_defaults_from_config
@@ -40,6 +41,10 @@ class Tenant < ApplicationRecord
 
   def generate_key
     self.key = Nanoid.generate(size: KEY_LENGTH)
+  end
+
+  def downcase_key
+    self.key = key.downcase
   end
 
   def generate_webhook_secret

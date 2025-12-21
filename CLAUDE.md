@@ -12,6 +12,26 @@
 🚨 **Documentation:** НЕ архивировать FIP/US/TSD документы из `docs/requirements/`
 🚨 **Testing:** Без `File.write/File.delete` и изменения ENV в тестах
 
+## 📸 Скриншоты для документации
+
+Генерация скриншотов dashboard для PR и документации:
+
+```bash
+# Установка зависимостей (один раз)
+npm install
+npx playwright install chromium
+
+# Запуск сервера (в отдельном терминале)
+HOST=lvh.me bin/rails server
+
+# Генерация скриншотов (7 дней + 30 дней)
+bin/rails screenshots:dashboard
+```
+
+Скриншоты сохраняются в `docs/screenshots/`.
+
+**Требования:** Node.js, Playwright, seed данные (`bin/rails db:seed`), запущенный сервер.
+
 ## 📋 Ссылки
 
 **Process:** @docs/FLOW.md | **Development:** @docs/development/README.md | **Error Handling:** @docs/patterns/error-handling.md | **Architecture:** @docs/architecture/decisions.md | **Gems:** @docs/gems/README.md
