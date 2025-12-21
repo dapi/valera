@@ -1,0 +1,1356 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"system","content":"Test
+        system prompt"},{"role":"user","content":"Запиши меня на покраску"}],"stream":false,"temperature":0.5,"tools":[{"type":"function","function":{"name":"booking","description":"Определяет
+        является ли сообщение клиента заявкой на услугу и отправляет ее в административный
+        чат","parameters":{"type":"object","properties":{"customer_name":{"type":"string","description":"Полное
+        имя клиента"},"customer_phone":{"type":"string","description":"Телефон клиента
+        в формате +7(XXX)XXX-XX-XX"},"car_brand":{"type":"string","description":"Марка
+        автомобиля"},"car_model":{"type":"string","description":"Модель автомобиля"},"car_year":{"type":"string","description":"Год
+        выпуска автомобиля"},"car_class":{"type":"string","description":"Класс автомаобиля"},"car_mileage":{"type":"string","description":"Пробег
+        автомобиля"},"required_services":{"type":"string","description":"Перечень
+        необходимых работ"},"cost_calculation":{"type":"string","description":"Последний
+        названный пользователю расчет стоимости услуг (общая стоимость услуг)"},"dialog_context":{"type":"string","description":"Контекст
+        диалога для понимания ситуации (включает данные о клиенте, дате и времени
+        записи и об услуге которые пользователь запрашивал и получал от ассистента)"},"details":{"type":"string","description":"Детали
+        записи в формате Markdown включающие все необходимые данные о пользователе,
+        услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную
+        переписку, номер заявки"}},"required":["dialog_context","details"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:48:42 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - cc90aad4bc5040054c167c469788ab26
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 a343e6d95a3aa41ea1f611848664d0e8.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P4
+      X-Amz-Cf-Id:
+      - D57Y69hkKwkxih5A6SQ9LAFgbwoHh_ReOqiPthk9Q3NKY1zdZXzKLw==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6ImM1NWIyMzM3LTlkYWUtNDVmYi05ZTA1LTIzZDViOWNhYjJhOSIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzMjIsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0JTQu9GPINC+0YTQvtGA0LzQu9C10L3QuNGPINC30LDRj9Cy0LrQuCDQvdCwINC/0L7QutGA0LDRgdC60YMg0LzQvdC1INC90YPQttC90L4g0YHQvtCx0YDQsNGC0Ywg0L3QtdC+0LHRhdC+0LTQuNC80YPRjiDQuNC90YTQvtGA0LzQsNGG0LjRji4gXG5cbtCf0L7QttCw0LvRg9C50YHRgtCwLCDRg9GC0L7Rh9C90LjRgtC1OlxuMS4g0JLQsNGI0LUg0L/QvtC70L3QvtC1INC40LzRj1xuMi4g0J3QvtC80LXRgCDRgtC10LvQtdGE0L7QvdCwINC00LvRjyDRgdCy0Y/Qt9C4XG4zLiDQnNCw0YDQutGDINC4INC80L7QtNC10LvRjCDQsNCy0YLQvtC80L7QsdC40LvRj1xuNC4g0JPQvtC0INCy0YvQv9GD0YHQutCwINCw0LLRgtC+0LzQvtCx0LjQu9GPXG41LiDQmtCw0LrQvtC5INC60LvQsNGB0YEg0LDQstGC0L7QvNC+0LHQuNC70Y8gKNGB0LXQtNCw0L0sINGF0Y3RgtGH0LHQtdC6LCDQstC90LXQtNC+0YDQvtC20L3QuNC6INC4INGCLtC0LilcbjYuINCf0YDQvtCx0LXQsyDQsNCy0YLQvtC80L7QsdC40LvRj1xuNy4g0JrQsNC60LjQtSDQuNC80LXQvdC90L4g0LTQtdGC0LDQu9C4INC90YPQttC90L4g0L/QvtC60YDQsNGB0LjRgtGMXG44LiDQn9GA0LXQtNCy0LDRgNC40YLQtdC70YzQvdGL0Lkg0YDQsNGB0YfQtdGCINGB0YLQvtC40LzQvtGB0YLQuCAo0LXRgdC70Lgg0L7QvSDRg9C20LUg0LHRi9C7INGB0LTQtdC70LDQvSlcblxu0KLQsNC60LbQtSwg0LXRgdC70Lgg0YMg0LLQsNGBINC10YHRgtGMINC60LDQutC40LUt0YLQviDQvtGB0L7QsdGL0LUg0L/QvtC20LXQu9Cw0L3QuNGPINC40LvQuCDQtNC10YLQsNC70Lgg0L/QviDRg9GB0LvRg9Cz0LUsINC/0L7QttCw0LvRg9C50YHRgtCwLCDRgdC+0L7QsdGJ0LjRgtC1INC40YUuIn0sImxvZ3Byb2JzIjpudWxsLCJmaW5pc2hfcmVhc29uIjoic3RvcCJ9XSwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6NjcwLCJjb21wbGV0aW9uX3Rva2VucyI6MTYwLCJ0b3RhbF90b2tlbnMiOjgzMCwicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjB9LCJwcm9tcHRfY2FjaGVfaGl0X3Rva2VucyI6MCwicHJvbXB0X2NhY2hlX21pc3NfdG9rZW5zIjo2NzB9LCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJmcF9lYWFiOGQxMTRiX3Byb2QwODIwX2ZwOF9rdmNhY2hlIn0=
+  recorded_at: Sun, 21 Dec 2025 12:48:36 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"system","content":"Ты
+        автолюбитель который хочет записаться на покраску бампера своего автмобиля
+        Lada Vesta.\n\nТы списался с менеджером автосервиса в чате, где он тебя спрашивает,
+        а ты  просто, односложно отвечаешь на вопросы менеджера, до тех пор пока он
+        не запишет тебя на услуги.\n\n\nЕсли спросят телефон - отвечай +7-916-111-12-12.
+        \nЕсли спросят имя - отвечай Серж. \nЕсли спросят марку или модель авто -
+        отвечай Lada веста. \nЕсли не задают конкретного вопроса и спрашивает чего
+        ты вообще хочешь хочешь - отвечай ''покрасить бампер''.\n\nТебе удообно приехат
+        на покраску завтра утром.\n\nКогда просят еще раз - повторяешь еще раз прошлое
+        сообщение.\n\nПродолжай пока тебя не запишут на звонок, встречу или покраску.\n"},{"role":"user","content":"Для
+        оформления заявки на покраску мне нужно собрать необходимую информацию.\n\nПожалуйста,
+        уточните: Ваше полное имя Номер телефона для связи Марку и модель автомобиля
+        Год выпуска автомобиля Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.) Пробег автомобиля Какие именно детали нужно покрасить Предварительный
+        расчет стоимости (если он уже был сделан)\n\nТакже, если у вас есть какие-то
+        особые пожелания или детали по услуге, пожалуйста, сообщите их."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:48:48 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - 0fbc286da79a77d9d0d90600d6b6ca5b
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 0940ebc581f946bd99b903dc6120a26e.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P4
+      X-Amz-Cf-Id:
+      - dHBd0yvzSKQVzmuKCjgki6a2VB7qNiLYfVrD6ciczDP_0e-Qtjp6jw==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6IjJkNzFkNTY3LWUxYTUtNGRmNy1iNzI0LWMzYjdiMDU5YzU2MiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzMjgsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0KHQtdGA0LYuICs3LTkxNi0xMTEtMTItMTIuIExhZGEgVmVzdGEuINCf0L7QutGA0LDRgdC40YLRjCDQsdCw0LzQv9C10YAuIn0sImxvZ3Byb2JzIjpudWxsLCJmaW5pc2hfcmVhc29uIjoic3RvcCJ9XSwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6Mzc0LCJjb21wbGV0aW9uX3Rva2VucyI6MjcsInRvdGFsX3Rva2VucyI6NDAxLCJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOnsiY2FjaGVkX3Rva2VucyI6MH0sInByb21wdF9jYWNoZV9oaXRfdG9rZW5zIjowLCJwcm9tcHRfY2FjaGVfbWlzc190b2tlbnMiOjM3NH0sInN5c3RlbV9maW5nZXJwcmludCI6ImZwX2VhYWI4ZDExNGJfcHJvZDA4MjBfZnA4X2t2Y2FjaGUifQ==
+  recorded_at: Sun, 21 Dec 2025 12:48:39 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"system","content":"Test
+        system prompt"},{"role":"user","content":"Запиши меня на покраску"},{"role":"assistant","content":"Для
+        оформления заявки на покраску мне нужно собрать необходимую информацию. \n\nПожалуйста,
+        уточните:\n1. Ваше полное имя\n2. Номер телефона для связи\n3. Марку и модель
+        автомобиля\n4. Год выпуска автомобиля\n5. Какой класс автомобиля (седан, хэтчбек,
+        внедорожник и т.д.)\n6. Пробег автомобиля\n7. Какие именно детали нужно покрасить\n8.
+        Предварительный расчет стоимости (если он уже был сделан)\n\nТакже, если у
+        вас есть какие-то особые пожелания или детали по услуге, пожалуйста, сообщите
+        их."},{"role":"system","content":"Test system prompt"},{"role":"user","content":"Серж.
+        +7-916-111-12-12. Lada Vesta. Покрасить бампер."}],"stream":false,"temperature":0.5,"tools":[{"type":"function","function":{"name":"booking","description":"Определяет
+        является ли сообщение клиента заявкой на услугу и отправляет ее в административный
+        чат","parameters":{"type":"object","properties":{"customer_name":{"type":"string","description":"Полное
+        имя клиента"},"customer_phone":{"type":"string","description":"Телефон клиента
+        в формате +7(XXX)XXX-XX-XX"},"car_brand":{"type":"string","description":"Марка
+        автомобиля"},"car_model":{"type":"string","description":"Модель автомобиля"},"car_year":{"type":"string","description":"Год
+        выпуска автомобиля"},"car_class":{"type":"string","description":"Класс автомаобиля"},"car_mileage":{"type":"string","description":"Пробег
+        автомобиля"},"required_services":{"type":"string","description":"Перечень
+        необходимых работ"},"cost_calculation":{"type":"string","description":"Последний
+        названный пользователю расчет стоимости услуг (общая стоимость услуг)"},"dialog_context":{"type":"string","description":"Контекст
+        диалога для понимания ситуации (включает данные о клиенте, дате и времени
+        записи и об услуге которые пользователь запрашивал и получал от ассистента)"},"details":{"type":"string","description":"Детали
+        записи в формате Markdown включающие все необходимые данные о пользователе,
+        услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную
+        переписку, номер заявки"}},"required":["dialog_context","details"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:48:51 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - 6081ab9dc9c189ccb3833d871c4dfdf4
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 300b37db84213522f613ff36077caa62.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P2
+      X-Amz-Cf-Id:
+      - Z_jHEatBChuO7yMXb2yUwcCgLo6Nss3vohBOKbFFrSMyE8PJ8RT7-g==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6ImVjZTRiODY0LTdiYWItNDMyNS1hYTM1LWZjZDM5NDg0MzBkYiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzMzEsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0KHQv9Cw0YHQuNCx0L4g0LfQsCDQuNC90YTQvtGA0LzQsNGG0LjRjiwg0KHQtdGA0LYhINCjINC80LXQvdGPINC10YHRgtGMINCy0LDRiNC1INC40LzRjyDQuCDRgtC10LvQtdGE0L7QvSwg0LAg0YLQsNC60LbQtSDQtNCw0L3QvdGL0LUg0L7QsSDQsNCy0YLQvtC80L7QsdC40LvQtSDQuCDRg9GB0LvRg9Cz0LUuXG5cbtCU0LvRjyDQv9C+0LvQvdC+0LPQviDQvtGE0L7RgNC80LvQtdC90LjRjyDQt9Cw0Y/QstC60Lgg0LzQvdC1INC90YPQttC90L4g0LXRidC1INC90LXRgdC60L7Qu9GM0LrQviDQtNC10YLQsNC70LXQuTpcblxuMS4gKirQk9C+0LQg0LLRi9C/0YPRgdC60LAgTGFkYSBWZXN0YSoqXG4yLiAqKtCa0LvQsNGB0YEg0LDQstGC0L7QvNC+0LHQuNC70Y8qKiAo0YHQtdC00LDQvSwg0YXRjdGC0YfQsdC10LosINGD0L3QuNCy0LXRgNGB0LDQuyDQuCDRgi7QtC4pXG4zLiAqKtCf0YDQvtCx0LXQsyDQsNCy0YLQvtC80L7QsdC40LvRjyoqXG40LiAqKtCf0YDQtdC00LLQsNGA0LjRgtC10LvRjNC90YvQuSDRgNCw0YHRh9C10YIg0YHRgtC+0LjQvNC+0YHRgtC4Kiog0L/QvtC60YDQsNGB0LrQuCDQsdCw0LzQv9C10YDQsCAo0LXRgdC70Lgg0L7QvSDRg9C20LUg0LHRi9C7INGB0LTQtdC70LDQvSlcblxu0KLQsNC60LbQtSDRg9GC0L7Rh9C90LjRgtC1LCDQv9C+0LbQsNC70YPQudGB0YLQsDpcbi0g0JrQsNC60L7QuSDQuNC80LXQvdC90L4g0LHQsNC80L/QtdGAINC90YPQttC90L4g0L/QvtC60YDQsNGB0LjRgtGMICjQv9C10YDQtdC00L3QuNC5INC40LvQuCDQt9Cw0LTQvdC40LkpP1xuLSDQldGB0YLRjCDQu9C4INC60LDQutC40LUt0YLQviDQvtGB0L7QsdGL0LUg0L/QvtC20LXQu9Cw0L3QuNGPINC/0L4g0YbQstC10YLRgyDQuNC70Lgg0YLQuNC/0YMg0LrRgNCw0YHQutC4P1xuXG7QmtCw0Log0YLQvtC70YzQutC+INCy0Ysg0L/RgNC10LTQvtGB0YLQsNCy0LjRgtC1INGN0YLRgyDQuNC90YTQvtGA0LzQsNGG0LjRjiwg0Y8g0YHQvNC+0LPRgyDQvtGE0L7RgNC80LjRgtGMINC30LDRj9Cy0LrRgyDQvdCwINC/0L7QutGA0LDRgdC60YMg0LHQsNC80L/QtdGA0LAg0LTQu9GPINCy0LDRiNC10LkgTGFkYSBWZXN0YS4ifSwibG9ncHJvYnMiOm51bGwsImZpbmlzaF9yZWFzb24iOiJzdG9wIn1dLCJ1c2FnZSI6eyJwcm9tcHRfdG9rZW5zIjo4NjUsImNvbXBsZXRpb25fdG9rZW5zIjoyMDIsInRvdGFsX3Rva2VucyI6MTA2NywicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjB9LCJwcm9tcHRfY2FjaGVfaGl0X3Rva2VucyI6MCwicHJvbXB0X2NhY2hlX21pc3NfdG9rZW5zIjo4NjV9LCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJmcF9lYWFiOGQxMTRiX3Byb2QwODIwX2ZwOF9rdmNhY2hlIn0=
+  recorded_at: Sun, 21 Dec 2025 12:48:46 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"system","content":"Ты
+        автолюбитель который хочет записаться на покраску бампера своего автмобиля
+        Lada Vesta.\n\nТы списался с менеджером автосервиса в чате, где он тебя спрашивает,
+        а ты  просто, односложно отвечаешь на вопросы менеджера, до тех пор пока он
+        не запишет тебя на услуги.\n\n\nЕсли спросят телефон - отвечай +7-916-111-12-12.
+        \nЕсли спросят имя - отвечай Серж. \nЕсли спросят марку или модель авто -
+        отвечай Lada веста. \nЕсли не задают конкретного вопроса и спрашивает чего
+        ты вообще хочешь хочешь - отвечай ''покрасить бампер''.\n\nТебе удообно приехат
+        на покраску завтра утром.\n\nКогда просят еще раз - повторяешь еще раз прошлое
+        сообщение.\n\nПродолжай пока тебя не запишут на звонок, встречу или покраску.\n"},{"role":"user","content":"Для
+        оформления заявки на покраску мне нужно собрать необходимую информацию.\n\nПожалуйста,
+        уточните: Ваше полное имя Номер телефона для связи Марку и модель автомобиля
+        Год выпуска автомобиля Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.) Пробег автомобиля Какие именно детали нужно покрасить Предварительный
+        расчет стоимости (если он уже был сделан)\n\nТакже, если у вас есть какие-то
+        особые пожелания или детали по услуге, пожалуйста, сообщите их."},{"role":"assistant","content":"Серж.
+        +7-916-111-12-12. Lada Vesta. Покрасить бампер."},{"role":"user","content":"Спасибо
+        за информацию, Серж! У меня есть ваше имя и телефон, а также данные об автомобиле
+        и услуге.\n\nДля полного оформления заявки мне нужно еще несколько деталей:\n\n*Год
+        выпуска Lada Vesta* *Класс автомобиля* (седан, хэтчбек, универсал и т.д.)
+        *Пробег автомобиля* *Предварительный расчет стоимости* покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста: • Какой именно бампер нужно
+        покрасить (передний или задний)? • Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:48:58 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - '028ec7b7ed1659aa172076af1c0387bc'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 f046dddea42312c0568a651a5699d67e.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P3
+      X-Amz-Cf-Id:
+      - 0Lb3Ll-hbtpmzcVXBb6v8wGetejnTI8YFe6GO0_mSbLdyNDDakResg==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6ImUzNjA0YjUxLWUzZDctNGU5YS05OGU5LTNkNmE4Y2NiNWI3ZSIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzMzgsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0J/QvtC60YDQsNGB0LjRgtGMINCx0LDQvNC/0LXRgC4ifSwibG9ncHJvYnMiOm51bGwsImZpbmlzaF9yZWFzb24iOiJzdG9wIn1dLCJ1c2FnZSI6eyJwcm9tcHRfdG9rZW5zIjo1OTksImNvbXBsZXRpb25fdG9rZW5zIjo3LCJ0b3RhbF90b2tlbnMiOjYwNiwicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjM4NH0sInByb21wdF9jYWNoZV9oaXRfdG9rZW5zIjozODQsInByb21wdF9jYWNoZV9taXNzX3Rva2VucyI6MjE1fSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfZWFhYjhkMTE0Yl9wcm9kMDgyMF9mcDhfa3ZjYWNoZSJ9
+  recorded_at: Sun, 21 Dec 2025 12:48:48 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"user","content":"Запиши
+        меня на покраску"},{"role":"assistant","content":"Для оформления заявки на
+        покраску мне нужно собрать необходимую информацию. \n\nПожалуйста, уточните:\n1.
+        Ваше полное имя\n2. Номер телефона для связи\n3. Марку и модель автомобиля\n4.
+        Год выпуска автомобиля\n5. Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.)\n6. Пробег автомобиля\n7. Какие именно детали нужно покрасить\n8.
+        Предварительный расчет стоимости (если он уже был сделан)\n\nТакже, если у
+        вас есть какие-то особые пожелания или детали по услуге, пожалуйста, сообщите
+        их."},{"role":"system","content":"Test system prompt"},{"role":"user","content":"Серж.
+        +7-916-111-12-12. Lada Vesta. Покрасить бампер."},{"role":"assistant","content":"Спасибо
+        за информацию, Серж! У меня есть ваше имя и телефон, а также данные об автомобиле
+        и услуге.\n\nДля полного оформления заявки мне нужно еще несколько деталей:\n\n1.
+        **Год выпуска Lada Vesta**\n2. **Класс автомобиля** (седан, хэтчбек, универсал
+        и т.д.)\n3. **Пробег автомобиля**\n4. **Предварительный расчет стоимости**
+        покраски бампера (если он уже был сделан)\n\nТакже уточните, пожалуйста:\n-
+        Какой именно бампер нужно покрасить (передний или задний)?\n- Есть ли какие-то
+        особые пожелания по цвету или типу краски?\n\nКак только вы предоставите эту
+        информацию, я смогу оформить заявку на покраску бампера для вашей Lada Vesta."},{"role":"system","content":"Test
+        system prompt"},{"role":"user","content":"Покрасить бампер."}],"stream":false,"temperature":0.5,"tools":[{"type":"function","function":{"name":"booking","description":"Определяет
+        является ли сообщение клиента заявкой на услугу и отправляет ее в административный
+        чат","parameters":{"type":"object","properties":{"customer_name":{"type":"string","description":"Полное
+        имя клиента"},"customer_phone":{"type":"string","description":"Телефон клиента
+        в формате +7(XXX)XXX-XX-XX"},"car_brand":{"type":"string","description":"Марка
+        автомобиля"},"car_model":{"type":"string","description":"Модель автомобиля"},"car_year":{"type":"string","description":"Год
+        выпуска автомобиля"},"car_class":{"type":"string","description":"Класс автомаобиля"},"car_mileage":{"type":"string","description":"Пробег
+        автомобиля"},"required_services":{"type":"string","description":"Перечень
+        необходимых работ"},"cost_calculation":{"type":"string","description":"Последний
+        названный пользователю расчет стоимости услуг (общая стоимость услуг)"},"dialog_context":{"type":"string","description":"Контекст
+        диалога для понимания ситуации (включает данные о клиенте, дате и времени
+        записи и об услуге которые пользователь запрашивал и получал от ассистента)"},"details":{"type":"string","description":"Детали
+        записи в формате Markdown включающие все необходимые данные о пользователе,
+        услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную
+        переписку, номер заявки"}},"required":["dialog_context","details"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:00 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - 46684d34b676c12bd2c524571c61dbfd
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 f62dda7d026036fb70c194c62c99bb26.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P2
+      X-Amz-Cf-Id:
+      - pyR_X1at07JeGDItlvhUUzEQRjlZFcqkJxTOygNCcRkV6OrhMhV7Cg==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6IjNjOWEyZDNkLTcxN2QtNDY5OC1hNjYxLWRiYWZkZDcwZjQyMSIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzNDAsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0K8g0LLQuNC20YMsINGH0YLQviDQstGLINGF0L7RgtC40YLQtSDQv9C+0LrRgNCw0YHQuNGC0Ywg0LHQsNC80L/QtdGAINC00LvRjyBMYWRhIFZlc3RhLiDQlNC70Y8g0L7RhNC+0YDQvNC70LXQvdC40Y8g0LfQsNGP0LLQutC4INC80L3QtSDQvdC1INGF0LLQsNGC0LDQtdGCINC90LXRgdC60L7Qu9GM0LrQuNGFINCy0LDQttC90YvRhSDQtNC10YLQsNC70LXQuTpcblxuKirQndC10L7QsdGF0L7QtNC40LzQsNGPINC40L3RhNC+0YDQvNCw0YbQuNGPOioqXG4xLiDQk9C+0LQg0LLRi9C/0YPRgdC60LAg0LLQsNGI0LXQuSBMYWRhIFZlc3RhXG4yLiDQmtC70LDRgdGBINCw0LLRgtC+0LzQvtCx0LjQu9GPICjRgdC10LTQsNC9LCDRhdGN0YLRh9Cx0LXQuiwg0YPQvdC40LLQtdGA0YHQsNC7KVxuMy4g0J/RgNC+0LHQtdCzINCw0LLRgtC+0LzQvtCx0LjQu9GPXG40LiDQmtCw0LrQvtC5INC40LzQtdC90L3QviDQsdCw0LzQv9C10YAg0L3Rg9C20L3QviDQv9C+0LrRgNCw0YHQuNGC0YwgKNC/0LXRgNC10LTQvdC40Lkg0LjQu9C4INC30LDQtNC90LjQuSk/XG5cbioq0KLQsNC60LbQtSDRg9GC0L7Rh9C90LjRgtC1OioqXG4tINCR0YvQuyDQu9C4INCy0LDQvCDRgdC00LXQu9Cw0L0g0L/RgNC10LTQstCw0YDQuNGC0LXQu9GM0L3Ri9C5INGA0LDRgdGH0LXRgiDRgdGC0L7QuNC80L7RgdGC0Lgg0L/QvtC60YDQsNGB0LrQuCDQsdCw0LzQv9C10YDQsD9cbi0g0JXRgdGC0Ywg0LvQuCDQvtGB0L7QsdGL0LUg0L/QvtC20LXQu9Cw0L3QuNGPINC/0L4g0YbQstC10YLRgyDQuNC70Lgg0YLQuNC/0YMg0LrRgNCw0YHQutC4P1xuXG7QmtCw0Log0YLQvtC70YzQutC+INCy0Ysg0L/RgNC10LTQvtGB0YLQsNCy0LjRgtC1INGN0YLRgyDQuNC90YTQvtGA0LzQsNGG0LjRjiwg0Y8g0YHQvNC+0LPRgyDQvtGE0L7RgNC80LjRgtGMINC30LDRj9Cy0LrRgyDQvdCwINC/0L7QutGA0LDRgdC60YMg0LHQsNC80L/QtdGA0LAg0LTQu9GPINCy0LDRiNC10LkgTGFkYSBWZXN0YS4ifSwibG9ncHJvYnMiOm51bGwsImZpbmlzaF9yZWFzb24iOiJzdG9wIn1dLCJ1c2FnZSI6eyJwcm9tcHRfdG9rZW5zIjoxMDc4LCJjb21wbGV0aW9uX3Rva2VucyI6MTg3LCJ0b3RhbF90b2tlbnMiOjEyNjUsInByb21wdF90b2tlbnNfZGV0YWlscyI6eyJjYWNoZWRfdG9rZW5zIjoxMDI0fSwicHJvbXB0X2NhY2hlX2hpdF90b2tlbnMiOjEwMjQsInByb21wdF9jYWNoZV9taXNzX3Rva2VucyI6NTR9LCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJmcF9lYWFiOGQxMTRiX3Byb2QwODIwX2ZwOF9rdmNhY2hlIn0=
+  recorded_at: Sun, 21 Dec 2025 12:48:56 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"system","content":"Ты
+        автолюбитель который хочет записаться на покраску бампера своего автмобиля
+        Lada Vesta.\n\nТы списался с менеджером автосервиса в чате, где он тебя спрашивает,
+        а ты  просто, односложно отвечаешь на вопросы менеджера, до тех пор пока он
+        не запишет тебя на услуги.\n\n\nЕсли спросят телефон - отвечай +7-916-111-12-12.
+        \nЕсли спросят имя - отвечай Серж. \nЕсли спросят марку или модель авто -
+        отвечай Lada веста. \nЕсли не задают конкретного вопроса и спрашивает чего
+        ты вообще хочешь хочешь - отвечай ''покрасить бампер''.\n\nТебе удообно приехат
+        на покраску завтра утром.\n\nКогда просят еще раз - повторяешь еще раз прошлое
+        сообщение.\n\nПродолжай пока тебя не запишут на звонок, встречу или покраску.\n"},{"role":"user","content":"Для
+        оформления заявки на покраску мне нужно собрать необходимую информацию.\n\nПожалуйста,
+        уточните: Ваше полное имя Номер телефона для связи Марку и модель автомобиля
+        Год выпуска автомобиля Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.) Пробег автомобиля Какие именно детали нужно покрасить Предварительный
+        расчет стоимости (если он уже был сделан)\n\nТакже, если у вас есть какие-то
+        особые пожелания или детали по услуге, пожалуйста, сообщите их."},{"role":"assistant","content":"Серж.
+        +7-916-111-12-12. Lada Vesta. Покрасить бампер."},{"role":"user","content":"Спасибо
+        за информацию, Серж! У меня есть ваше имя и телефон, а также данные об автомобиле
+        и услуге.\n\nДля полного оформления заявки мне нужно еще несколько деталей:\n\n*Год
+        выпуска Lada Vesta* *Класс автомобиля* (седан, хэтчбек, универсал и т.д.)
+        *Пробег автомобиля* *Предварительный расчет стоимости* покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста: • Какой именно бампер нужно
+        покрасить (передний или задний)? • Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"assistant","content":"Покрасить
+        бампер."},{"role":"user","content":"Я вижу, что вы хотите покрасить бампер
+        для Lada Vesta. Для оформления заявки мне не хватает нескольких важных деталей:\n\n*Необходимая
+        информация:* Год выпуска вашей Lada Vesta Класс автомобиля (седан, хэтчбек,
+        универсал) Пробег автомобиля Какой именно бампер нужно покрасить (передний
+        или задний)?\n\n*Также уточните:* • Был ли вам сделан предварительный расчет
+        стоимости покраски бампера? • Есть ли особые пожелания по цвету или типу краски?\n\nКак
+        только вы предоставите эту информацию, я смогу оформить заявку на покраску
+        бампера для вашей Lada Vesta."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:07 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - db9344d56b950d9b189957d6a6e49dc9
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 e1226569e4a7c4c1eedba106ad846b1c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P6
+      X-Amz-Cf-Id:
+      - 5xHF2inCZAFKgmm5zE6kgyaFUXZ-n2C3njwev4ZSyY7yjwKRPj-qZQ==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6ImQ0Mzg0YjlhLTM5NzAtNGY3Yi04MjM0LTE0N2RlNmJmMzk3YyIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzNDcsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0J/QvtC60YDQsNGB0LjRgtGMINCx0LDQvNC/0LXRgC4ifSwibG9ncHJvYnMiOm51bGwsImZpbmlzaF9yZWFzb24iOiJzdG9wIn1dLCJ1c2FnZSI6eyJwcm9tcHRfdG9rZW5zIjo3ODUsImNvbXBsZXRpb25fdG9rZW5zIjo3LCJ0b3RhbF90b2tlbnMiOjc5MiwicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjU3Nn0sInByb21wdF9jYWNoZV9oaXRfdG9rZW5zIjo1NzYsInByb21wdF9jYWNoZV9taXNzX3Rva2VucyI6MjA5fSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfZWFhYjhkMTE0Yl9wcm9kMDgyMF9mcDhfa3ZjYWNoZSJ9
+  recorded_at: Sun, 21 Dec 2025 12:48:57 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"user","content":"Запиши
+        меня на покраску"},{"role":"assistant","content":"Для оформления заявки на
+        покраску мне нужно собрать необходимую информацию. \n\nПожалуйста, уточните:\n1.
+        Ваше полное имя\n2. Номер телефона для связи\n3. Марку и модель автомобиля\n4.
+        Год выпуска автомобиля\n5. Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.)\n6. Пробег автомобиля\n7. Какие именно детали нужно покрасить\n8.
+        Предварительный расчет стоимости (если он уже был сделан)\n\nТакже, если у
+        вас есть какие-то особые пожелания или детали по услуге, пожалуйста, сообщите
+        их."},{"role":"user","content":"Серж. +7-916-111-12-12. Lada Vesta. Покрасить
+        бампер."},{"role":"assistant","content":"Спасибо за информацию, Серж! У меня
+        есть ваше имя и телефон, а также данные об автомобиле и услуге.\n\nДля полного
+        оформления заявки мне нужно еще несколько деталей:\n\n1. **Год выпуска Lada
+        Vesta**\n2. **Класс автомобиля** (седан, хэтчбек, универсал и т.д.)\n3. **Пробег
+        автомобиля**\n4. **Предварительный расчет стоимости** покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста:\n- Какой именно бампер нужно
+        покрасить (передний или задний)?\n- Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"system","content":"Test
+        system prompt"},{"role":"user","content":"Покрасить бампер."},{"role":"assistant","content":"Я
+        вижу, что вы хотите покрасить бампер для Lada Vesta. Для оформления заявки
+        мне не хватает нескольких важных деталей:\n\n**Необходимая информация:**\n1.
+        Год выпуска вашей Lada Vesta\n2. Класс автомобиля (седан, хэтчбек, универсал)\n3.
+        Пробег автомобиля\n4. Какой именно бампер нужно покрасить (передний или задний)?\n\n**Также
+        уточните:**\n- Был ли вам сделан предварительный расчет стоимости покраски
+        бампера?\n- Есть ли особые пожелания по цвету или типу краски?\n\nКак только
+        вы предоставите эту информацию, я смогу оформить заявку на покраску бампера
+        для вашей Lada Vesta."},{"role":"system","content":"Test system prompt"},{"role":"user","content":"Покрасить
+        бампер."}],"stream":false,"temperature":0.5,"tools":[{"type":"function","function":{"name":"booking","description":"Определяет
+        является ли сообщение клиента заявкой на услугу и отправляет ее в административный
+        чат","parameters":{"type":"object","properties":{"customer_name":{"type":"string","description":"Полное
+        имя клиента"},"customer_phone":{"type":"string","description":"Телефон клиента
+        в формате +7(XXX)XXX-XX-XX"},"car_brand":{"type":"string","description":"Марка
+        автомобиля"},"car_model":{"type":"string","description":"Модель автомобиля"},"car_year":{"type":"string","description":"Год
+        выпуска автомобиля"},"car_class":{"type":"string","description":"Класс автомаобиля"},"car_mileage":{"type":"string","description":"Пробег
+        автомобиля"},"required_services":{"type":"string","description":"Перечень
+        необходимых работ"},"cost_calculation":{"type":"string","description":"Последний
+        названный пользователю расчет стоимости услуг (общая стоимость услуг)"},"dialog_context":{"type":"string","description":"Контекст
+        диалога для понимания ситуации (включает данные о клиенте, дате и времени
+        записи и об услуге которые пользователь запрашивал и получал от ассистента)"},"details":{"type":"string","description":"Детали
+        записи в формате Markdown включающие все необходимые данные о пользователе,
+        услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную
+        переписку, номер заявки"}},"required":["dialog_context","details"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:09 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - 05cf3d0ffa316f9774593fd60ddaf0df
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 f5ff8d2de77a8e68bc1d3664bb1a45f2.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P6
+      X-Amz-Cf-Id:
+      - 4LeYRbSkRFv0wptsYeXoZMVdGdAE6BCHwY_He-hzH_Jd3oxTCQj6Ew==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6IjI0OWNkZDI2LWNlNzYtNGNlNi1iZmU1LTBjZmNkMGFhZmUwOCIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzNDksIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0K8g0L/QvtC90LjQvNCw0Y4sINGH0YLQviDQstGLINGF0L7RgtC40YLQtSDQv9C+0LrRgNCw0YHQuNGC0Ywg0LHQsNC80L/QtdGAINC00LvRjyBMYWRhIFZlc3RhLCDQvdC+INC00LvRjyDQvtGE0L7RgNC80LvQtdC90LjRjyDQt9Cw0Y/QstC60Lgg0LzQvdC1INC90LXQvtCx0YXQvtC00LjQvNCwINC00L7Qv9C+0LvQvdC40YLQtdC70YzQvdCw0Y8g0LjQvdGE0L7RgNC80LDRhtC40Y8uXG5cbioq0JzQuNC90LjQvNCw0LvRjNC90L4g0L3QtdC+0LHRhdC+0LTQuNC80YvQtSDQtNCw0L3QvdGL0LUg0LTQu9GPINC30LDRj9Cy0LrQuDoqKlxuMS4g0JPQvtC0INCy0YvQv9GD0YHQutCwIExhZGEgVmVzdGFcbjIuINCa0LvQsNGB0YEg0LDQstGC0L7QvNC+0LHQuNC70Y8gKNGB0LXQtNCw0L0sINGF0Y3RgtGH0LHQtdC6LCDRg9C90LjQstC10YDRgdCw0LspXG4zLiDQn9GA0L7QsdC10LMg0LDQstGC0L7QvNC+0LHQuNC70Y9cbjQuINCa0LDQutC+0Lkg0LjQvNC10L3QvdC+INCx0LDQvNC/0LXRgCAo0L/QtdGA0LXQtNC90LjQuSDQuNC70Lgg0LfQsNC00L3QuNC5KT9cblxuKirQotCw0LrQttC1INCy0LDQttC90L46Kipcbi0g0JHRi9C7INC70Lgg0LLQsNC8INGB0LTQtdC70LDQvSDRgNCw0YHRh9C10YIg0YHRgtC+0LjQvNC+0YHRgtC4P1xuLSDQldGB0YLRjCDQu9C4INC+0YHQvtCx0YvQtSDQv9C+0LbQtdC70LDQvdC40Y8g0L/QviDQv9C+0LrRgNCw0YHQutC1P1xuXG7QkdC10Lcg0Y3RgtC+0Lkg0LjQvdGE0L7RgNC80LDRhtC40Lgg0Y8g0L3QtSDQvNC+0LPRgyDQvtGE0L7RgNC80LjRgtGMINC30LDRj9Cy0LrRgy4g0J/QvtC20LDQu9GD0LnRgdGC0LAsINC/0YDQtdC00L7RgdGC0LDQstGM0YLQtSDRhdC+0YLRjyDQsdGLINCz0L7QtCDQstGL0L/Rg9GB0LrQsCDQsNCy0YLQvtC80L7QsdC40LvRjyDQuCDQv9GA0L7QsdC10LMsINGH0YLQvtCx0Ysg0Y8g0LzQvtCzINC90LDRh9Cw0YLRjCDQvtGE0L7RgNC80LvQtdC90LjQtS4ifSwibG9ncHJvYnMiOm51bGwsImZpbmlzaF9yZWFzb24iOiJzdG9wIn1dLCJ1c2FnZSI6eyJwcm9tcHRfdG9rZW5zIjoxMjc2LCJjb21wbGV0aW9uX3Rva2VucyI6MTc5LCJ0b3RhbF90b2tlbnMiOjE0NTUsInByb21wdF90b2tlbnNfZGV0YWlscyI6eyJjYWNoZWRfdG9rZW5zIjoxMjE2fSwicHJvbXB0X2NhY2hlX2hpdF90b2tlbnMiOjEyMTYsInByb21wdF9jYWNoZV9taXNzX3Rva2VucyI6NjB9LCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJmcF9lYWFiOGQxMTRiX3Byb2QwODIwX2ZwOF9rdmNhY2hlIn0=
+  recorded_at: Sun, 21 Dec 2025 12:49:04 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"system","content":"Ты
+        автолюбитель который хочет записаться на покраску бампера своего автмобиля
+        Lada Vesta.\n\nТы списался с менеджером автосервиса в чате, где он тебя спрашивает,
+        а ты  просто, односложно отвечаешь на вопросы менеджера, до тех пор пока он
+        не запишет тебя на услуги.\n\n\nЕсли спросят телефон - отвечай +7-916-111-12-12.
+        \nЕсли спросят имя - отвечай Серж. \nЕсли спросят марку или модель авто -
+        отвечай Lada веста. \nЕсли не задают конкретного вопроса и спрашивает чего
+        ты вообще хочешь хочешь - отвечай ''покрасить бампер''.\n\nТебе удообно приехат
+        на покраску завтра утром.\n\nКогда просят еще раз - повторяешь еще раз прошлое
+        сообщение.\n\nПродолжай пока тебя не запишут на звонок, встречу или покраску.\n"},{"role":"user","content":"Для
+        оформления заявки на покраску мне нужно собрать необходимую информацию.\n\nПожалуйста,
+        уточните: Ваше полное имя Номер телефона для связи Марку и модель автомобиля
+        Год выпуска автомобиля Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.) Пробег автомобиля Какие именно детали нужно покрасить Предварительный
+        расчет стоимости (если он уже был сделан)\n\nТакже, если у вас есть какие-то
+        особые пожелания или детали по услуге, пожалуйста, сообщите их."},{"role":"assistant","content":"Серж.
+        +7-916-111-12-12. Lada Vesta. Покрасить бампер."},{"role":"user","content":"Спасибо
+        за информацию, Серж! У меня есть ваше имя и телефон, а также данные об автомобиле
+        и услуге.\n\nДля полного оформления заявки мне нужно еще несколько деталей:\n\n*Год
+        выпуска Lada Vesta* *Класс автомобиля* (седан, хэтчбек, универсал и т.д.)
+        *Пробег автомобиля* *Предварительный расчет стоимости* покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста: • Какой именно бампер нужно
+        покрасить (передний или задний)? • Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"assistant","content":"Покрасить
+        бампер."},{"role":"user","content":"Я вижу, что вы хотите покрасить бампер
+        для Lada Vesta. Для оформления заявки мне не хватает нескольких важных деталей:\n\n*Необходимая
+        информация:* Год выпуска вашей Lada Vesta Класс автомобиля (седан, хэтчбек,
+        универсал) Пробег автомобиля Какой именно бампер нужно покрасить (передний
+        или задний)?\n\n*Также уточните:* • Был ли вам сделан предварительный расчет
+        стоимости покраски бампера? • Есть ли особые пожелания по цвету или типу краски?\n\nКак
+        только вы предоставите эту информацию, я смогу оформить заявку на покраску
+        бампера для вашей Lada Vesta."},{"role":"assistant","content":"Покрасить бампер."},{"role":"user","content":"Я
+        понимаю, что вы хотите покрасить бампер для Lada Vesta, но для оформления
+        заявки мне необходима дополнительная информация.\n\n*Минимально необходимые
+        данные для заявки:* Год выпуска Lada Vesta Класс автомобиля (седан, хэтчбек,
+        универсал) Пробег автомобиля Какой именно бампер (передний или задний)?\n\n*Также
+        важно:* • Был ли вам сделан расчет стоимости? • Есть ли особые пожелания по
+        покраске?\n\nБез этой информации я не могу оформить заявку. Пожалуйста, предоставьте
+        хотя бы год выпуска автомобиля и пробег, чтобы я мог начать оформление."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:16 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - f502e58c954a52a26f301a99ad868541
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 45ff2040e09b26d7b6a62f48718e1406.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P1
+      X-Amz-Cf-Id:
+      - 8J6YE8psecpvXLyHS7EjqhDBNkoDFaqqelFxxbfXx1VZZif7x4SOPQ==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6IjI3MDk1ZTMxLWY1YTEtNDRkZC1iYTU3LWEyNDBmM2Y3MjVhNiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzNTYsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0J/QvtC60YDQsNGB0LjRgtGMINCx0LDQvNC/0LXRgC4ifSwibG9ncHJvYnMiOm51bGwsImZpbmlzaF9yZWFzb24iOiJzdG9wIn1dLCJ1c2FnZSI6eyJwcm9tcHRfdG9rZW5zIjo5NjMsImNvbXBsZXRpb25fdG9rZW5zIjo3LCJ0b3RhbF90b2tlbnMiOjk3MCwicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjc2OH0sInByb21wdF9jYWNoZV9oaXRfdG9rZW5zIjo3NjgsInByb21wdF9jYWNoZV9taXNzX3Rva2VucyI6MTk1fSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfZWFhYjhkMTE0Yl9wcm9kMDgyMF9mcDhfa3ZjYWNoZSJ9
+  recorded_at: Sun, 21 Dec 2025 12:49:06 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"user","content":"Запиши
+        меня на покраску"},{"role":"assistant","content":"Для оформления заявки на
+        покраску мне нужно собрать необходимую информацию. \n\nПожалуйста, уточните:\n1.
+        Ваше полное имя\n2. Номер телефона для связи\n3. Марку и модель автомобиля\n4.
+        Год выпуска автомобиля\n5. Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.)\n6. Пробег автомобиля\n7. Какие именно детали нужно покрасить\n8.
+        Предварительный расчет стоимости (если он уже был сделан)\n\nТакже, если у
+        вас есть какие-то особые пожелания или детали по услуге, пожалуйста, сообщите
+        их."},{"role":"user","content":"Серж. +7-916-111-12-12. Lada Vesta. Покрасить
+        бампер."},{"role":"assistant","content":"Спасибо за информацию, Серж! У меня
+        есть ваше имя и телефон, а также данные об автомобиле и услуге.\n\nДля полного
+        оформления заявки мне нужно еще несколько деталей:\n\n1. **Год выпуска Lada
+        Vesta**\n2. **Класс автомобиля** (седан, хэтчбек, универсал и т.д.)\n3. **Пробег
+        автомобиля**\n4. **Предварительный расчет стоимости** покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста:\n- Какой именно бампер нужно
+        покрасить (передний или задний)?\n- Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"user","content":"Покрасить
+        бампер."},{"role":"assistant","content":"Я вижу, что вы хотите покрасить бампер
+        для Lada Vesta. Для оформления заявки мне не хватает нескольких важных деталей:\n\n**Необходимая
+        информация:**\n1. Год выпуска вашей Lada Vesta\n2. Класс автомобиля (седан,
+        хэтчбек, универсал)\n3. Пробег автомобиля\n4. Какой именно бампер нужно покрасить
+        (передний или задний)?\n\n**Также уточните:**\n- Был ли вам сделан предварительный
+        расчет стоимости покраски бампера?\n- Есть ли особые пожелания по цвету или
+        типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"system","content":"Test
+        system prompt"},{"role":"user","content":"Покрасить бампер."},{"role":"assistant","content":"Я
+        понимаю, что вы хотите покрасить бампер для Lada Vesta, но для оформления
+        заявки мне необходима дополнительная информация.\n\n**Минимально необходимые
+        данные для заявки:**\n1. Год выпуска Lada Vesta\n2. Класс автомобиля (седан,
+        хэтчбек, универсал)\n3. Пробег автомобиля\n4. Какой именно бампер (передний
+        или задний)?\n\n**Также важно:**\n- Был ли вам сделан расчет стоимости?\n-
+        Есть ли особые пожелания по покраске?\n\nБез этой информации я не могу оформить
+        заявку. Пожалуйста, предоставьте хотя бы год выпуска автомобиля и пробег,
+        чтобы я мог начать оформление."},{"role":"system","content":"Test system prompt"},{"role":"user","content":"Покрасить
+        бампер."}],"stream":false,"temperature":0.5,"tools":[{"type":"function","function":{"name":"booking","description":"Определяет
+        является ли сообщение клиента заявкой на услугу и отправляет ее в административный
+        чат","parameters":{"type":"object","properties":{"customer_name":{"type":"string","description":"Полное
+        имя клиента"},"customer_phone":{"type":"string","description":"Телефон клиента
+        в формате +7(XXX)XXX-XX-XX"},"car_brand":{"type":"string","description":"Марка
+        автомобиля"},"car_model":{"type":"string","description":"Модель автомобиля"},"car_year":{"type":"string","description":"Год
+        выпуска автомобиля"},"car_class":{"type":"string","description":"Класс автомаобиля"},"car_mileage":{"type":"string","description":"Пробег
+        автомобиля"},"required_services":{"type":"string","description":"Перечень
+        необходимых работ"},"cost_calculation":{"type":"string","description":"Последний
+        названный пользователю расчет стоимости услуг (общая стоимость услуг)"},"dialog_context":{"type":"string","description":"Контекст
+        диалога для понимания ситуации (включает данные о клиенте, дате и времени
+        записи и об услуге которые пользователь запрашивал и получал от ассистента)"},"details":{"type":"string","description":"Детали
+        записи в формате Markdown включающие все необходимые данные о пользователе,
+        услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную
+        переписку, номер заявки"}},"required":["dialog_context","details"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:18 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - e6f029380aa6e73e93973330b068aa6d
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 119768052e761a67208147e029ac3baa.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P2
+      X-Amz-Cf-Id:
+      - 0iXkEEtjUjgiv57jnRpnAdfGudCdq4NuuvXJF2mjU0dw_9vSx46WEg==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6IjIyZWY2MzdhLWIyYTktNGNhNC1iOGNiLWYzZWM1M2JhNDAyNyIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzNTgsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0K8g0LLQuNC20YMsINGH0YLQviDQstGLINC90LDRgdGC0L7QudGH0LjQstC+INGF0L7RgtC40YLQtSDQv9C+0LrRgNCw0YHQuNGC0Ywg0LHQsNC80L/QtdGALCDQvdC+INC00LvRjyDQvtGE0L7RgNC80LvQtdC90LjRjyDQt9Cw0Y/QstC60Lgg0LzQvdC1INC90YPQttC90Ysg0L7QsdGP0LfQsNGC0LXQu9GM0L3Ri9C1INC00LDQvdC90YvQtS4gXG5cbtCf0L7Qv9GA0L7QsdGD0Y4g0L7RhNC+0YDQvNC40YLRjCDQt9Cw0Y/QstC60YMg0YEg0LjQvNC10Y7RidC10LnRgdGPINC40L3RhNC+0YDQvNCw0YbQuNC10LksINC90L4g0L7RgtC80LXRh9GDINC90LXQtNC+0YHRgtCw0Y7RidC40LUg0LTQsNC90L3Ri9C1OiIsInRvb2xfY2FsbHMiOlt7ImluZGV4IjowLCJpZCI6ImNhbGxfMDBfemxwSjBONHliSE9ITDFrWEVLZXJMZ2l1IiwidHlwZSI6ImZ1bmN0aW9uIiwiZnVuY3Rpb24iOnsibmFtZSI6ImJvb2tpbmciLCJhcmd1bWVudHMiOiJ7XCJkaWFsb2dfY29udGV4dFwiOiBcItCa0LvQuNC10L3RgiDQodC10YDQtiwg0YLQtdC70LXRhNC+0L0gKzctOTE2LTExMS0xMi0xMiwg0LDQstGC0L7QvNC+0LHQuNC70YwgTGFkYSBWZXN0YS4g0JrQu9C40LXQvdGCINGF0L7Rh9C10YIg0L/QvtC60YDQsNGB0LjRgtGMINCx0LDQvNC/0LXRgCwg0L3QviDQvdC1INC/0YDQtdC00L7RgdGC0LDQstC40Lsg0L/QvtC70L3Rg9GOINC40L3RhNC+0YDQvNCw0YbQuNGOLiDQndC10YHQutC+0LvRjNC60L4g0YDQsNC3INC30LDQv9GA0LDRiNC40LLQsNC7INC/0L7QutGA0LDRgdC60YMg0LHQsNC80L/QtdGA0LAsINC90L4g0L3QtSDQvtGC0LLQtdGH0LDQuyDQvdCwINGD0YLQvtGH0L3Rj9GO0YnQuNC1INCy0L7Qv9GA0L7RgdGLINC+INCz0L7QtNC1INCy0YvQv9GD0YHQutCwLCDQutC70LDRgdGB0LUg0LDQstGC0L7QvNC+0LHQuNC70Y8sINC/0YDQvtCx0LXQs9C1LCDQutC+0L3QutGA0LXRgtC90L7QvCDQsdCw0LzQv9C10YDQtSAo0L/QtdGA0LXQtNC90LjQuS/Qt9Cw0LTQvdC40LkpINC4INGA0LDRgdGH0LXRgtC1INGB0YLQvtC40LzQvtGB0YLQuC5cIiwgXCJkZXRhaWxzXCI6IFwiIyDQl9Cw0Y/QstC60LAg0L3QsCDQv9C+0LrRgNCw0YHQutGDINCx0LDQvNC/0LXRgNCwXFxuXFxuIyMg0JTQsNC90L3Ri9C1INC60LvQuNC10L3RgtCwXFxuLSAqKtCY0LzRjzoqKiDQodC10YDQtlxcbi0gKirQotC10LvQtdGE0L7QvToqKiArNy05MTYtMTExLTEyLTEyXFxuXFxuIyMg0JDQstGC0L7QvNC+0LHQuNC70YxcXG4tICoq0JzQsNGA0LrQsDoqKiBMYWRhXFxuLSAqKtCc0L7QtNC10LvRjDoqKiBWZXN0YVxcbi0gKirQk9C+0LQg0LLRi9C/0YPRgdC60LA6Kiog0L3QtSDRg9C60LDQt9Cw0L1cXG4tICoq0JrQu9Cw0YHRgToqKiDQvdC1INGD0LrQsNC30LDQvVxcbi0gKirQn9GA0L7QsdC10LM6Kiog0L3QtSDRg9C60LDQt9Cw0L1cXG5cXG4jIyDQo9GB0LvRg9Cz0LBcXG4tICoq0KLRgNC10LHRg9C10LzRi9C1INGA0LDQsdC+0YLRizoqKiDQn9C+0LrRgNCw0YHQutCwINCx0LDQvNC/0LXRgNCwXFxuLSAqKtCa0L7QvdC60YDQtdGC0L3Ri9C5INCx0LDQvNC/0LXRgDoqKiDQvdC1INGD0LrQsNC30LDQvSAo0L/QtdGA0LXQtNC90LjQuS/Qt9Cw0LTQvdC40LkpXFxuLSAqKtCe0YHQvtCx0YvQtSDQv9C+0LbQtdC70LDQvdC40Y86Kiog0L3QtSDRg9C60LDQt9Cw0L3Ri1xcblxcbiMjINCh0YLQvtC40LzQvtGB0YLRjFxcbi0gKirQoNCw0YHRh9C10YIg0YHRgtC+0LjQvNC+0YHRgtC4OioqINC90LUg0L/RgNC10LTQvtGB0YLQsNCy0LvQtdC9XFxuXFxuIyMg0JrQvtC90YLQtdC60YHRgiDQtNC40LDQu9C+0LPQsFxcbtCa0LvQuNC10L3RgiDQvdC10YHQutC+0LvRjNC60L4g0YDQsNC3INC/0L7QstGC0L7RgNGP0LsgXFxcItCf0L7QutGA0LDRgdC40YLRjCDQsdCw0LzQv9C10YBcXFwiLCDQvdC+INC90LUg0L7RgtCy0LXRh9Cw0Lsg0L3QsCDRg9GC0L7Rh9C90Y/RjtGJ0LjQtSDQstC+0L/RgNC+0YHRiyDQvjpcXG4xLiDQk9C+0LTQtSDQstGL0L/Rg9GB0LrQsCDQsNCy0YLQvtC80L7QsdC40LvRj1xcbjIuINCa0LvQsNGB0YHQtSDQsNCy0YLQvtC80L7QsdC40LvRj1xcbjMuINCf0YDQvtCx0LXQs9C1XFxuNC4g0JrQvtC90LrRgNC10YLQvdC+0Lwg0LHQsNC80L/QtdGA0LUgKNC/0LXRgNC10LTQvdC40Lkv0LfQsNC00L3QuNC5KVxcbjUuINCg0LDRgdGH0LXRgtC1INGB0YLQvtC40LzQvtGB0YLQuFxcblxcbiMjINCf0L7RgdC70LXQtNC90LjQtSDRgdC+0L7QsdGJ0LXQvdC40Y8g0L/QvtC70YzQt9C+0LLQsNGC0LXQu9GPXFxuLSBcXFwi0J/QvtC60YDQsNGB0LjRgtGMINCx0LDQvNC/0LXRgC5cXFwiICjQv9C+0LLRgtC+0YDQtdC90L4g0L3QtdGB0LrQvtC70YzQutC+INGA0LDQtylcXG5cXG4jIyDQktCw0LbQvdC+XFxuKirQndC10L7QsdGF0L7QtNC40LzQviDRgdCy0Y/Qt9Cw0YLRjNGB0Y8g0YEg0LrQu9C40LXQvdGC0L7QvCDQtNC70Y8g0YPRgtC+0YfQvdC10L3QuNGPINC90LXQtNC+0YHRgtCw0Y7RidC40YUg0LTQsNC90L3Ri9GFINC/0LXRgNC10LQg0LLRi9C/0L7Qu9C90LXQvdC40LXQvCDRgNCw0LHQvtGCLioqXFxuXFxuIyMg0J3QvtC80LXRgCDQt9Cw0Y/QstC60LhcXG5b0LHRg9C00LXRgiDQv9GA0LjRgdCy0L7QtdC9INGB0LjRgdGC0LXQvNC+0LldXCJ9In19XX0sImxvZ3Byb2JzIjpudWxsLCJmaW5pc2hfcmVhc29uIjoidG9vbF9jYWxscyJ9XSwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6MTQ2NiwiY29tcGxldGlvbl90b2tlbnMiOjUzNCwidG90YWxfdG9rZW5zIjoyMDAwLCJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOnsiY2FjaGVkX3Rva2VucyI6MTQwOH0sInByb21wdF9jYWNoZV9oaXRfdG9rZW5zIjoxNDA4LCJwcm9tcHRfY2FjaGVfbWlzc190b2tlbnMiOjU4fSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfZWFhYjhkMTE0Yl9wcm9kMDgyMF9mcDhfa3ZjYWNoZSJ9
+  recorded_at: Sun, 21 Dec 2025 12:49:24 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"user","content":"Запиши
+        меня на покраску"},{"role":"assistant","content":"Для оформления заявки на
+        покраску мне нужно собрать необходимую информацию. \n\nПожалуйста, уточните:\n1.
+        Ваше полное имя\n2. Номер телефона для связи\n3. Марку и модель автомобиля\n4.
+        Год выпуска автомобиля\n5. Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.)\n6. Пробег автомобиля\n7. Какие именно детали нужно покрасить\n8.
+        Предварительный расчет стоимости (если он уже был сделан)\n\nТакже, если у
+        вас есть какие-то особые пожелания или детали по услуге, пожалуйста, сообщите
+        их."},{"role":"user","content":"Серж. +7-916-111-12-12. Lada Vesta. Покрасить
+        бампер."},{"role":"assistant","content":"Спасибо за информацию, Серж! У меня
+        есть ваше имя и телефон, а также данные об автомобиле и услуге.\n\nДля полного
+        оформления заявки мне нужно еще несколько деталей:\n\n1. **Год выпуска Lada
+        Vesta**\n2. **Класс автомобиля** (седан, хэтчбек, универсал и т.д.)\n3. **Пробег
+        автомобиля**\n4. **Предварительный расчет стоимости** покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста:\n- Какой именно бампер нужно
+        покрасить (передний или задний)?\n- Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"user","content":"Покрасить
+        бампер."},{"role":"assistant","content":"Я вижу, что вы хотите покрасить бампер
+        для Lada Vesta. Для оформления заявки мне не хватает нескольких важных деталей:\n\n**Необходимая
+        информация:**\n1. Год выпуска вашей Lada Vesta\n2. Класс автомобиля (седан,
+        хэтчбек, универсал)\n3. Пробег автомобиля\n4. Какой именно бампер нужно покрасить
+        (передний или задний)?\n\n**Также уточните:**\n- Был ли вам сделан предварительный
+        расчет стоимости покраски бампера?\n- Есть ли особые пожелания по цвету или
+        типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"system","content":"Test
+        system prompt"},{"role":"user","content":"Покрасить бампер."},{"role":"assistant","content":"Я
+        понимаю, что вы хотите покрасить бампер для Lada Vesta, но для оформления
+        заявки мне необходима дополнительная информация.\n\n**Минимально необходимые
+        данные для заявки:**\n1. Год выпуска Lada Vesta\n2. Класс автомобиля (седан,
+        хэтчбек, универсал)\n3. Пробег автомобиля\n4. Какой именно бампер (передний
+        или задний)?\n\n**Также важно:**\n- Был ли вам сделан расчет стоимости?\n-
+        Есть ли особые пожелания по покраске?\n\nБез этой информации я не могу оформить
+        заявку. Пожалуйста, предоставьте хотя бы год выпуска автомобиля и пробег,
+        чтобы я мог начать оформление."},{"role":"system","content":"Test system prompt"},{"role":"user","content":"Покрасить
+        бампер."},{"role":"assistant","content":"Я вижу, что вы настойчиво хотите
+        покрасить бампер, но для оформления заявки мне нужны обязательные данные.
+        \n\nПопробую оформить заявку с имеющейся информацией, но отмечу недостающие
+        данные:","tool_calls":[{"id":"call_00_zlpJ0N4ybHOHL1kXEKerLgiu","type":"function","function":{"name":"booking","arguments":"{\"dialog_context\":\"Клиент
+        Серж, телефон +7-916-111-12-12, автомобиль Lada Vesta. Клиент хочет покрасить
+        бампер, но не предоставил полную информацию. Несколько раз запрашивал покраску
+        бампера, но не отвечал на уточняющие вопросы о годе выпуска, классе автомобиля,
+        пробеге, конкретном бампере (передний/задний) и расчете стоимости.\",\"details\":\"#
+        Заявка на покраску бампера\\n\\n## Данные клиента\\n- **Имя:** Серж\\n- **Телефон:**
+        +7-916-111-12-12\\n\\n## Автомобиль\\n- **Марка:** Lada\\n- **Модель:** Vesta\\n-
+        **Год выпуска:** не указан\\n- **Класс:** не указан\\n- **Пробег:** не указан\\n\\n##
+        Услуга\\n- **Требуемые работы:** Покраска бампера\\n- **Конкретный бампер:**
+        не указан (передний/задний)\\n- **Особые пожелания:** не указаны\\n\\n## Стоимость\\n-
+        **Расчет стоимости:** не предоставлен\\n\\n## Контекст диалога\\nКлиент несколько
+        раз повторял \\\"Покрасить бампер\\\", но не отвечал на уточняющие вопросы
+        о:\\n1. Годе выпуска автомобиля\\n2. Классе автомобиля\\n3. Пробеге\\n4. Конкретном
+        бампере (передний/задний)\\n5. Расчете стоимости\\n\\n## Последние сообщения
+        пользователя\\n- \\\"Покрасить бампер.\\\" (повторено несколько раз)\\n\\n##
+        Важно\\n**Необходимо связаться с клиентом для уточнения недостающих данных
+        перед выполнением работ.**\\n\\n## Номер заявки\\n[будет присвоен системой]\"}"}}]},{"role":"tool","content":"Заявка
+        под номером 980190963 отправлена администратору\n\nℹ️ **Дополнительно**: Эта
+        заявка создана в тестовом режиме и не будет обработана реальным администратором.\n","tool_call_id":"call_00_zlpJ0N4ybHOHL1kXEKerLgiu"}],"stream":false,"temperature":0.5,"tools":[{"type":"function","function":{"name":"booking","description":"Определяет
+        является ли сообщение клиента заявкой на услугу и отправляет ее в административный
+        чат","parameters":{"type":"object","properties":{"customer_name":{"type":"string","description":"Полное
+        имя клиента"},"customer_phone":{"type":"string","description":"Телефон клиента
+        в формате +7(XXX)XXX-XX-XX"},"car_brand":{"type":"string","description":"Марка
+        автомобиля"},"car_model":{"type":"string","description":"Модель автомобиля"},"car_year":{"type":"string","description":"Год
+        выпуска автомобиля"},"car_class":{"type":"string","description":"Класс автомаобиля"},"car_mileage":{"type":"string","description":"Пробег
+        автомобиля"},"required_services":{"type":"string","description":"Перечень
+        необходимых работ"},"cost_calculation":{"type":"string","description":"Последний
+        названный пользователю расчет стоимости услуг (общая стоимость услуг)"},"dialog_context":{"type":"string","description":"Контекст
+        диалога для понимания ситуации (включает данные о клиенте, дате и времени
+        записи и об услуге которые пользователь запрашивал и получал от ассистента)"},"details":{"type":"string","description":"Детали
+        записи в формате Markdown включающие все необходимые данные о пользователе,
+        услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную
+        переписку, номер заявки"}},"required":["dialog_context","details"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:36 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - fea848e75f50f8e820863488c22416b0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 670634f4e91a144b336cc6e85bafc7c0.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P6
+      X-Amz-Cf-Id:
+      - k0Yy8JMVR8dfHlmuB7H1W4Ks4VpHWX4WUoKFL1kbxT5cFXb0SQRbWw==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6Ijc2YzkyYzI0LWExZGEtNDQ4Ni04ZTYxLTZiMDIxZjhmODNhYiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzNzYsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0JfQsNGP0LLQutCwINC90LAg0L/QvtC60YDQsNGB0LrRgyDQsdCw0LzQv9C10YDQsCDQvtGE0L7RgNC80LvQtdC90LAg0L/QvtC0INC90L7QvNC10YDQvtC8ICoqOTgwMTkwOTYzKiouXG5cbioq0JLQsNC20L3QvjoqKiDQkiDQt9Cw0Y/QstC60LUg0L7RgtGB0YPRgtGB0YLQstGD0Y7RgiDQstCw0LbQvdGL0LUg0LTQsNC90L3Ri9C1OlxuLSDQk9C+0LQg0LLRi9C/0YPRgdC60LAg0LDQstGC0L7QvNC+0LHQuNC70Y9cbi0g0JrQu9Cw0YHRgSDQsNCy0YLQvtC80L7QsdC40LvRj1xuLSDQn9GA0L7QsdC10LNcbi0g0JrQvtC90LrRgNC10YLQvdGL0Lkg0LHQsNC80L/QtdGAICjQv9C10YDQtdC00L3QuNC5L9C30LDQtNC90LjQuSlcbi0g0KDQsNGB0YfQtdGCINGB0YLQvtC40LzQvtGB0YLQuFxuXG7QkNC00LzQuNC90LjRgdGC0YDQsNGC0L7RgCDRgdCy0Y/QttC10YLRgdGPINGBINCy0LDQvNC4INC/0L4g0YLQtdC70LXRhNC+0L3RgyArNy05MTYtMTExLTEyLTEyINC00LvRjyDRg9GC0L7Rh9C90LXQvdC40Y8g0Y3RgtC40YUg0LTQtdGC0LDQu9C10Lkg0L/QtdGA0LXQtCDQstGL0L/QvtC70L3QtdC90LjQtdC8INGA0LDQsdC+0YIuIn0sImxvZ3Byb2JzIjpudWxsLCJmaW5pc2hfcmVhc29uIjoic3RvcCJ9XSwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6MjA2NSwiY29tcGxldGlvbl90b2tlbnMiOjEwNywidG90YWxfdG9rZW5zIjoyMTcyLCJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOnsiY2FjaGVkX3Rva2VucyI6MTk4NH0sInByb21wdF9jYWNoZV9oaXRfdG9rZW5zIjoxOTg0LCJwcm9tcHRfY2FjaGVfbWlzc190b2tlbnMiOjgxfSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfZWFhYjhkMTE0Yl9wcm9kMDgyMF9mcDhfa3ZjYWNoZSJ9
+  recorded_at: Sun, 21 Dec 2025 12:49:29 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"system","content":"Ты
+        автолюбитель который хочет записаться на покраску бампера своего автмобиля
+        Lada Vesta.\n\nТы списался с менеджером автосервиса в чате, где он тебя спрашивает,
+        а ты  просто, односложно отвечаешь на вопросы менеджера, до тех пор пока он
+        не запишет тебя на услуги.\n\n\nЕсли спросят телефон - отвечай +7-916-111-12-12.
+        \nЕсли спросят имя - отвечай Серж. \nЕсли спросят марку или модель авто -
+        отвечай Lada веста. \nЕсли не задают конкретного вопроса и спрашивает чего
+        ты вообще хочешь хочешь - отвечай ''покрасить бампер''.\n\nТебе удообно приехат
+        на покраску завтра утром.\n\nКогда просят еще раз - повторяешь еще раз прошлое
+        сообщение.\n\nПродолжай пока тебя не запишут на звонок, встречу или покраску.\n"},{"role":"user","content":"Для
+        оформления заявки на покраску мне нужно собрать необходимую информацию.\n\nПожалуйста,
+        уточните: Ваше полное имя Номер телефона для связи Марку и модель автомобиля
+        Год выпуска автомобиля Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.) Пробег автомобиля Какие именно детали нужно покрасить Предварительный
+        расчет стоимости (если он уже был сделан)\n\nТакже, если у вас есть какие-то
+        особые пожелания или детали по услуге, пожалуйста, сообщите их."},{"role":"assistant","content":"Серж.
+        +7-916-111-12-12. Lada Vesta. Покрасить бампер."},{"role":"user","content":"Спасибо
+        за информацию, Серж! У меня есть ваше имя и телефон, а также данные об автомобиле
+        и услуге.\n\nДля полного оформления заявки мне нужно еще несколько деталей:\n\n*Год
+        выпуска Lada Vesta* *Класс автомобиля* (седан, хэтчбек, универсал и т.д.)
+        *Пробег автомобиля* *Предварительный расчет стоимости* покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста: • Какой именно бампер нужно
+        покрасить (передний или задний)? • Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"assistant","content":"Покрасить
+        бампер."},{"role":"user","content":"Я вижу, что вы хотите покрасить бампер
+        для Lada Vesta. Для оформления заявки мне не хватает нескольких важных деталей:\n\n*Необходимая
+        информация:* Год выпуска вашей Lada Vesta Класс автомобиля (седан, хэтчбек,
+        универсал) Пробег автомобиля Какой именно бампер нужно покрасить (передний
+        или задний)?\n\n*Также уточните:* • Был ли вам сделан предварительный расчет
+        стоимости покраски бампера? • Есть ли особые пожелания по цвету или типу краски?\n\nКак
+        только вы предоставите эту информацию, я смогу оформить заявку на покраску
+        бампера для вашей Lada Vesta."},{"role":"assistant","content":"Покрасить бампер."},{"role":"user","content":"Я
+        понимаю, что вы хотите покрасить бампер для Lada Vesta, но для оформления
+        заявки мне необходима дополнительная информация.\n\n*Минимально необходимые
+        данные для заявки:* Год выпуска Lada Vesta Класс автомобиля (седан, хэтчбек,
+        универсал) Пробег автомобиля Какой именно бампер (передний или задний)?\n\n*Также
+        важно:* • Был ли вам сделан расчет стоимости? • Есть ли особые пожелания по
+        покраске?\n\nБез этой информации я не могу оформить заявку. Пожалуйста, предоставьте
+        хотя бы год выпуска автомобиля и пробег, чтобы я мог начать оформление."},{"role":"assistant","content":"Покрасить
+        бампер."},{"role":"user","content":"Заявка на покраску бампера оформлена под
+        номером *980190963*.\n\n*Важно:* В заявке отсутствуют важные данные: • Год
+        выпуска автомобиля • Класс автомобиля • Пробег • Конкретный бампер (передний/задний)
+        • Расчет стоимости\n\nАдминистратор свяжется с вами по телефону +7-916-111-12-12
+        для уточнения этих деталей перед выполнением работ."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:41 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - b66c30534e5d927bf74897e018df1bed
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 d3e98d8cca4d16199794e4f4191b942c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P1
+      X-Amz-Cf-Id:
+      - fk24E8ORrZ6w7gvGEuMqrrIBohf5dTUl4MtiEgf0PTkcAVMeEPc5mw==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6IjcwOTMxNDI5LTczZGItNDk3Ny04ZGMwLWZlZWZjYTMxNTQ1MCIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzODEsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0KXQvtGA0L7RiNC+LiJ9LCJsb2dwcm9icyI6bnVsbCwiZmluaXNoX3JlYXNvbiI6InN0b3AifV0sInVzYWdlIjp7InByb21wdF90b2tlbnMiOjEwNzksImNvbXBsZXRpb25fdG9rZW5zIjo0LCJ0b3RhbF90b2tlbnMiOjEwODMsInByb21wdF90b2tlbnNfZGV0YWlscyI6eyJjYWNoZWRfdG9rZW5zIjo5NjB9LCJwcm9tcHRfY2FjaGVfaGl0X3Rva2VucyI6OTYwLCJwcm9tcHRfY2FjaGVfbWlzc190b2tlbnMiOjExOX0sInN5c3RlbV9maW5nZXJwcmludCI6ImZwX2VhYWI4ZDExNGJfcHJvZDA4MjBfZnA4X2t2Y2FjaGUifQ==
+  recorded_at: Sun, 21 Dec 2025 12:49:30 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"user","content":"Запиши
+        меня на покраску"},{"role":"assistant","content":"Для оформления заявки на
+        покраску мне нужно собрать необходимую информацию. \n\nПожалуйста, уточните:\n1.
+        Ваше полное имя\n2. Номер телефона для связи\n3. Марку и модель автомобиля\n4.
+        Год выпуска автомобиля\n5. Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.)\n6. Пробег автомобиля\n7. Какие именно детали нужно покрасить\n8.
+        Предварительный расчет стоимости (если он уже был сделан)\n\nТакже, если у
+        вас есть какие-то особые пожелания или детали по услуге, пожалуйста, сообщите
+        их."},{"role":"user","content":"Серж. +7-916-111-12-12. Lada Vesta. Покрасить
+        бампер."},{"role":"assistant","content":"Спасибо за информацию, Серж! У меня
+        есть ваше имя и телефон, а также данные об автомобиле и услуге.\n\nДля полного
+        оформления заявки мне нужно еще несколько деталей:\n\n1. **Год выпуска Lada
+        Vesta**\n2. **Класс автомобиля** (седан, хэтчбек, универсал и т.д.)\n3. **Пробег
+        автомобиля**\n4. **Предварительный расчет стоимости** покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста:\n- Какой именно бампер нужно
+        покрасить (передний или задний)?\n- Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"user","content":"Покрасить
+        бампер."},{"role":"assistant","content":"Я вижу, что вы хотите покрасить бампер
+        для Lada Vesta. Для оформления заявки мне не хватает нескольких важных деталей:\n\n**Необходимая
+        информация:**\n1. Год выпуска вашей Lada Vesta\n2. Класс автомобиля (седан,
+        хэтчбек, универсал)\n3. Пробег автомобиля\n4. Какой именно бампер нужно покрасить
+        (передний или задний)?\n\n**Также уточните:**\n- Был ли вам сделан предварительный
+        расчет стоимости покраски бампера?\n- Есть ли особые пожелания по цвету или
+        типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"user","content":"Покрасить
+        бампер."},{"role":"assistant","content":"Я понимаю, что вы хотите покрасить
+        бампер для Lada Vesta, но для оформления заявки мне необходима дополнительная
+        информация.\n\n**Минимально необходимые данные для заявки:**\n1. Год выпуска
+        Lada Vesta\n2. Класс автомобиля (седан, хэтчбек, универсал)\n3. Пробег автомобиля\n4.
+        Какой именно бампер (передний или задний)?\n\n**Также важно:**\n- Был ли вам
+        сделан расчет стоимости?\n- Есть ли особые пожелания по покраске?\n\nБез этой
+        информации я не могу оформить заявку. Пожалуйста, предоставьте хотя бы год
+        выпуска автомобиля и пробег, чтобы я мог начать оформление."},{"role":"system","content":"Test
+        system prompt"},{"role":"user","content":"Покрасить бампер."},{"role":"assistant","content":"Я
+        вижу, что вы настойчиво хотите покрасить бампер, но для оформления заявки
+        мне нужны обязательные данные. \n\nПопробую оформить заявку с имеющейся информацией,
+        но отмечу недостающие данные:","tool_calls":[{"id":"call_00_zlpJ0N4ybHOHL1kXEKerLgiu","type":"function","function":{"name":"booking","arguments":"{\"details\":\"#
+        Заявка на покраску бампера\\n\\n## Данные клиента\\n- **Имя:** Серж\\n- **Телефон:**
+        +7-916-111-12-12\\n\\n## Автомобиль\\n- **Марка:** Lada\\n- **Модель:** Vesta\\n-
+        **Год выпуска:** не указан\\n- **Класс:** не указан\\n- **Пробег:** не указан\\n\\n##
+        Услуга\\n- **Требуемые работы:** Покраска бампера\\n- **Конкретный бампер:**
+        не указан (передний/задний)\\n- **Особые пожелания:** не указаны\\n\\n## Стоимость\\n-
+        **Расчет стоимости:** не предоставлен\\n\\n## Контекст диалога\\nКлиент несколько
+        раз повторял \\\"Покрасить бампер\\\", но не отвечал на уточняющие вопросы
+        о:\\n1. Годе выпуска автомобиля\\n2. Классе автомобиля\\n3. Пробеге\\n4. Конкретном
+        бампере (передний/задний)\\n5. Расчете стоимости\\n\\n## Последние сообщения
+        пользователя\\n- \\\"Покрасить бампер.\\\" (повторено несколько раз)\\n\\n##
+        Важно\\n**Необходимо связаться с клиентом для уточнения недостающих данных
+        перед выполнением работ.**\\n\\n## Номер заявки\\n[будет присвоен системой]\",\"dialog_context\":\"Клиент
+        Серж, телефон +7-916-111-12-12, автомобиль Lada Vesta. Клиент хочет покрасить
+        бампер, но не предоставил полную информацию. Несколько раз запрашивал покраску
+        бампера, но не отвечал на уточняющие вопросы о годе выпуска, классе автомобиля,
+        пробеге, конкретном бампере (передний/задний) и расчете стоимости.\"}"}}]},{"role":"tool","content":"Заявка
+        под номером 980190963 отправлена администратору\n\nℹ️ **Дополнительно**: Эта
+        заявка создана в тестовом режиме и не будет обработана реальным администратором.\n","tool_call_id":"call_00_zlpJ0N4ybHOHL1kXEKerLgiu"},{"role":"assistant","content":"Заявка
+        на покраску бампера оформлена под номером **980190963**.\n\n**Важно:** В заявке
+        отсутствуют важные данные:\n- Год выпуска автомобиля\n- Класс автомобиля\n-
+        Пробег\n- Конкретный бампер (передний/задний)\n- Расчет стоимости\n\nАдминистратор
+        свяжется с вами по телефону +7-916-111-12-12 для уточнения этих деталей перед
+        выполнением работ."},{"role":"system","content":"Test system prompt"},{"role":"user","content":"Хорошо."}],"stream":false,"temperature":0.5,"tools":[{"type":"function","function":{"name":"booking","description":"Определяет
+        является ли сообщение клиента заявкой на услугу и отправляет ее в административный
+        чат","parameters":{"type":"object","properties":{"customer_name":{"type":"string","description":"Полное
+        имя клиента"},"customer_phone":{"type":"string","description":"Телефон клиента
+        в формате +7(XXX)XXX-XX-XX"},"car_brand":{"type":"string","description":"Марка
+        автомобиля"},"car_model":{"type":"string","description":"Модель автомобиля"},"car_year":{"type":"string","description":"Год
+        выпуска автомобиля"},"car_class":{"type":"string","description":"Класс автомаобиля"},"car_mileage":{"type":"string","description":"Пробег
+        автомобиля"},"required_services":{"type":"string","description":"Перечень
+        необходимых работ"},"cost_calculation":{"type":"string","description":"Последний
+        названный пользователю расчет стоимости услуг (общая стоимость услуг)"},"dialog_context":{"type":"string","description":"Контекст
+        диалога для понимания ситуации (включает данные о клиенте, дате и времени
+        записи и об услуге которые пользователь запрашивал и получал от ассистента)"},"details":{"type":"string","description":"Детали
+        записи в формате Markdown включающие все необходимые данные о пользователе,
+        услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную
+        переписку, номер заявки"}},"required":["dialog_context","details"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:42 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - af9f53650420e9c90e3fb99a8e51f980
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 82636c8aa9a5ece412a0bc535c0ca124.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P1
+      X-Amz-Cf-Id:
+      - c-3C0XZKx1Xlywp5n7Us785y5W2gVsN81asBqF0AG3EDBMGLlUx--A==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6IjNkYWJlYTIzLTM3YjItNGI4Ny1iNmVkLWExNjYxZmFhNWMzMyIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzODIsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0J7RgtC70LjRh9C90L4hINCX0LDRj9Cy0LrQsCDQvtGE0L7RgNC80LvQtdC90LAuINCQ0LTQvNC40L3QuNGB0YLRgNCw0YLQvtGAINGB0LLRj9C20LXRgtGB0Y8g0YEg0LLQsNC80Lgg0L/QviDRg9C60LDQt9Cw0L3QvdC+0LzRgyDRgtC10LvQtdGE0L7QvdGDICs3LTkxNi0xMTEtMTItMTIg0LTQu9GPINGD0YLQvtGH0L3QtdC90LjRjyDQstGB0LXRhSDQtNC10YLQsNC70LXQuSDQv9C+INC/0L7QutGA0LDRgdC60LUg0LHQsNC80L/QtdGA0LAg0LLQsNGI0LXQuSBMYWRhIFZlc3RhLlxuXG7QldGB0LvQuCDRgyDQstCw0YEg0L/QvtGP0LLRj9GC0YHRjyDQtNC+0L/QvtC70L3QuNGC0LXQu9GM0L3Ri9C1INCy0L7Qv9GA0L7RgdGLINC40LvQuCDQv9C+0YLRgNC10LHRg9C10YLRgdGPINGH0YLQvi3RgtC+INGD0YLQvtGH0L3QuNGC0YwsINC+0LHRgNCw0YnQsNC50YLQtdGB0YwhIn0sImxvZ3Byb2JzIjpudWxsLCJmaW5pc2hfcmVhc29uIjoic3RvcCJ9XSwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6MjE4MCwiY29tcGxldGlvbl90b2tlbnMiOjc4LCJ0b3RhbF90b2tlbnMiOjIyNTgsInByb21wdF90b2tlbnNfZGV0YWlscyI6eyJjYWNoZWRfdG9rZW5zIjoxNTM2fSwicHJvbXB0X2NhY2hlX2hpdF90b2tlbnMiOjE1MzYsInByb21wdF9jYWNoZV9taXNzX3Rva2VucyI6NjQ0fSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfZWFhYjhkMTE0Yl9wcm9kMDgyMF9mcDhfa3ZjYWNoZSJ9
+  recorded_at: Sun, 21 Dec 2025 12:49:34 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"system","content":"Ты
+        автолюбитель который хочет записаться на покраску бампера своего автмобиля
+        Lada Vesta.\n\nТы списался с менеджером автосервиса в чате, где он тебя спрашивает,
+        а ты  просто, односложно отвечаешь на вопросы менеджера, до тех пор пока он
+        не запишет тебя на услуги.\n\n\nЕсли спросят телефон - отвечай +7-916-111-12-12.
+        \nЕсли спросят имя - отвечай Серж. \nЕсли спросят марку или модель авто -
+        отвечай Lada веста. \nЕсли не задают конкретного вопроса и спрашивает чего
+        ты вообще хочешь хочешь - отвечай ''покрасить бампер''.\n\nТебе удообно приехат
+        на покраску завтра утром.\n\nКогда просят еще раз - повторяешь еще раз прошлое
+        сообщение.\n\nПродолжай пока тебя не запишут на звонок, встречу или покраску.\n"},{"role":"user","content":"Для
+        оформления заявки на покраску мне нужно собрать необходимую информацию.\n\nПожалуйста,
+        уточните: Ваше полное имя Номер телефона для связи Марку и модель автомобиля
+        Год выпуска автомобиля Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.) Пробег автомобиля Какие именно детали нужно покрасить Предварительный
+        расчет стоимости (если он уже был сделан)\n\nТакже, если у вас есть какие-то
+        особые пожелания или детали по услуге, пожалуйста, сообщите их."},{"role":"assistant","content":"Серж.
+        +7-916-111-12-12. Lada Vesta. Покрасить бампер."},{"role":"user","content":"Спасибо
+        за информацию, Серж! У меня есть ваше имя и телефон, а также данные об автомобиле
+        и услуге.\n\nДля полного оформления заявки мне нужно еще несколько деталей:\n\n*Год
+        выпуска Lada Vesta* *Класс автомобиля* (седан, хэтчбек, универсал и т.д.)
+        *Пробег автомобиля* *Предварительный расчет стоимости* покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста: • Какой именно бампер нужно
+        покрасить (передний или задний)? • Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"assistant","content":"Покрасить
+        бампер."},{"role":"user","content":"Я вижу, что вы хотите покрасить бампер
+        для Lada Vesta. Для оформления заявки мне не хватает нескольких важных деталей:\n\n*Необходимая
+        информация:* Год выпуска вашей Lada Vesta Класс автомобиля (седан, хэтчбек,
+        универсал) Пробег автомобиля Какой именно бампер нужно покрасить (передний
+        или задний)?\n\n*Также уточните:* • Был ли вам сделан предварительный расчет
+        стоимости покраски бампера? • Есть ли особые пожелания по цвету или типу краски?\n\nКак
+        только вы предоставите эту информацию, я смогу оформить заявку на покраску
+        бампера для вашей Lada Vesta."},{"role":"assistant","content":"Покрасить бампер."},{"role":"user","content":"Я
+        понимаю, что вы хотите покрасить бампер для Lada Vesta, но для оформления
+        заявки мне необходима дополнительная информация.\n\n*Минимально необходимые
+        данные для заявки:* Год выпуска Lada Vesta Класс автомобиля (седан, хэтчбек,
+        универсал) Пробег автомобиля Какой именно бампер (передний или задний)?\n\n*Также
+        важно:* • Был ли вам сделан расчет стоимости? • Есть ли особые пожелания по
+        покраске?\n\nБез этой информации я не могу оформить заявку. Пожалуйста, предоставьте
+        хотя бы год выпуска автомобиля и пробег, чтобы я мог начать оформление."},{"role":"assistant","content":"Покрасить
+        бампер."},{"role":"user","content":"Заявка на покраску бампера оформлена под
+        номером *980190963*.\n\n*Важно:* В заявке отсутствуют важные данные: • Год
+        выпуска автомобиля • Класс автомобиля • Пробег • Конкретный бампер (передний/задний)
+        • Расчет стоимости\n\nАдминистратор свяжется с вами по телефону +7-916-111-12-12
+        для уточнения этих деталей перед выполнением работ."},{"role":"assistant","content":"Хорошо."},{"role":"user","content":"Отлично!
+        Заявка оформлена. Администратор свяжется с вами по указанному телефону +7-916-111-12-12
+        для уточнения всех деталей по покраске бампера вашей Lada Vesta.\n\nЕсли у
+        вас появятся дополнительные вопросы или потребуется что-то уточнить, обращайтесь!"}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:46 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - fb38a13c1a7279af830b08c00dfea528
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 a1451748ba8b18ad8f43ddcdf2b8ace4.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P5
+      X-Amz-Cf-Id:
+      - 0b7gxzyDJmwb5opyqJl6cDHEKSpxFTqkI9uMtz-NLh67ma3OeK6MUQ==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6IjI4ZmM3NTBmLTM3ZWUtNGE0OS1hNzRkLTA4MTUyOWE5OGZlYSIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzODYsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0KHQv9Cw0YHQuNCx0L4uIn0sImxvZ3Byb2JzIjpudWxsLCJmaW5pc2hfcmVhc29uIjoic3RvcCJ9XSwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6MTE2NSwiY29tcGxldGlvbl90b2tlbnMiOjUsInRvdGFsX3Rva2VucyI6MTE3MCwicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjEwMjR9LCJwcm9tcHRfY2FjaGVfaGl0X3Rva2VucyI6MTAyNCwicHJvbXB0X2NhY2hlX21pc3NfdG9rZW5zIjoxNDF9LCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJmcF9lYWFiOGQxMTRiX3Byb2QwODIwX2ZwOF9rdmNhY2hlIn0=
+  recorded_at: Sun, 21 Dec 2025 12:49:36 GMT
+- request:
+    method: post
+    uri: https://api.deepseek.com/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"deepseek-chat","messages":[{"role":"user","content":"Запиши
+        меня на покраску"},{"role":"assistant","content":"Для оформления заявки на
+        покраску мне нужно собрать необходимую информацию. \n\nПожалуйста, уточните:\n1.
+        Ваше полное имя\n2. Номер телефона для связи\n3. Марку и модель автомобиля\n4.
+        Год выпуска автомобиля\n5. Какой класс автомобиля (седан, хэтчбек, внедорожник
+        и т.д.)\n6. Пробег автомобиля\n7. Какие именно детали нужно покрасить\n8.
+        Предварительный расчет стоимости (если он уже был сделан)\n\nТакже, если у
+        вас есть какие-то особые пожелания или детали по услуге, пожалуйста, сообщите
+        их."},{"role":"user","content":"Серж. +7-916-111-12-12. Lada Vesta. Покрасить
+        бампер."},{"role":"assistant","content":"Спасибо за информацию, Серж! У меня
+        есть ваше имя и телефон, а также данные об автомобиле и услуге.\n\nДля полного
+        оформления заявки мне нужно еще несколько деталей:\n\n1. **Год выпуска Lada
+        Vesta**\n2. **Класс автомобиля** (седан, хэтчбек, универсал и т.д.)\n3. **Пробег
+        автомобиля**\n4. **Предварительный расчет стоимости** покраски бампера (если
+        он уже был сделан)\n\nТакже уточните, пожалуйста:\n- Какой именно бампер нужно
+        покрасить (передний или задний)?\n- Есть ли какие-то особые пожелания по цвету
+        или типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"user","content":"Покрасить
+        бампер."},{"role":"assistant","content":"Я вижу, что вы хотите покрасить бампер
+        для Lada Vesta. Для оформления заявки мне не хватает нескольких важных деталей:\n\n**Необходимая
+        информация:**\n1. Год выпуска вашей Lada Vesta\n2. Класс автомобиля (седан,
+        хэтчбек, универсал)\n3. Пробег автомобиля\n4. Какой именно бампер нужно покрасить
+        (передний или задний)?\n\n**Также уточните:**\n- Был ли вам сделан предварительный
+        расчет стоимости покраски бампера?\n- Есть ли особые пожелания по цвету или
+        типу краски?\n\nКак только вы предоставите эту информацию, я смогу оформить
+        заявку на покраску бампера для вашей Lada Vesta."},{"role":"user","content":"Покрасить
+        бампер."},{"role":"assistant","content":"Я понимаю, что вы хотите покрасить
+        бампер для Lada Vesta, но для оформления заявки мне необходима дополнительная
+        информация.\n\n**Минимально необходимые данные для заявки:**\n1. Год выпуска
+        Lada Vesta\n2. Класс автомобиля (седан, хэтчбек, универсал)\n3. Пробег автомобиля\n4.
+        Какой именно бампер (передний или задний)?\n\n**Также важно:**\n- Был ли вам
+        сделан расчет стоимости?\n- Есть ли особые пожелания по покраске?\n\nБез этой
+        информации я не могу оформить заявку. Пожалуйста, предоставьте хотя бы год
+        выпуска автомобиля и пробег, чтобы я мог начать оформление."},{"role":"user","content":"Покрасить
+        бампер."},{"role":"assistant","content":"Я вижу, что вы настойчиво хотите
+        покрасить бампер, но для оформления заявки мне нужны обязательные данные.
+        \n\nПопробую оформить заявку с имеющейся информацией, но отмечу недостающие
+        данные:","tool_calls":[{"id":"call_00_zlpJ0N4ybHOHL1kXEKerLgiu","type":"function","function":{"name":"booking","arguments":"{\"details\":\"#
+        Заявка на покраску бампера\\n\\n## Данные клиента\\n- **Имя:** Серж\\n- **Телефон:**
+        +7-916-111-12-12\\n\\n## Автомобиль\\n- **Марка:** Lada\\n- **Модель:** Vesta\\n-
+        **Год выпуска:** не указан\\n- **Класс:** не указан\\n- **Пробег:** не указан\\n\\n##
+        Услуга\\n- **Требуемые работы:** Покраска бампера\\n- **Конкретный бампер:**
+        не указан (передний/задний)\\n- **Особые пожелания:** не указаны\\n\\n## Стоимость\\n-
+        **Расчет стоимости:** не предоставлен\\n\\n## Контекст диалога\\nКлиент несколько
+        раз повторял \\\"Покрасить бампер\\\", но не отвечал на уточняющие вопросы
+        о:\\n1. Годе выпуска автомобиля\\n2. Классе автомобиля\\n3. Пробеге\\n4. Конкретном
+        бампере (передний/задний)\\n5. Расчете стоимости\\n\\n## Последние сообщения
+        пользователя\\n- \\\"Покрасить бампер.\\\" (повторено несколько раз)\\n\\n##
+        Важно\\n**Необходимо связаться с клиентом для уточнения недостающих данных
+        перед выполнением работ.**\\n\\n## Номер заявки\\n[будет присвоен системой]\",\"dialog_context\":\"Клиент
+        Серж, телефон +7-916-111-12-12, автомобиль Lada Vesta. Клиент хочет покрасить
+        бампер, но не предоставил полную информацию. Несколько раз запрашивал покраску
+        бампера, но не отвечал на уточняющие вопросы о годе выпуска, классе автомобиля,
+        пробеге, конкретном бампере (передний/задний) и расчете стоимости.\"}"}}]},{"role":"tool","content":"Заявка
+        под номером 980190963 отправлена администратору\n\nℹ️ **Дополнительно**: Эта
+        заявка создана в тестовом режиме и не будет обработана реальным администратором.\n","tool_call_id":"call_00_zlpJ0N4ybHOHL1kXEKerLgiu"},{"role":"assistant","content":"Заявка
+        на покраску бампера оформлена под номером **980190963**.\n\n**Важно:** В заявке
+        отсутствуют важные данные:\n- Год выпуска автомобиля\n- Класс автомобиля\n-
+        Пробег\n- Конкретный бампер (передний/задний)\n- Расчет стоимости\n\nАдминистратор
+        свяжется с вами по телефону +7-916-111-12-12 для уточнения этих деталей перед
+        выполнением работ."},{"role":"system","content":"Test system prompt"},{"role":"user","content":"Хорошо."},{"role":"assistant","content":"Отлично!
+        Заявка оформлена. Администратор свяжется с вами по указанному телефону +7-916-111-12-12
+        для уточнения всех деталей по покраске бампера вашей Lada Vesta.\n\nЕсли у
+        вас появятся дополнительные вопросы или потребуется что-то уточнить, обращайтесь!"},{"role":"system","content":"Test
+        system prompt"},{"role":"user","content":"Спасибо."}],"stream":false,"temperature":0.5,"tools":[{"type":"function","function":{"name":"booking","description":"Определяет
+        является ли сообщение клиента заявкой на услугу и отправляет ее в административный
+        чат","parameters":{"type":"object","properties":{"customer_name":{"type":"string","description":"Полное
+        имя клиента"},"customer_phone":{"type":"string","description":"Телефон клиента
+        в формате +7(XXX)XXX-XX-XX"},"car_brand":{"type":"string","description":"Марка
+        автомобиля"},"car_model":{"type":"string","description":"Модель автомобиля"},"car_year":{"type":"string","description":"Год
+        выпуска автомобиля"},"car_class":{"type":"string","description":"Класс автомаобиля"},"car_mileage":{"type":"string","description":"Пробег
+        автомобиля"},"required_services":{"type":"string","description":"Перечень
+        необходимых работ"},"cost_calculation":{"type":"string","description":"Последний
+        названный пользователю расчет стоимости услуг (общая стоимость услуг)"},"dialog_context":{"type":"string","description":"Контекст
+        диалога для понимания ситуации (включает данные о клиенте, дате и времени
+        записи и об услуге которые пользователь запрашивал и получал от ассистента)"},"details":{"type":"string","description":"Детали
+        записи в формате Markdown включающие все необходимые данные о пользователе,
+        услуге, стоимости, автомобиле, последние сообщения пользователя и суммаризованную
+        переписку, номер заявки"}},"required":["dialog_context","details"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 21 Dec 2025 12:49:48 GMT
+      Server:
+      - elb
+      Vary:
+      - origin, access-control-request-method, access-control-request-headers
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Ds-Trace-Id:
+      - 5da8e0765a073b0816c77627bd10db5f
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 7a9b9c43feb0aea0b869406fb217b842.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - HEL51-P1
+      X-Amz-Cf-Id:
+      - ytl4Asgmsv5TnWgRwAHrEh6vIxvDk_4raWEERKNCIHmFC8CLJRHo4w==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6ImI0OGNkNzhlLTc3YzAtNGY4NC04NTQ0LWFhODBhYzNhMzMzNSIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NjYzMjEzODgsIm1vZGVsIjoiZGVlcHNlZWstY2hhdCIsImNob2ljZXMiOlt7ImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoi0J/QvtC20LDQu9GD0LnRgdGC0LAhINCg0LDQtCDQsdGL0Lsg0L/QvtC80L7Rh9GMLiDQltC10LvQsNGOINGD0LTQsNGH0Lgg0YEg0L/QvtC60YDQsNGB0LrQvtC5INCx0LDQvNC/0LXRgNCwINCy0LDRiNC10LkgTGFkYSBWZXN0YSEgXG5cbtCV0YHQu9C4INCyINCx0YPQtNGD0YnQtdC8INC/0L7QvdCw0LTQvtCx0LjRgtGB0Y8g0L/QvtC80L7RidGMINGBINC00YDRg9Cz0LjQvNC4INGD0YHQu9GD0LPQsNC80LgsINC+0LHRgNCw0YnQsNC50YLQtdGB0YwuINCS0YHQtdCz0L4g0LTQvtCx0YDQvtCz0L4hIn0sImxvZ3Byb2JzIjpudWxsLCJmaW5pc2hfcmVhc29uIjoic3RvcCJ9XSwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6MjI2NywiY29tcGxldGlvbl90b2tlbnMiOjU1LCJ0b3RhbF90b2tlbnMiOjIzMjIsInByb21wdF90b2tlbnNfZGV0YWlscyI6eyJjYWNoZWRfdG9rZW5zIjoyMjQwfSwicHJvbXB0X2NhY2hlX2hpdF90b2tlbnMiOjIyNDAsInByb21wdF9jYWNoZV9taXNzX3Rva2VucyI6Mjd9LCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJmcF9lYWFiOGQxMTRiX3Byb2QwODIwX2ZwOF9rdmNhY2hlIn0=
+  recorded_at: Sun, 21 Dec 2025 12:49:40 GMT
+recorded_with: VCR 6.3.1
