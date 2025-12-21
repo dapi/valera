@@ -21,13 +21,16 @@
 npm install
 npx playwright install chromium
 
-# Генерация скриншота
+# Запуск сервера (в отдельном терминале)
+HOST=lvh.me bin/rails server
+
+# Генерация скриншотов (7 дней + 30 дней)
 bin/rails screenshots:dashboard
 ```
 
-Скриншот сохраняется в `docs/screenshots/dashboard-overview.png`.
+Скриншоты сохраняются в `docs/screenshots/`.
 
-**Требования:** Node.js, Playwright, seed данные (`bin/rails db:seed`).
+**Требования:** Node.js, Playwright, seed данные (`bin/rails db:seed`), запущенный сервер.
 
 ## 📋 Ссылки
 
