@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_21_065739) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_21_145610) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -108,6 +108,19 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_21_065739) do
     t.index ["telegram_user_id"], name: "index_clients_on_telegram_user_id"
     t.index ["tenant_id", "telegram_user_id"], name: "index_clients_on_tenant_id_and_telegram_user_id", unique: true
     t.index ["tenant_id"], name: "index_clients_on_tenant_id"
+  end
+
+  create_table "leads", force: :cascade do |t|
+    t.string "city"
+    t.string "company_name"
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.string "phone"
+    t.string "source"
+    t.datetime "updated_at", null: false
+    t.string "utm_campaign"
+    t.string "utm_medium"
+    t.string "utm_source"
   end
 
   create_table "messages", force: :cascade do |t|
