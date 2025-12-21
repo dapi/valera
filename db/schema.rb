@@ -110,6 +110,19 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_21_151716) do
     t.index ["tenant_id"], name: "index_clients_on_tenant_id"
   end
 
+  create_table "leads", force: :cascade do |t|
+    t.string "city"
+    t.string "company_name"
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.string "phone"
+    t.string "source"
+    t.datetime "updated_at", null: false
+    t.string "utm_campaign"
+    t.string "utm_medium"
+    t.string "utm_source"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.bigint "chat_id", null: false
     t.text "content"
