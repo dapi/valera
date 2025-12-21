@@ -12,8 +12,7 @@ class LandingControllerTest < ActionDispatch::IntegrationTest
       post leads_url, params: {
         lead: {
           name: 'Иван Петров',
-          phone: '+7 999 123 45 67',
-          company_name: 'АвтоМастер'
+          phone: '+7 999 123 45 67'
         }
       }
     end
@@ -29,8 +28,7 @@ class LandingControllerTest < ActionDispatch::IntegrationTest
       post leads_url, params: {
         lead: {
           name: '',
-          phone: '',
-          company_name: ''
+          phone: ''
         }
       }
     end
@@ -42,8 +40,7 @@ class LandingControllerTest < ActionDispatch::IntegrationTest
     post leads_url, params: {
       lead: {
         name: 'Иван Петров',
-        phone: '+7 999 123 45 67',
-        company_name: 'АвтоМастер'
+        phone: '+7 999 123 45 67'
       },
       utm_source: 'yandex',
       utm_medium: 'cpc',
