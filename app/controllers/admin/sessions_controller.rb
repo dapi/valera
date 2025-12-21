@@ -13,6 +13,7 @@ module Admin
       admin_user = AdminUser.find_by(email: params[:email])
 
       if admin_user&.authenticate(params[:password])
+        reset_session # Prevent session fixation attacks
         session[:admin_user_id] = admin_user.id
         redirect_to admin_root_path, notice: 'Logged in successfully'
       else
