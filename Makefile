@@ -37,7 +37,7 @@ push-release:
 test:
 	./bin/rails db:test:prepare test:system
 	./bin/rake test
-	SYSTEM_PROMPT_PATH=data/system-prompt-v2-optimized.md ./bin/rake test
+	SYSTEM_PROMPT_PATH=data/system-prompt-v2.md ./bin/rake test
 
 up:
 	./bin/dev
