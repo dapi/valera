@@ -12,21 +12,24 @@ class ChatIdNotificationJobTest < ActiveJob::TestCase
   end
 
   test 'sends message with chat_id when chat_id is provided' do
-    chat_id = -1001234567890
+    chat = chats(:one)
+    mock_bot_client = mock('bot_client')
 
-    # Мокаем Telegram.bot.send_message
-    Telegram.bot.expects(:send_message).with(
-      chat_id: chat_id,
-      text: I18n.t('chat_id_notification.message', chat_id: chat_id),
+    chat.tenant.stubs(:bot_client).returns(mock_bot_client)
+    Chat.stubs(:find).with(chat.id).returns(chat)
+
+    mock_bot_client.expects(:send_message).with(
+      chat_id: chat.id,
+      text: I18n.t('chat_id_notification.message', chat_id: chat.id),
       parse_mode: 'Markdown'
     ).once
 
-    ChatIdNotificationJob.perform_now(chat_id)
+    ChatIdNotificationJob.perform_now(chat.id)
   end
 
   test 'does not send message when chat_id is blank' do
-    # Мокаем чтобы убедиться что метод не вызывается
-    Telegram.bot.expects(:send_message).never
+    # При пустом chat_id не должно быть вызовов Chat.find
+    Chat.expects(:find).never
 
     # Тестируем с nil
     ChatIdNotificationJob.perform_now(nil)
@@ -38,60 +41,60 @@ class ChatIdNotificationJobTest < ActiveJob::TestCase
     ChatIdNotificationJob.perform_now('   ')
   end
 
-  test 'handles positive chat_id' do
-    chat_id = 12345
+  test 'handles chat from fixture' do
+    chat = chats(:two)
+    mock_bot_client = mock('bot_client')
 
-    Telegram.bot.expects(:send_message).with(
-      chat_id: chat_id,
-      text: I18n.t('chat_id_notification.message', chat_id: chat_id),
+    chat.tenant.stubs(:bot_client).returns(mock_bot_client)
+    Chat.stubs(:find).with(chat.id).returns(chat)
+
+    mock_bot_client.expects(:send_message).with(
+      chat_id: chat.id,
+      text: I18n.t('chat_id_notification.message', chat_id: chat.id),
       parse_mode: 'Markdown'
     ).once
 
-    ChatIdNotificationJob.perform_now(chat_id)
-  end
-
-  test 'handles negative chat_id (supergroup)' do
-    chat_id = -1009876543210
-
-    Telegram.bot.expects(:send_message).with(
-      chat_id: chat_id,
-      text: I18n.t('chat_id_notification.message', chat_id: chat_id),
-      parse_mode: 'Markdown'
-    ).once
-
-    ChatIdNotificationJob.perform_now(chat_id)
+    ChatIdNotificationJob.perform_now(chat.id)
   end
 
   test 'logs error when send_message fails' do
-    chat_id = -1001234567890
+    chat = chats(:one)
+    mock_bot_client = mock('bot_client')
     error_message = 'Telegram API error'
 
+    chat.tenant.stubs(:bot_client).returns(mock_bot_client)
+    Chat.stubs(:find).with(chat.id).returns(chat)
+
     # Мокаем чтобы метод вызывал ошибку
-    Telegram.bot.expects(:send_message).raises(StandardError.new(error_message))
+    mock_bot_client.expects(:send_message).raises(StandardError.new(error_message))
 
     # Мокаем логирование ошибки
     ChatIdNotificationJob.any_instance.expects(:log_error).with(
       instance_of(StandardError),
       job: 'ChatIdNotificationJob',
-      chat_id: chat_id
+      chat_id: chat.id
     ).once
 
     # Проверяем что ошибка пробрасывается дальше (для retry логики)
     assert_raises StandardError do
-      ChatIdNotificationJob.perform_now(chat_id)
+      ChatIdNotificationJob.perform_now(chat.id)
     end
   end
 
   test 'uses correct message format with chat_id' do
-    chat_id = -1001234567890
+    chat = chats(:one)
+    mock_bot_client = mock('bot_client')
 
-    Telegram.bot.expects(:send_message).with do |options|
-      expected_text = I18n.t('chat_id_notification.message', chat_id: chat_id)
+    chat.tenant.stubs(:bot_client).returns(mock_bot_client)
+    Chat.stubs(:find).with(chat.id).returns(chat)
+
+    mock_bot_client.expects(:send_message).with do |options|
+      expected_text = I18n.t('chat_id_notification.message', chat_id: chat.id)
       options[:text] == expected_text &&
       options[:parse_mode] == 'Markdown' &&
-      options[:chat_id] == chat_id
+      options[:chat_id] == chat.id
     end.once
 
-    ChatIdNotificationJob.perform_now(chat_id)
+    ChatIdNotificationJob.perform_now(chat.id)
   end
 end
