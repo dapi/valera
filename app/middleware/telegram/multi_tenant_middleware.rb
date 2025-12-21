@@ -39,7 +39,7 @@ module Telegram
     # @return [Array] Rack response [status, headers, body]
     def call(env)
       request = ActionDispatch::Request.new(env)
-      tenant_key = extract_tenant_key(env)
+      tenant_key = extract_tenant_key(request)
       tenant = Tenant.find_by!(key: tenant_key)
 
       verify_webhook_secret!(request, tenant)
@@ -66,12 +66,12 @@ module Telegram
 
     private
 
-    # Извлекает tenant_key из URL path parameters
+    # Извлекает tenant_key из subdomain
     #
-    # @param env [Hash] Rack environment
+    # @param request [ActionDispatch::Request]
     # @return [String] ключ тенанта
-    def extract_tenant_key(env)
-      env['action_dispatch.request.path_parameters'][:tenant_key]
+    def extract_tenant_key(request)
+      request.subdomain
     end
 
     # Верифицирует X-Telegram-Bot-Api-Secret-Token заголовок

@@ -16,7 +16,8 @@ module TelegramSupport
     private
 
     def post_message(text)
-      post tenant_telegram_webhook_path(tenant_key: @test_tenant.key),
+      host! "#{@test_tenant.key}.lvh.me"
+      post '/telegram/webhook',
            params: message(text).to_json,
            headers: {
              'X-Telegram-Bot-Api-Secret-Token' => @test_tenant.webhook_secret,

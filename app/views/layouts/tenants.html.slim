@@ -1,0 +1,49 @@
+doctype html
+html
+  head
+    title
+      = "#{Current.tenant&.name} | Valera"
+    meta name="viewport" content="width=device-width,initial-scale=1"
+    = csrf_meta_tags
+    = csp_meta_tag
+
+    = stylesheet_link_tag :app, "data-turbo-track": "reload"
+    = javascript_importmap_tags
+
+  body.bg-gray-100.min-h-screen
+    / Sidebar
+    aside.fixed.inset-y-0.left-0.w-64.bg-white.shadow-lg.hidden.lg:block
+      .p-6
+        h1.text-xl.font-bold.text-gray-800 = Current.tenant&.name
+        p.text-sm.text-gray-500 Панель управления
+
+      nav.mt-6
+        = link_to tenant_root_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_root_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
+          span.ml-3 Обзор
+
+        = link_to tenant_clients_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_clients_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
+          span.ml-3 Клиенты
+
+        = link_to tenant_bookings_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_bookings_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
+          span.ml-3 Заявки
+
+        = link_to edit_tenant_settings_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(edit_tenant_settings_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
+          span.ml-3 Настройки
+
+      .absolute.bottom-0.left-0.right-0.p-6.border-t
+        .flex.items-center.justify-between
+          .text-sm.text-gray-600 = current_user&.email
+          = button_to tenant_session_path, method: :delete, class: "text-sm text-red-600 hover:text-red-800"
+            | Выход
+
+    / Main content
+    main.lg:ml-64.p-8
+      - if flash[:notice]
+        .mb-4.p-4.bg-green-100.border.border-green-400.text-green-700.rounded
+          = flash[:notice]
+
+      - if flash[:alert]
+        .mb-4.p-4.bg-red-100.border.border-red-400.text-red-700.rounded
+          = flash[:alert]
+
+      = yield
