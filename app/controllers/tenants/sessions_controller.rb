@@ -6,7 +6,7 @@ module Tenants
   #
   class SessionsController < ApplicationController
     skip_before_action :authenticate_owner!
-    layout 'tenants_auth'
+    layout 'tenants/auth'
 
     # GET /session/new
     def new

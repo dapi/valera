@@ -7,7 +7,7 @@ module Tenants
   class PasswordsController < ApplicationController
     skip_before_action :authenticate_owner!
     before_action :require_pending_user!
-    layout 'tenants_auth'
+    layout 'tenants/auth'
 
     # GET /password/new
     def new
