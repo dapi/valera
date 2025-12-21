@@ -1,0 +1,12 @@
+{
+  "name": "valera",
+  "version": "1.0.0",
+  "description": "Node.js dependencies for Valera project (screenshots, etc.)",
+  "private": true,
+  "scripts": {
+    "screenshots:dashboard": "bin/rails screenshots:dashboard"
+  },
+  "devDependencies": {
+    "playwright": "^1.57.0"
+  }
+}
