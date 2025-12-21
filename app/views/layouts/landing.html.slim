@@ -1,0 +1,18 @@
+doctype html
+html lang="ru"
+  head
+    title Valera - AI-ассистент для автосервиса
+    meta name="viewport" content="width=device-width,initial-scale=1"
+    meta name="description" content="AI-ассистент для вашего автосервиса. Отвечает клиентам 24/7, записывает на осмотр, консультирует по ценам."
+    meta property="og:title" content="Valera - AI-ассистент для автосервиса"
+    meta property="og:description" content="Отвечает клиентам 24/7, записывает на осмотр, консультирует по ценам. Вы получаете готовые заявки."
+    meta property="og:type" content="website"
+    = csrf_meta_tags
+    = csp_meta_tag
+
+    link rel="icon" href="/icon.png" type="image/png"
+    = stylesheet_link_tag :app, "data-turbo-track": "reload"
+    = javascript_importmap_tags
+
+  body.bg-white.text-gray-900.antialiased
+    = yield
