@@ -57,3 +57,5 @@ dip.override.yml
 # Node.js (for Playwright screenshots)
 /node_modules/
 /package-lock.json
+
+.mcp.json
