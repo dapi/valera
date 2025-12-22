@@ -217,8 +217,8 @@ Account (Автосервис А)
 
 **4. Growth:**
 - Добавление менеджеров в команду
-- Upgrade на Professional (фото-анализ)
-- Upgrade на Enterprise (страховые)
+- Upgrade на Professional (расширенные функции)
+- Upgrade на Enterprise (страховые + custom)
 
 **5. Advocacy:**
 - Положительные отзывы

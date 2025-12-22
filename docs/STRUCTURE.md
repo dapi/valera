@@ -74,7 +74,6 @@ docs/ (34 директории, 123 файла)
 │   │   ├── 🤖 US-001-telegram-auto-greeting.md
 │   │   ├── 💬 US-002a-telegram-basic-consultation.md
 │   │   ├── 📅 US-002b-telegram-recording-booking.md
-│   │   ├── 📸 US-003-telegram-photo-damage-assessment.md
 │   │   ├── 🛡️ US-004-telegram-insurance-automation.md
 │   │   ├── ✅ US-005-telegram-booking-confirmation.md
 │   │   ├── 🔍 US-006-telegram-chat-id-detection.md
@@ -86,7 +85,6 @@ docs/ (34 директории, 123 файла)
 │   │   ├── 📊 TSD-001-analytics-system.md
 │   │   ├── 💬 TSD-002a-telegram-basic-consultation.md
 │   │   ├── 📅 TSD-002b-telegram-recording-booking.md
-│   │   ├── 📸 TSD-003-telegram-photo-damage-assessment.md
 │   │   ├── 🛡️ TSD-004-telegram-insurance-automation.md
 │   │   ├── 🔍 TSD-006-telegram-chat-id-detection.md
 │   │   ├── 🔧 TSD-007-telegram-services-discovery.md
@@ -206,7 +204,6 @@ docs/ (34 директории, 123 файла)
 │   │   ├── ❓ 03-general-inquiries.md
 │   │   ├── 😤 04-complaint-resolution.md
 │   │   ├── 💰 05-sales-objection-handling.md
-│   │   ├── 📸 06-photo-based-assessment.md
 │   │   ├── 📅 07-ideal-booking-flow.md
 │   │   └── 🔧 DIALOG_STARTED_v2_IMPLEMENTATION_PLAN.md
 │   │
