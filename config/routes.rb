@@ -3,7 +3,7 @@
 Rails.application.routes.draw do
   # Platform Bot webhook (единый бот для авторизации и системных уведомлений платформы)
   # Доступен на любом домене без subdomain constraint
-  telegram_webhook Telegram::PlatformBotController, :default, as: :platform_bot_webhook
+  telegram_webhook Telegram::PlatformBotController, :default
 
   # Admin panel with subdomain constraint
   constraints subdomain: 'admin' do
