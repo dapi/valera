@@ -38,6 +38,7 @@ default: &default
   host: 'localhost'
   port: 3000
   protocol: 'http'
+  # public_port: определяется автоматически из protocol (https=443, http=80)
 
   # Telegram Auth settings
   telegram_auth_expiration: 300
@@ -47,8 +48,8 @@ development:
   llm_provider: 'openai'
   llm_model: 'gpt-4o-mini'
   host: '3010.brandymint.ru'
-  port: 443
   protocol: 'https'
+  # public_port: не указан, т.к. https = 443 по умолчанию
   allowed_hosts:
     - '.lvh.me'
     - 'lvh.me'

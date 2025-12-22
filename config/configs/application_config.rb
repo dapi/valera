@@ -69,6 +69,7 @@ class ApplicationConfig < Anyway::Config
     :host,
     :port,
     :protocol,
+    :public_port, # Публичный порт для формирования URL (по умолчанию: 443 для https, 80 для http)
 
     # Admin host for URL generation (default: admin.#{host})
     :admin_host,
@@ -115,6 +116,7 @@ class ApplicationConfig < Anyway::Config
     # Host and protocol
     host: :string,
     protocol: :string,
+    public_port: :integer,
 
     # Floats
     llm_temperature: :float,
@@ -184,12 +186,20 @@ class ApplicationConfig < Anyway::Config
     platform_bot_token.to_s.split(':').first.to_i
   end
 
+  # Возвращает публичный порт для URL (по умолчанию: 443 для https, 80 для http)
+  def public_port_with_default
+    return public_port if public_port.present?
+
+    protocol == 'https' ? 443 : 80
+  end
+
   # Опции для генерации URL в routes и mailers
   def default_url_options
     options = { host:, protocol: }
+    effective_port = public_port_with_default
     # Добавляем port только если он нестандартный
-    unless (port.to_s == '80' && protocol == 'http') || (port.to_s == '443' && protocol == 'https')
-      options[:port] = port
+    unless (effective_port == 80 && protocol == 'http') || (effective_port == 443 && protocol == 'https')
+      options[:port] = effective_port
     end
     options
   end
