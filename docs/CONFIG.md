@@ -346,11 +346,176 @@ ApplicationConfig.tld_length          # для subdomain routing
 
 ---
 
+## Gem-Specific Environment Variables
+
+Дополнительные переменные окружения, которые читаются напрямую используемыми gems.
+
+### PostgreSQL (pg gem)
+
+Libpq environment variables — используются если не указаны явно в `database.yml`:
+
+| Переменная | Описание |
+|------------|----------|
+| `PGHOST` | Хост PostgreSQL |
+| `PGPORT` | Порт (default: 5432) |
+| `PGDATABASE` | Имя базы данных |
+| `PGUSER` | Имя пользователя |
+| `PGPASSWORD` | Пароль (не рекомендуется, используйте `.pgpass`) |
+| `PGSSLMODE` | Режим SSL: `disable`, `require`, `verify-ca`, `verify-full` |
+
+### Redis (redis gem)
+
+| Переменная | Default | Описание |
+|------------|---------|----------|
+| `REDIS_URL` | — | URL подключения (автоматически используется gem) |
+| `REDIS_TIMEOUT` | `1` | Таймаут подключения в секундах |
+| `REDIS_RECONNECT_ATTEMPTS` | `3` | Количество попыток переподключения |
+
+### Thruster (HTTP proxy)
+
+Все переменные можно использовать с префиксом `THRUSTER_`:
+
+| Переменная | Default | Описание |
+|------------|---------|----------|
+| `TLS_DOMAIN` | — | Домены для TLS (comma-separated) |
+| `HTTP_PORT` | `80` | Порт для HTTP |
+| `HTTPS_PORT` | `443` | Порт для HTTPS |
+| `TARGET_PORT` | — | Порт Puma (куда проксировать) |
+| `ACME_DIRECTORY` | Let's Encrypt | URL ACME для сертификатов |
+| `STORAGE_PATH` | — | Путь для хранения сертификатов |
+| `BAD_GATEWAY_PAGE` | — | HTML страница для 502 ошибки |
+| `IDLE_TIMEOUT` | — | Таймаут idle соединения |
+| `READ_TIMEOUT` | — | Таймаут чтения запроса |
+| `WRITE_TIMEOUT` | — | Таймаут записи ответа |
+
+### Bugsnag (расширенные)
+
+| Переменная | Описание |
+|------------|----------|
+| `BUGSNAG_API_KEY` | API ключ (основной) |
+| `BUGSNAG_RELEASE_STAGE` | Стадия релиза (`production`, `staging`) |
+| `BUGSNAG_APP_VERSION` | Версия приложения |
+| `BUGSNAG_DISABLE_AUTOCONFIGURE` | Отключить автоконфигурацию |
+| `BUGSNAG_ENABLED_RELEASE_STAGES` | Разрешённые стадии (comma-separated) |
+
+### Solid Queue
+
+| Переменная | Default | Описание |
+|------------|---------|----------|
+| `SOLID_QUEUE_CONFIG` | `config/queue.yml` | Путь к конфигурации |
+| `SOLID_QUEUE_SKIP_RECURRING` | `false` | Пропустить recurring tasks |
+| `SOLID_QUEUE_IN_PUMA` | `false` | Запускать внутри Puma |
+| `JOB_CONCURRENCY` | `1` | Количество worker процессов |
+
+### Bootsnap
+
+| Переменная | Default | Описание |
+|------------|---------|----------|
+| `BOOTSNAP_CACHE_DIR` | `tmp/cache` | Директория кеша |
+| `BOOTSNAP_LOG` | — | Логировать cache misses в STDERR |
+| `BOOTSNAP_STATS` | — | Статистика hit rate при выходе |
+| `BOOTSNAP_IGNORE_DIRECTORIES` | `node_modules` | Игнорируемые директории |
+
+### RubyLLM (debug)
+
+| Переменная | Описание |
+|------------|----------|
+| `RUBYLLM_DEBUG` | Включить debug logging (`true`) |
+| `RUBY_LLM_DEBUG` | Альтернатива для debug tool calls |
+
+### Selenium/Capybara (testing)
+
+| Переменная | Описание |
+|------------|----------|
+| `SELENIUM_HOST` | Хост Selenium server |
+| `SELENIUM_REMOTE_HOST` | Remote Selenium host (Docker) |
+| `SELENIUM_REMOTE_PORT` | Remote Selenium port |
+| `WD_INSTALL_DIR` | Директория для webdrivers |
+| `WD_CHROME_PATH` | Путь к Chrome binary |
+| `CAPYBARA_JAVASCRIPT_DRIVER` | JS драйвер (`:chrome_headless`) |
+| `APP_HOST` | Хост приложения для тестов |
+
+### Image Processing (libvips)
+
+| Переменная | Описание |
+|------------|----------|
+| `VIPS_WARNING` | Отключить warnings |
+| `VIPS_INFO` | Включить info output |
+| `PKG_CONFIG_PATH` | Путь к pkg-config (для сборки) |
+
+### macOS Specific
+
+| Переменная | Описание |
+|------------|----------|
+| `OBJC_DISABLE_INITIALIZE_FORK_SAFETY` | `YES` — для Solid Queue и ruby-vips |
+
+### Telegram Bot
+
+| Переменная | Описание |
+|------------|----------|
+| `BOT_POLLER_MODE` | `true` — режим polling (для daemons) |
+| `TELEGRAM_BOT_POOL_SIZE` | Размер connection pool (default: 1) |
+| `CERT` | Путь к SSL сертификату для webhook |
+
+---
+
+## Complete Environment Variables Checklist
+
+### Production Deployment Checklist
+
+```bash
+# === CRITICAL (Required) ===
+LLM_PROVIDER=anthropic
+LLM_MODEL=claude-sonnet-4-20250514
+ANTHROPIC_API_KEY=sk-ant-xxx
+SECRET_KEY_BASE=xxx
+RAILS_MASTER_KEY=xxx
+
+# === Telegram ===
+AUTH_BOT_TOKEN=123456789:ABCxxx
+AUTH_BOT_USERNAME=my_bot
+
+# === Database ===
+DATABASE_URL=postgres://user:pass@host:5432/valera_production
+# или
+VALERA_DATABASE_HOST=db.example.com
+VALERA_DATABASE_PASSWORD=xxx
+
+# === Redis ===
+REDIS_URL=redis://redis:6379/0
+REDIS_CACHE_STORE_URL=redis://redis:6379/2
+
+# === Hosts ===
+HOST=app.example.com
+PORT=443
+PROTOCOL=https
+APPLICATION_HOST=app.example.com
+APPLICATION_DOMAIN=example.com
+
+# === Error Tracking ===
+BUGSNAG_API_KEY=xxx
+BUGSNAG_RELEASE_STAGE=production
+
+# === Performance ===
+WEB_CONCURRENCY=2
+RAILS_MAX_THREADS=5
+
+# === Optional ===
+RAILS_LOG_LEVEL=info
+TIMEZONE=Europe/Moscow
+ANALYTICS_ENABLED=true
+```
+
+---
+
 ## Related Documentation
 
 - [Development Guide](development/README.md)
 - [Deployment Guide](deployment/README.md)
 - [Error Handling](patterns/error-handling.md)
+- [Puma Configuration](https://github.com/puma/puma)
+- [Thruster Configuration](https://github.com/basecamp/thruster)
+- [Bugsnag Ruby Docs](https://docs.bugsnag.com/platforms/ruby/rails/configuration-options/)
 
 ---
 
