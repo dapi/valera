@@ -18,7 +18,7 @@ section.py-20.md:py-32.flex.items-center.justify-center.bg-gradient-to-br.from-b
       | Ответ за 3 секунды. Вы получаете готовые заявки.
 
     .flex.flex-col.sm:flex-row.gap-4.justify-center
-      a.inline-block.bg-white.text-blue-600.font-bold.py-4.px-8.rounded-lg.text-lg.hover:bg-blue-50.transition href="https://t.me/valera_demo_bot" target="_blank"
+      a.inline-block.bg-white.text-blue-600.font-bold.py-4.px-8.rounded-lg.text-lg.hover:bg-blue-50.transition href="https://t.me/#{ApplicationConfig.demo_bot_username}" target="_blank"
         | Попробовать демо-бота
 
       a.inline-block.border-2.border-white.text-white.font-bold.py-4.px-8.rounded-lg.text-lg.hover:bg-white.hover:text-blue-600.transition href="#form"
@@ -60,7 +60,7 @@ section.py-12.md:py-20.px-4
       | Как это работает
 
     p.text-base.md:text-xl.text-gray-600.text-center.mb-8.md:mb-12
-      | Valera — AI-бот в Telegram, который работает за вас
+      | #{ApplicationConfig.app_name} — AI-бот в Telegram, который работает за вас
 
     .grid.grid-cols-1.md:grid-cols-2.gap-8.md:gap-12.items-center
       / Left: Steps
@@ -97,7 +97,7 @@ section.py-12.md:py-20.px-4
             .w-10.h-10.bg-blue-400.rounded-full.flex.items-center.justify-center
               span.text-xl V
             div
-              .font-semibold Valera Bot
+              .font-semibold = "#{ApplicationConfig.app_name} Bot"
               .text-sm.text-blue-200 online
 
           / Chat messages
@@ -105,7 +105,7 @@ section.py-12.md:py-20.px-4
             / Bot message
             .flex.justify-start
               .bg-white.rounded-lg.px-4.py-2.shadow-sm.max-w-xs
-                p.text-sm Здравствуйте! Я Valera, AI-ассистент автосервиса. Чем могу помочь?
+                p.text-sm Здравствуйте! Я #{ApplicationConfig.app_name}, AI-ассистент автосервиса. Чем могу помочь?
 
             / User message
             .flex.justify-end
@@ -159,7 +159,7 @@ section#form.py-16.md:py-20.px-4.bg-blue-600.text-white
 
     p.mt-6.text-blue-100.text-sm.md:text-base
       | Или напишите нам напрямую:
-      a.underline.ml-1 href="https://t.me/valera_support" target="_blank" @valera_support
+      a.underline.ml-1 href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank" @#{ApplicationConfig.support_telegram}
 
 / ========================================
 / SECTION 5: Footer
@@ -167,13 +167,13 @@ section#form.py-16.md:py-20.px-4.bg-blue-600.text-white
 footer.py-8.px-4.bg-gray-900.text-gray-400
   .max-w-4xl.mx-auto.text-center
     .mb-4
-      span.text-white.font-semibold Valera
+      span.text-white.font-semibold = ApplicationConfig.app_name
       span.mx-2 —
       span AI-ассистент для автосервисов
 
     .flex.justify-center.gap-6.mb-4
-      a.hover:text-white.transition href="https://t.me/valera_support" target="_blank" Telegram
-      a.hover:text-white.transition href="mailto:support@valera.ai" Email
+      a.hover:text-white.transition href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank" Telegram
+      a.hover:text-white.transition href="mailto:#{ApplicationConfig.support_email}" Email
 
     p.text-sm
-      | &copy; #{Time.current.year} Valera. Все права защищены.
+      | &copy; #{Time.current.year} #{ApplicationConfig.app_name}. Все права защищены.

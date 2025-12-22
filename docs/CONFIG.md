@@ -93,6 +93,16 @@
 
 ---
 
+## Landing Page & Support
+
+| Переменная | Тип | Default | Описание |
+|------------|-----|---------|----------|
+| `DEMO_BOT_USERNAME` | string | `super_valera_demo_bot` | Username демо-бота для landing page |
+| `SUPPORT_TELEGRAM` | string | `super_valera_support` | Username Telegram поддержки |
+| `SUPPORT_EMAIL` | string | `danil@brandymint.ru` | Email адрес поддержки |
+
+---
+
 ## URL & Host Configuration
 
 Используются для генерации URL, subdomain routing и mailers:

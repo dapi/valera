@@ -29,6 +29,11 @@ class ApplicationConfig < Anyway::Config
     # Application branding
     app_name: 'Супер Валера',
 
+    # Landing page and support
+    demo_bot_username: 'super_valera_demo_bot',
+    support_telegram: 'super_valera_support',
+    support_email: 'danil@brandymint.ru',
+
     # File paths
     system_prompt_path: './data/system-prompt.md',
     welcome_message_path: './data/welcome-message.md',
@@ -114,7 +119,12 @@ class ApplicationConfig < Anyway::Config
     # Auth Bot
     auth_bot_token: :string,
     auth_bot_username: :string,
-    telegram_auth_expiration: :integer
+    telegram_auth_expiration: :integer,
+
+    # Landing page and support
+    demo_bot_username: :string,
+    support_telegram: :string,
+    support_email: :string
   )
 
   # System prompt
