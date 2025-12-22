@@ -66,14 +66,6 @@ class LeadNotificationJob < ApplicationJob
   end
 
   def admin_lead_url(lead)
-    host = ApplicationConfig.admin_host_with_default
-    protocol = ApplicationConfig.protocol
-    port = ApplicationConfig.port
-
-    url = "#{protocol}://#{host}"
-    unless (port.to_s == '80' && protocol == 'http') || (port.to_s == '443' && protocol == 'https')
-      url += ":#{port}"
-    end
-    url + "/leads/#{lead.id}"
+    Rails.application.routes.url_helpers.admin_lead_url(lead)
   end
 end
