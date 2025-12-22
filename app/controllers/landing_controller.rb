@@ -10,9 +10,6 @@ class LandingController < ApplicationController
   def create_lead
     @lead = Lead.new(lead_params)
     @lead.source = 'landing_page'
-    @lead.utm_source = params[:utm_source]
-    @lead.utm_medium = params[:utm_medium]
-    @lead.utm_campaign = params[:utm_campaign]
 
     if @lead.save
       redirect_to root_path, notice: 'Спасибо! Мы свяжемся с вами в ближайшее время.'
@@ -24,6 +21,6 @@ class LandingController < ApplicationController
   private
 
   def lead_params
-    params.require(:lead).permit(:name, :phone, :company_name, :city)
+    params.require(:lead).permit(:name, :phone, :company_name, :city, :utm_source, :utm_medium, :utm_campaign)
   end
 end

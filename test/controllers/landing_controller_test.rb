@@ -40,11 +40,11 @@ class LandingControllerTest < ActionDispatch::IntegrationTest
     post leads_url, params: {
       lead: {
         name: 'Иван Петров',
-        phone: '+7 999 123 45 67'
-      },
-      utm_source: 'yandex',
-      utm_medium: 'cpc',
-      utm_campaign: 'landing'
+        phone: '+7 999 123 45 67',
+        utm_source: 'yandex',
+        utm_medium: 'cpc',
+        utm_campaign: 'landing'
+      }
     }
 
     lead = Lead.last

@@ -19,6 +19,9 @@ VCR.configure do |config|
       match.captures.first
     end
   end
+
+  # Ignore Selenium/Capybara requests to localhost for system tests
+  config.ignore_localhost = true
 end
 
 module ActiveSupport
