@@ -78,7 +78,7 @@ COPY --from=build /rails /rails
 RUN mkdir -p log tmp tmp/cache tmp/pids tmp/sockets && \
     groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    chown -R rails:rails db log tmp data && \
+    chown -R rails:rails app config db lib log tmp data && \
     chmod -R 755 public && \
     chmod -R 775 log tmp && \
     chmod +x bin/*
