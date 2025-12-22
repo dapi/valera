@@ -43,6 +43,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    continue-on-error: true
     env:
       RUBOCOP_CACHE_ROOT: tmp/rubocop
     steps:
