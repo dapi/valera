@@ -70,15 +70,20 @@ LABEL org.opencontainers.image.source="https://github.com/dapi/valera" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.revision="${GIT_SHA}"
 
-# Run and own only the runtime files as a non-root user for security
-RUN groupadd --system --gid 1000 rails && \
-    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
-USER 1000:1000
+# Copy built artifacts: gems and application
+COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+COPY --from=build /rails /rails
 
-# Copy built artifacts: gems, application
-# Use numeric UID:GID to avoid buildx --link --chown resolution bug
-COPY --link --chown=1000:1000 --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --link --chown=1000:1000 --from=build /rails /rails
+# Create necessary runtime directories and set permissions
+RUN mkdir -p log tmp tmp/cache tmp/pids tmp/sockets && \
+    groupadd --system --gid 1000 rails && \
+    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
+    chown -R rails:rails db log tmp data && \
+    chmod -R 755 public && \
+    chmod -R 775 log tmp && \
+    chmod +x bin/*
+
+USER 1000:1000
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
