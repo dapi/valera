@@ -36,6 +36,9 @@ Rails.application.routes.draw do
       resource :session, only: %i[new create destroy]
       resource :password, only: %i[new create]
 
+      # Cross-domain auth token endpoint
+      get 'auth/token', to: 'token_auth#show', as: :auth_token
+
       # Telegram auth routes
       scope :auth, as: :auth do
         get 'telegram/login', to: 'telegram_auth#login', as: :telegram_login
@@ -57,6 +60,20 @@ Rails.application.routes.draw do
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+
+  # Universal auth on main domain (no subdomain)
+  scope :login, controller: :auth do
+    get '/', action: :new, as: :login
+    post '/', action: :create
+    delete '/', action: :destroy, as: :logout
+
+    get 'select', action: :select, as: :select_tenant
+    post 'select', action: :switch_tenant
+
+    # Telegram auth via Platform Bot
+    get 'telegram', action: :telegram_login, as: :login_telegram
+    get 'telegram/callback', action: :telegram_callback, as: :login_telegram_callback
+  end
 
   # Landing page (main domain without subdomain)
   root 'landing#show'
