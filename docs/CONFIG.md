@@ -1,6 +1,6 @@
 # Configuration Guide
 
-**Обновлено:** 2025-12-19
+**Обновлено:** 2025-12-22
 
 Руководство по настройке переменных окружения для приложения Valera.
 
@@ -12,17 +12,34 @@
 
 **Преобразование имён:** `snake_case` атрибуты → `SCREAMING_SNAKE_CASE` переменные окружения.
 
+**Порядок загрузки (последующие переопределяют предыдущие):**
+1. **Defaults** — значения по умолчанию в `attr_config`
+2. **YAML files** — `config/application.yml`
+3. **Environment variables** — переменные окружения
+
 ---
 
 ## Required Variables
 
-Эти переменные **обязательны** для запуска приложения:
+Эти переменные **обязательны** для запуска приложения (определены через `required` в ApplicationConfig):
 
 | Переменная | Тип | Описание |
 |------------|-----|----------|
-| `BOT_TOKEN` | string | Telegram Bot API token (получить у @BotFather) |
 | `LLM_PROVIDER` | string | Провайдер LLM: `openai`, `anthropic`, `deepseek`, `gemini`, `mistral`, `openrouter`, `perplexity` |
 | `LLM_MODEL` | string | Модель LLM (например: `gpt-4o`, `claude-sonnet-4-20250514`, `deepseek-chat`) |
+
+---
+
+## Telegram Auth Bot
+
+Единый бот для авторизации и уведомлений владельцев (tenant-боты создаются динамически):
+
+| Переменная | Тип | Default | Описание |
+|------------|-----|---------|----------|
+| `AUTH_BOT_TOKEN` | string | — | Telegram Bot API token для auth-бота |
+| `AUTH_BOT_USERNAME` | string | — | Username бота (без @) |
+| `TELEGRAM_AUTH_EXPIRATION` | integer | `300` | TTL токенов авторизации в секундах (5 минут) |
+| `WEBHOOK_PORT` | integer | — | Порт для webhook сервера (если используется) |
 
 ---
 
@@ -42,10 +59,10 @@
 
 ### Custom API Endpoints
 
-| Переменная | Тип | Описание |
-|------------|-----|----------|
-| `OPENAI_API_BASE` | string | Custom base URL для OpenAI-совместимых API |
-| `ANTHROPIC_BASE_URL` | string | Custom base URL для Anthropic API (default: `https://api.anthropic.com`) |
+| Переменная | Тип | Default | Описание |
+|------------|-----|---------|----------|
+| `OPENAI_API_BASE` | string | — | Custom base URL для OpenAI-совместимых API |
+| `ANTHROPIC_BASE_URL` | string | `https://api.anthropic.com` | Custom base URL для Anthropic API |
 
 ### Google Cloud (VertexAI)
 
@@ -53,16 +70,6 @@
 |------------|-----|----------|
 | `VERTEXAI_LOCATION` | string | Google Cloud region (например: `us-central1`) |
 | `VERTEXAI_PROJECT_ID` | string | Google Cloud project ID |
-
----
-
-## Telegram Configuration
-
-| Переменная | Тип | Default | Описание |
-|------------|-----|---------|----------|
-| `BOT_TOKEN` | string | — | **Required.** Telegram Bot API token |
-| `ADMIN_CHAT_ID` | integer | — | ID чата для отправки уведомлений о заявках |
-| `WEBHOOK_PORT` | integer | — | Порт для webhook сервера (если используется) |
 
 ---
 
@@ -74,6 +81,32 @@
 | `LLM_MODEL` | string | — | **Required.** Модель LLM |
 | `LLM_TEMPERATURE` | float | `0.5` | Температура генерации (0.0-2.0) |
 | `MAX_HISTORY_SIZE` | integer | `10` | Максимальное количество сообщений в истории диалога |
+
+---
+
+## Application Settings
+
+| Переменная | Тип | Default | Описание |
+|------------|-----|---------|----------|
+| `APP_NAME` | string | `Супер Валера` | Название приложения |
+| `DEVELOPMENT_WARNING` | boolean | `true` | Показывать предупреждения о development режиме |
+
+---
+
+## URL & Host Configuration
+
+Используются для генерации URL, subdomain routing и mailers:
+
+| Переменная | Тип | Default | Описание |
+|------------|-----|---------|----------|
+| `HOST` | string | `localhost` | Хост для URL generation |
+| `PORT` | integer | `3000` | Порт для URL generation |
+| `PROTOCOL` | string | `http` | Протокол (`http` или `https`) |
+| `ALLOWED_HOSTS` | array | `[]` | Разрешённые хосты для subdomain routing |
+| `APPLICATION_HOST` | string | `localhost` | Хост для production (config.hosts) |
+| `APPLICATION_DOMAIN` | string | `localhost` | Домен для subdomain matching в production |
+
+**Примечание:** `ALLOWED_HOSTS` можно указать через запятую: `lvh.me,localhost,.brandymint.ru`
 
 ---
 
@@ -104,7 +137,7 @@
 
 | Переменная | Тип | Default | Описание |
 |------------|-----|---------|----------|
-| `REDIS_CACHE_STORE_URL` | string | `redis://localhost:6379/2` | URL для Redis (session store) |
+| `REDIS_CACHE_STORE_URL` | string | `redis://localhost:6379/2` | URL для Redis (session store для Telegram) |
 
 ---
 
@@ -127,6 +160,16 @@
 | `RAILS_LOG_LEVEL` | string | `info` | Уровень логирования: `debug`, `info`, `warn`, `error` |
 | `SECRET_KEY_BASE` | string | — | Секретный ключ Rails (production) |
 | `RAILS_MASTER_KEY` | string | — | Мастер-ключ для credentials |
+| `TIMEZONE` | string | `Europe/Moscow` | Временная зона приложения |
+
+---
+
+## Analytics
+
+| Переменная | Тип | Default | Описание |
+|------------|-----|---------|----------|
+| `ANALYTICS_ENABLED` | boolean | `true` | Включить аналитику |
+| `FORCE_ANALYTICS` | boolean | — | Принудительно включить аналитику (для тестов) |
 
 ---
 
@@ -134,8 +177,9 @@
 
 | Переменная | Тип | Default | Описание |
 |------------|-----|---------|----------|
-| `WEB_CONCURRENCY` | integer | — | Количество worker процессов |
-| `RAILS_MAX_THREADS` | integer | `5` | Максимум потоков на worker |
+| `PORT` | integer | `3000` | Порт Puma сервера |
+| `WEB_CONCURRENCY` | integer | `auto` | Количество worker процессов |
+| `RAILS_MAX_THREADS` | integer | `3` | Максимум потоков на worker |
 | `PIDFILE` | string | — | Путь к PID файлу |
 | `SOLID_QUEUE_IN_PUMA` | boolean | — | Запускать Solid Queue внутри Puma |
 
@@ -151,11 +195,11 @@ Bugsnag автоматически считывает `BUGSNAG_API_KEY` из о�
 
 ---
 
-## Development
+## Development Only
 
 | Переменная | Тип | Default | Описание |
 |------------|-----|---------|----------|
-| `DEVELOPMENT_WARNING` | boolean | `true` | Показывать предупреждения о development режиме |
+| `WEB_CONSOLE_PERMISSIONS` | array | `[]` | IP адреса/сети для Web Console (например: `192.168.0.0/16`) |
 | `CI` | boolean | — | Признак CI окружения (включает eager_load в тестах) |
 
 ---
@@ -165,7 +209,6 @@ Bugsnag автоматически считывает `BUGSNAG_API_KEY` из о�
 ### Minimal (Development)
 
 ```bash
-export BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
 export LLM_PROVIDER="deepseek"
 export LLM_MODEL="deepseek-chat"
 export DEEPSEEK_API_KEY="sk-xxx"
@@ -175,16 +218,18 @@ export DEEPSEEK_API_KEY="sk-xxx"
 
 ```bash
 # Required
-export BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
 export LLM_PROVIDER="anthropic"
 export LLM_MODEL="claude-sonnet-4-20250514"
 export ANTHROPIC_API_KEY="sk-ant-xxx"
 
+# Auth Bot
+export AUTH_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+export AUTH_BOT_USERNAME="my_auth_bot"
+
 # Database
 export VALERA_DATABASE_HOST="db.example.com"
 export VALERA_DATABASE_PASSWORD="secure_password"
-
-# Or use DATABASE_URL
+# Или используйте DATABASE_URL
 export DATABASE_URL="postgres://valera:password@db.example.com:5432/valera_production"
 
 # Rails
@@ -192,8 +237,12 @@ export RAILS_ENV="production"
 export SECRET_KEY_BASE="your-secret-key-base"
 export RAILS_MASTER_KEY="your-master-key"
 
-# Telegram
-export ADMIN_CHAT_ID="123456789"
+# Host configuration
+export HOST="myapp.example.com"
+export PORT="443"
+export PROTOCOL="https"
+export APPLICATION_HOST="myapp.example.com"
+export APPLICATION_DOMAIN="example.com"
 
 # Error Tracking
 export BUGSNAG_API_KEY="your-bugsnag-api-key"
@@ -208,13 +257,31 @@ export RAILS_MAX_THREADS="5"
 
 ---
 
-## Configuration Loading Order
+## Configuration via YAML
 
-Anyway Config загружает конфигурацию в следующем порядке (последующие переопределяют предыдущие):
+Альтернативно можно использовать `config/application.yml`:
 
-1. **Defaults** — значения по умолчанию в `attr_config`
-2. **YAML files** — `config/application.yml` (если существует)
-3. **Environment variables** — переменные окружения
+```yaml
+# config/application.yml
+default: &default
+  allowed_hosts: []
+  web_console_permissions: []
+
+development:
+  <<: *default
+  llm_provider: 'openai'
+  llm_model: 'gpt-4o-mini'
+  host: 'lvh.me'
+  port: 3000
+  protocol: 'http'
+  allowed_hosts:
+    - '.lvh.me'
+    - 'localhost'
+
+production:
+  <<: *default
+  # В production используйте ENV переменные!
+```
 
 ---
 
@@ -238,14 +305,44 @@ Anyway Config автоматически преобразует типы:
 
 ```ruby
 # Singleton access
-ApplicationConfig.bot_token
 ApplicationConfig.llm_provider
-ApplicationConfig.admin_chat_id
+ApplicationConfig.llm_model
+ApplicationConfig.auth_bot_token
 
 # Computed values
-ApplicationConfig.system_prompt      # читает файл
-ApplicationConfig.bot_id             # извлекает ID из токена
+ApplicationConfig.system_prompt       # читает файл
+ApplicationConfig.default_url_options # {host:, protocol:, port:}
+ApplicationConfig.tld_length          # для subdomain routing
 ```
+
+---
+
+## Environment Summary Table
+
+### Critical (Production Required)
+
+| Переменная | Источник | Обязательна |
+|------------|----------|-------------|
+| `LLM_PROVIDER` | ApplicationConfig | Да |
+| `LLM_MODEL` | ApplicationConfig | Да |
+| `AUTH_BOT_TOKEN` | ApplicationConfig | Для Telegram |
+| `SECRET_KEY_BASE` | Rails | Production |
+| `VALERA_DATABASE_PASSWORD` | database.yml | Production |
+
+### Infrastructure
+
+| Переменная | Источник | Описание |
+|------------|----------|----------|
+| `DATABASE_URL` | Rails | Полный URL БД |
+| `REDIS_CACHE_STORE_URL` | ApplicationConfig | Redis для sessions |
+| `BUGSNAG_API_KEY` | Bugsnag gem | Error tracking |
+
+### Performance Tuning
+
+| Переменная | Источник | Влияние |
+|------------|----------|---------|
+| `WEB_CONCURRENCY` | puma.rb | Worker processes |
+| `RAILS_MAX_THREADS` | puma.rb + database.yml | Threads + DB pool |
 
 ---
 
@@ -258,4 +355,5 @@ ApplicationConfig.bot_id             # извлекает ID из токена
 ---
 
 **Документ создан:** 2025-12-19
+**Обновлён:** 2025-12-22
 **Ответственный:** Development Team
