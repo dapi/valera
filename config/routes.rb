@@ -60,5 +60,6 @@ Rails.application.routes.draw do
 
   # Landing page (main domain without subdomain)
   root 'landing#show'
+  get 'price', to: 'landing#price'
   post 'leads', to: 'landing#create_lead', as: :leads
 end

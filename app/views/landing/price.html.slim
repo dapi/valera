@@ -1,0 +1,158 @@
+/ ========================================
+/ Страница тарифов
+/ ========================================
+
+/ Header
+section.py-16.md:py-24.bg-gradient-to-br.from-blue-600.to-blue-800.text-white.px-4
+  .max-w-4xl.mx-auto.text-center
+    h1.text-3xl.md:text-5xl.font-bold.mb-4
+      | Тарифы
+    p.text-lg.md:text-xl.text-blue-100
+      | Выберите подходящий план для вашего автосервиса
+
+/ Pricing cards
+section.py-12.md:py-20.px-4.bg-gray-50
+  .max-w-6xl.mx-auto
+
+    / Plans grid
+    .grid.grid-cols-1.md:grid-cols-3.gap-6.md:gap-8.mb-12
+      - @plans.each do |plan|
+        - is_popular = plan['popular']
+        - is_custom = plan['custom']
+
+        .relative.bg-white.rounded-2xl.shadow-lg.p-6.md:p-8.flex.flex-col class=(is_popular ? 'ring-2 ring-blue-600 scale-105' : '')
+          / Popular badge
+          - if is_popular
+            .absolute.-top-4.left-1/2.transform.-translate-x-1/2
+              span.bg-blue-600.text-white.text-sm.font-semibold.px-4.py-1.rounded-full
+                | Популярный
+
+          / Plan name
+          h3.text-xl.md:text-2xl.font-bold.text-gray-900.mb-2
+            = plan['name']
+
+          / Price
+          .mb-6
+            span.text-4xl.md:text-5xl.font-bold.text-gray-900
+              = number_with_delimiter(plan['price'], delimiter: ' ')
+            span.text-gray-600.ml-1
+              = plan['currency']
+            span.text-gray-500.text-sm
+              | /мес
+
+          / Limits
+          .space-y-3.mb-8.flex-grow
+            - if is_custom
+              .flex.items-center.gap-3
+                span.text-green-500 ✓
+                span.text-gray-700 Без лимитов на диалоги
+              .flex.items-center.gap-3
+                span.text-green-500 ✓
+                span.text-gray-700 Без лимитов на записи
+              .flex.items-center.gap-3
+                span.text-green-500 ✓
+                span.text-gray-700 Количество ботов по договору
+              .flex.items-center.gap-3
+                span.text-green-500 ✓
+                span.text-gray-700 Количество менеджеров по договору
+            - else
+              - limits = plan['limits']
+              .flex.items-center.gap-3
+                span.text-blue-500 ●
+                span.text-gray-700
+                  | #{limits['dialogs']} диалогов/мес
+              .flex.items-center.gap-3
+                span.text-blue-500 ●
+                span.text-gray-700
+                  | #{limits['bookings']} записей/мес
+              .flex.items-center.gap-3
+                span.text-blue-500 ●
+                span.text-gray-700
+                  | #{limits['bots']} #{pluralize_ru(limits['bots'], 'бот', 'бота', 'ботов')}
+              .flex.items-center.gap-3
+                span.text-blue-500 ●
+                span.text-gray-700
+                  | #{limits['managers']} #{pluralize_ru(limits['managers'], 'менеджер', 'менеджера', 'менеджеров')}
+
+          / Features
+          - if plan['features'].present?
+            .border-t.pt-6.mb-6
+              h4.text-sm.font-semibold.text-gray-500.uppercase.mb-3 Включено
+              .space-y-2
+                - plan['features'].each do |feature|
+                  .flex.items-start.gap-2
+                    span.text-green-500.mt-0.5 ✓
+                    span.text-gray-600.text-sm = feature
+
+          / CTA button
+          a.block.text-center.py-3.px-6.rounded-lg.font-semibold.transition href="#contact" class=(is_popular ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 text-gray-900 hover:bg-gray-200')
+            = is_custom ? 'Связаться с нами' : 'Оставить заявку'
+
+    / Conditions
+    .bg-white.rounded-2xl.shadow-lg.p-6.md:p-8.max-w-2xl.mx-auto
+      h3.text-xl.font-bold.text-gray-900.mb-4.text-center
+        | Условия подписки
+
+      .space-y-3.text-gray-700
+        .flex.items-start.gap-3
+          span.text-blue-500.mt-1 ●
+          span
+            | Минимальный срок подписки:
+            strong  #{PricingConfig.min_subscription_months} месяцев
+        .flex.items-start.gap-3
+          span.text-blue-500.mt-1 ●
+          span
+            | Штраф за досрочное расторжение:
+            strong  #{PricingConfig.early_termination_penalty_percent}%
+            |  от оставшейся суммы
+        .flex.items-start.gap-3
+          span.text-blue-500.mt-1 ●
+          span
+            | Полные условия:
+            a.text-blue-600.hover:underline href=ApplicationConfig.offer_url target="_blank"
+              |  Публичная оферта
+
+/ Contact form
+section#contact.py-12.md:py-16.px-4.bg-blue-600.text-white
+  .max-w-xl.mx-auto.text-center
+    h2.text-2xl.md:text-3xl.font-bold.mb-4
+      | Оставить заявку
+
+    p.text-blue-100.mb-8
+      | Мы свяжемся с вами и поможем выбрать подходящий тариф
+
+    .bg-white.rounded-2xl.p-6.md:p-8.text-gray-900
+      = form_with model: Lead.new, url: leads_path, local: true, class: "space-y-4" do |f|
+        div
+          = f.label :phone, "Телефон", class: "block text-sm font-semibold text-gray-700 mb-2"
+          = f.telephone_field :phone, class: "w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500", placeholder: "+7 (999) 123-45-67", required: true, inputmode: "tel"
+
+        div
+          = f.label :name, "Ваше имя", class: "block text-sm font-semibold text-gray-700 mb-2"
+          = f.text_field :name, class: "w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500", placeholder: "Иван Петров"
+
+        = f.submit "Перезвоните мне", class: "w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+
+    p.mt-6.text-blue-100.text-sm
+      | Или напишите напрямую:
+      a.underline href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank"
+        |  @#{ApplicationConfig.support_telegram}
+
+/ Footer
+footer.py-8.px-4.bg-gray-900.text-gray-400
+  .max-w-4xl.mx-auto.text-center
+    .mb-4
+      a.text-white.font-semibold.hover:text-blue-400.transition href="/"
+        = ApplicationConfig.app_name
+      span.mx-2 —
+      span AI-ассистент для автосервисов
+
+    .flex.justify-center.gap-6.mb-4
+      a.hover:text-white.transition href="/" Главная
+      a.hover:text-white.transition href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank" Telegram
+      a.hover:text-white.transition href="mailto:#{ApplicationConfig.support_email}" Email
+      a.hover:text-white.transition href=ApplicationConfig.offer_url target="_blank" Оферта
+      a.hover:text-white.transition href=ApplicationConfig.requisites_url target="_blank" Реквизиты
+
+    p.text-sm
+      | © #{Time.current.year} #{ApplicationConfig.app_name}. Все права защищены.
