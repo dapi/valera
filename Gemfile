@@ -96,7 +96,7 @@ group :test do
   gem 'minitest-stub_any_instance'
 
   # Pin minitest to 5.x - minitest 6.0 breaks Rails 8.1 compatibility
-  gem 'minitest', '~> 5.0'
+  gem 'minitest', '~> 6.0'
 end
 
 gem 'slim-rails', '~> 3.7'
