@@ -22,6 +22,7 @@ class AuthController < ApplicationController
     user = User.find_by(email: params[:email])
 
     if user&.authenticate(params[:password])
+      reset_session
       session[:user_id] = user.id
       redirect_after_login(user)
     else
@@ -73,6 +74,7 @@ class AuthController < ApplicationController
     user = User.find_by(telegram_user_id: telegram_user&.id)
 
     if user
+      reset_session
       session[:user_id] = user.id
       redirect_after_login(user)
     else

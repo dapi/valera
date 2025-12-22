@@ -25,6 +25,7 @@ module Tenants
         return
       end
 
+      reset_session
       session[:user_id] = data[:user_id]
       redirect_to tenant_root_path, notice: I18n.t('tenants.token_auth.success')
     end
