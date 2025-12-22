@@ -48,5 +48,6 @@ begin
   task yard_clean: 'doc:clean'
 
 rescue LoadError
-  puts "⚠️  YARD gem not found. Add it to your Gemfile and run bundle install"
+  # YARD is only available in development/test environments
+  # Silence this warning in production where it's not needed
 end
