@@ -61,9 +61,11 @@ module Telegram
       end
     end
 
-    # Обработчик сообщений в группах
-    # В личных чатах используется только /start
-    # В группах бот молчит, но логирует если это не админская группа
+    # Обработчик сообщений
+    #
+    # - В личных чатах: отвечает про неизвестную команду
+    # - В группах без admin_chat_id: предупреждает о настройке
+    # - В админской группе: отвечает только при reply/mention
     #
     # @param message [Hash] сообщение
     # @return [void]
@@ -71,18 +73,57 @@ module Telegram
       chat_id = message.dig('chat', 'id')
       chat_type = message.dig('chat', 'type')
 
-      # В личных чатах — только /start (уже обрабатывается через start!)
-      return if chat_type == 'private'
+      # Личные сообщения — отвечаем про неизвестную команду
+      if chat_type == 'private'
+        respond_with :message, text: <<~TEXT.strip
+          Неизвестная команда.
 
-      # В группах — проверяем что это админская группа
-      if ApplicationConfig.platform_admin_chat_id.present? &&
-         chat_id.to_s != ApplicationConfig.platform_admin_chat_id.to_s
-        Rails.logger.warn("[PlatformBot] Message in non-admin group: #{chat_id}")
+          Для авторизации используйте кнопку "Войти через Telegram" на странице входа вашего автосервиса.
+        TEXT
+        return
       end
-      # Бот молчит в группах
+
+      # Группа без настроенного admin_chat_id
+      if ApplicationConfig.platform_admin_chat_id.blank?
+        Rails.logger.info("[PlatformBot] Message in group without admin_chat_id: #{chat_id}")
+        respond_with :message, text: 'Бот не настроен: не указан канал администратора.'
+        return
+      end
+
+      # Админская группа — отвечаем только при обращении к боту
+      if chat_id.to_s == ApplicationConfig.platform_admin_chat_id.to_s
+        return unless message_addressed_to_bot?(message)
+
+        respond_with :message, text: '🤖 Пока я не умею отвечать на сообщения в этой группе.'
+        return
+      end
+
+      # Не админская группа — молчим, но логируем
+      Rails.logger.warn("[PlatformBot] Message in non-admin group: #{chat_id}")
     end
 
     private
+
+    # Проверяет, адресовано ли сообщение боту (reply или @mention)
+    #
+    # @param message [Hash] сообщение от Telegram
+    # @return [Boolean] true если сообщение адресовано боту
+    def message_addressed_to_bot?(message)
+      # Reply на сообщение бота
+      reply_to = message.dig('reply_to_message', 'from')
+      if reply_to && reply_to['is_bot'] && reply_to['id'] == ApplicationConfig.platform_bot_id
+        return true
+      end
+
+      # @mention бота
+      text = message['text'] || ''
+      bot_username = ApplicationConfig.platform_bot_username
+      if bot_username.present? && text.include?("@#{bot_username}")
+        return true
+      end
+
+      false
+    end
 
     # Обработка /start без payload
     def handle_empty_start

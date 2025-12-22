@@ -72,5 +72,115 @@ module Telegram
       # Токен в тестах: '123:fake' (из config/initializers/telegram.rb)
       assert_equal 123, ApplicationConfig.platform_bot_id
     end
+
+    # Тесты метода message
+
+    test 'message in private chat responds with unknown command' do
+      message = { 'chat' => { 'id' => 12345, 'type' => 'private' }, 'text' => 'привет' }
+
+      @controller.expects(:respond_with).with(:message, has_entry(:text, includes('Неизвестная команда')))
+      @controller.message(message)
+    end
+
+    test 'message in group without admin_chat_id responds with not configured' do
+      message = { 'chat' => { 'id' => 99999, 'type' => 'group' }, 'text' => 'test' }
+
+      ApplicationConfig.stubs(:platform_admin_chat_id).returns(nil)
+      @controller.expects(:respond_with).with(:message, has_entry(:text, 'Бот не настроен: не указан канал администратора.'))
+      @controller.message(message)
+    end
+
+    test 'message in admin group with reply to bot responds' do
+      admin_chat_id = '12345'
+      bot_id = ApplicationConfig.platform_bot_id
+      message = {
+        'chat' => { 'id' => admin_chat_id.to_i, 'type' => 'group' },
+        'text' => 'как дела?',
+        'reply_to_message' => { 'from' => { 'is_bot' => true, 'id' => bot_id } }
+      }
+
+      ApplicationConfig.stubs(:platform_admin_chat_id).returns(admin_chat_id)
+      @controller.expects(:respond_with).with(:message, has_entry(:text, includes('не умею отвечать')))
+      @controller.message(message)
+    end
+
+    test 'message in admin group with mention responds' do
+      admin_chat_id = '12345'
+      bot_username = 'test_bot'
+      message = {
+        'chat' => { 'id' => admin_chat_id.to_i, 'type' => 'group' },
+        'text' => "@#{bot_username} что умеешь?"
+      }
+
+      ApplicationConfig.stubs(:platform_admin_chat_id).returns(admin_chat_id)
+      ApplicationConfig.stubs(:platform_bot_username).returns(bot_username)
+      @controller.expects(:respond_with).with(:message, has_entry(:text, includes('не умею отвечать')))
+      @controller.message(message)
+    end
+
+    test 'message in admin group without reply or mention stays silent' do
+      admin_chat_id = '12345'
+      message = {
+        'chat' => { 'id' => admin_chat_id.to_i, 'type' => 'group' },
+        'text' => 'просто сообщение в группе'
+      }
+
+      ApplicationConfig.stubs(:platform_admin_chat_id).returns(admin_chat_id)
+      ApplicationConfig.stubs(:platform_bot_username).returns('test_bot')
+      @controller.expects(:respond_with).never
+      @controller.message(message)
+    end
+
+    test 'message in non-admin group stays silent but logs warning' do
+      admin_chat_id = '12345'
+      non_admin_chat_id = 99999
+      message = {
+        'chat' => { 'id' => non_admin_chat_id, 'type' => 'group' },
+        'text' => 'сообщение в другой группе'
+      }
+
+      ApplicationConfig.stubs(:platform_admin_chat_id).returns(admin_chat_id)
+      @controller.expects(:respond_with).never
+      @controller.message(message)
+    end
+
+    # Тесты вспомогательного метода message_addressed_to_bot?
+
+    test 'message_addressed_to_bot? returns true for reply to bot' do
+      bot_id = ApplicationConfig.platform_bot_id
+      message = {
+        'text' => 'ответ',
+        'reply_to_message' => { 'from' => { 'is_bot' => true, 'id' => bot_id } }
+      }
+
+      result = @controller.send(:message_addressed_to_bot?, message)
+      assert result
+    end
+
+    test 'message_addressed_to_bot? returns true for mention' do
+      message = { 'text' => '@test_bot привет' }
+
+      ApplicationConfig.stubs(:platform_bot_username).returns('test_bot')
+      result = @controller.send(:message_addressed_to_bot?, message)
+      assert result
+    end
+
+    test 'message_addressed_to_bot? returns false for regular message' do
+      message = { 'text' => 'обычное сообщение' }
+
+      ApplicationConfig.stubs(:platform_bot_username).returns('test_bot')
+      result = @controller.send(:message_addressed_to_bot?, message)
+      assert_not result
+    end
+
+    test 'message_addressed_to_bot? returns false for reply to non-bot' do
+      message = {
+        'text' => 'ответ',
+        'reply_to_message' => { 'from' => { 'is_bot' => false, 'id' => 999 } }
+      }
+
+      result = @controller.send(:message_addressed_to_bot?, message)
+      assert_not result
+    end
   end
 end
