@@ -99,7 +99,7 @@ group :test do
   gem 'minitest', '~> 6.0'
 end
 
-gem 'slim-rails', '~> 3.7'
+gem 'slim-rails', '~> 4.0'
 
 gem 'anyway_config', '~> 2.7'
 
