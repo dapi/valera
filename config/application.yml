@@ -1,8 +1,46 @@
 # frozen_string_literal: true
 
 default: &default
+  # Application branding
+  app_name: 'Супер Валера'
+
+  # Landing page and support
+  demo_bot_username: 'super_valera_demo_bot'
+  support_telegram: 'super_valera_support'
+  support_email: 'danil@brandymint.ru'
+  offer_url: 'https://docs.google.com/document/d/1xnN0_oFDfQ41lhblmQdiSliRV6PhUfQLp2QU0YeuUqw/edit'
+  requisites_url: 'https://pismenny.ru/Реквизиты.pdf'
+
+  # File paths
+  system_prompt_path: './data/system-prompt.md'
+  welcome_message_path: './data/welcome-message.md'
+  price_list_path: './data/price.csv'
+  tools_instruction_path: './config/tools-instruction.md'
+  company_info_path: './data/company-info.md'
+  redis_cache_store_url: 'redis://localhost:6379/2'
+
+  # Rate limiter configuration
+  rate_limit_requests: 10
+  rate_limit_period: 60
+
+  # Conversation management
+  max_history_size: 10
+
+  # LLM configuration
+  llm_temperature: 0.5
+
+  # Development warnings
+  development_warning: true
+
+  # Hosts
   allowed_hosts: []
   web_console_permissions: []
+  host: 'localhost'
+  port: 3000
+  protocol: 'http'
+
+  # Telegram Auth settings
+  telegram_auth_expiration: 300
 
 development:
   <<: *default
@@ -33,3 +71,5 @@ test:
   llm_provider: 'deepseek'
   llm_model: 'deepseek-chat'
   deepseek_api_key: 'fake'
+  platform_bot_token: '123:fake'
+  platform_bot_username: 'fakebot'

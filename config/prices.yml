@@ -1,0 +1,54 @@
+# Тарифные планы Супер Валера
+# Единый источник правды для сайта и оферты
+
+plans:
+  - key: starter
+    name: Starter
+    price: 10000
+    currency: '₽'
+    period: month
+    limits:
+      dialogs: 100
+      bookings: 30
+      bots: 1
+      managers: 2
+    features:
+      - AI-консультации 24/7
+      - Запись клиентов
+      - Базовая аналитика
+
+  - key: professional
+    name: Professional
+    price: 25000
+    currency: '₽'
+    period: month
+    popular: true
+    limits:
+      dialogs: 500
+      bookings: 150
+      bots: 2
+      managers: 5
+    features:
+      - Всё из Starter
+      - Расширенная аналитика
+      - Приоритетная поддержка
+
+  - key: enterprise
+    name: Enterprise
+    price: 50000
+    currency: '₽'
+    period: month
+    custom: true
+    limits:
+      dialogs: ~
+      bookings: ~
+      bots: ~
+      managers: ~
+    features:
+      - Всё из Professional
+      - Индивидуальные условия
+      - Выделенный менеджер
+
+# Общие условия
+min_subscription_months: 12
+early_termination_penalty_percent: 50

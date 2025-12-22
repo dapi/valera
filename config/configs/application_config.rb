@@ -4,6 +4,7 @@
 class ApplicationConfig < Anyway::Config
   env_prefix ''
 
+  # Defaults are in config/application.yml
   attr_config(
     # RubyLLM configuration
     :llm_provider,
@@ -22,53 +23,58 @@ class ApplicationConfig < Anyway::Config
     :vertexai_location,
     :vertexai_project_id,
 
-    # Auth Bot (единый бот для авторизации и уведомлений владельцев)
-    :auth_bot_token,
-    :auth_bot_username,
+    # Platform Bot (единый бот для авторизации и уведомлений платформы)
+    :platform_bot_token,
+    :platform_bot_username,
+    :platform_admin_chat_id,
 
     # Application branding
-    app_name: 'Супер Валера',
+    :app_name,
 
     # Landing page and support
-    demo_bot_username: 'super_valera_demo_bot',
-    support_telegram: 'super_valera_support',
-    support_email: 'danil@brandymint.ru',
+    :demo_bot_username,
+    :support_telegram,
+    :support_email,
+    :offer_url,
+    :requisites_url,
 
     # File paths
-    system_prompt_path: './data/system-prompt.md',
-    welcome_message_path: './data/welcome-message.md',
-    price_list_path: './data/price.csv',
-    tools_instruction_path: './config/tools-instruction.md',
-    company_info_path: './data/company-info.md',
-    redis_cache_store_url: 'redis://localhost:6379/2',
+    :system_prompt_path,
+    :welcome_message_path,
+    :price_list_path,
+    :tools_instruction_path,
+    :company_info_path,
+    :redis_cache_store_url,
 
     # Rate limiter configuration
-    rate_limit_requests: 10,
-    rate_limit_period: 60,
+    :rate_limit_requests,
+    :rate_limit_period,
 
     # Conversation management
-    max_history_size: 10,
+    :max_history_size,
 
     # LLM configuration
-    llm_temperature: 0.5,
+    :llm_temperature,
 
     # Development warnings
-    development_warning: true,
+    :development_warning,
 
-    # Allowed hosts for subdomain routing (array or comma-separated string)
-    allowed_hosts: [],
+    # Allowed hosts for subdomain routing
+    :allowed_hosts,
 
     # Web console permissions (IP addresses/networks)
-    # E.g., ['192.168.0.0/16', '10.0.0.0/8']
-    web_console_permissions: [],
+    :web_console_permissions,
 
     # Host and port for URL generation and subdomain routing
-    host: 'localhost',
-    port: 3000,
-    protocol: 'http',
+    :host,
+    :port,
+    :protocol,
+
+    # Admin host for URL generation (default: admin.#{host})
+    :admin_host,
 
     # Telegram Auth settings
-    telegram_auth_expiration: 300  # TTL токенов в секундах (5 минут)
+    :telegram_auth_expiration
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -116,15 +122,21 @@ class ApplicationConfig < Anyway::Config
     # Booleans
     development_warning: :boolean,
 
-    # Auth Bot
-    auth_bot_token: :string,
-    auth_bot_username: :string,
+    # Platform Bot
+    platform_bot_token: :string,
+    platform_bot_username: :string,
+    platform_admin_chat_id: :string,
     telegram_auth_expiration: :integer,
+
+    # Admin host
+    admin_host: :string,
 
     # Landing page and support
     demo_bot_username: :string,
     support_telegram: :string,
-    support_email: :string
+    support_email: :string,
+    offer_url: :string,
+    requisites_url: :string
   )
 
   # System prompt
@@ -153,12 +165,23 @@ class ApplicationConfig < Anyway::Config
     File.read(welcome_message_path).presence || raise('No welcome message defined')
   end
 
+  # Возвращает хост админки (с дефолтом admin.#{host})
+  def admin_host_with_default
+    admin_host.presence || "admin.#{host}"
+  end
+
   # Вычисляет tld_length для корректной работы с поддоменами
   # Для '3010.brandymint.ru' -> 2 (чтобы subdomain был 'admin', а не 'admin.3010')
   # Для 'localhost' -> 1 (default)
   def tld_length
     dots = host.to_s.count('.')
     dots.positive? ? dots : 1
+  end
+
+  # Возвращает ID платформенного бота (первая часть токена)
+  # Токен имеет формат: BOT_ID:SECRET_KEY
+  def platform_bot_id
+    platform_bot_token.to_s.split(':').first.to_i
   end
 
   # Опции для генерации URL в routes и mailers

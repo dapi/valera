@@ -3,9 +3,9 @@
 require 'test_helper'
 
 module Telegram
-  class AuthBotControllerTest < ActiveSupport::TestCase
+  class PlatformBotControllerTest < ActiveSupport::TestCase
     setup do
-      @controller = Telegram::AuthBotController.new
+      @controller = Telegram::PlatformBotController.new
       @tenant = tenants(:one)
       @telegram_user = telegram_users(:one)
       @user = @tenant.owner
@@ -56,6 +56,21 @@ module Telegram
       url = @controller.send(:build_confirm_url, return_url, token)
 
       assert_includes url, CGI.escape(token)
+    end
+
+    # Тесты для обработки групп
+
+    test 'new_chat_members is defined' do
+      assert_respond_to @controller, :new_chat_members
+    end
+
+    test 'message is defined' do
+      assert_respond_to @controller, :message
+    end
+
+    test 'ApplicationConfig.platform_bot_id extracts ID from token' do
+      # Токен в тестах: '123:fake' (из config/initializers/telegram.rb)
+      assert_equal 123, ApplicationConfig.platform_bot_id
     end
   end
 end

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  # Auth Bot webhook (единый бот для авторизации и уведомлений владельцев)
+  # Platform Bot webhook (единый бот для авторизации и системных уведомлений платформы)
   # Доступен на любом домене без subdomain constraint
-  telegram_webhook Telegram::AuthBotController, :default, as: :auth_bot_webhook
+  telegram_webhook Telegram::PlatformBotController, :default, as: :platform_bot_webhook
 
   # Admin panel with subdomain constraint
   constraints subdomain: 'admin' do
@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       resources :tenants
       resources :users
       resources :admin_users
+      resources :leads
 
       root to: 'tenants#index'
     end

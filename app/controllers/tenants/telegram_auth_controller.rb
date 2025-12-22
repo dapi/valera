@@ -4,7 +4,7 @@ module Tenants
   # Контроллер авторизации через Telegram для владельцев tenant
   #
   # Обрабатывает:
-  # - GET /auth/telegram/login - редирект на Auth Bot
+  # - GET /auth/telegram/login - редирект на Platform Bot
   # - GET /auth/telegram/confirm - подтверждение авторизации
   #
   # @see TelegramAuthService для работы с токенами
@@ -29,7 +29,7 @@ module Tenants
         return_url: tenant_root_url
       )
 
-      bot_url = "https://t.me/#{ApplicationConfig.auth_bot_username}?start=#{key}"
+      bot_url = "https://t.me/#{ApplicationConfig.platform_bot_username}?start=#{key}"
       redirect_to bot_url, allow_other_host: true
     end
 

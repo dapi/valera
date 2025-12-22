@@ -3,12 +3,12 @@
 Rails.application.config.telegram_updates_controller
      .session_store = :redis_cache_store, { url: ApplicationConfig.redis_cache_store_url, expires_in: 1.month }
 
-# Auth Bot - единый бот для авторизации и уведомлений владельцев
+# Platform Bot - единый бот для авторизации и системных уведомлений платформы
 # Tenant-боты создаются динамически per-tenant через MultiTenantMiddleware
 Telegram.bots_config = {
   default: {
-    token: ApplicationConfig.auth_bot_token,
-    username: ApplicationConfig.auth_bot_username
+    token: ApplicationConfig.platform_bot_token,
+    username: ApplicationConfig.platform_bot_username
   }
 }
 

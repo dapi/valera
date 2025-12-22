@@ -100,6 +100,8 @@
 | `DEMO_BOT_USERNAME` | string | `super_valera_demo_bot` | Username демо-бота для landing page |
 | `SUPPORT_TELEGRAM` | string | `super_valera_support` | Username Telegram поддержки |
 | `SUPPORT_EMAIL` | string | `danil@brandymint.ru` | Email адрес поддержки |
+| `OFFER_URL` | string | Google Doc | URL публичной оферты |
+| `REQUISITES_URL` | string | pismenny.ru | URL PDF с реквизитами |
 
 ---
 
