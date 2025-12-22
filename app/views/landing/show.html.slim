@@ -4,9 +4,22 @@
     p = notice
 
 / ========================================
+/ HEADER with Login button
+/ ========================================
+header.fixed.top-0.left-0.right-0.z-40.bg-white.bg-opacity-95.backdrop-blur-sm.shadow-sm
+  .max-w-6xl.mx-auto.px-4.py-3.flex.items-center.justify-between
+    / Logo
+    = link_to root_path, class: "flex items-center gap-2" do
+      span.text-xl.font-bold.text-blue-600 = ApplicationConfig.app_name
+
+    / Login button
+    = link_to login_path, class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-200 text-sm" do
+      | Войти
+
+/ ========================================
 / SECTION 1: Hero
 / ========================================
-section.py-20.md:py-32.flex.items-center.justify-center.bg-gradient-to-br.from-blue-600.to-blue-800.text-white.px-4
+section.pt-24.pb-20.md:pt-32.md:pb-32.flex.items-center.justify-center.bg-gradient-to-br.from-blue-600.to-blue-800.text-white.px-4
   .max-w-4xl.mx-auto.text-center
     h1.text-4xl.md:text-6xl.font-bold.mb-6
       | AI-ассистент для вашего автосервиса

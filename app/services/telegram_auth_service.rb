@@ -7,11 +7,17 @@
 # - Хранение auth data в Redis с TTL
 # - Генерацию и верификацию confirm токенов
 # - Связывание User с TelegramUser
+# - Глобальную авторизацию (без tenant_key) для главного домена
 #
-# @example Генерация auth request
+# @example Генерация auth request для tenant
 #   service = TelegramAuthService.new
 #   key = service.create_auth_request(tenant_key: 'abc123', return_url: 'https://abc123.example.com/')
 #   # => "xYz123..." (22 символа)
+#
+# @example Генерация глобального auth request
+#   service = TelegramAuthService.new
+#   key = service.create_global_auth_request(return_url: 'https://example.com/login/telegram/callback')
+#   # => "GLB_xYz123..." (26 символов)
 #
 # @example Получение auth data в боте
 #   data = service.get_auth_request(key)
@@ -21,6 +27,7 @@
 # @since 0.2.0
 class TelegramAuthService
   AUTH_REQUEST_PREFIX = 'telegram_auth:'
+  GLOBAL_AUTH_PREFIX = 'telegram_global_auth:'
   INVITE_PREFIX = 'telegram_invite:'
 
   # Создаёт auth request и возвращает короткий ключ
@@ -132,6 +139,81 @@ class TelegramAuthService
     return false if user.telegram_user_id.present? && user.telegram_user_id != telegram_user.id
 
     user.update(telegram_user_id: telegram_user.id)
+  end
+
+  # === Глобальная авторизация (без tenant_key) ===
+
+  # Создаёт глобальный auth request для авторизации на главном домене
+  #
+  # @param return_url [String] URL для возврата после авторизации
+  # @return [String] короткий ключ для /start payload с префиксом GLB_
+  def create_global_auth_request(return_url:)
+    key = "GLB_#{SecureRandom.urlsafe_base64(16)}"  # ~26 символов
+
+    Rails.cache.write(
+      "#{GLOBAL_AUTH_PREFIX}#{key}",
+      {
+        type: 'global_auth_request',
+        return_url: return_url,
+        timestamp: Time.current.to_i
+      },
+      expires_in: expiration_time
+    )
+
+    key
+  end
+
+  # Получает глобальный auth data по ключу
+  #
+  # @param key [String] короткий ключ из /start payload
+  # @return [Hash, nil] данные авторизации или nil если не найдено/истекло
+  def get_global_auth_request(key)
+    Rails.cache.read("#{GLOBAL_AUTH_PREFIX}#{key}")
+  end
+
+  # Удаляет глобальный auth request (одноразовый токен)
+  #
+  # @param key [String] короткий ключ
+  # @return [void]
+  def delete_global_auth_request(key)
+    Rails.cache.delete("#{GLOBAL_AUTH_PREFIX}#{key}")
+  end
+
+  # Генерирует глобальный confirm token для перехода на веб
+  #
+  # @param telegram_user_id [Integer] ID пользователя Telegram
+  # @return [String] подписанный токен
+  def generate_global_confirm_token(telegram_user_id:)
+    verifier.generate(
+      {
+        type: 'global_confirm',
+        telegram_user_id: telegram_user_id,
+        timestamp: Time.current.to_i
+      },
+      purpose: :telegram_global_confirm,
+      expires_in: expiration_time
+    )
+  end
+
+  # Верифицирует глобальный confirm token
+  #
+  # @param token [String] токен для проверки
+  # @return [Hash, nil] данные токена или nil если невалиден
+  def verify_global_confirm_token(token)
+    data = verifier.verify(token, purpose: :telegram_global_confirm)
+    return nil unless data['type'] == 'global_confirm'
+
+    data.symbolize_keys
+  rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveSupport::MessageEncryptor::InvalidMessage
+    nil
+  end
+
+  # Проверяет является ли ключ глобальным auth request
+  #
+  # @param key [String] ключ из /start payload
+  # @return [Boolean]
+  def global_auth_request?(key)
+    key.to_s.start_with?('GLB_')
   end
 
   private

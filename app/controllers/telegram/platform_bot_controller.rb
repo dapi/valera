@@ -23,6 +23,8 @@ module Telegram
         handle_empty_start
       elsif payload.start_with?('INV_')
         handle_invite(payload)
+      elsif payload.start_with?('GLB_')
+        handle_global_auth_request(payload)
       else
         handle_auth_request(payload)
       end
@@ -139,6 +141,49 @@ module Telegram
                    }
     end
 
+    # Обработка глобального auth request (для главного домена)
+    #
+    # @param key [String] глобальный ключ (GLB_...)
+    def handle_global_auth_request(key)
+      auth_data = auth_service.get_global_auth_request(key)
+
+      unless auth_data
+        respond_with :message, text: '❌ Ссылка для авторизации устарела или недействительна. Попробуйте войти заново.'
+        return
+      end
+
+      telegram_user = find_or_create_telegram_user
+      user = find_user_by_telegram(telegram_user)
+
+      unless user
+        respond_with :message, text: <<~TEXT
+          ❌ Ваш Telegram не привязан к аккаунту владельца.
+
+          Если вы новый владелец - обратитесь к администратору для получения приглашения.
+        TEXT
+        return
+      end
+
+      # Удаляем использованный ключ
+      auth_service.delete_global_auth_request(key)
+
+      # Генерируем глобальный confirm token
+      confirm_token = auth_service.generate_global_confirm_token(
+        telegram_user_id: telegram_user.id
+      )
+
+      return_url = auth_data[:return_url] || auth_data['return_url']
+      confirm_url = build_global_confirm_url(return_url, confirm_token)
+
+      respond_with :message,
+                   text: "✅ Авторизация подтверждена!\n\nНажмите на ссылку для входа:\n#{confirm_url}\n\n⏱ Ссылка действительна 5 минут.",
+                   reply_markup: {
+                     inline_keyboard: [
+                       [ { text: '🔐 Войти в личный кабинет', url: confirm_url } ]
+                     ]
+                   }
+    end
+
     # Обработка invite токена для нового владельца
     #
     # @param key [String] invite ключ (INV_...)
@@ -189,7 +234,7 @@ module Telegram
       User.find_by(telegram_user_id: telegram_user.id)
     end
 
-    # Строит URL для подтверждения авторизации
+    # Строит URL для подтверждения авторизации на tenant
     #
     # @param return_url [String] базовый URL
     # @param token [String] confirm token
@@ -197,6 +242,17 @@ module Telegram
     def build_confirm_url(return_url, token)
       uri = URI.parse(return_url)
       uri.path = '/auth/telegram/confirm'
+      uri.query = "token=#{CGI.escape(token)}"
+      uri.to_s
+    end
+
+    # Строит URL для глобального подтверждения авторизации
+    #
+    # @param return_url [String] callback URL
+    # @param token [String] confirm token
+    # @return [String]
+    def build_global_confirm_url(return_url, token)
+      uri = URI.parse(return_url)
       uri.query = "token=#{CGI.escape(token)}"
       uri.to_s
     end
