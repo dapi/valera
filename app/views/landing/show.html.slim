@@ -135,12 +135,17 @@ section#form.py-16.md:py-20.px-4.bg-blue-600.text-white
 
     / Form
     .bg-white.rounded-2xl.p-6.md:p-8.text-gray-900.shadow-2xl.text-left
-      = form_with model: @lead, url: leads_path, local: true, class: "space-y-4" do |f|
+      = form_with model: @lead, url: leads_path, local: true, class: "space-y-4", data: { controller: "utm" } do |f|
         - if @lead.errors.any?
           .bg-red-100.border.border-red-400.text-red-700.px-4.py-3.rounded.mb-4
             ul
               - @lead.errors.full_messages.each do |message|
                 li = message
+
+        / Hidden UTM fields
+        = f.hidden_field :utm_source, data: { utm_target: "source" }
+        = f.hidden_field :utm_medium, data: { utm_target: "medium" }
+        = f.hidden_field :utm_campaign, data: { utm_target: "campaign" }
 
         .space-y-5
           div.text-left
