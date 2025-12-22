@@ -36,6 +36,7 @@ class ApplicationConfig < Anyway::Config
     :support_telegram,
     :support_email,
     :offer_url,
+    :requisites_url,
 
     # File paths
     :system_prompt_path,
@@ -134,7 +135,8 @@ class ApplicationConfig < Anyway::Config
     demo_bot_username: :string,
     support_telegram: :string,
     support_email: :string,
-    offer_url: :string
+    offer_url: :string,
+    requisites_url: :string
   )
 
   # System prompt
@@ -174,6 +176,12 @@ class ApplicationConfig < Anyway::Config
   def tld_length
     dots = host.to_s.count('.')
     dots.positive? ? dots : 1
+  end
+
+  # Возвращает ID платформенного бота (первая часть токена)
+  # Токен имеет формат: BOT_ID:SECRET_KEY
+  def platform_bot_id
+    platform_bot_token.to_s.split(':').first.to_i
   end
 
   # Опции для генерации URL в routes и mailers

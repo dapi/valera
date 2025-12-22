@@ -9,6 +9,7 @@ default: &default
   support_telegram: 'super_valera_support'
   support_email: 'danil@brandymint.ru'
   offer_url: 'https://docs.google.com/document/d/1xnN0_oFDfQ41lhblmQdiSliRV6PhUfQLp2QU0YeuUqw/edit'
+  requisites_url: 'https://pismenny.ru/Реквизиты.pdf'
 
   # File paths
   system_prompt_path: './data/system-prompt.md'
@@ -70,3 +71,5 @@ test:
   llm_provider: 'deepseek'
   llm_model: 'deepseek-chat'
   deepseek_api_key: 'fake'
+  platform_bot_token: '123:fake'
+  platform_bot_username: 'fakebot'

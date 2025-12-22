@@ -31,6 +31,57 @@ module Telegram
       respond_with :message, text: 'Произошла ошибка. Попробуйте позже.'
     end
 
+    # Обработчик добавления новых участников в группу
+    # Telegram присылает это событие когда бот добавляется в группу
+    #
+    # @param message [Hash] сообщение с данными о новых участниках
+    # @return [void]
+    def new_chat_members(message)
+      chat_id = message.dig('chat', 'id')
+      new_members = message['new_chat_members']
+
+      # Проверяем что добавлен наш бот
+      bot_added = new_members&.any? do |member|
+        member['is_bot'] && member['id'] == ApplicationConfig.platform_bot_id
+      end
+      return unless bot_added
+
+      if ApplicationConfig.platform_admin_chat_id.blank?
+        # Подсказываем как настроить
+        respond_with :message, text: <<~TEXT
+          👋 Бот добавлен в группу!
+
+          Для получения уведомлений о лидах, установите переменную окружения:
+
+          PLATFORM_ADMIN_CHAT_ID=#{chat_id}
+        TEXT
+      elsif chat_id.to_s != ApplicationConfig.platform_admin_chat_id.to_s
+        # Не админская группа — молчим, но логируем
+        Rails.logger.warn("[PlatformBot] Added to non-admin group: #{chat_id}")
+      end
+    end
+
+    # Обработчик сообщений в группах
+    # В личных чатах используется только /start
+    # В группах бот молчит, но логирует если это не админская группа
+    #
+    # @param message [Hash] сообщение
+    # @return [void]
+    def message(message)
+      chat_id = message.dig('chat', 'id')
+      chat_type = message.dig('chat', 'type')
+
+      # В личных чатах — только /start (уже обрабатывается через start!)
+      return if chat_type == 'private'
+
+      # В группах — проверяем что это админская группа
+      if ApplicationConfig.platform_admin_chat_id.present? &&
+         chat_id.to_s != ApplicationConfig.platform_admin_chat_id.to_s
+        Rails.logger.warn("[PlatformBot] Message in non-admin group: #{chat_id}")
+      end
+      # Бот молчит в группах
+    end
+
     private
 
     # Обработка /start без payload
