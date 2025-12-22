@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Контроллер для обработки webhook Auth Bot
+# Контроллер для обработки webhook Platform Bot
 #
 # Обрабатывает команду /start с payload для авторизации владельцев:
 # - /start KEY - авторизация существующего владельца
@@ -11,7 +11,7 @@
 # @author Danil Pismenny
 # @since 0.2.0
 module Telegram
-  class AuthBotController < Telegram::Bot::UpdatesController
+  class PlatformBotController < Telegram::Bot::UpdatesController
     include ErrorLogger
 
     # Обработчик команды /start
@@ -27,7 +27,7 @@ module Telegram
         handle_auth_request(payload)
       end
     rescue StandardError => e
-      log_error(e, context: { controller: 'AuthBotController', method: 'start!', payload: payload })
+      log_error(e, context: { controller: 'PlatformBotController', method: 'start!', payload: payload })
       respond_with :message, text: 'Произошла ошибка. Попробуйте позже.'
     end
 

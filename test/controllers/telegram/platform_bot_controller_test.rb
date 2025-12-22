@@ -3,9 +3,9 @@
 require 'test_helper'
 
 module Telegram
-  class AuthBotControllerTest < ActiveSupport::TestCase
+  class PlatformBotControllerTest < ActiveSupport::TestCase
     setup do
-      @controller = Telegram::AuthBotController.new
+      @controller = Telegram::PlatformBotController.new
       @tenant = tenants(:one)
       @telegram_user = telegram_users(:one)
       @user = @tenant.owner

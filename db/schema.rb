@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_21_151716) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_22_131104) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -114,6 +114,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_21_151716) do
     t.string "city"
     t.string "company_name"
     t.datetime "created_at", null: false
+    t.bigint "manager_id"
     t.string "name"
     t.string "phone"
     t.string "source"
@@ -121,6 +122,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_21_151716) do
     t.string "utm_campaign"
     t.string "utm_medium"
     t.string "utm_source"
+    t.index ["manager_id"], name: "index_leads_on_manager_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -234,6 +236,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_21_151716) do
   add_foreign_key "chats", "tenants"
   add_foreign_key "clients", "telegram_users"
   add_foreign_key "clients", "tenants"
+  add_foreign_key "leads", "admin_users", column: "manager_id"
   add_foreign_key "messages", "chats"
   add_foreign_key "tenants", "users", column: "owner_id"
   add_foreign_key "users", "telegram_users"
