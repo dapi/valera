@@ -9,7 +9,7 @@ module Tenants
   # @author Danil Pismenny
   # @since 0.4.0
   class TokenAuthController < ApplicationController
-    skip_before_action :authenticate_owner!
+    skip_before_action :authenticate_user_with_access!
 
     # GET /auth/token?t=xxx
     def show

@@ -11,7 +11,7 @@ module Tenants
   # @author Danil Pismenny
   # @since 0.2.0
   class TelegramAuthController < ApplicationController
-    skip_before_action :authenticate_owner!
+    skip_before_action :authenticate_user_with_access!
     layout 'tenants/auth'
 
     # GET /auth/telegram/login
