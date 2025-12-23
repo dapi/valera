@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 require 'administrate/base_dashboard'
+require_relative '../fields/url_field'
 
 class TenantDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Field::Number,
     name: Field::String,
     key: Field::String,
+    dashboard_url: UrlField.with_options(link_text: 'Open Dashboard'),
     bot_username: Field::String,
     bot_token: Field::Password, # Hide sensitive token
     webhook_secret: Field::Password, # Hide sensitive secret
@@ -34,6 +36,7 @@ class TenantDashboard < Administrate::BaseDashboard
     id
     name
     key
+    dashboard_url
     bot_username
     bot_token
     webhook_secret

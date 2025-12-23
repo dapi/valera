@@ -39,6 +39,15 @@ class Tenant < ApplicationRecord
     bot_token.split(':').to_i
   end
 
+  # URL для dashboard тенанта
+  #
+  # @return [String] полный URL dashboard
+  def dashboard_url
+    port = ApplicationConfig.public_port.to_i
+    port_suffix = port.in?([ 0, 80, 443 ]) ? '' : ":#{port}"
+    "#{ApplicationConfig.protocol}://#{key}.#{ApplicationConfig.host}#{port_suffix}"
+  end
+
   private
 
   def generate_key
