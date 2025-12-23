@@ -1,0 +1,44 @@
+h1.text-2xl.font-bold.text-gray-800.mb-6 Настройки
+
+.max-w-2xl
+  .bg-white.rounded-lg.shadow.p-6
+    h2.text-lg.font-semibold.text-gray-700.mb-4 Поддомен
+
+    = form_with model: @tenant, url: tenant_settings_path, method: :patch, class: "space-y-4" do |f|
+      - if @tenant.errors.any?
+        .p-4.bg-red-100.border.border-red-400.text-red-700.rounded.text-sm.mb-4
+          ul.list-disc.list-inside
+            - @tenant.errors.full_messages.each do |msg|
+              li = msg
+
+      div
+        label.block.text-sm.font-medium.text-gray-700.mb-1 for="tenant_key"
+          | Ключ (поддомен)
+        .flex.items-center.gap-2
+          = f.text_field :key, \
+            class: "flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono", \
+            placeholder: "example", \
+            maxlength: Tenant::KEY_LENGTH, \
+            pattern: "[a-z0-9]+", \
+            required: true
+          span.text-gray-500
+            = ".#{ApplicationConfig.host}"
+
+        p.text-sm.text-gray-500.mt-1
+          | Ключ должен содержать ровно #{Tenant::KEY_LENGTH} символов: только строчные латинские буквы и цифры.
+        p.text-sm.text-amber-600.mt-1
+          | После изменения вы будете перенаправлены на новый адрес.
+
+      .pt-4
+        button.px-4.py-2.bg-blue-600.hover:bg-blue-700.text-white.font-semibold.rounded-lg.transition.duration-200[
+          type="submit"
+        ]
+          | Сохранить
+
+    .mt-6.pt-6.border-t.border-gray-200
+      h3.text-md.font-medium.text-gray-700.mb-2 Текущий адрес панели управления
+      .flex.items-center.gap-2
+        code.px-3.py-2.bg-gray-100.rounded.text-sm.font-mono
+          = @tenant.dashboard_url
+        = link_to @tenant.dashboard_url, target: "_blank", class: "text-blue-600 hover:text-blue-800 text-sm"
+          | Открыть

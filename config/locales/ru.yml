@@ -38,6 +38,9 @@ ru:
           attributes:
             bot_token:
               invalid_format: "имеет неверный формат. Ожидается формат: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+            key:
+              invalid_key_format: "должен содержать только строчные латинские буквы и цифры"
+              taken: "уже используется другим автосервисом"
 
   # Development warnings
   development_warning:
@@ -223,3 +226,7 @@ ru:
         success: Участник успешно добавлен
       destroy:
         success: Участник удален
+    settings:
+      update:
+        success: Настройки сохранены
+        key_changed: Поддомен изменён. Вы перенаправлены на новый адрес.

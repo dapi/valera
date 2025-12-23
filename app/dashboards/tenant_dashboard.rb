@@ -52,6 +52,7 @@ class TenantDashboard < Administrate::BaseDashboard
 
   FORM_ATTRIBUTES = %i[
     name
+    key
     bot_token
     admin_chat_id
     owner

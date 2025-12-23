@@ -4,6 +4,7 @@ class Tenant < ApplicationRecord
   include ErrorLogger
 
   KEY_LENGTH = 8
+  KEY_FORMAT = /\A[a-z0-9]+\z/
   WEBHOOK_SECRET_LENGTH = 32
   BOT_TOKEN_FORMAT = /\A\d+:[A-Za-z0-9_-]+\z/
 
@@ -19,7 +20,8 @@ class Tenant < ApplicationRecord
   validates :name, presence: true
   validates :bot_token, presence: true, uniqueness: true, format: { with: BOT_TOKEN_FORMAT, message: :invalid_format }
   validates :bot_username, presence: true
-  validates :key, presence: true, uniqueness: true, length: { is: KEY_LENGTH }
+  validates :key, presence: true, uniqueness: true, length: { is: KEY_LENGTH },
+                  format: { with: KEY_FORMAT, message: :invalid_key_format }
   validates :webhook_secret, presence: true
 
   before_validation :generate_key, on: :create, if: -> { key.blank? }
@@ -77,7 +79,8 @@ class Tenant < ApplicationRecord
   private
 
   def generate_key
-    self.key = Nanoid.generate(size: KEY_LENGTH)
+    alphabet = ('a'..'z').to_a + ('0'..'9').to_a
+    self.key = Nanoid.generate(size: KEY_LENGTH, alphabet: alphabet)
   end
 
   def downcase_key
