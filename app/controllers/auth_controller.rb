@@ -44,8 +44,9 @@ class AuthController < ApplicationController
 
   # POST /login/select
   def switch_tenant
-    tenant = current_user.accessible_tenants.find { |t| t.key == params[:tenant_key] }
-    raise ActiveRecord::RecordNotFound unless tenant
+    tenant = Tenant.find_by key: params[:tenant_key]
+    raise ActiveRecord::RecordNotFound unless tenant && current_user.has_access_to?(tenant)
+
     token = generate_cross_domain_token(current_user, tenant)
     redirect_to tenant_auth_token_url(subdomain: tenant.key, t: token), allow_other_host: true
   rescue ActiveRecord::RecordNotFound

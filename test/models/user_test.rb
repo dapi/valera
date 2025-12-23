@@ -126,15 +126,15 @@ class UserTest < ActiveSupport::TestCase
     assert_not user.has_access_to?(tenants(:two))
   end
 
-  test 'telegram_only_user? returns true for new telegram user without email' do
+  test 'telegram_only_user? returns true for telegram user without email' do
     telegram_user = telegram_users(:one)
     user = User.new(name: 'Telegram User', telegram_user_id: telegram_user.id)
     assert user.telegram_only_user?
   end
 
-  test 'telegram_only_user? returns false for persisted user' do
+  test 'telegram_only_user? returns true for persisted telegram user without email' do
     user = users(:telegram_only_user)
-    assert_not user.telegram_only_user?
+    assert user.telegram_only_user?
   end
 
   test 'telegram_only_user? returns false for user with email' do
@@ -146,5 +146,21 @@ class UserTest < ActiveSupport::TestCase
     telegram_user = telegram_users(:one)
     user = User.new(name: 'Telegram Only', telegram_user_id: telegram_user.id)
     assert user.valid?
+  end
+
+  test 'display_name returns name when present' do
+    user = User.new(name: 'Test User', email: 'test@example.com')
+    assert_equal 'Test User', user.display_name
+  end
+
+  test 'display_name returns email when name is blank' do
+    user = User.new(name: '', email: 'test@example.com')
+    assert_equal 'test@example.com', user.display_name
+  end
+
+  test 'display_name returns default when name and email are blank' do
+    telegram_user = telegram_users(:one)
+    user = User.new(name: '', telegram_user_id: telegram_user.id)
+    assert_equal 'Пользователь', user.display_name
   end
 end

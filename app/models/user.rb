@@ -57,6 +57,13 @@ class User < ApplicationRecord
   #
   # @return [Boolean]
   def telegram_only_user?
-    telegram_user_id.present? && email.blank? && !persisted?
+    telegram_user_id.present? && email.blank?
+  end
+
+  # Отображаемое имя пользователя
+  #
+  # @return [String]
+  def display_name
+    name.presence || email.presence || 'Пользователь'
   end
 end

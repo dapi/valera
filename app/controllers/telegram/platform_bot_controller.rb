@@ -32,7 +32,7 @@ module Telegram
       end
     rescue StandardError => e
       log_error(e, context: { controller: 'PlatformBotController', method: 'start!', payload: payload })
-      respond_with :message, text: 'Произошла ошибка. Попробуйте позже.'
+      respond_with :message, text: I18n.t('platform_bot.errors.generic')
     end
 
     # Обработчик добавления новых участников в группу
@@ -52,13 +52,7 @@ module Telegram
 
       if ApplicationConfig.platform_admin_chat_id.blank?
         # Подсказываем как настроить
-        respond_with :message, text: <<~TEXT
-          👋 Бот добавлен в группу!
-
-          Для получения уведомлений о лидах, установите переменную окружения:
-
-          PLATFORM_ADMIN_CHAT_ID=#{chat_id}
-        TEXT
+        respond_with :message, text: I18n.t('platform_bot.group.added', chat_id: chat_id)
       elsif chat_id.to_s != ApplicationConfig.platform_admin_chat_id.to_s
         # Не админская группа — молчим, но логируем
         Rails.logger.warn("[PlatformBot] Added to non-admin group: #{chat_id}")
@@ -79,18 +73,14 @@ module Telegram
 
       # Личные сообщения — отвечаем про неизвестную команду
       if chat_type == 'private'
-        respond_with :message, text: <<~TEXT.strip
-          Неизвестная команда.
-
-          Для авторизации используйте кнопку "Войти через Telegram" на странице входа вашего автосервиса.
-        TEXT
+        respond_with :message, text: I18n.t('platform_bot.messages.unknown_command').strip
         return
       end
 
       # Группа без настроенного admin_chat_id
       if ApplicationConfig.platform_admin_chat_id.blank?
         Rails.logger.info("[PlatformBot] Message in group without admin_chat_id: #{chat_id}")
-        respond_with :message, text: 'Бот не настроен: не указан канал администратора.'
+        respond_with :message, text: I18n.t('platform_bot.messages.bot_not_configured')
         return
       end
 
@@ -98,7 +88,7 @@ module Telegram
       if chat_id.to_s == ApplicationConfig.platform_admin_chat_id.to_s
         return unless message_addressed_to_bot?(message)
 
-        respond_with :message, text: '🤖 Пока я не умею отвечать на сообщения в этой группе.'
+        respond_with :message, text: I18n.t('platform_bot.messages.group_reply')
         return
       end
 
@@ -131,13 +121,7 @@ module Telegram
 
     # Обработка /start без payload
     def handle_empty_start
-      respond_with :message, text: <<~TEXT
-        👋 Это бот для авторизации владельцев автосервисов в Valera.
-
-        Для входа в панель управления используйте кнопку "Войти через Telegram" на странице входа вашего автосервиса.
-
-        Если вы новый владелец - обратитесь к администратору для получения приглашения.
-      TEXT
+      respond_with :message, text: I18n.t('platform_bot.messages.empty_start')
     end
 
     # Обработка auth request от веб-страницы
@@ -147,7 +131,7 @@ module Telegram
       auth_data = auth_service.get_auth_request(key)
 
       unless auth_data
-        respond_with :message, text: '❌ Ссылка для авторизации устарела или недействительна. Попробуйте войти заново.'
+        respond_with :message, text: I18n.t('platform_bot.errors.link_expired')
         return
       end
 
@@ -155,11 +139,7 @@ module Telegram
       user = find_user_by_telegram(telegram_user)
 
       unless user
-        respond_with :message, text: <<~TEXT
-          ❌ Ваш Telegram не привязан к аккаунту владельца.
-
-          Если вы новый владелец - обратитесь к администратору для получения приглашения.
-        TEXT
+        respond_with :message, text: I18n.t('platform_bot.errors.not_linked')
         return
       end
 
@@ -176,10 +156,10 @@ module Telegram
       confirm_url = build_confirm_url(return_url, confirm_token)
 
       respond_with :message,
-                   text: "✅ Авторизация подтверждена!\n\nНажмите на ссылку для входа:\n#{confirm_url}\n\n⏱ Ссылка действительна 5 минут.",
+                   text: I18n.t('platform_bot.messages.auth_confirmed', confirm_url: confirm_url),
                    reply_markup: {
                      inline_keyboard: [
-                       [ { text: '🔐 Войти в панель управления', url: confirm_url } ]
+                       [ { text: I18n.t('platform_bot.messages.login_button'), url: confirm_url } ]
                      ]
                    }
     end
@@ -191,7 +171,7 @@ module Telegram
       auth_data = auth_service.get_global_auth_request(key)
 
       unless auth_data
-        respond_with :message, text: '❌ Ссылка для авторизации устарела или недействительна. Попробуйте войти заново.'
+        respond_with :message, text: I18n.t('platform_bot.errors.link_expired')
         return
       end
 
@@ -199,11 +179,7 @@ module Telegram
       user = find_user_by_telegram(telegram_user)
 
       unless user
-        respond_with :message, text: <<~TEXT
-          ❌ Ваш Telegram не привязан к аккаунту владельца.
-
-          Если вы новый владелец - обратитесь к администратору для получения приглашения.
-        TEXT
+        respond_with :message, text: I18n.t('platform_bot.errors.not_linked')
         return
       end
 
@@ -219,10 +195,10 @@ module Telegram
       confirm_url = build_global_confirm_url(return_url, confirm_token)
 
       respond_with :message,
-                   text: "✅ Авторизация подтверждена!\n\nНажмите на ссылку для входа:\n#{confirm_url}\n\n⏱ Ссылка действительна 5 минут.",
+                   text: I18n.t('platform_bot.messages.auth_confirmed', confirm_url: confirm_url),
                    reply_markup: {
                      inline_keyboard: [
-                       [ { text: '🔐 Войти в личный кабинет', url: confirm_url } ]
+                       [ { text: I18n.t('platform_bot.messages.login_personal_button'), url: confirm_url } ]
                      ]
                    }
     end
@@ -234,7 +210,7 @@ module Telegram
       invite_data = auth_service.consume_member_invite_token(key)
 
       unless invite_data
-        respond_with :message, text: '❌ Приглашение устарело или уже использовано.'
+        respond_with :message, text: I18n.t('platform_bot.errors.invite_expired')
         return
       end
 
@@ -244,7 +220,7 @@ module Telegram
 
       tenant = Tenant.find_by(id: tenant_id)
       unless tenant
-        respond_with :message, text: '❌ Автосервис не найден.'
+        respond_with :message, text: I18n.t('platform_bot.errors.tenant_not_found')
         return
       end
 
@@ -253,14 +229,14 @@ module Telegram
 
       # Проверяем не является ли пользователь уже владельцем
       if tenant.owner_id == user.id
-        respond_with :message, text: '✅ Вы уже являетесь владельцем этого автосервиса.'
+        respond_with :message, text: I18n.t('platform_bot.messages.already_owner')
         return
       end
 
       # Проверяем не существует ли уже membership
       existing_membership = TenantMembership.find_by(tenant: tenant, user: user)
       if existing_membership
-        respond_with :message, text: "✅ Вы уже являетесь участником этого автосервиса с ролью: #{role_display_name(existing_membership.role)}."
+        respond_with :message, text: I18n.t('platform_bot.messages.already_member', role: role_display_name(existing_membership.role))
         return
       end
 
@@ -273,15 +249,9 @@ module Telegram
       )
 
       if membership.save
-        respond_with :message, text: <<~TEXT
-          ✅ Вы успешно добавлены в команду автосервиса "#{tenant.name}"!
-
-          Ваша роль: #{role_display_name(role)}
-
-          Теперь вы можете входить в панель управления через Telegram.
-        TEXT
+        respond_with :message, text: I18n.t('platform_bot.messages.member_added', tenant_name: tenant.name, role: role_display_name(role))
       else
-        respond_with :message, text: '❌ Не удалось добавить вас в команду. Попробуйте позже.'
+        respond_with :message, text: I18n.t('platform_bot.errors.membership_failed')
       end
     end
 
@@ -292,7 +262,7 @@ module Telegram
       invite_data = auth_service.consume_invite_token(key)
 
       unless invite_data
-        respond_with :message, text: '❌ Приглашение устарело или уже использовано.'
+        respond_with :message, text: I18n.t('platform_bot.errors.invite_expired')
         return
       end
 
@@ -300,22 +270,16 @@ module Telegram
       user = User.find_by(id: user_id)
 
       unless user
-        respond_with :message, text: '❌ Пользователь не найден.'
+        respond_with :message, text: I18n.t('platform_bot.errors.user_not_found')
         return
       end
 
       telegram_user = find_or_create_telegram_user
 
       if auth_service.link_user_to_telegram(user, telegram_user)
-        respond_with :message, text: <<~TEXT
-          ✅ Ваш Telegram успешно привязан к аккаунту!
-
-          Теперь вы можете входить в панель управления через Telegram.
-
-          Для входа используйте кнопку "Войти через Telegram" на странице вашего автосервиса.
-        TEXT
+        respond_with :message, text: I18n.t('platform_bot.messages.link_success')
       else
-        respond_with :message, text: '❌ Не удалось привязать Telegram. Возможно, этот аккаунт уже привязан к другому Telegram.'
+        respond_with :message, text: I18n.t('platform_bot.errors.link_failed')
       end
     end
 
@@ -355,12 +319,7 @@ module Telegram
     # @param role [String, Symbol]
     # @return [String]
     def role_display_name(role)
-      case role.to_s
-      when 'viewer' then 'Наблюдатель'
-      when 'operator' then 'Оператор'
-      when 'admin' then 'Администратор'
-      else role.to_s
-      end
+      I18n.t("platform_bot.roles.#{role}", default: role.to_s)
     end
 
     # Строит URL для подтверждения авторизации на tenant

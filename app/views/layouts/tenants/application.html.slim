@@ -36,7 +36,7 @@ html
 
       .absolute.bottom-0.left-0.right-0.p-6.border-t
         .flex.items-center.justify-between
-          .text-sm.text-gray-600 = current_user&.name || current_user&.email
+          .text-sm.text-gray-600 = current_user.display_name
           = button_to tenant_session_path, method: :delete, class: "text-sm text-red-600 hover:text-red-800"
             | Выход
 
