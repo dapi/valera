@@ -5,7 +5,7 @@ module Tenants
   # Shows owner email (readonly) and requires only password input.
   #
   class SessionsController < ApplicationController
-    skip_before_action :authenticate_owner!
+    skip_before_action :authenticate_user_with_access!
     layout 'tenants/auth'
 
     # GET /session/new

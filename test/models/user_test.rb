@@ -61,4 +61,106 @@ class UserTest < ActiveSupport::TestCase
     user = users(:one)
     assert_respond_to user, :owned_tenants
   end
+
+  test 'has many tenant_memberships' do
+    user = users(:operator_user)
+    assert_respond_to user, :tenant_memberships
+    assert_includes user.tenant_memberships, tenant_memberships(:operator_on_tenant_one)
+  end
+
+  test 'has many member_tenants through tenant_memberships' do
+    user = users(:operator_user)
+    assert_respond_to user, :member_tenants
+    assert_includes user.member_tenants, tenants(:one)
+  end
+
+  test 'accessible_tenants includes owned tenants' do
+    user = users(:one)
+    assert_includes user.accessible_tenants, tenants(:one)
+  end
+
+  test 'accessible_tenants includes member tenants' do
+    user = users(:operator_user)
+    assert_includes user.accessible_tenants, tenants(:one)
+  end
+
+  test 'accessible_tenants returns unique tenants' do
+    user = users(:one)
+    # Owner should not have duplicates
+    assert_equal user.accessible_tenants.uniq, user.accessible_tenants
+  end
+
+  test 'membership_for returns membership for tenant' do
+    user = users(:operator_user)
+    membership = user.membership_for(tenants(:one))
+    assert_equal tenant_memberships(:operator_on_tenant_one), membership
+  end
+
+  test 'membership_for returns nil for non-member tenant' do
+    user = users(:operator_user)
+    assert_nil user.membership_for(tenants(:two))
+  end
+
+  test 'owner_of? returns true for owned tenant' do
+    user = users(:one)
+    assert user.owner_of?(tenants(:one))
+  end
+
+  test 'owner_of? returns false for non-owned tenant' do
+    user = users(:one)
+    assert_not user.owner_of?(tenants(:two))
+  end
+
+  test 'has_access_to? returns true for owner' do
+    user = users(:one)
+    assert user.has_access_to?(tenants(:one))
+  end
+
+  test 'has_access_to? returns true for member' do
+    user = users(:operator_user)
+    assert user.has_access_to?(tenants(:one))
+  end
+
+  test 'has_access_to? returns false for non-member' do
+    user = users(:operator_user)
+    assert_not user.has_access_to?(tenants(:two))
+  end
+
+  test 'telegram_only_user? returns true for telegram user without email' do
+    telegram_user = telegram_users(:one)
+    user = User.new(name: 'Telegram User', telegram_user_id: telegram_user.id)
+    assert user.telegram_only_user?
+  end
+
+  test 'telegram_only_user? returns true for persisted telegram user without email' do
+    user = users(:telegram_only_user)
+    assert user.telegram_only_user?
+  end
+
+  test 'telegram_only_user? returns false for user with email' do
+    user = User.new(email: 'test@example.com', name: 'Test', telegram_user_id: 1)
+    assert_not user.telegram_only_user?
+  end
+
+  test 'allows blank email for telegram only users' do
+    telegram_user = telegram_users(:one)
+    user = User.new(name: 'Telegram Only', telegram_user_id: telegram_user.id)
+    assert user.valid?
+  end
+
+  test 'display_name returns name when present' do
+    user = User.new(name: 'Test User', email: 'test@example.com')
+    assert_equal 'Test User', user.display_name
+  end
+
+  test 'display_name returns email when name is blank' do
+    user = User.new(name: '', email: 'test@example.com')
+    assert_equal 'test@example.com', user.display_name
+  end
+
+  test 'display_name returns default when name and email are blank' do
+    telegram_user = telegram_users(:one)
+    user = User.new(name: '', telegram_user_id: telegram_user.id)
+    assert_equal 'Пользователь', user.display_name
+  end
 end

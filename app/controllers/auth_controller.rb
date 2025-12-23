@@ -39,12 +39,14 @@ class AuthController < ApplicationController
 
   # GET /login/select
   def select
-    @tenants = current_user.owned_tenants
+    @tenants = current_user.accessible_tenants
   end
 
   # POST /login/select
   def switch_tenant
-    tenant = current_user.owned_tenants.find_by!(key: params[:tenant_key])
+    tenant = Tenant.find_by key: params[:tenant_key]
+    raise ActiveRecord::RecordNotFound unless tenant && current_user.has_access_to?(tenant)
+
     token = generate_cross_domain_token(current_user, tenant)
     redirect_to tenant_auth_token_url(subdomain: tenant.key, t: token), allow_other_host: true
   rescue ActiveRecord::RecordNotFound
@@ -103,7 +105,7 @@ class AuthController < ApplicationController
   end
 
   def redirect_after_login(user)
-    tenants = user.owned_tenants
+    tenants = user.accessible_tenants
 
     case tenants.count
     when 0

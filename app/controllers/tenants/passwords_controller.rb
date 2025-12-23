@@ -5,7 +5,7 @@ module Tenants
   # Used when owner has no password_digest set.
   #
   class PasswordsController < ApplicationController
-    skip_before_action :authenticate_owner!
+    skip_before_action :authenticate_user_with_access!
     before_action :require_pending_user!
     layout 'tenants/auth'
 

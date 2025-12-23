@@ -1,0 +1,46 @@
+h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
+
+.max-w-lg.mx-auto.bg-white.rounded-lg.shadow.p-6
+  .text-center.mb-6
+    .text-6xl.mb-4 🔗
+    h2.text-xl.font-semibold.text-gray-800 = t('.link_title')
+    p.text-gray-600.mt-2
+      = t('.role_label')
+      - case @role
+      - when 'viewer'
+        span.font-semibold.text-gray-700 = " #{t('.roles.viewer')}"
+      - when 'operator'
+        span.font-semibold.text-blue-700 = " #{t('.roles.operator')}"
+      - when 'admin'
+        span.font-semibold.text-green-700 = " #{t('.roles.admin')}"
+
+  .bg-gray-50.rounded-lg.p-4.mb-6
+    p.text-sm.text-gray-600.mb-2 = t('.send_link')
+    .flex.items-center.gap-2
+      input.flex-1.bg-white.border.rounded.px-3.py-2.text-sm.font-mono.text-gray-700 readonly="readonly" value=@invite_url id="invite-url"
+      button.bg-blue-500.hover:bg-blue-600.text-white.px-4.py-2.rounded.text-sm type="button" onclick="copyInviteUrl()" = t('.copy')
+
+  .text-sm.text-gray-500.mb-6
+    p.mb-2 = t('.instruction_title')
+    ol.list-decimal.list-inside.space-y-1
+      li = t('.instruction_1')
+      li = t('.instruction_2')
+      li = t('.instruction_3')
+      li = t('.instruction_4')
+
+  .bg-yellow-50.border-l-4.border-yellow-400.p-4.mb-6
+    .flex
+      .flex-shrink-0
+        span.text-yellow-400 ⚠️
+      .ml-3
+        p.text-sm.text-yellow-700 = t('.link_warning')
+
+  = link_to t('.back'), tenant_members_path, class: 'block text-center bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded'
+
+javascript:
+  function copyInviteUrl() {
+    const input = document.getElementById('invite-url');
+    input.select();
+    document.execCommand('copy');
+    alert('#{j t('.copy_alert')}');
+  }

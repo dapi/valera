@@ -3,7 +3,7 @@
 module Tenants
   # Base controller for tenant dashboard.
   # Current.tenant is set by TenantSubdomainConstraint in routes.
-  # Authenticates owner via session.
+  # Authenticates users with access (owner or member) via session.
   #
   # @example Usage in child controller
   #   class Tenants::HomeController < Tenants::ApplicationController
@@ -13,9 +13,12 @@ module Tenants
   #   end
   #
   class ApplicationController < ::ApplicationController
-    before_action :authenticate_owner!
+    include RoleAuthorization
 
-    helper_method :current_user, :user_signed_in?, :current_tenant
+    before_action :authenticate_user_with_access!
+
+    helper_method :current_user, :user_signed_in?, :current_tenant, :current_membership,
+                  :current_user_is_owner?, :current_user_is_admin?, :current_user_can_manage_members?
 
     layout 'tenants/application'
 
@@ -28,12 +31,44 @@ module Tenants
       Current.tenant
     end
 
-    # Ensures current user is the owner of the tenant.
-    # Redirects to login if not authenticated or not the owner.
-    def authenticate_owner!
-      return if current_tenant&.owner_id == current_user&.id
+    # Returns current user's membership for current tenant.
+    # nil if user is owner (no membership needed).
+    #
+    # @return [TenantMembership, nil]
+    def current_membership
+      return @current_membership if defined?(@current_membership)
+      return @current_membership = nil unless current_user && current_tenant
+
+      @current_membership = current_user.membership_for(current_tenant)
+    end
+
+    # Ensures current user has access to the tenant (owner or member).
+    # Redirects to login if not authenticated or has no access.
+    def authenticate_user_with_access!
+      return if current_user&.has_access_to?(current_tenant)
 
       redirect_to new_tenant_session_path
+    end
+
+    # Checks if current user is owner of current tenant.
+    #
+    # @return [Boolean]
+    def current_user_is_owner?
+      current_tenant&.owner_id == current_user&.id
+    end
+
+    # Checks if current user is admin (owner or admin member).
+    #
+    # @return [Boolean]
+    def current_user_is_admin?
+      current_user_is_owner? || current_membership&.admin?
+    end
+
+    # Checks if current user can manage members.
+    #
+    # @return [Boolean]
+    def current_user_can_manage_members?
+      current_user_is_owner? || current_membership&.can_manage_members?
     end
 
     # Returns current logged in user from session.
