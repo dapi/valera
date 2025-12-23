@@ -9,6 +9,8 @@ class Tenant < ApplicationRecord
 
   belongs_to :owner, class_name: 'User', optional: true
 
+  has_many :tenant_memberships, dependent: :destroy
+  has_many :members, through: :tenant_memberships, source: :user
   has_many :clients, dependent: :destroy
   has_many :chats, dependent: :destroy
   has_many :bookings, dependent: :destroy

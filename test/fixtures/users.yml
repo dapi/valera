@@ -5,3 +5,19 @@ one:
 two:
   email: owner2@example.com
   name: Owner Two
+
+operator_user:
+  email: operator@example.com
+  name: Operator User
+
+admin_member:
+  email: admin_member@example.com
+  name: Admin Member
+
+viewer_user:
+  email: viewer@example.com
+  name: Viewer User
+
+telegram_only_user:
+  name: Telegram User
+  telegram_user: one

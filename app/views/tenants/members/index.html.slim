@@ -1,0 +1,92 @@
+h1.text-2xl.font-bold.text-gray-800.mb-6 Команда
+
+/ Invite buttons
+.mb-6.flex.gap-4
+  = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
+    = f.hidden_field :role, value: 'viewer'
+    = f.submit 'Пригласить наблюдателя', class: 'bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded cursor-pointer'
+
+  = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
+    = f.hidden_field :role, value: 'operator'
+    = f.submit 'Пригласить оператора', class: 'bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded cursor-pointer'
+
+  = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
+    = f.hidden_field :role, value: 'admin'
+    = f.submit 'Пригласить администратора', class: 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded cursor-pointer'
+
+/ Members table
+.bg-white.rounded-lg.shadow.overflow-hidden
+  table.min-w-full.divide-y.divide-gray-200
+    thead.bg-gray-50
+      tr
+        th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Имя
+        th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Email
+        th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Роль
+        th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Telegram
+        th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Приглашён
+        th.px-6.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Действия
+
+    tbody.bg-white.divide-y.divide-gray-200
+      / Owner row
+      - if @owner
+        tr.bg-yellow-50
+          td.px-6.py-4.whitespace-nowrap
+            .text-sm.font-medium.text-gray-900 = @owner.name
+          td.px-6.py-4.whitespace-nowrap
+            .text-sm.text-gray-500 = @owner.email || '—'
+          td.px-6.py-4.whitespace-nowrap
+            span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-yellow-100.text-yellow-800
+              | Владелец
+          td.px-6.py-4.whitespace-nowrap
+            - if @owner.telegram_linked?
+              span.text-green-600 ✓ Привязан
+            - else
+              span.text-gray-400 Не привязан
+          td.px-6.py-4.whitespace-nowrap.text-sm.text-gray-500 —
+          td.px-6.py-4.whitespace-nowrap.text-right.text-sm.font-medium
+            span.text-gray-400 —
+
+      / Members rows
+      - @memberships.each do |membership|
+        tr
+          td.px-6.py-4.whitespace-nowrap
+            .text-sm.font-medium.text-gray-900 = membership.user.name
+          td.px-6.py-4.whitespace-nowrap
+            .text-sm.text-gray-500 = membership.user.email || '—'
+          td.px-6.py-4.whitespace-nowrap
+            - case membership.role
+            - when 'viewer'
+              span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-gray-100.text-gray-800
+                | Наблюдатель
+            - when 'operator'
+              span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-blue-100.text-blue-800
+                | Оператор
+            - when 'admin'
+              span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-green-100.text-green-800
+                | Администратор
+          td.px-6.py-4.whitespace-nowrap
+            - if membership.user.telegram_linked?
+              span.text-green-600 ✓ Привязан
+            - else
+              span.text-gray-400 Не привязан
+          td.px-6.py-4.whitespace-nowrap.text-sm.text-gray-500
+            - if membership.invited_by
+              = membership.invited_by.name
+            - else
+              | —
+          td.px-6.py-4.whitespace-nowrap.text-right.text-sm.font-medium
+            = button_to 'Удалить', tenant_member_path(membership), method: :delete, data: { confirm: "Удалить #{membership.user.name} из команды?" }, class: 'text-red-600 hover:text-red-900'
+
+/ Role description
+.mt-6.bg-gray-50.rounded-lg.p-4
+  h3.font-semibold.text-gray-700.mb-2 Описание ролей
+  ul.text-sm.text-gray-600.space-y-1
+    li
+      span.font-medium Наблюдатель:
+      |  просмотр чатов, клиентов, статистики
+    li
+      span.font-medium Оператор:
+      |  наблюдатель + ответы клиентам, управление записями
+    li
+      span.font-medium Администратор:
+      |  оператор + настройки, управление командой

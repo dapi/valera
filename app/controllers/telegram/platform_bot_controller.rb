@@ -21,6 +21,8 @@ module Telegram
     def start!(payload = nil)
       if payload.blank?
         handle_empty_start
+      elsif payload.start_with?('MBR_')
+        handle_member_invite(payload)
       elsif payload.start_with?('INV_')
         handle_invite(payload)
       elsif payload.start_with?('GLB_')
@@ -225,6 +227,64 @@ module Telegram
                    }
     end
 
+    # Обработка member invite токена для добавления участника в tenant
+    #
+    # @param key [String] member invite ключ (MBR_...)
+    def handle_member_invite(key)
+      invite_data = auth_service.consume_member_invite_token(key)
+
+      unless invite_data
+        respond_with :message, text: '❌ Приглашение устарело или уже использовано.'
+        return
+      end
+
+      tenant_id = invite_data[:tenant_id] || invite_data['tenant_id']
+      role = invite_data[:role] || invite_data['role']
+      invited_by_user_id = invite_data[:invited_by_user_id] || invite_data['invited_by_user_id']
+
+      tenant = Tenant.find_by(id: tenant_id)
+      unless tenant
+        respond_with :message, text: '❌ Автосервис не найден.'
+        return
+      end
+
+      telegram_user = find_or_create_telegram_user
+      user = find_or_create_user_by_telegram(telegram_user)
+
+      # Проверяем не является ли пользователь уже владельцем
+      if tenant.owner_id == user.id
+        respond_with :message, text: '✅ Вы уже являетесь владельцем этого автосервиса.'
+        return
+      end
+
+      # Проверяем не существует ли уже membership
+      existing_membership = TenantMembership.find_by(tenant: tenant, user: user)
+      if existing_membership
+        respond_with :message, text: "✅ Вы уже являетесь участником этого автосервиса с ролью: #{role_display_name(existing_membership.role)}."
+        return
+      end
+
+      # Создаём membership
+      membership = TenantMembership.new(
+        tenant: tenant,
+        user: user,
+        role: role,
+        invited_by_id: invited_by_user_id
+      )
+
+      if membership.save
+        respond_with :message, text: <<~TEXT
+          ✅ Вы успешно добавлены в команду автосервиса "#{tenant.name}"!
+
+          Ваша роль: #{role_display_name(role)}
+
+          Теперь вы можете входить в панель управления через Telegram.
+        TEXT
+      else
+        respond_with :message, text: '❌ Не удалось добавить вас в команду. Попробуйте позже.'
+      end
+    end
+
     # Обработка invite токена для нового владельца
     #
     # @param key [String] invite ключ (INV_...)
@@ -273,6 +333,34 @@ module Telegram
     # @return [User, nil]
     def find_user_by_telegram(telegram_user)
       User.find_by(telegram_user_id: telegram_user.id)
+    end
+
+    # Находит или создаёт User по TelegramUser
+    # Для member invite нужно создавать нового пользователя если его нет
+    #
+    # @param telegram_user [TelegramUser]
+    # @return [User]
+    def find_or_create_user_by_telegram(telegram_user)
+      user = User.find_by(telegram_user_id: telegram_user.id)
+      return user if user
+
+      User.create!(
+        name: telegram_user.full_name.presence || "User #{telegram_user.telegram_id}",
+        telegram_user_id: telegram_user.id
+      )
+    end
+
+    # Возвращает человекочитаемое название роли
+    #
+    # @param role [String, Symbol]
+    # @return [String]
+    def role_display_name(role)
+      case role.to_s
+      when 'viewer' then 'Наблюдатель'
+      when 'operator' then 'Оператор'
+      when 'admin' then 'Администратор'
+      else role.to_s
+      end
     end
 
     # Строит URL для подтверждения авторизации на tenant
