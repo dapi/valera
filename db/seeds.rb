@@ -32,8 +32,9 @@ end
 AdminUser.find_or_create_by!(email: 'admin@example.com') do |admin|
   admin.password = 'password'
   admin.password_confirmation = 'password'
+  admin.role = :superuser
 end
-Rails.logger.info '[Seeds] Default AdminUser created: admin@example.com / password'
+Rails.logger.info '[Seeds] Default AdminUser created: admin@example.com / password (superuser)'
 
 # =============================================================================
 # Dashboard Demo Data (для визуализации dashboard с заполненными данными)

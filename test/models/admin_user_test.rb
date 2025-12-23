@@ -36,4 +36,35 @@ class AdminUserTest < ActiveSupport::TestCase
     admin = AdminUser.create!(email: 'auth2@example.com', password: 'password')
     assert_not admin.authenticate('wrong')
   end
+
+  # Role tests
+  test 'default role is manager' do
+    admin = AdminUser.create!(email: 'default_role@example.com', password: 'password')
+    assert admin.manager?
+    assert_not admin.superuser?
+  end
+
+  test 'superuser role' do
+    admin = admin_users(:superuser)
+    assert admin.superuser?
+    assert_not admin.manager?
+  end
+
+  test 'manager role' do
+    admin = admin_users(:manager)
+    assert admin.manager?
+    assert_not admin.superuser?
+  end
+
+  test 'can change role from manager to superuser' do
+    admin = AdminUser.create!(email: 'role_change@example.com', password: 'password')
+    assert admin.manager?
+
+    admin.superuser!
+    assert admin.superuser?
+  end
+
+  test 'role enum values' do
+    assert_equal({ 'manager' => 0, 'superuser' => 1 }, AdminUser.roles)
+  end
 end
