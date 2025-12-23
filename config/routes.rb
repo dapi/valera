@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       resources :users
       resources :admin_users
       resources :leads
+      resources :telegram_users, only: %i[index show]
 
       root to: 'tenants#index'
     end
