@@ -43,9 +43,7 @@ class Tenant < ApplicationRecord
   #
   # @return [String] полный URL dashboard
   def dashboard_url
-    port = ApplicationConfig.public_port.to_i
-    port_suffix = port.in?([ 0, 80, 443 ]) ? '' : ":#{port}"
-    "#{ApplicationConfig.protocol}://#{key}.#{ApplicationConfig.host}#{port_suffix}"
+    Rails.application.routes.url_helpers.tenant_root_url(subdomain: key)
   end
 
   private
