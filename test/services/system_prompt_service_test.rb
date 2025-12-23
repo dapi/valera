@@ -27,14 +27,15 @@ class SystemPromptServiceTest < ActiveSupport::TestCase
     assert_includes prompt, 'Tenant Price List'
   end
 
-  test 'returns empty string for blank tenant fields' do
-    @tenant.update!(system_prompt: '', company_info: nil, price_list: nil)
+  test 'uses default values from config when tenant fields are blank' do
+    @tenant.update!(system_prompt: nil, company_info: nil, price_list: nil)
 
     service = SystemPromptService.new(@tenant)
     prompt = service.system_prompt
 
-    # Пустые поля заменяются на пустые строки
-    assert_equal '', prompt
+    # При пустых полях используются дефолты из ApplicationConfig
+    assert_includes prompt, ApplicationConfig.company_info
+    assert_includes prompt, ApplicationConfig.price_list
   end
 
   test 'includes current time when placeholder present' do

@@ -176,28 +176,43 @@ class TenantTest < ActiveSupport::TestCase
     tenant.valid?
   end
 
-  test 'sets defaults from config on create' do
+  test 'allows nil values for prompt fields on create' do
     tenant = Tenant.create!(
       name: 'Defaults Test',
       bot_token: '123456800:ABCdefGHIjklMNOpqrsTUVwxyz'
     )
 
-    assert_not_nil tenant.system_prompt
-    assert_not_nil tenant.welcome_message
-    assert_not_nil tenant.company_info
-    assert_not_nil tenant.price_list
+    assert_nil tenant.system_prompt
+    assert_nil tenant.welcome_message
+    assert_nil tenant.company_info
+    assert_nil tenant.price_list
   end
 
-  test 'does not override existing values on create' do
+  test '*_or_default methods return config defaults when fields are nil' do
+    tenant = Tenant.create!(
+      name: 'Defaults Test',
+      bot_token: '123456801:ABCdefGHIjklMNOpqrsTUVwxyz'
+    )
+
+    assert_equal ApplicationConfig.system_prompt, tenant.system_prompt_or_default
+    assert_equal ApplicationConfig.welcome_message_template, tenant.welcome_message_or_default
+    assert_equal ApplicationConfig.company_info, tenant.company_info_or_default
+    assert_equal ApplicationConfig.price_list, tenant.price_list_or_default
+  end
+
+  test '*_or_default methods return tenant values when fields are set' do
     custom_prompt = 'Custom system prompt'
+    custom_welcome = 'Custom welcome'
 
     tenant = Tenant.create!(
       name: 'Custom Prompt Test',
-      bot_token: '123456801:ABCdefGHIjklMNOpqrsTUVwxyz',
-      system_prompt: custom_prompt
+      bot_token: '123456802:ABCdefGHIjklMNOpqrsTUVwxyz',
+      system_prompt: custom_prompt,
+      welcome_message: custom_welcome
     )
 
-    assert_equal custom_prompt, tenant.system_prompt
+    assert_equal custom_prompt, tenant.system_prompt_or_default
+    assert_equal custom_welcome, tenant.welcome_message_or_default
   end
 
   test 'adds error when Telegram API fails' do

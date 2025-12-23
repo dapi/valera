@@ -105,5 +105,4 @@ class Tenant < ApplicationRecord
     errors.add(:bot_token, :invalid, message: "не удалось получить информацию о боте: #{e.message}")
     throw :abort
   end
-
 end

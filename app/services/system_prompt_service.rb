@@ -38,9 +38,9 @@ class SystemPromptService
   def system_prompt
     current_time = Time.current.in_time_zone.strftime('%d.%m.%Y %H:%M (%Z)')
 
-    tenant.system_prompt.to_s
-      .gsub(/{{\s*COMPANY_INFO\s*}}/, tenant.company_info.to_s)
-      .gsub(/{{\s*PRICE_LIST\s*}}/, tenant.price_list.to_s)
+    tenant.system_prompt_or_default.to_s
+      .gsub(/{{\s*COMPANY_INFO\s*}}/, tenant.company_info_or_default.to_s)
+      .gsub(/{{\s*PRICE_LIST\s*}}/, tenant.price_list_or_default.to_s)
       .gsub(/{{\s*CURRENT_TIME\s*}}/, current_time)
   end
 
