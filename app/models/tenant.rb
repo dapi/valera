@@ -26,11 +26,11 @@ class Tenant < ApplicationRecord
   before_validation :downcase_key, if: -> { key.present? }
   before_validation :generate_webhook_secret, on: :create, if: -> { webhook_secret.blank? }
   before_validation :fetch_bot_username, if: :should_fetch_bot_username?
-  before_create :set_defaults_from_config
-
   # Возвращает Telegram Bot клиент для этого тенанта
   #
   # @return [Telegram::Bot::Client] клиент бота
+  alias_attribute :subdomain, :key
+
   def bot_client
     @bot_client ||= Telegram::Bot::Client.new(bot_token, bot_username)
   end
@@ -43,7 +43,7 @@ class Tenant < ApplicationRecord
   #
   # @return [String] полный URL dashboard
   def dashboard_url
-    Rails.application.routes.url_helpers.tenant_root_url(subdomain: key)
+    Rails.application.routes.url_helpers.tenant_root_url(subdomain: subdomain)
   end
 
   private
