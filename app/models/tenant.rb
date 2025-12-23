@@ -46,6 +46,34 @@ class Tenant < ApplicationRecord
     Rails.application.routes.url_helpers.tenant_root_url(subdomain: subdomain)
   end
 
+  # Возвращает system_prompt или дефолтное значение из конфига
+  #
+  # @return [String] системный промпт
+  def system_prompt_or_default
+    system_prompt.presence || ApplicationConfig.system_prompt
+  end
+
+  # Возвращает welcome_message или дефолтное значение из конфига
+  #
+  # @return [String] приветственное сообщение
+  def welcome_message_or_default
+    welcome_message.presence || ApplicationConfig.welcome_message_template
+  end
+
+  # Возвращает company_info или дефолтное значение из конфига
+  #
+  # @return [String] информация о компании
+  def company_info_or_default
+    company_info.presence || ApplicationConfig.company_info
+  end
+
+  # Возвращает price_list или дефолтное значение из конфига
+  #
+  # @return [String] прайс-лист
+  def price_list_or_default
+    price_list.presence || ApplicationConfig.price_list
+  end
+
   private
 
   def generate_key
@@ -78,10 +106,4 @@ class Tenant < ApplicationRecord
     throw :abort
   end
 
-  def set_defaults_from_config
-    self.system_prompt ||= ApplicationConfig.system_prompt
-    self.welcome_message ||= ApplicationConfig.welcome_message_template
-    self.company_info ||= ApplicationConfig.company_info
-    self.price_list ||= ApplicationConfig.price_list
-  end
 end
