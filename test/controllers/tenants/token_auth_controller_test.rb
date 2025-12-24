@@ -7,7 +7,7 @@ module Tenants
     setup do
       @tenant = tenants(:one)
       @user = @tenant.owner
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
     end
 
     test 'logs in with valid token' do

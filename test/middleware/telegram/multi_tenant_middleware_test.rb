@@ -26,7 +26,7 @@ module Telegram
     end
 
     test 'returns 404 for non-existent tenant' do
-      host! 'nonexistent.lvh.me'
+      host! "nonexistent.#{ApplicationConfig.host}"
       post '/telegram/webhook',
            params: @telegram_update.to_json,
            headers: @valid_headers
@@ -35,7 +35,7 @@ module Telegram
     end
 
     test 'returns 401 for invalid secret token' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       invalid_headers = @valid_headers.merge('X-Telegram-Bot-Api-Secret-Token' => 'wrong_secret')
 
       post '/telegram/webhook',
@@ -47,7 +47,7 @@ module Telegram
     end
 
     test 'returns 401 for missing secret token' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       headers_without_secret = { 'Content-Type' => 'application/json' }
 
       post '/telegram/webhook',
@@ -59,7 +59,7 @@ module Telegram
     end
 
     test 'sets Current.tenant for valid request' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       WebhookController.expects(:dispatch).once.with do |bot, update, _request|
         Current.tenant == @tenant &&
           bot.is_a?(::Telegram::Bot::Client) &&
@@ -74,7 +74,7 @@ module Telegram
     end
 
     test 'passes bot client to dispatch' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       WebhookController.expects(:dispatch).once.with do |bot, _update, _request|
         # Проверяем что передается tenant.bot_client (застабленный в setup)
         bot == @bot_stub
@@ -89,7 +89,7 @@ module Telegram
 
     test 'works with different tenants and sets correct Current.tenant' do
       tenant_two = tenants(:two)
-      host! "#{tenant_two.key}.lvh.me"
+      host! "#{tenant_two.key}.#{ApplicationConfig.host}"
       headers_for_two = {
         'Content-Type' => 'application/json',
         'X-Telegram-Bot-Api-Secret-Token' => tenant_two.webhook_secret
@@ -107,7 +107,7 @@ module Telegram
     end
 
     test 'protects against timing attacks with secure_compare' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       # Ensure we use secure_compare for secret verification
       # This test verifies the implementation doesn't use simple == comparison
       ActiveSupport::SecurityUtils.expects(:secure_compare).at_least_once.returns(true)

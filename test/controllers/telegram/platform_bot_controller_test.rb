@@ -41,16 +41,16 @@ module Telegram
     end
 
     test 'build_confirm_url builds correct URL' do
-      return_url = 'https://example.lvh.me/'
+      return_url = 'https://example.com/'
       token = 'test_token_123'
 
       url = @controller.send(:build_confirm_url, return_url, token)
 
-      assert_equal 'https://example.lvh.me/auth/telegram/confirm?token=test_token_123', url
+      assert_equal 'https://example.com/auth/telegram/confirm?token=test_token_123', url
     end
 
     test 'build_confirm_url escapes token' do
-      return_url = 'https://example.lvh.me/'
+      return_url = 'https://example.com/'
       token = 'token+with/special=chars'
 
       url = @controller.send(:build_confirm_url, return_url, token)

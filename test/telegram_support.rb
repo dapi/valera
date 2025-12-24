@@ -16,7 +16,7 @@ module TelegramSupport
     private
 
     def post_message(text)
-      host! "#{@test_tenant.key}.lvh.me"
+      host! "#{@test_tenant.key}.#{ApplicationConfig.host}"
       post '/telegram/webhook',
            params: message(text).to_json,
            headers: {

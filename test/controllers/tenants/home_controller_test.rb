@@ -11,14 +11,14 @@ module Tenants
     end
 
     test 'redirects to login when not authenticated' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       get '/'
 
       assert_redirected_to '/session/new'
     end
 
     test 'shows dashboard when authenticated' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       get '/'
@@ -28,7 +28,7 @@ module Tenants
     end
 
     test 'shows tenant statistics' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       get '/'
@@ -39,7 +39,7 @@ module Tenants
     end
 
     test 'displays tenant name in sidebar' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       get '/'
@@ -49,7 +49,7 @@ module Tenants
     end
 
     test 'supports period parameter for chart' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       get '/', params: { period: 30 }
@@ -58,7 +58,7 @@ module Tenants
     end
 
     test 'defaults to 7 days period for invalid period' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       get '/', params: { period: 999 }
@@ -67,7 +67,7 @@ module Tenants
     end
 
     test 'shows activity chart section' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       get '/'
@@ -78,7 +78,7 @@ module Tenants
     end
 
     test 'shows recent dialogs section' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       get '/'

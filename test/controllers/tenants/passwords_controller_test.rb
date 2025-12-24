@@ -11,14 +11,14 @@ module Tenants
     end
 
     test 'redirects to login without pending user' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       get '/password/new'
 
       assert_redirected_to '/session/new'
     end
 
     test 'shows set password form with pending user' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'anything' }
 
       get '/password/new'
@@ -28,7 +28,7 @@ module Tenants
     end
 
     test 'sets password and logs in' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'anything' }
 
       post '/password', params: {
@@ -45,7 +45,7 @@ module Tenants
     end
 
     test 'rejects mismatched password confirmation' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'anything' }
 
       post '/password', params: {
@@ -59,7 +59,7 @@ module Tenants
     end
 
     test 'rejects password shorter than 8 characters' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'anything' }
 
       post '/password', params: {

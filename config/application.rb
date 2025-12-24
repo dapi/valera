@@ -39,6 +39,10 @@ module Valera
     # Analytics configuration
     config.analytics_enabled = ENV.fetch('ANALYTICS_ENABLED', 'true') == 'true'
 
+    # Disable ENV loader for test environment to use values from application.yml
+    # (ENV variables like HOST from dev environment would override test config)
+    Anyway.loaders.delete :env if Rails.env.test?
+
     # Configure TLD length for subdomain routing
     # For '3010.brandymint.ru' -> tld_length=2 -> subdomain 'admin' (not 'admin.3010')
     config.action_dispatch.tld_length = ApplicationConfig.tld_length

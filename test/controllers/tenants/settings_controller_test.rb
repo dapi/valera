@@ -11,14 +11,14 @@ module Tenants
     end
 
     test 'redirects to login when not authenticated' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       get '/settings/edit'
 
       assert_redirected_to '/session/new'
     end
 
     test 'shows settings form when authenticated as owner' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       get '/settings/edit'
@@ -32,7 +32,7 @@ module Tenants
       # admin_member already has membership via fixtures (admin_on_tenant_one)
       member = users(:admin_member)
 
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
       # Login as owner first
       post '/session', params: { password: 'password123' }
@@ -48,7 +48,7 @@ module Tenants
     end
 
     test 'updates key successfully' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       new_key = 'newkey12'
@@ -60,7 +60,7 @@ module Tenants
     end
 
     test 'shows error for invalid key format' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       # Key with special chars (will be downcased first, so use something that fails after downcase)
@@ -71,7 +71,7 @@ module Tenants
     end
 
     test 'shows error for key with wrong length' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       patch '/settings', params: { tenant: { key: 'short' } }
@@ -81,7 +81,7 @@ module Tenants
 
     test 'shows error for duplicate key' do
       other_tenant = tenants(:two)
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       patch '/settings', params: { tenant: { key: other_tenant.key } }
@@ -91,7 +91,7 @@ module Tenants
     end
 
     test 'displays current dashboard url' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       get '/settings/edit'

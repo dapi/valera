@@ -11,7 +11,7 @@ module Tenants
     end
 
     test 'shows login page' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       get '/session/new'
 
       assert_response :success
@@ -20,7 +20,7 @@ module Tenants
 
     test 'redirects to set password when owner has no password' do
       @owner.update_column(:password_digest, nil)
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
       post '/session', params: { password: 'anything' }
 
@@ -29,7 +29,7 @@ module Tenants
     end
 
     test 'logs in with correct password' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
       post '/session', params: { password: 'password123' }
 
@@ -38,7 +38,7 @@ module Tenants
     end
 
     test 'rejects incorrect password' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
       post '/session', params: { password: 'wrongpassword' }
 
@@ -47,7 +47,7 @@ module Tenants
     end
 
     test 'logs out successfully' do
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
       delete '/session'
@@ -58,7 +58,7 @@ module Tenants
 
     test 'shows error when tenant has no owner' do
       @tenant.update!(owner: nil)
-      host! "#{@tenant.key}.lvh.me"
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
       post '/session', params: { password: 'password123' }
 
