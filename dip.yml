@@ -33,7 +33,7 @@ interaction:
   dev:
     description: Start full dev stack (server + css + bot)
     service: app
-    command: foreman start -f Procfile.dev
+    command: foreman start -f Procfile.docker
     compose:
       run_options: [service-ports, rm]
 

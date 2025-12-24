@@ -11,12 +11,27 @@ services:
     tmpfs:
       - /tmp:exec
       - /app/tmp/pids
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
     environment:
       RAILS_ENV: development
       DATABASE_URL: postgresql://valera:password@postgres:5432/valera_development
       REDIS_URL: redis://redis:6379/0
       HISTFILE: /app/log/.bash_history
       EDITOR: vim
+      # Server port (default 3000)
+      PORT: ${PORT:-3000}
+      # Telegram Platform Bot (from host environment)
+      PLATFORM_BOT_TOKEN: ${PLATFORM_BOT_TOKEN}
+      PLATFORM_BOT_USERNAME: ${PLATFORM_BOT_USERNAME}
+      PLATFORM_ADMIN_CHAT_ID: ${PLATFORM_ADMIN_CHAT_ID}
+      # LLM Provider API Keys (from host environment)
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      # Bugsnag
+      BUGSNAG_API_KEY: ${BUGSNAG_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy
