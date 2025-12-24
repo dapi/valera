@@ -6,6 +6,7 @@ class Admin::AdminUsersControllerTest < ActionDispatch::IntegrationTest
   setup do
     @superuser = admin_users(:superuser)
     @manager = admin_users(:manager)
+    host! 'admin.lvh.me'
   end
 
   test 'superuser can access admin users index' do

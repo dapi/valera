@@ -9,3 +9,10 @@ two:
   first_name: Maria
   last_name: Ivanova
   photo_url: https://example.com/photo2.jpg
+
+# Unlinked telegram user for testing link operations
+unlinked:
+  username: unlinked_user
+  first_name: Unlinked
+  last_name: User
+  photo_url: https://example.com/photo3.jpg

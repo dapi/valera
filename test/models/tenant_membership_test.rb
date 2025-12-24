@@ -16,20 +16,20 @@ class TenantMembershipTest < ActiveSupport::TestCase
   test 'requires tenant' do
     membership = TenantMembership.new(user: @user, role: :viewer)
     assert_not membership.valid?
-    assert_includes membership.errors[:tenant], 'must exist'
+    assert_includes membership.errors[:tenant], I18n.t('errors.messages.required')
   end
 
   test 'requires user' do
     membership = TenantMembership.new(tenant: @tenant, role: :viewer)
     assert_not membership.valid?
-    assert_includes membership.errors[:user], 'must exist'
+    assert_includes membership.errors[:user], I18n.t('errors.messages.required')
   end
 
   test 'requires role' do
     membership = TenantMembership.new(tenant: @tenant, user: users(:two))
     membership.role = nil
     assert_not membership.valid?
-    assert_includes membership.errors[:role], "can't be blank"
+    assert_includes membership.errors[:role], I18n.t('errors.messages.blank')
   end
 
   test 'user can only have one membership per tenant' do
@@ -39,7 +39,7 @@ class TenantMembershipTest < ActiveSupport::TestCase
       role: :admin
     )
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:user_id], 'has already been taken'
+    assert_includes duplicate.errors[:user_id], I18n.t('errors.messages.taken')
   end
 
   test 'user can have memberships in multiple tenants' do

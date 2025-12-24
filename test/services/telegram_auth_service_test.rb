@@ -200,11 +200,13 @@ class TelegramAuthServiceTest < ActiveSupport::TestCase
       telegram_user: nil
     )
 
-    result = @service.link_user_to_telegram(user, @telegram_user)
+    # Use unlinked telegram user to avoid unique constraint violation
+    unlinked_telegram_user = telegram_users(:unlinked)
+    result = @service.link_user_to_telegram(user, unlinked_telegram_user)
 
     assert result
     user.reload
-    assert_equal @telegram_user.id, user.telegram_user_id
+    assert_equal unlinked_telegram_user.id, user.telegram_user_id
   end
 
   test 'returns false when user already has telegram linked' do
