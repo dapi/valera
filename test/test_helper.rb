@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 ENV['RAILS_ENV'] ||= 'test'
-# Override HOST to use lvh.me for subdomain testing (tld_length = 1)
-ENV['HOST'] = 'lvh.me'
 require_relative '../config/environment'
 require 'rails/test_help'
 
