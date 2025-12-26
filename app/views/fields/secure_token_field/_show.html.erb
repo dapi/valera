@@ -1,0 +1,5 @@
+<% if field.token_set? %>
+  <code style="font-size: 1.1em;"><%= field.masked_value %></code>
+<% else %>
+  <span class="text-muted">Не установлен</span>
+<% end %>

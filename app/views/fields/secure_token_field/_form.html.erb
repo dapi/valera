@@ -1,0 +1,15 @@
+<div class="field-unit__label">
+  <%= f.label field.attribute %>
+</div>
+<div class="field-unit__field">
+  <% if field.token_set? %>
+    <div style="margin-bottom: 0.5rem;">
+      <span class="text-muted">Текущий:</span>
+      <code><%= field.masked_value %></code>
+    </div>
+  <% end %>
+  <%= f.text_field field.new_token_attribute,
+      value: '',
+      placeholder: field.token_set? ? 'Новый токен (оставьте пустым для сохранения текущего)' : 'Введите токен',
+      autocomplete: 'off' %>
+</div>

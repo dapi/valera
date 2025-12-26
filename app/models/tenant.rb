@@ -27,6 +27,10 @@ class Tenant < ApplicationRecord
                   exclusion: { in: ->(_) { ApplicationConfig.reserved_subdomains || [] }, message: :reserved }
   validates :webhook_secret, presence: true
 
+  # Virtual attribute for updating bot_token without exposing the current value
+  attr_accessor :new_bot_token
+  before_validation :apply_new_bot_token, if: -> { new_bot_token.present? }
+
   before_validation :generate_key, on: :create, if: -> { key.blank? }
   before_validation :downcase_key, if: -> { key.present? }
   before_validation :generate_webhook_secret, on: :create, if: -> { webhook_secret.blank? }
@@ -92,6 +96,10 @@ class Tenant < ApplicationRecord
 
   def generate_webhook_secret
     self.webhook_secret = SecureRandom.hex(WEBHOOK_SECRET_LENGTH)
+  end
+
+  def apply_new_bot_token
+    self.bot_token = new_bot_token
   end
 
   def should_fetch_bot_username?
