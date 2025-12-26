@@ -121,7 +121,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.18.6)
       msgpack (~> 1.2)
-    brakeman (7.1.1)
+    brakeman (7.1.2)
       racc
     bugsnag (6.28.0)
       concurrent-ruby (~> 1.0)
