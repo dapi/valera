@@ -23,23 +23,24 @@ Displays detailed information about Telegram bot and webhook status.
       <p><%= @error %></p>
     </div>
   <% else %>
-    <%# Bot Info %>
-    <div class="webhook-status__section">
-      <h2><%= t("admin.tenants.webhooks.show.bot_info") %></h2>
-      <dl class="webhook-status__details">
-        <dt><%= t("admin.tenants.webhooks.show.bot_username") %></dt>
-        <dd>@<%= @bot_info.dig('result', 'username') %></dd>
+    <div class="webhook-status__grid">
+      <%# Bot Info %>
+      <div class="webhook-status__section">
+        <h2><%= t("admin.tenants.webhooks.show.bot_info") %></h2>
+        <dl class="webhook-status__details">
+          <dt><%= t("admin.tenants.webhooks.show.bot_username") %></dt>
+          <dd>@<%= @bot_info.dig('result', 'username') %></dd>
 
-        <dt><%= t("admin.tenants.webhooks.show.bot_name") %></dt>
-        <dd><%= @bot_info.dig('result', 'first_name') %></dd>
+          <dt><%= t("admin.tenants.webhooks.show.bot_name") %></dt>
+          <dd><%= @bot_info.dig('result', 'first_name') %></dd>
 
-        <dt><%= t("admin.tenants.webhooks.show.bot_id") %></dt>
-        <dd><%= @bot_info.dig('result', 'id') %></dd>
-      </dl>
-    </div>
+          <dt><%= t("admin.tenants.webhooks.show.bot_id") %></dt>
+          <dd><%= @bot_info.dig('result', 'id') %></dd>
+        </dl>
+      </div>
 
-    <%# Webhook Status %>
-    <div class="webhook-status__section">
+      <%# Webhook Status %>
+      <div class="webhook-status__section">
       <h2><%= t("admin.tenants.webhooks.show.webhook_status") %></h2>
 
       <% case @webhook_status %>
@@ -84,24 +85,8 @@ Displays detailed information about Telegram bot and webhook status.
       <% end %>
     </div>
 
-    <%# Last Error (shown prominently if present) %>
-    <% webhook_result = @webhook_info['result'] || @webhook_info %>
-    <% if webhook_result['last_error_message'].present? %>
-      <div class="webhook-status__section webhook-status__section--error">
-        <h2><%= t("admin.tenants.webhooks.show.last_error_title") %></h2>
-        <div class="webhook-status__last-error">
-          <p class="webhook-status__error-message"><%= webhook_result['last_error_message'] %></p>
-          <% if webhook_result['last_error_date'].present? %>
-            <p class="webhook-status__error-time">
-              <%= time_ago_in_words(Time.zone.at(webhook_result['last_error_date'])) %> назад
-              (<%= Time.zone.at(webhook_result['last_error_date']).strftime("%d.%m.%Y %H:%M:%S") %>)
-            </p>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-
     <%# Additional Webhook Info %>
+    <% webhook_result = @webhook_info['result'] || @webhook_info %>
     <% if webhook_result.present? %>
       <div class="webhook-status__section">
         <h2><%= t("admin.tenants.webhooks.show.additional_info") %></h2>
@@ -132,6 +117,23 @@ Displays detailed information about Telegram bot and webhook status.
         <pre class="webhook-status__raw"><code><%= JSON.pretty_generate(@webhook_info) %></code></pre>
       </details>
     </div>
+    </div><%# Close grid %>
+
+    <%# Last Error (shown prominently if present, full width) %>
+    <% if webhook_result['last_error_message'].present? %>
+      <div class="webhook-status__section webhook-status__section--error">
+        <h2><%= t("admin.tenants.webhooks.show.last_error_title") %></h2>
+        <div class="webhook-status__last-error">
+          <p class="webhook-status__error-message"><%= webhook_result['last_error_message'] %></p>
+          <% if webhook_result['last_error_date'].present? %>
+            <p class="webhook-status__error-time">
+              <%= time_ago_in_words(Time.zone.at(webhook_result['last_error_date'])) %> назад
+              (<%= Time.zone.at(webhook_result['last_error_date']).strftime("%d.%m.%Y %H:%M:%S") %>)
+            </p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
 
     <%# Actions %>
     <div class="webhook-status__actions">
