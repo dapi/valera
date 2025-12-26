@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_26_070451) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_26_094551) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -214,6 +214,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_26_070451) do
     t.text "company_info"
     t.datetime "created_at", null: false
     t.string "key", null: false
+    t.bigint "manager_id"
     t.string "name"
     t.bigint "owner_id"
     t.text "price_list"
@@ -222,6 +223,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_26_070451) do
     t.string "webhook_secret", null: false
     t.text "welcome_message"
     t.index ["key"], name: "index_tenants_on_key", unique: true
+    t.index ["manager_id"], name: "index_tenants_on_manager_id"
     t.index ["owner_id"], name: "index_tenants_on_owner_id"
   end
 
@@ -277,6 +279,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_26_070451) do
   add_foreign_key "tenant_memberships", "tenants"
   add_foreign_key "tenant_memberships", "users"
   add_foreign_key "tenant_memberships", "users", column: "invited_by_id"
+  add_foreign_key "tenants", "admin_users", column: "manager_id"
   add_foreign_key "tenants", "users", column: "owner_id"
   add_foreign_key "users", "telegram_users"
   add_foreign_key "vehicles", "clients"

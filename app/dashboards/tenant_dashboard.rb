@@ -15,6 +15,7 @@ class TenantDashboard < Administrate::BaseDashboard
     webhook_secret: Field::Password, # Hide sensitive secret
     admin_chat_id: Field::Number,
     owner: Field::BelongsTo,
+    manager: Field::BelongsTo,
     company_info: Field::Text,
     price_list: Field::Text,
     system_prompt: Field::Text,
@@ -31,6 +32,7 @@ class TenantDashboard < Administrate::BaseDashboard
     dashboard_url
     bot_username
     owner
+    manager
     created_at
   ].freeze
 
@@ -44,6 +46,7 @@ class TenantDashboard < Administrate::BaseDashboard
     webhook_secret
     admin_chat_id
     owner
+    manager
     company_info
     price_list
     system_prompt
@@ -59,6 +62,7 @@ class TenantDashboard < Administrate::BaseDashboard
     bot_token
     admin_chat_id
     owner
+    manager
     company_info
     price_list
     system_prompt
