@@ -9,7 +9,7 @@ class Tenant < ApplicationRecord
   BOT_TOKEN_FORMAT = /\A\d+:[A-Za-z0-9_-]+\z/
 
   belongs_to :owner, class_name: 'User', optional: true
-  belongs_to :manager, class_name: 'AdminUser', optional: true
+  belongs_to :manager, class_name: 'AdminUser', optional: true, counter_cache: :managed_tenants_count
 
   has_many :tenant_memberships, dependent: :destroy
   has_many :members, through: :tenant_memberships, source: :user

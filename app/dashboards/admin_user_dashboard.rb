@@ -12,6 +12,7 @@ class AdminUserDashboard < Administrate::BaseDashboard
       searchable: false,
       collection: ->(field) { field.resource.class.roles.keys }
     ),
+    managed_tenants_count: ManagedTenantsCountField,
     managed_tenants: Field::HasMany,
     managed_leads: Field::HasMany,
     created_at: Field::DateTime,
@@ -23,6 +24,7 @@ class AdminUserDashboard < Administrate::BaseDashboard
     name
     email
     role
+    managed_tenants_count
     created_at
   ].freeze
 
@@ -31,6 +33,7 @@ class AdminUserDashboard < Administrate::BaseDashboard
     name
     email
     role
+    managed_tenants_count
     managed_tenants
     managed_leads
     created_at
