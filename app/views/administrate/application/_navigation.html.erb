@@ -87,6 +87,13 @@
     <% else %>
       <span class="navigation__external-link navigation__external-link--disabled">Offer (not set)</span>
     <% end %>
+    <% if ApplicationConfig.requisites_url.present? %>
+      <%= link_to ApplicationConfig.requisites_url, target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
+        Requisites <span class="navigation__external-icon">↗</span>
+      <% end %>
+    <% else %>
+      <span class="navigation__external-link navigation__external-link--disabled">Requisites (not set)</span>
+    <% end %>
   </div>
 
   <div class="navigation__version">
