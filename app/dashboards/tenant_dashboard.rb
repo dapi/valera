@@ -52,28 +52,32 @@ class TenantDashboard < Administrate::BaseDashboard
     created_at
   ].freeze
 
-  SHOW_PAGE_ATTRIBUTES = %i[
-    id
-    name
-    subdomain
-    dashboard_url
-    bot_username
-    chats_count
-    clients_count
-    bookings_count
-    last_message_at
-    bot_token
-    webhook_secret
-    admin_chat_id
-    owner
-    manager
-    company_info
-    price_list
-    system_prompt
-    welcome_message
-    created_at
-    updated_at
-  ].freeze
+  SHOW_PAGE_ATTRIBUTES = {
+    "" => %i[
+      id
+      name
+      subdomain
+      dashboard_url
+      chats_count
+      clients_count
+      bookings_count
+      last_message_at
+      owner
+      manager
+      created_at
+      updated_at
+    ],
+    "Telegram" => %i[
+      bot_username
+      bot_token
+      webhook_secret
+      admin_chat_id
+    ],
+    "Информация о компании" => %i[company_info],
+    "Прайс-лист" => %i[price_list],
+    "Системный промпт" => %i[system_prompt],
+    "Приветствие" => %i[welcome_message]
+  }.freeze
 
   FORM_ATTRIBUTES = {
     "Основное" => %i[
