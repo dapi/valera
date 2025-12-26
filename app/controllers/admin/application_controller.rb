@@ -6,7 +6,7 @@ module Admin
   class ApplicationController < Administrate::ApplicationController
     before_action :authenticate_admin!
 
-    helper_method :current_admin_user
+    helper_method :current_admin_user, :impersonating?, :original_admin_user
 
     private
 
@@ -18,6 +18,16 @@ module Admin
 
     def current_admin_user
       Current.admin_user ||= AdminUser.find_by(id: session[:admin_user_id])
+    end
+
+    def impersonating?
+      session[:original_admin_user_id].present?
+    end
+
+    def original_admin_user
+      return unless impersonating?
+
+      @original_admin_user ||= AdminUser.find_by(id: session[:original_admin_user_id])
     end
 
     # Override this value to specify the number of elements to display at a time

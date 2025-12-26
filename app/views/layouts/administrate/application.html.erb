@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+<head>
+  <meta charset="utf-8">
+  <meta name="ROBOTS" content="NOODP">
+  <meta name="viewport" content="initial-scale=1">
+  <title>
+    <%= content_for(:title) %> - <%= application_title %>
+  </title>
+  <%= render "stylesheet" %>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag if defined?(csp_meta_tag) %>
+  <%= render "javascript" %>
+  <style>
+    .impersonation-banner {
+      background-color: #fbbf24;
+      color: #1f2937;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 500;
+    }
+    .impersonation-banner__text {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .impersonation-banner__stop {
+      background-color: #1f2937;
+      color: #ffffff;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+    }
+    .impersonation-banner__stop:hover {
+      background-color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <%= render "icons" %>
+
+  <% if impersonating? %>
+    <div class="impersonation-banner">
+      <span class="impersonation-banner__text">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <%= t('admin.impersonations.banner_text', name: current_admin_user.name.presence || current_admin_user.email) %>
+      </span>
+      <%= button_to(
+        t('admin.impersonations.stop_button'),
+        admin_stop_impersonating_path,
+        method: :delete,
+        class: 'impersonation-banner__stop'
+      ) %>
+    </div>
+  <% end %>
+
+  <div class="app-container">
+    <%= render "navigation" -%>
+
+    <main class="main-content">
+      <%= render "flashes" -%>
+      <%= yield %>
+    </main>
+  </div>
+</body>
+</html>
