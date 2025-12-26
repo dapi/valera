@@ -12,6 +12,7 @@ default: &default
   requisites_url: 'https://pismenny.ru/Реквизиты.pdf'
   commercial_proposal_url: 'https://docs.google.com/document/d/1lrCkM8d89AZZtbZVa3pdxZKzrSuu0rN8WcKRh1Dd-4I/edit?tab=t.0'
   contract_url: 'https://docs.google.com/document/d/1xY_Us9x0zT6eH3qbUJf1PeOjg2ykFW4Lhh81a4vyp_A/edit?usp=sharing'
+  project_folder_url: 'https://drive.google.com/drive/folders/1O3R0DMi1T5oJj6EFjVfPOBjbp7Rg3-Jo?usp=share_link'
 
   # File paths
   system_prompt_path: './data/system-prompt.md'

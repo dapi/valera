@@ -108,6 +108,13 @@
     <% else %>
       <span class="navigation__external-link navigation__external-link--disabled">Договор (not set)</span>
     <% end %>
+    <% if ApplicationConfig.project_folder_url.present? %>
+      <%= link_to ApplicationConfig.project_folder_url, target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
+        Документы <span class="navigation__external-icon">↗</span>
+      <% end %>
+    <% else %>
+      <span class="navigation__external-link navigation__external-link--disabled">Документы (not set)</span>
+    <% end %>
   </div>
 
   <div class="navigation__version">
