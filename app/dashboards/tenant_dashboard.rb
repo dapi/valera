@@ -25,8 +25,16 @@ class TenantDashboard < Administrate::BaseDashboard
       fields: %i[owner manager],
       field_types: { owner: Field::BelongsTo, manager: Field::BelongsTo }
     ),
-    company_info: TextWithDefaultField.with_options(default_method: :company_info_or_default, rows: 30),
-    price_list: TextWithDefaultField.with_options(default_method: :price_list_or_default, rows: 30),
+    company_info: TextWithDefaultField.with_options(
+      default_method: :company_info_or_default,
+      rows: 30,
+      hint: 'Название, адрес, телефон, email, реквизиты, время работы — всё что AI должен знать о компании'
+    ),
+    price_list: TextWithDefaultField.with_options(
+      default_method: :price_list_or_default,
+      rows: 30,
+      hint: 'CSV формат: услуга, цена по классам авто. AI использует для расчёта стоимости'
+    ),
     system_prompt: TextWithDefaultField.with_options(
       default_method: :system_prompt_or_default,
       rows: 30,
@@ -35,7 +43,11 @@ class TenantDashboard < Administrate::BaseDashboard
             '<code>{{PRICE_LIST}}</code> — прайс-лист, ' \
             '<code>{{CURRENT_TIME}}</code> — текущее время'
     ),
-    welcome_message: TextWithDefaultField.with_options(default_method: :welcome_message_or_default, rows: 30),
+    welcome_message: TextWithDefaultField.with_options(
+      default_method: :welcome_message_or_default,
+      rows: 30,
+      hint: 'Первое сообщение при старте диалога. Поддерживает Markdown форматирование'
+    ),
     clients: Field::HasMany,
     chats: Field::HasMany,
     chats_count: CounterLinkField.with_options(resource_name: :chats),
