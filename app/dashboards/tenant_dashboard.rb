@@ -79,10 +79,12 @@ class TenantDashboard < Administrate::BaseDashboard
     "Основное" => %i[
       name
       subdomain
+      owner_and_manager
+    ],
+    "Telegram" => %i[
       bot_token
       bot_username
       admin_chat_id
-      owner_and_manager
     ],
     "Информация о компании" => %i[company_info],
     "Прайс-лист" => %i[price_list],
