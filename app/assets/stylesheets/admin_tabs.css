@@ -76,3 +76,132 @@
   color: #666;
   margin-right: 0.5rem;
 }
+
+/* Webhook Status Page */
+
+.webhook-status__section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.webhook-status__section h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.webhook-status__details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+.webhook-status__details dt {
+  font-weight: 500;
+  color: #666;
+}
+
+.webhook-status__details dd {
+  margin: 0;
+  word-break: break-all;
+}
+
+.webhook-status__details code {
+  background: #e9ecef;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.webhook-status__badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.webhook-status__badge--success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.webhook-status__badge--warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.webhook-status__badge--danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.webhook-status__description {
+  margin: 0 0 1rem;
+  color: #666;
+}
+
+.webhook-status__error {
+  padding: 1.5rem;
+  background: #f8d7da;
+  border-radius: 8px;
+  color: #721c24;
+}
+
+.webhook-status__error h2 {
+  margin: 0 0 0.5rem;
+}
+
+.webhook-status__error-message {
+  color: #dc3545;
+  font-weight: 500;
+  margin: 0;
+}
+
+.webhook-status__section--error {
+  background: #fff5f5;
+  border: 1px solid #f8d7da;
+}
+
+.webhook-status__section--error h2 {
+  color: #721c24;
+}
+
+.webhook-status__last-error {
+  padding: 0;
+}
+
+.webhook-status__error-time {
+  color: #666;
+  font-size: 0.9em;
+  margin: 0.5rem 0 0;
+}
+
+.webhook-status__actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.webhook-status__raw {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.85em;
+  margin-top: 0.5rem;
+}
+
+.webhook-status__section details summary {
+  cursor: pointer;
+  color: #0066cc;
+  font-weight: 500;
+}
+
+.webhook-status__section details summary:hover {
+  text-decoration: underline;
+}

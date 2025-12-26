@@ -1,0 +1,160 @@
+<%#
+# Webhook Status Page
+
+Displays detailed information about Telegram bot and webhook status.
+%>
+
+<% content_for(:title) { t("admin.tenants.webhooks.show.title") } %>
+
+<header class="main-content__header">
+  <h1 class="main-content__page-title">
+    <%= content_for(:title) %>: <%= @tenant.name %>
+  </h1>
+
+  <div>
+    <%= link_to t("administrate.actions.back"), [:edit, :admin, @tenant, anchor: "telegram"], class: "button" %>
+  </div>
+</header>
+
+<section class="main-content__body webhook-status">
+  <% if @error %>
+    <div class="webhook-status__error">
+      <h2><%= t("admin.tenants.webhooks.show.error_title") %></h2>
+      <p><%= @error %></p>
+    </div>
+  <% else %>
+    <%# Bot Info %>
+    <div class="webhook-status__section">
+      <h2><%= t("admin.tenants.webhooks.show.bot_info") %></h2>
+      <dl class="webhook-status__details">
+        <dt><%= t("admin.tenants.webhooks.show.bot_username") %></dt>
+        <dd>@<%= @bot_info.dig('result', 'username') %></dd>
+
+        <dt><%= t("admin.tenants.webhooks.show.bot_name") %></dt>
+        <dd><%= @bot_info.dig('result', 'first_name') %></dd>
+
+        <dt><%= t("admin.tenants.webhooks.show.bot_id") %></dt>
+        <dd><%= @bot_info.dig('result', 'id') %></dd>
+      </dl>
+    </div>
+
+    <%# Webhook Status %>
+    <div class="webhook-status__section">
+      <h2><%= t("admin.tenants.webhooks.show.webhook_status") %></h2>
+
+      <% case @webhook_status %>
+      <% when :not_set %>
+        <div class="webhook-status__badge webhook-status__badge--warning">
+          <%= t("admin.tenants.webhooks.show.status_not_set") %>
+        </div>
+        <p class="webhook-status__description">
+          <%= t("admin.tenants.webhooks.show.status_not_set_description") %>
+        </p>
+        <dl class="webhook-status__details">
+          <dt><%= t("admin.tenants.webhooks.show.expected_url") %></dt>
+          <dd><code><%= @expected_url %></code></dd>
+        </dl>
+
+      <% when :correct %>
+        <div class="webhook-status__badge webhook-status__badge--success">
+          <%= t("admin.tenants.webhooks.show.status_correct") %>
+        </div>
+        <p class="webhook-status__description">
+          <%= t("admin.tenants.webhooks.show.status_correct_description") %>
+        </p>
+        <dl class="webhook-status__details">
+          <dt><%= t("admin.tenants.webhooks.show.current_url") %></dt>
+          <dd><code><%= @current_url %></code></dd>
+        </dl>
+
+      <% when :mismatch %>
+        <div class="webhook-status__badge webhook-status__badge--danger">
+          <%= t("admin.tenants.webhooks.show.status_mismatch") %>
+        </div>
+        <p class="webhook-status__description">
+          <%= t("admin.tenants.webhooks.show.status_mismatch_description") %>
+        </p>
+        <dl class="webhook-status__details">
+          <dt><%= t("admin.tenants.webhooks.show.current_url") %></dt>
+          <dd><code><%= @current_url %></code></dd>
+
+          <dt><%= t("admin.tenants.webhooks.show.expected_url") %></dt>
+          <dd><code><%= @expected_url %></code></dd>
+        </dl>
+      <% end %>
+    </div>
+
+    <%# Last Error (shown prominently if present) %>
+    <% webhook_result = @webhook_info['result'] || @webhook_info %>
+    <% if webhook_result['last_error_message'].present? %>
+      <div class="webhook-status__section webhook-status__section--error">
+        <h2><%= t("admin.tenants.webhooks.show.last_error_title") %></h2>
+        <div class="webhook-status__last-error">
+          <p class="webhook-status__error-message"><%= webhook_result['last_error_message'] %></p>
+          <% if webhook_result['last_error_date'].present? %>
+            <p class="webhook-status__error-time">
+              <%= time_ago_in_words(Time.zone.at(webhook_result['last_error_date'])) %> назад
+              (<%= Time.zone.at(webhook_result['last_error_date']).strftime("%d.%m.%Y %H:%M:%S") %>)
+            </p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Additional Webhook Info %>
+    <% if webhook_result.present? %>
+      <div class="webhook-status__section">
+        <h2><%= t("admin.tenants.webhooks.show.additional_info") %></h2>
+        <dl class="webhook-status__details">
+          <% if webhook_result['pending_update_count'].present? %>
+            <dt><%= t("admin.tenants.webhooks.show.pending_updates") %></dt>
+            <dd><%= webhook_result['pending_update_count'] %></dd>
+          <% end %>
+
+          <% if webhook_result['max_connections'].present? %>
+            <dt><%= t("admin.tenants.webhooks.show.max_connections") %></dt>
+            <dd><%= webhook_result['max_connections'] %></dd>
+          <% end %>
+
+          <% if webhook_result['ip_address'].present? %>
+            <dt><%= t("admin.tenants.webhooks.show.ip_address") %></dt>
+            <dd><%= webhook_result['ip_address'] %></dd>
+          <% end %>
+        </dl>
+      </div>
+    <% end %>
+
+    <%# Raw Response for Diagnostics %>
+    <div class="webhook-status__section">
+      <h2><%= t("admin.tenants.webhooks.show.raw_response") %></h2>
+      <details>
+        <summary><%= t("admin.tenants.webhooks.show.show_raw_data") %></summary>
+        <pre class="webhook-status__raw"><code><%= JSON.pretty_generate(@webhook_info) %></code></pre>
+      </details>
+    </div>
+
+    <%# Actions %>
+    <div class="webhook-status__actions">
+      <%= link_to(
+        t("admin.tenants.webhooks.show.refresh"),
+        admin_tenant_webhook_path(@tenant),
+        class: "button"
+      ) %>
+
+      <%= button_to(
+        t("admin.tenants.show.setup_webhook"),
+        admin_tenant_webhook_path(@tenant),
+        method: :post,
+        class: "button button--success"
+      ) %>
+
+      <%= button_to(
+        t("admin.tenants.show.remove_webhook"),
+        admin_tenant_webhook_path(@tenant),
+        method: :delete,
+        class: "button button--danger",
+        data: { turbo_confirm: t("admin.tenants.show.remove_webhook_confirm") }
+      ) %>
+    </div>
+  <% end %>
+</section>

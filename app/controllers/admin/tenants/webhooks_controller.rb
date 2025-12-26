@@ -9,15 +9,17 @@ module Admin
       before_action :set_tenant
 
       # GET /admin/tenants/:tenant_id/webhook
-      # Показывает информацию о текущем webhook
+      # Показывает информацию о текущем webhook на отдельной странице
       def show
-        bot_info = @tenant.bot_client.get_me
-        webhook_info = TenantWebhookService.new(@tenant).webhook_info
+        @bot_info = @tenant.bot_client.get_me
+        @webhook_info = TenantWebhookService.new(@tenant).webhook_info
+        @expected_url = @tenant.webhook_url
+        # Telegram API возвращает данные в result.url
+        @current_url = @webhook_info.dig('result', 'url')
 
-        webhook_status = build_webhook_status(webhook_info)
-        redirect_back_or_to [ :admin, @tenant ], notice: t('.success', username: bot_info.dig('result', 'username'), webhook: webhook_status)
+        @webhook_status = determine_webhook_status
       rescue TenantWebhookService::TelegramApiError, Telegram::Bot::Error => e
-        redirect_back_or_to [ :admin, @tenant ], alert: t('.error', message: e.message)
+        @error = e.message
       end
 
       # POST /admin/tenants/:tenant_id/webhook
@@ -46,19 +48,12 @@ module Admin
         @tenant = Tenant.find(params[:tenant_id])
       end
 
-      # Формирует статус webhook для отображения
-      # @param webhook_info [Hash] информация о webhook из Telegram API
-      # @return [String] статус webhook
-      def build_webhook_status(webhook_info)
-        current_url = webhook_info['url']
-        return t('.webhook_not_set') if current_url.blank?
+      # Определяет статус webhook
+      # @return [Symbol] :not_set, :correct, :mismatch
+      def determine_webhook_status
+        return :not_set if @current_url.blank?
 
-        expected_url = @tenant.webhook_url
-        if current_url == expected_url
-          t('.webhook_correct', url: current_url)
-        else
-          t('.webhook_mismatch', current: current_url, expected: expected_url)
-        end
+        @current_url == @expected_url ? :correct : :mismatch
       end
     end
   end

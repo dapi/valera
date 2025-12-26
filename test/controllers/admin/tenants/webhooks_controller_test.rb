@@ -14,8 +14,8 @@ class Admin::Tenants::WebhooksControllerTest < ActionDispatch::IntegrationTest
     sign_in_admin(@superuser)
 
     expected_url = @tenant.webhook_url
-    bot_info = { 'ok' => true, 'result' => { 'username' => 'test_bot', 'id' => 123 } }
-    webhook_info = { 'url' => expected_url }
+    bot_info = { 'ok' => true, 'result' => { 'username' => 'test_bot', 'first_name' => 'Test Bot', 'id' => 123 } }
+    webhook_info = { 'ok' => true, 'result' => { 'url' => expected_url } }
 
     mock_client = mock('Telegram::Bot::Client')
     mock_client.expects(:get_me).returns(bot_info)
@@ -25,16 +25,17 @@ class Admin::Tenants::WebhooksControllerTest < ActionDispatch::IntegrationTest
 
     get admin_tenant_webhook_path(@tenant)
 
-    assert_redirected_to admin_tenant_path(@tenant)
-    assert_match 'test_bot', flash[:notice]
-    assert_match expected_url, flash[:notice]
+    assert_response :success
+    assert_select '.webhook-status__badge--success', text: I18n.t('admin.tenants.webhooks.show.status_correct')
+    assert_select 'dd', text: '@test_bot'
+    assert_select 'code', text: expected_url
   end
 
   test 'show displays warning when webhook URL mismatches' do
     sign_in_admin(@superuser)
 
-    bot_info = { 'ok' => true, 'result' => { 'username' => 'test_bot', 'id' => 123 } }
-    webhook_info = { 'url' => 'https://wrong.example.com/webhook' }
+    bot_info = { 'ok' => true, 'result' => { 'username' => 'test_bot', 'first_name' => 'Test Bot', 'id' => 123 } }
+    webhook_info = { 'ok' => true, 'result' => { 'url' => 'https://wrong.example.com/webhook' } }
 
     mock_client = mock('Telegram::Bot::Client')
     mock_client.expects(:get_me).returns(bot_info)
@@ -44,16 +45,17 @@ class Admin::Tenants::WebhooksControllerTest < ActionDispatch::IntegrationTest
 
     get admin_tenant_webhook_path(@tenant)
 
-    assert_redirected_to admin_tenant_path(@tenant)
-    assert_match 'test_bot', flash[:notice]
-    assert_match 'wrong.example.com', flash[:notice]
+    assert_response :success
+    assert_select '.webhook-status__badge--danger', text: I18n.t('admin.tenants.webhooks.show.status_mismatch')
+    assert_select 'code', text: 'https://wrong.example.com/webhook'
+    assert_select 'code', text: @tenant.webhook_url
   end
 
   test 'show displays not set when webhook is empty' do
     sign_in_admin(@superuser)
 
-    bot_info = { 'ok' => true, 'result' => { 'username' => 'test_bot', 'id' => 123 } }
-    webhook_info = { 'url' => '' }
+    bot_info = { 'ok' => true, 'result' => { 'username' => 'test_bot', 'first_name' => 'Test Bot', 'id' => 123 } }
+    webhook_info = { 'ok' => true, 'result' => { 'url' => '' } }
 
     mock_client = mock('Telegram::Bot::Client')
     mock_client.expects(:get_me).returns(bot_info)
@@ -63,8 +65,9 @@ class Admin::Tenants::WebhooksControllerTest < ActionDispatch::IntegrationTest
 
     get admin_tenant_webhook_path(@tenant)
 
-    assert_redirected_to admin_tenant_path(@tenant)
-    assert_match 'test_bot', flash[:notice]
+    assert_response :success
+    assert_select '.webhook-status__badge--warning', text: I18n.t('admin.tenants.webhooks.show.status_not_set')
+    assert_select 'dd', text: '@test_bot'
   end
 
   test 'show handles API errors' do
@@ -77,8 +80,8 @@ class Admin::Tenants::WebhooksControllerTest < ActionDispatch::IntegrationTest
 
     get admin_tenant_webhook_path(@tenant)
 
-    assert_redirected_to admin_tenant_path(@tenant)
-    assert_match 'Invalid token', flash[:alert]
+    assert_response :success
+    assert_select '.webhook-status__error', text: /Invalid token/
   end
 
   # === CREATE (Setup Webhook) ===
