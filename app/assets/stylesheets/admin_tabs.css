@@ -7,39 +7,45 @@
 .admin-tabs__nav {
   display: flex;
   gap: 0;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 1px solid #ddd;
   margin-bottom: 1.5rem;
+  padding: 0;
 }
 
 .admin-tabs__button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   border: none;
-  background: transparent;
+  border-bottom: 3px solid transparent;
+  background: #f8f9fa;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
+  margin-bottom: -1px;
   font-weight: 500;
-  font-size: 0.95rem;
-  color: #6b7280;
+  font-size: 14px;
+  color: #666;
   transition: all 0.15s ease;
+  border-radius: 4px 4px 0 0;
+  margin-right: 2px;
 }
 
 .admin-tabs__button:hover {
-  color: #374151;
-  background-color: #f9fafb;
+  color: #333;
+  background: #e9ecef;
 }
 
-.admin-tabs__button.active {
-  color: #2563eb;
-  border-bottom-color: #2563eb;
+.admin-tabs__button--active,
+.admin-tabs__button.admin-tabs__button--active {
+  color: #0066cc;
+  background: #fff;
+  border-bottom-color: #0066cc;
 }
 
 .admin-tabs__panel {
   border: none;
   padding: 0;
   margin: 0;
+  min-width: 0;
 }
 
 .admin-tabs__panel[hidden] {
-  display: none;
+  display: none !important;
 }

@@ -28,9 +28,9 @@ Groups fields into "Основное" and "Контент" tabs.
       <% page.attributes(controller.action_name).each_with_index do |(title, _), index| %>
         <button type="button"
                 data-admin-tabs-target="tab"
-                data-action="admin-tabs#switch"
+                data-action="click->admin-tabs#switch"
                 data-index="<%= index %>"
-                class="admin-tabs__button <%= 'active' if index == 0 %>">
+                class="admin-tabs__button<%= ' admin-tabs__button--active' if index == 0 %>">
           <%= title %>
         </button>
       <% end %>
@@ -38,7 +38,7 @@ Groups fields into "Основное" and "Контент" tabs.
 
     <%# Tab panels %>
     <% page.attributes(controller.action_name).each_with_index do |(title, attributes), index| %>
-      <fieldset data-admin-tabs-target="panel" <%= 'hidden' if index > 0 %> class="admin-tabs__panel">
+      <fieldset data-admin-tabs-target="panel" class="admin-tabs__panel" <%= 'hidden' if index > 0 %>>
         <% attributes.each do |attribute| %>
           <div class="field-unit field-unit--<%= attribute.html_class %> field-unit--<%= requireness(attribute) %>">
             <%= render_field attribute, f: f %>

@@ -2,24 +2,29 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["tab", "panel"]
-  static values = { index: { type: Number, default: 0 } }
 
   connect() {
-    this.showTab(this.indexValue)
+    this.showTab(0)
   }
 
   switch(event) {
     event.preventDefault()
-    const index = parseInt(event.currentTarget.dataset.index)
+    event.stopPropagation()
+    const index = parseInt(event.currentTarget.dataset.index, 10)
     this.showTab(index)
   }
 
   showTab(index) {
     this.tabTargets.forEach((tab, i) => {
-      tab.classList.toggle("active", i === index)
+      if (i === index) {
+        tab.classList.add("admin-tabs__button--active")
+      } else {
+        tab.classList.remove("admin-tabs__button--active")
+      }
     })
+
     this.panelTargets.forEach((panel, i) => {
-      panel.hidden = i !== index
+      panel.hidden = (i !== index)
     })
   }
 }
