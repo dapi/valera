@@ -3,7 +3,7 @@ Custom form for Tenant with tabbed interface.
 Groups fields into "Основное" and "Контент" tabs.
 %>
 
-<div data-controller="admin-tabs" class="admin-tabs-container">
+<div data-controller="admin-tabs" class="admin-tabs-container admin-tabs--loading">
   <%= form_with(model: [namespace, page.resource], local: true, class: "form") do |f| %>
     <% if page.resource.errors.any? %>
       <div id="error_explanation">

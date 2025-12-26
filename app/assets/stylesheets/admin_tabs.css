@@ -1,5 +1,11 @@
 /* Admin Tabs Styling */
 
+/* Prevent flash of wrong tab on page load */
+.admin-tabs--loading .admin-tabs__panel,
+.admin-tabs--loading [data-admin-tabs-target="conditional"] {
+  display: none !important;
+}
+
 .admin-tabs {
   margin-bottom: 1.5rem;
 }

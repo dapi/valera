@@ -9,6 +9,9 @@ export default class extends Controller {
     const index = hash ? this.findTabIndexBySlug(hash) : 0
     this.showTab(index >= 0 ? index : 0)
 
+    // Remove loading class to reveal content (prevents flash of wrong tab)
+    this.element.classList.remove("admin-tabs--loading")
+
     // Listen for hash changes (back/forward buttons)
     this.boundHashChange = this.handleHashChange.bind(this)
     window.addEventListener("hashchange", this.boundHashChange)
