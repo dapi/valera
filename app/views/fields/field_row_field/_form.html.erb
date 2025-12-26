@@ -5,7 +5,7 @@
   <% resource = f.object %>
   <% field.fields_config.each do |field_name| %>
     <% field_class = field.field_types[field_name] || Administrate::Field::String %>
-    <% sub_field = field_class.new(field_name, resource.send(field_name), field.page) %>
+    <% sub_field = field_class.new(field_name, resource.send(field_name), field.page, resource: resource) %>
     <div style="flex: 1;">
       <label for="<%= "#{f.object_name}_#{sub_field.permitted_attribute}" %>" style="display: block; margin-bottom: 0.25rem; font-weight: 500;">
         <%= t("activerecord.attributes.#{resource.class.name.underscore}.#{field_name}", default: field_name.to_s.humanize) %>
