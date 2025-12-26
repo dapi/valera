@@ -1,0 +1,51 @@
+<% Administrate::Engine.stylesheets.each do |css_path| %>
+  <%= stylesheet_link_tag css_path %>
+<% end %>
+
+<%= yield :stylesheet %>
+
+<style>
+  .navigation__user {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .navigation__user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .navigation__email {
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    word-break: break-all;
+  }
+
+  .navigation__role {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .navigation__logout {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    text-align: center;
+    transition: background 0.2s;
+  }
+
+  .navigation__logout:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+</style>

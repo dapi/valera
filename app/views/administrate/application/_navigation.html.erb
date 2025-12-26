@@ -1,0 +1,19 @@
+<nav class="navigation">
+  <% if current_admin_user %>
+    <div class="navigation__user">
+      <div class="navigation__user-info">
+        <span class="navigation__email"><%= current_admin_user.email %></span>
+        <span class="navigation__role"><%= current_admin_user.role %></span>
+      </div>
+      <%= link_to "Logout", admin_logout_path, data: { turbo_method: :delete }, class: "navigation__logout" %>
+    </div>
+  <% end %>
+
+  <% Administrate::Namespace.new(namespace).resources_with_index_route.each do |resource| %>
+    <%= link_to(
+      display_resource_name(resource),
+      resource_index_route(resource),
+      class: "navigation__link navigation__link--#{nav_link_state(resource)}"
+    ) if accessible_action?(model_from_resource(resource), :index) %>
+  <% end %>
+</nav>
