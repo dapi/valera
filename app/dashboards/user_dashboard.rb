@@ -42,6 +42,7 @@ class UserDashboard < Administrate::BaseDashboard
   COLLECTION_FILTERS = {}.freeze
 
   def display_resource(user)
-    user.name.presence || user.email
+    name = user.name.presence || user.email
+    "##{user.id} #{name}"
   end
 end
