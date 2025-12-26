@@ -99,6 +99,7 @@ ru:
         chats_count: Чаты
         clients_count: Клиенты
         bookings_count: Записи
+        last_message_at: Последнее сообщение
         created_at: Создан
         updated_at: Обновлён
       admin_user:
