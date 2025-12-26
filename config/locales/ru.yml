@@ -33,12 +33,39 @@ ru:
 
   activerecord:
     models:
+      tenant:
+        one: Автосервис
+        other: Автосервисы
+      user:
+        one: Пользователь
+        other: Пользователи
+      admin_user:
+        one: Администратор
+        other: Администраторы
+      lead:
+        one: Лид
+        other: Лиды
+      telegram_user:
+        one: Telegram
+        other: Telegram
       tenant_membership:
-        one: Membership
-        other: Memberships
+        one: Участник
+        other: Участники
       tenant_invite:
-        one: Invite
-        other: Invites
+        one: Приглашение
+        other: Приглашения
+      client:
+        one: Клиент
+        other: Клиенты
+      chat:
+        one: Чат
+        other: Чаты
+      vehicle:
+        one: Автомобиль
+        other: Автомобили
+      booking:
+        one: Запись
+        other: Записи
     errors:
       models:
         tenant:
