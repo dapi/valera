@@ -3,7 +3,7 @@
 # Client represents a TelegramUser in the context of a specific Tenant (auto service).
 # One TelegramUser can be a client of multiple auto services.
 class Client < ApplicationRecord
-  belongs_to :tenant
+  belongs_to :tenant, counter_cache: true
   belongs_to :telegram_user
 
   has_many :vehicles, dependent: :destroy

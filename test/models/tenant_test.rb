@@ -264,6 +264,73 @@ class TenantTest < ActiveSupport::TestCase
     assert tenant.errors[:bot_token].any?
   end
 
+  # === Counter Cache Tests ===
+
+  test 'chats_count increments when chat is created' do
+    tenant = tenants(:one)
+    client = clients(:one)
+    initial_count = tenant.chats_count
+
+    Chat.create!(tenant: tenant, client: client)
+
+    assert_equal initial_count + 1, tenant.reload.chats_count
+  end
+
+  test 'chats_count decrements when chat is destroyed' do
+    tenant = tenants(:one)
+    chat = chats(:one)
+    initial_count = tenant.chats_count
+
+    chat.destroy
+
+    assert_equal initial_count - 1, tenant.reload.chats_count
+  end
+
+  test 'clients_count increments when client is created' do
+    tenant = tenants(:one)
+    telegram_user = telegram_users(:unlinked)
+    initial_count = tenant.clients_count
+
+    Client.create!(tenant: tenant, telegram_user: telegram_user)
+
+    assert_equal initial_count + 1, tenant.reload.clients_count
+  end
+
+  test 'clients_count decrements when client is destroyed' do
+    tenant = tenants(:one)
+    # Create a client without associated chats for clean destruction
+    telegram_user = TelegramUser.create!(username: 'test_counter_cache', first_name: 'Test')
+    client = Client.create!(tenant: tenant, telegram_user: telegram_user)
+    initial_count = tenant.reload.clients_count
+
+    client.destroy
+
+    assert_equal initial_count - 1, tenant.reload.clients_count
+  end
+
+  test 'bookings_count increments when booking is created' do
+    tenant = tenants(:one)
+    client = clients(:one)
+    chat = chats(:one)
+    initial_count = tenant.bookings_count
+
+    Booking.create!(tenant: tenant, client: client, chat: chat)
+
+    assert_equal initial_count + 1, tenant.reload.bookings_count
+  end
+
+  test 'bookings_count decrements when booking is destroyed' do
+    tenant = tenants(:one)
+    client = clients(:one)
+    chat = chats(:one)
+    booking = Booking.create!(tenant: tenant, client: client, chat: chat)
+    initial_count = tenant.reload.bookings_count
+
+    booking.destroy
+
+    assert_equal initial_count - 1, tenant.reload.bookings_count
+  end
+
   private
 
   def stub_telegram_get_me(username: 'stubbed_bot')

@@ -24,7 +24,7 @@
 class Chat < ApplicationRecord
   include ErrorLogger
 
-  belongs_to :tenant
+  belongs_to :tenant, counter_cache: true
   belongs_to :client
 
   has_one :telegram_user, through: :client

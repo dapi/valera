@@ -3,6 +3,7 @@
 require 'administrate/base_dashboard'
 require_relative '../fields/url_field'
 require_relative '../fields/telegram_bot_field'
+require_relative '../fields/counter_link_field'
 
 class TenantDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
@@ -22,6 +23,9 @@ class TenantDashboard < Administrate::BaseDashboard
     welcome_message: Field::Text,
     clients: Field::HasMany,
     chats: Field::HasMany,
+    chats_count: CounterLinkField.with_options(resource_name: :chats),
+    clients_count: CounterLinkField.with_options(resource_name: :clients),
+    bookings_count: CounterLinkField.with_options(resource_name: :bookings),
     created_at: Field::DateTime,
     updated_at: Field::DateTime
   }.freeze
@@ -31,6 +35,9 @@ class TenantDashboard < Administrate::BaseDashboard
     name
     dashboard_url
     bot_username
+    chats_count
+    clients_count
+    bookings_count
     owner
     manager
     created_at
@@ -42,6 +49,9 @@ class TenantDashboard < Administrate::BaseDashboard
     key
     dashboard_url
     bot_username
+    chats_count
+    clients_count
+    bookings_count
     bot_token
     webhook_secret
     admin_chat_id

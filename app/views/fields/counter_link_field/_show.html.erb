@@ -1,0 +1,5 @@
+<% if field.linkable? %>
+  <%= link_to field.count, field.link_path, style: 'color: #2c5282; text-decoration: underline; font-weight: 500;' %>
+<% else %>
+  <span style="color: #718096;"><%= field.count %></span>
+<% end %>
