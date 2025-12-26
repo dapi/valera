@@ -82,17 +82,17 @@
     <% end %>
     <% if ApplicationConfig.offer_url.present? %>
       <%= link_to ApplicationConfig.offer_url, target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
-        Offer <span class="navigation__external-icon">↗</span>
+        Оферта <span class="navigation__external-icon">↗</span>
       <% end %>
     <% else %>
-      <span class="navigation__external-link navigation__external-link--disabled">Offer (not set)</span>
+      <span class="navigation__external-link navigation__external-link--disabled">Оферта (not set)</span>
     <% end %>
     <% if ApplicationConfig.requisites_url.present? %>
       <%= link_to ApplicationConfig.requisites_url, target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
-        Requisites <span class="navigation__external-icon">↗</span>
+        Реквизиты <span class="navigation__external-icon">↗</span>
       <% end %>
     <% else %>
-      <span class="navigation__external-link navigation__external-link--disabled">Requisites (not set)</span>
+      <span class="navigation__external-link navigation__external-link--disabled">Реквизиты (not set)</span>
     <% end %>
     <% if ApplicationConfig.commercial_proposal_url.present? %>
       <%= link_to ApplicationConfig.commercial_proposal_url, target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
