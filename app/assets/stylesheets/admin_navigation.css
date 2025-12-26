@@ -131,3 +131,32 @@
   font-size: 1.1rem;
   font-weight: bold;
 }
+
+/* Tenant Telegram actions */
+.tenant-telegram-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.button--primary {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+.button--primary:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.button--success {
+  background-color: #16a34a;
+  border-color: #16a34a;
+  color: white;
+}
+
+.button--success:hover {
+  background-color: #15803d;
+  border-color: #15803d;
+}

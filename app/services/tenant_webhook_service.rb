@@ -5,8 +5,8 @@
 # Обеспечивает регистрацию и удаление webhook в Telegram API
 # с использованием secret_token для верификации запросов.
 #
-# @example Регистрация webhook
-#   service = TenantWebhookService.new(tenant, base_url: 'https://example.com')
+# @example Регистрация webhook (с использованием tenant.webhook_url)
+#   service = TenantWebhookService.new(tenant)
 #   result = service.setup_webhook
 #   #=> { ok: true }
 #
@@ -26,32 +26,27 @@ class TenantWebhookService
   class TelegramApiError < StandardError; end
 
   # @param tenant [Tenant] тенант для которого настраивается webhook
-  # @param base_url [String, nil] базовый URL для webhook (например https://example.com)
-  def initialize(tenant, base_url: nil)
+  def initialize(tenant)
     @tenant = tenant
-    @base_url = base_url
   end
 
   # Регистрирует webhook в Telegram для тенанта
   #
   # Вызывает Telegram API setWebhook с:
-  # - URL вида {base_url}/telegram/webhook/{tenant.key}
+  # - URL из tenant.webhook_url
   # - secret_token для верификации запросов
   #
   # @return [Hash] ответ от Telegram API
   # @raise [TelegramApiError] при ошибке вызова API
-  # @raise [ArgumentError] если base_url не задан
   def setup_webhook
-    raise ArgumentError, 'base_url is required for setup_webhook' if @base_url.blank?
-
-    webhook_url = build_webhook_url
+    url = tenant.webhook_url
 
     response = bot_client.set_webhook(
-      url: webhook_url,
+      url:,
       secret_token: tenant.webhook_secret
     )
 
-    log_webhook_setup(response, webhook_url)
+    log_webhook_setup(response, url)
     response
   rescue Telegram::Bot::Error => e
     handle_telegram_error('setup_webhook', e)
@@ -88,14 +83,6 @@ class TenantWebhookService
 
   # Делегируем метод bot_client тенанту
   delegate :bot_client, to: :tenant
-
-  # Формирует URL webhook для тенанта
-  #
-  # @return [String] полный URL webhook
-  # @api private
-  def build_webhook_url
-    "#{@base_url.chomp('/')}/telegram/webhook/#{tenant.key}"
-  end
 
   # Логирует успешную настройку webhook
   #

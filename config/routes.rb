@@ -14,7 +14,10 @@ Rails.application.routes.draw do
       delete 'logout', to: 'sessions#destroy', as: :logout
 
       # Administrate resources
-      resources :tenants
+      resources :tenants do
+        # Telegram webhook management (singular resource)
+        resource :webhook, only: %i[show create destroy], module: :tenants
+      end
       resources :users
       resources :admin_users do
         post :impersonate, on: :member, to: 'impersonations#create'
