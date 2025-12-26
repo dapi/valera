@@ -1,0 +1,10 @@
+<% if field.data.present? %>
+  <div>
+    <code style="font-size: 1.1em;"><%= field.data %></code><span class="text-muted"><%= field.domain_suffix %></span>
+  </div>
+  <div class="mt-1">
+    <a href="<%= field.full_url %>" target="_blank" class="text-muted" style="font-size: 0.9em;">
+      <%= field.full_url %> ↗
+    </a>
+  </div>
+<% end %>

@@ -82,6 +82,7 @@ ru:
         other: Записи
     attributes:
       tenant:
+        subdomain: Поддомен
         manager: Менеджер
         chats_count: Чаты
         clients_count: Клиенты
@@ -99,6 +100,7 @@ ru:
             key:
               invalid_key_format: "должен содержать только строчные латинские буквы и цифры"
               taken: "уже используется другим автосервисом"
+              reserved: "является зарезервированным и не может быть использован"
 
   # Development warnings
   development_warning:

@@ -4,12 +4,13 @@ require 'administrate/base_dashboard'
 require_relative '../fields/url_field'
 require_relative '../fields/telegram_bot_field'
 require_relative '../fields/counter_link_field'
+require_relative '../fields/subdomain_field'
 
 class TenantDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Field::Number,
     name: Field::String,
-    key: Field::String,
+    subdomain: SubdomainField,
     dashboard_url: UrlField.with_options(link_text: ->(field) { "#{URI.parse(field.data).host} ↗" }),
     bot_username: TelegramBotField,
     bot_token: Field::Password, # Hide sensitive token
@@ -46,7 +47,7 @@ class TenantDashboard < Administrate::BaseDashboard
   SHOW_PAGE_ATTRIBUTES = %i[
     id
     name
-    key
+    subdomain
     dashboard_url
     bot_username
     chats_count
@@ -67,9 +68,9 @@ class TenantDashboard < Administrate::BaseDashboard
 
   FORM_ATTRIBUTES = %i[
     name
-    key
-    bot_username
+    subdomain
     bot_token
+    bot_username
     admin_chat_id
     owner
     manager
