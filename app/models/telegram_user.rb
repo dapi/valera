@@ -23,6 +23,8 @@
 class TelegramUser < ApplicationRecord
   has_many :clients, dependent: :destroy
   has_many :chats, dependent: :destroy
+  has_one :user, dependent: :nullify
+  has_many :tenant_memberships, through: :user
 
   # Возвращает имя пользователя для отображения
   #
