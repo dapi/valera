@@ -41,6 +41,8 @@ module Telegram
     def message(message)
       return unless text_message?(message)
 
+      current_tenant.touch(:last_message_at)
+
       chat_id = message.dig('chat', 'id')
 
       # Track dialog start for first message of the day

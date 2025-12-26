@@ -33,6 +33,7 @@ class TenantDashboard < Administrate::BaseDashboard
     chats_count: CounterLinkField.with_options(resource_name: :chats),
     clients_count: CounterLinkField.with_options(resource_name: :clients),
     bookings_count: CounterLinkField.with_options(resource_name: :bookings),
+    last_message_at: Field::DateTime,
     created_at: Field::DateTime,
     updated_at: Field::DateTime
   }.freeze
@@ -47,6 +48,7 @@ class TenantDashboard < Administrate::BaseDashboard
     bookings_count
     owner
     manager
+    last_message_at
     created_at
   ].freeze
 
@@ -59,6 +61,7 @@ class TenantDashboard < Administrate::BaseDashboard
     chats_count
     clients_count
     bookings_count
+    last_message_at
     bot_token
     webhook_secret
     admin_chat_id
