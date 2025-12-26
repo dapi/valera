@@ -111,3 +111,37 @@ build-and-push: docker-build docker-push ## Build, push and deploy
 
 production-psql:
 	PGOPTIONS='' PGPASSWORD=${PRODUCTION_VALERA_DATABASE_PASSWORD} psql -h ${PRODUCTION_VALERA_DATABASE_HOST} -p 5433 -U ${PRODUCTION_VALERA_DATABASE_USERNAME} -d ${PRODUCTION_VALERA_DATABASE_NAME}
+
+# Clone production database to local Docker postgres
+# Usage: make clone-production-db
+# Prerequisites: dip up (postgres running), production env vars set
+clone-production-db: guard-production-env
+	@echo "📦 Dumping production database..."
+	@PGOPTIONS='' PGPASSWORD=${PRODUCTION_VALERA_DATABASE_PASSWORD} \
+		pg_dump -h ${PRODUCTION_VALERA_DATABASE_HOST} -p 5433 \
+		-U ${PRODUCTION_VALERA_DATABASE_USERNAME} \
+		-d ${PRODUCTION_VALERA_DATABASE_NAME} \
+		--no-owner --no-acl --clean --if-exists \
+		-Fc -f tmp/production_dump.dump
+	@echo "✓ Dump saved to tmp/production_dump.dump"
+	@echo ""
+	@echo "🗑️  Recreating local database..."
+	@docker compose exec -T postgres psql -U valera -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'valera_development' AND pid <> pg_backend_pid();" > /dev/null 2>&1 || true
+	@docker compose exec -T postgres dropdb -U valera --if-exists valera_development
+	@docker compose exec -T postgres createdb -U valera valera_development
+	@echo "✓ Local database recreated"
+	@echo ""
+	@echo "📥 Restoring dump to local database..."
+	@cat tmp/production_dump.dump | docker compose exec -T postgres pg_restore -U valera -d valera_development --no-owner --no-acl || true
+	@echo "✓ Database restored"
+	@echo ""
+	@echo "🔄 Running migrations..."
+	@dip rails db:migrate
+	@echo ""
+	@echo "✅ Sync complete! Production data is now in local Docker postgres."
+
+guard-production-env:
+	@test -n "${PRODUCTION_VALERA_DATABASE_HOST}" || (echo "Error: PRODUCTION_VALERA_DATABASE_HOST is not set" && exit 1)
+	@test -n "${PRODUCTION_VALERA_DATABASE_PASSWORD}" || (echo "Error: PRODUCTION_VALERA_DATABASE_PASSWORD is not set" && exit 1)
+	@test -n "${PRODUCTION_VALERA_DATABASE_USERNAME}" || (echo "Error: PRODUCTION_VALERA_DATABASE_USERNAME is not set" && exit 1)
+	@test -n "${PRODUCTION_VALERA_DATABASE_NAME}" || (echo "Error: PRODUCTION_VALERA_DATABASE_NAME is not set" && exit 1)
