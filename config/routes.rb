@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       resources :leads
       resources :telegram_users, only: %i[index show]
       resources :tenant_memberships
+      resources :tenant_invites, only: %i[index show]
 
       root to: 'tenants#index'
     end
@@ -54,6 +55,7 @@ Rails.application.routes.draw do
       resources :members, only: %i[index create destroy] do
         collection do
           get :invite
+          delete 'invites/:id', action: :cancel_invite, as: :cancel_invite
         end
       end
       resource :settings, only: %i[edit update]

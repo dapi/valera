@@ -135,62 +135,6 @@ class TelegramAuthServiceTest < ActiveSupport::TestCase
     assert_nil data
   end
 
-  # === Member Invite Token Tests ===
-
-  test 'creates member invite token' do
-    token = @service.create_member_invite_token(
-      tenant_id: @tenant.id,
-      role: :operator,
-      invited_by_user_id: @user.id
-    )
-
-    assert_not_nil token
-    assert token.start_with?('MBR_'), 'Member invite token must start with MBR_'
-  end
-
-  test 'consumes valid member invite token' do
-    token = @service.create_member_invite_token(
-      tenant_id: @tenant.id,
-      role: :operator,
-      invited_by_user_id: @user.id
-    )
-
-    data = @service.consume_member_invite_token(token)
-
-    assert_not_nil data
-    assert_equal @tenant.id, data[:tenant_id]
-    assert_equal 'operator', data[:role]
-    assert_equal @user.id, data[:invited_by_user_id]
-  end
-
-  test 'consume removes member invite token' do
-    token = @service.create_member_invite_token(
-      tenant_id: @tenant.id,
-      role: :viewer,
-      invited_by_user_id: @user.id
-    )
-
-    @service.consume_member_invite_token(token)
-    data = @service.consume_member_invite_token(token)
-
-    assert_nil data, 'Member invite token should be consumed only once'
-  end
-
-  test 'returns nil for invalid member invite token' do
-    data = @service.consume_member_invite_token('MBR_invalid')
-    assert_nil data
-  end
-
-  test 'member_invite? returns true for MBR_ tokens' do
-    assert @service.member_invite?('MBR_abc123')
-  end
-
-  test 'member_invite? returns false for other tokens' do
-    assert_not @service.member_invite?('INV_abc123')
-    assert_not @service.member_invite?('GLB_abc123')
-    assert_not @service.member_invite?('abc123')
-  end
-
   # === Link User Tests ===
 
   test 'links user to telegram user' do

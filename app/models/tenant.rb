@@ -12,6 +12,7 @@ class Tenant < ApplicationRecord
 
   has_many :tenant_memberships, dependent: :destroy
   has_many :members, through: :tenant_memberships, source: :user
+  has_many :tenant_invites, dependent: :destroy
   has_many :clients, dependent: :destroy
   has_many :chats, dependent: :destroy
   has_many :bookings, dependent: :destroy

@@ -11,6 +11,7 @@ module Tenants
     # GET /members
     def index
       @memberships = current_tenant.tenant_memberships.includes(:user, :invited_by)
+      @pending_invites = current_tenant.tenant_invites.active.includes(:invited_by)
       @owner = current_tenant.owner
     end
 
@@ -22,18 +23,17 @@ module Tenants
         return
       end
 
-      invited_by = current_user
-      token = TelegramAuthService.new.create_member_invite_token(
-        tenant_id: current_tenant.id,
+      invite = current_tenant.tenant_invites.create!(
+        invited_by: current_user,
         role: role,
-        invited_by_user_id: invited_by.id
+        expires_at: 7.days.from_now
       )
 
-      @invite_url = "https://t.me/#{ApplicationConfig.platform_bot_username}?start=#{token}"
+      @invite_url = invite.telegram_url
       @role = role
 
       respond_to do |format|
-        format.html { redirect_to invite_tenant_members_path(token: token, role: role) }
+        format.html { redirect_to invite_tenant_members_path(token: invite.token, role: role) }
         format.turbo_stream
       end
     end
@@ -42,7 +42,8 @@ module Tenants
     def invite
       @token = params[:token]
       @role = params[:role]
-      @invite_url = "https://t.me/#{ApplicationConfig.platform_bot_username}?start=#{@token}"
+      @invite = current_tenant.tenant_invites.find_by(token: @token)
+      @invite_url = @invite&.telegram_url || "https://t.me/#{ApplicationConfig.platform_bot_username}?start=#{@token}"
     end
 
     # DELETE /members/:id
@@ -54,6 +55,13 @@ module Tenants
       else
         redirect_to tenant_members_path, alert: 'Не удалось удалить участника'
       end
+    end
+
+    # DELETE /members/invites/:id
+    def cancel_invite
+      invite = current_tenant.tenant_invites.pending.find(params[:id])
+      invite.cancel!
+      redirect_to tenant_members_path, notice: 'Приглашение отменено'
     end
 
     private
