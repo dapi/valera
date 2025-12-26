@@ -3,6 +3,8 @@
 class Lead < ApplicationRecord
   belongs_to :manager, class_name: 'AdminUser', optional: true
 
+  scope :without_manager, -> { where(manager_id: nil) }
+
   validates :name, presence: true
   validates :phone, presence: true
 

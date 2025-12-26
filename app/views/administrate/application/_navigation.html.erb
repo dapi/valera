@@ -21,11 +21,17 @@
   %>
 
   <% priority.each do |resource| %>
-    <%= link_to(
-      display_resource_name(resource),
-      resource_index_route(resource),
-      class: "navigation__link navigation__link--#{nav_link_state(resource)}"
-    ) if accessible_action?(model_from_resource(resource), :index) %>
+    <% if accessible_action?(model_from_resource(resource), :index) %>
+      <%= link_to resource_index_route(resource), class: "navigation__link navigation__link--#{nav_link_state(resource)}" do %>
+        <%= display_resource_name(resource) %>
+        <% if resource.to_s == 'leads' %>
+          <% unassigned_count = Lead.without_manager.count %>
+          <% if unassigned_count > 0 %>
+            <span class="navigation__badge"><%= unassigned_count %></span>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
   <% end %>
 
   <% if priority.any? && platform_resources.any? %>
