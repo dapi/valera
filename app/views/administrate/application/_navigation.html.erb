@@ -73,6 +73,13 @@
     <% else %>
       <span class="navigation__external-link navigation__external-link--disabled">Support (not set)</span>
     <% end %>
+    <% if ApplicationConfig.demo_bot_username.present? %>
+      <%= link_to "https://t.me/#{ApplicationConfig.demo_bot_username}", target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
+        Demo Bot <span class="navigation__external-icon">↗</span>
+      <% end %>
+    <% else %>
+      <span class="navigation__external-link navigation__external-link--disabled">Demo Bot (not set)</span>
+    <% end %>
   </div>
 
   <div class="navigation__version">
