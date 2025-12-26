@@ -94,6 +94,13 @@
     <% else %>
       <span class="navigation__external-link navigation__external-link--disabled">Requisites (not set)</span>
     <% end %>
+    <% if ApplicationConfig.commercial_proposal_url.present? %>
+      <%= link_to ApplicationConfig.commercial_proposal_url, target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
+        КП <span class="navigation__external-icon">↗</span>
+      <% end %>
+    <% else %>
+      <span class="navigation__external-link navigation__external-link--disabled">КП (not set)</span>
+    <% end %>
   </div>
 
   <div class="navigation__version">

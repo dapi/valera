@@ -37,6 +37,7 @@ class ApplicationConfig < Anyway::Config
     :support_email,
     :offer_url,
     :requisites_url,
+    :commercial_proposal_url,
 
     # File paths
     :system_prompt_path,
@@ -138,7 +139,8 @@ class ApplicationConfig < Anyway::Config
     support_telegram: :string,
     support_email: :string,
     offer_url: :string,
-    requisites_url: :string
+    requisites_url: :string,
+    commercial_proposal_url: :string
   )
 
   # System prompt
