@@ -10,3 +10,16 @@
   font-size: 13px;
   line-height: 1.4;
 }
+
+/* Full-width layout for single-field tabs */
+.field-unit--text-with-default-field {
+  display: block;
+}
+
+.field-unit--text-with-default-field .field-unit__label {
+  margin-bottom: 0.5rem;
+}
+
+.field-unit--text-with-default-field .field-unit__field {
+  max-width: 100%;
+}

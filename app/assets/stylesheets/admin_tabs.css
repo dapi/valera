@@ -56,6 +56,12 @@
   display: none !important;
 }
 
+/* Remove left margin from submit button in tabbed form */
+.admin-tabs-container .form-actions {
+  margin-left: 0;
+  padding-left: 0;
+}
+
 /* Telegram Actions Styling */
 
 .tenant-telegram-separator {

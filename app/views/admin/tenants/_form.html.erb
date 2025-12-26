@@ -62,18 +62,4 @@ Groups fields into "Основное" and "Контент" tabs.
       <%= f.submit %>
     </div>
   <% end %>
-
-  <%# Webhook management link (only for existing tenants and Telegram tab) %>
-  <% if page.resource.persisted? %>
-    <div data-admin-tabs-target="conditional" data-show-for-tab="telegram" hidden>
-      <hr class="tenant-telegram-separator">
-      <div class="tenant-telegram-actions">
-        <%= link_to(
-          t("admin.tenants.form.webhook_management"),
-          admin_tenant_webhook_path(page.resource),
-          class: "button"
-        ) %>
-      </div>
-    </div>
-  <% end %>
 </div>
