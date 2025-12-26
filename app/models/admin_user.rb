@@ -9,4 +9,9 @@ class AdminUser < ApplicationRecord
 
   validates :email, presence: true, uniqueness: true, 'valid_email_2/email': true
   validates :role, presence: true
+
+  # Virtual attribute for Administrate impersonate field
+  def impersonate
+    self
+  end
 end
