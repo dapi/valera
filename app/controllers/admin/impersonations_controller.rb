@@ -40,14 +40,6 @@ module Admin
 
     private
 
-    def authorize_superuser!
-      original_user = session[:original_admin_user_id] ? AdminUser.find_by(id: session[:original_admin_user_id]) : current_admin_user
-
-      return if original_user&.superuser?
-
-      redirect_to admin_root_path, alert: t('admin.impersonations.access_denied')
-    end
-
     def set_target_admin_user
       @target_admin_user = AdminUser.find(params[:id])
     end

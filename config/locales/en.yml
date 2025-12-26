@@ -40,6 +40,8 @@ en:
       access_denied: "Access denied. Superuser privileges required."
       banner_text: "You are impersonating %{name}"
       stop_button: Stop Impersonating
+    admin_users:
+      edit_own_profile_only: "Access denied. You can only edit your own profile."
   activerecord:
     models:
       tenant_membership:

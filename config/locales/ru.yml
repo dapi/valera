@@ -42,6 +42,8 @@ ru:
       access_denied: "Доступ запрещён. Требуются права суперпользователя."
       banner_text: "Вы вошли как %{name}"
       stop_button: Вернуться
+    admin_users:
+      edit_own_profile_only: "Доступ запрещён. Вы можете редактировать только свой профиль."
 
   activerecord:
     models:
@@ -61,8 +63,8 @@ ru:
         one: Telegram
         other: Telegram
       tenant_membership:
-        one: Участник
-        other: Участники
+        one: Сотрудник
+        other: Сотрудники
       tenant_invite:
         one: Приглашение
         other: Приглашения

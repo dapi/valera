@@ -30,6 +30,15 @@ module Admin
       @original_admin_user ||= AdminUser.find_by(id: session[:original_admin_user_id])
     end
 
+    def authorize_superuser!
+      # When impersonating, check the original user's role
+      user_to_check = impersonating? ? original_admin_user : current_admin_user
+
+      return if user_to_check&.superuser?
+
+      redirect_to admin_root_path, alert: t('admin.impersonations.access_denied')
+    end
+
     # Override this value to specify the number of elements to display at a time
     # on index pages. Defaults to 20.
     # def records_per_page
