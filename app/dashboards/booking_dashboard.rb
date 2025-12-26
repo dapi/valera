@@ -41,7 +41,8 @@ class BookingDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = [].freeze
 
   COLLECTION_FILTERS = {
-    tenant: ->(resources, attr) { resources.where(tenant_id: attr) }
+    tenant: ->(resources, attr) { resources.where(tenant_id: attr) },
+    tenant_id: ->(resources, attr) { resources.where(tenant_id: attr) }
   }.freeze
 
   def display_resource(booking)

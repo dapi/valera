@@ -31,7 +31,7 @@
 # @since 0.1.0
 class Booking < ApplicationRecord
   belongs_to :chat
-  belongs_to :tenant
+  belongs_to :tenant, counter_cache: true
   belongs_to :client
   belongs_to :vehicle, optional: true
 
