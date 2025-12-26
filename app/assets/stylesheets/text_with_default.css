@@ -1,28 +1,30 @@
 /* Styles for TextWithDefaultField */
 
-/* Override Administrate grid layout - make field full width */
+/* Override Administrate flex layout - make full width block */
 .field-unit--text-with-default-field {
   display: block !important;
-  max-width: 100% !important;
 }
 
-/* Wrapper for full-width layout with label on top */
-.text-with-default-wrapper {
-  display: block;
-  width: 100%;
-  max-width: 100%;
+/* Remove Administrate's 15% label width - make full width on top */
+.field-unit--text-with-default-field .field-unit__label {
+  width: 100% !important;
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-bottom: 0.5rem !important;
+  float: none !important;
 }
 
-.text-with-default-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+/* Remove Administrate's margin on field - make full width */
+.field-unit--text-with-default-field .field-unit__field {
+  width: 100% !important;
+  margin-left: 0 !important;
+  float: none !important;
 }
 
+/* Textarea styling */
 .text-with-default-textarea {
   display: block;
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
   font-family: monospace;
   font-size: 13px;
