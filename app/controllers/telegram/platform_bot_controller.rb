@@ -207,22 +207,14 @@ module Telegram
     #
     # @param key [String] member invite ключ (MBR_...)
     def handle_member_invite(key)
-      invite_data = auth_service.consume_member_invite_token(key)
+      invite = TenantInvite.active.find_by(token: key)
 
-      unless invite_data
+      unless invite
         respond_with :message, text: I18n.t('platform_bot.errors.invite_expired')
         return
       end
 
-      tenant_id = invite_data[:tenant_id] || invite_data['tenant_id']
-      role = invite_data[:role] || invite_data['role']
-      invited_by_user_id = invite_data[:invited_by_user_id] || invite_data['invited_by_user_id']
-
-      tenant = Tenant.find_by(id: tenant_id)
-      unless tenant
-        respond_with :message, text: I18n.t('platform_bot.errors.tenant_not_found')
-        return
-      end
+      tenant = invite.tenant
 
       telegram_user = find_or_create_telegram_user
       user = find_or_create_user_by_telegram(telegram_user)
@@ -240,19 +232,20 @@ module Telegram
         return
       end
 
-      # Создаём membership
-      membership = TenantMembership.new(
-        tenant: tenant,
-        user: user,
-        role: role,
-        invited_by_id: invited_by_user_id
-      )
-
-      if membership.save
-        respond_with :message, text: I18n.t('platform_bot.messages.member_added', tenant_name: tenant.name, role: role_display_name(role))
-      else
-        respond_with :message, text: I18n.t('platform_bot.errors.membership_failed')
+      # Создаём membership и принимаем инвайт атомарно
+      ActiveRecord::Base.transaction do
+        TenantMembership.create!(
+          tenant: tenant,
+          user: user,
+          role: invite.role,
+          invited_by_id: invite.invited_by_id
+        )
+        invite.accept!(user)
       end
+
+      respond_with :message, text: I18n.t('platform_bot.messages.member_added', tenant_name: tenant.name, role: role_display_name(invite.role))
+    rescue ActiveRecord::RecordInvalid
+      respond_with :message, text: I18n.t('platform_bot.errors.membership_failed')
     end
 
     # Обработка invite токена для нового владельца

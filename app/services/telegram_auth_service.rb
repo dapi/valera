@@ -29,7 +29,6 @@ class TelegramAuthService
   AUTH_REQUEST_PREFIX = 'telegram_auth:'
   GLOBAL_AUTH_PREFIX = 'telegram_global_auth:'
   INVITE_PREFIX = 'telegram_invite:'
-  MEMBER_INVITE_PREFIX = 'telegram_member_invite:'
 
   # Создаёт auth request и возвращает короткий ключ
   #
@@ -215,51 +214,6 @@ class TelegramAuthService
   # @return [Boolean]
   def global_auth_request?(key)
     key.to_s.start_with?('GLB_')
-  end
-
-  # === Member Invite (для приглашения участников в tenant) ===
-
-  # Создаёт member invite токен для приглашения участника в tenant
-  #
-  # @param tenant_id [Integer] ID tenant'а
-  # @param role [String, Symbol] роль участника (viewer, operator, admin)
-  # @param invited_by_user_id [Integer] ID пользователя, создающего приглашение
-  # @return [String] короткий ключ для /start payload с префиксом MBR_
-  def create_member_invite_token(tenant_id:, role:, invited_by_user_id:)
-    key = "MBR_#{SecureRandom.urlsafe_base64(12)}"
-
-    Rails.cache.write(
-      "#{MEMBER_INVITE_PREFIX}#{key}",
-      {
-        type: 'member_invite',
-        tenant_id: tenant_id,
-        role: role.to_s,
-        invited_by_user_id: invited_by_user_id,
-        timestamp: Time.current.to_i
-      },
-      expires_in: 7.days
-    )
-
-    key
-  end
-
-  # Получает и удаляет member invite token (одноразовый)
-  #
-  # @param key [String] ключ member invite токена
-  # @return [Hash, nil] данные invite или nil
-  def consume_member_invite_token(key)
-    cache_key = "#{MEMBER_INVITE_PREFIX}#{key}"
-    data = Rails.cache.read(cache_key)
-    Rails.cache.delete(cache_key) if data
-    data
-  end
-
-  # Проверяет является ли ключ member invite
-  #
-  # @param key [String] ключ из /start payload
-  # @return [Boolean]
-  def member_invite?(key)
-    key.to_s.start_with?('MBR_')
   end
 
   private

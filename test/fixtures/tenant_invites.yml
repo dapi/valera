@@ -1,0 +1,36 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+pending_invite:
+  tenant: one
+  invited_by: one
+  token: MBR_pending_test_token
+  role: 1
+  status: 0
+  expires_at: <%= 7.days.from_now.to_fs(:db) %>
+
+accepted_invite:
+  tenant: one
+  invited_by: one
+  accepted_by: two
+  token: MBR_accepted_test_token
+  role: 1
+  status: 1
+  expires_at: <%= 7.days.from_now.to_fs(:db) %>
+  accepted_at: <%= 1.day.ago.to_fs(:db) %>
+
+expired_invite:
+  tenant: one
+  invited_by: one
+  token: MBR_expired_test_token
+  role: 0
+  status: 0
+  expires_at: <%= 1.day.ago.to_fs(:db) %>
+
+cancelled_invite:
+  tenant: two
+  invited_by: two
+  token: MBR_cancelled_test_token
+  role: 2
+  status: 3
+  expires_at: <%= 7.days.from_now.to_fs(:db) %>
+  cancelled_at: <%= 1.day.ago.to_fs(:db) %>
