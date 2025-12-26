@@ -14,7 +14,7 @@ class Admin::Tenants::WebhooksControllerTest < ActionDispatch::IntegrationTest
     sign_in_admin(@superuser)
 
     expected_url = @tenant.webhook_url
-    bot_info = { 'username' => 'test_bot', 'id' => 123 }
+    bot_info = { 'ok' => true, 'result' => { 'username' => 'test_bot', 'id' => 123 } }
     webhook_info = { 'url' => expected_url }
 
     mock_client = mock('Telegram::Bot::Client')
@@ -33,7 +33,7 @@ class Admin::Tenants::WebhooksControllerTest < ActionDispatch::IntegrationTest
   test 'show displays warning when webhook URL mismatches' do
     sign_in_admin(@superuser)
 
-    bot_info = { 'username' => 'test_bot', 'id' => 123 }
+    bot_info = { 'ok' => true, 'result' => { 'username' => 'test_bot', 'id' => 123 } }
     webhook_info = { 'url' => 'https://wrong.example.com/webhook' }
 
     mock_client = mock('Telegram::Bot::Client')
@@ -52,7 +52,7 @@ class Admin::Tenants::WebhooksControllerTest < ActionDispatch::IntegrationTest
   test 'show displays not set when webhook is empty' do
     sign_in_admin(@superuser)
 
-    bot_info = { 'username' => 'test_bot', 'id' => 123 }
+    bot_info = { 'ok' => true, 'result' => { 'username' => 'test_bot', 'id' => 123 } }
     webhook_info = { 'url' => '' }
 
     mock_client = mock('Telegram::Bot::Client')

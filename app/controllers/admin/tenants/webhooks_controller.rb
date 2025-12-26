@@ -15,7 +15,7 @@ module Admin
         webhook_info = TenantWebhookService.new(@tenant).webhook_info
 
         webhook_status = build_webhook_status(webhook_info)
-        redirect_to [ :admin, @tenant ], notice: t('.success', username: bot_info['username'], webhook: webhook_status)
+        redirect_to [ :admin, @tenant ], notice: t('.success', username: bot_info.dig('result', 'username'), webhook: webhook_status)
       rescue TenantWebhookService::TelegramApiError, Telegram::Bot::Error => e
         redirect_to [ :admin, @tenant ], alert: t('.error', message: e.message)
       end
