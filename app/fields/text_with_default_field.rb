@@ -19,4 +19,14 @@ class TextWithDefaultField < Administrate::Field::Text
   def has_default?
     default_value.present?
   end
+
+  # Returns hint text to display below the field
+  def hint
+    options[:hint]
+  end
+
+  # Returns number of rows for textarea
+  def rows
+    options[:rows] || 15
+  end
 end

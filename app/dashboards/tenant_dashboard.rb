@@ -25,10 +25,17 @@ class TenantDashboard < Administrate::BaseDashboard
       fields: %i[owner manager],
       field_types: { owner: Field::BelongsTo, manager: Field::BelongsTo }
     ),
-    company_info: TextWithDefaultField.with_options(default_method: :company_info_or_default),
-    price_list: TextWithDefaultField.with_options(default_method: :price_list_or_default),
-    system_prompt: TextWithDefaultField.with_options(default_method: :system_prompt_or_default),
-    welcome_message: TextWithDefaultField.with_options(default_method: :welcome_message_or_default),
+    company_info: TextWithDefaultField.with_options(default_method: :company_info_or_default, rows: 30),
+    price_list: TextWithDefaultField.with_options(default_method: :price_list_or_default, rows: 30),
+    system_prompt: TextWithDefaultField.with_options(
+      default_method: :system_prompt_or_default,
+      rows: 30,
+      hint: '<strong>Доступные переменные:</strong> ' \
+            '<code>{{COMPANY_INFO}}</code> — информация о компании, ' \
+            '<code>{{PRICE_LIST}}</code> — прайс-лист, ' \
+            '<code>{{CURRENT_TIME}}</code> — текущее время'
+    ),
+    welcome_message: TextWithDefaultField.with_options(default_method: :welcome_message_or_default, rows: 30),
     clients: Field::HasMany,
     chats: Field::HasMany,
     chats_count: CounterLinkField.with_options(resource_name: :chats),
@@ -76,8 +83,8 @@ class TenantDashboard < Administrate::BaseDashboard
     ],
     "Информация о компании" => %i[company_info],
     "Прайс-лист" => %i[price_list],
-    "Системный промпт" => %i[system_prompt],
-    "Приветствие" => %i[welcome_message]
+    "Приветствие" => %i[welcome_message],
+    "Системный промпт" => %i[system_prompt]
   }.freeze
 
   FORM_ATTRIBUTES = {
@@ -93,8 +100,8 @@ class TenantDashboard < Administrate::BaseDashboard
     ],
     "Информация о компании" => %i[company_info],
     "Прайс-лист" => %i[price_list],
-    "Системный промпт" => %i[system_prompt],
-    "Приветствие" => %i[welcome_message]
+    "Приветствие" => %i[welcome_message],
+    "Системный промпт" => %i[system_prompt]
   }.freeze
 
   COLLECTION_FILTERS = {}.freeze

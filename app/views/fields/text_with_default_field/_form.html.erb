@@ -4,11 +4,16 @@
 <div class="field-unit__field">
   <%= f.text_area field.attribute,
       placeholder: field.has_default? ? field.default_value : nil,
-      rows: 15,
+      rows: field.rows,
       class: "text-with-default-textarea" %>
   <% if field.has_default? %>
     <small class="form-text text-muted">
       Если оставить пустым — используется значение по умолчанию
     </small>
+  <% end %>
+  <% if field.hint.present? %>
+    <div class="form-text text-muted" style="margin-top: 0.5rem;">
+      <%= field.hint.html_safe %>
+    </div>
   <% end %>
 </div>
