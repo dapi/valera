@@ -16,7 +16,7 @@
   ) if accessible_action?(resource, :destroy) %></td>
 <% end %>
 
-<% if original_admin_user&.superuser? && resource != current_admin_user %>
+<% if (original_admin_user || current_admin_user)&.superuser? && resource != current_admin_user %>
   <td class="cell-label--action-button">
     <%= button_to(
       t("admin.impersonations.impersonate_button"),
