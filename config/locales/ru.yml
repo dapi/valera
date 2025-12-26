@@ -70,6 +70,7 @@ ru:
       tenant:
         manager: Менеджер
       admin_user:
+        name: Имя
         managed_tenants: Автосервисы
         managed_leads: Лиды
     errors:
