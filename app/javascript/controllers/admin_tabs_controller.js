@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["tab", "panel"]
+  static targets = ["tab", "panel", "conditional"]
 
   connect() {
     // Read hash from URL or show first tab
@@ -27,6 +27,8 @@ export default class extends Controller {
   }
 
   showTab(index) {
+    const activeSlug = this.tabTargets[index]?.dataset.slug
+
     this.tabTargets.forEach((tab, i) => {
       if (i === index) {
         tab.classList.add("admin-tabs__button--active")
@@ -37,6 +39,12 @@ export default class extends Controller {
 
     this.panelTargets.forEach((panel, i) => {
       panel.hidden = (i !== index)
+    })
+
+    // Show/hide conditional elements based on active tab
+    this.conditionalTargets.forEach((el) => {
+      const showForTab = el.dataset.showForTab
+      el.hidden = (showForTab !== activeSlug)
     })
   }
 

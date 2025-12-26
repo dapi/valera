@@ -3,91 +3,95 @@ Custom form for Tenant with tabbed interface.
 Groups fields into "Основное" and "Контент" tabs.
 %>
 
-<%= form_with(model: [namespace, page.resource], local: true, class: "form") do |f| %>
-  <% if page.resource.errors.any? %>
-    <div id="error_explanation">
-      <h2>
-        <%= t(
-          "administrate.form.errors",
-          pluralized_errors: pluralize(page.resource.errors.count, t("administrate.form.error")),
-          resource_name: display_resource_name(page.resource_name, singular: true)
-        ) %>
-      </h2>
+<div data-controller="admin-tabs" class="admin-tabs-container">
+  <%= form_with(model: [namespace, page.resource], local: true, class: "form") do |f| %>
+    <% if page.resource.errors.any? %>
+      <div id="error_explanation">
+        <h2>
+          <%= t(
+            "administrate.form.errors",
+            pluralized_errors: pluralize(page.resource.errors.count, t("administrate.form.error")),
+            resource_name: display_resource_name(page.resource_name, singular: true)
+          ) %>
+        </h2>
 
-      <ul>
-        <% page.resource.errors.full_messages.each do |message| %>
-          <li class="flash-error"><%= message %></li>
+        <ul>
+          <% page.resource.errors.full_messages.each do |message| %>
+            <li class="flash-error"><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="admin-tabs">
+      <%# Tab navigation %>
+      <div class="admin-tabs__nav">
+        <% page.attributes(controller.action_name).each_with_index do |(title, _), index| %>
+          <button type="button"
+                  data-admin-tabs-target="tab"
+                  data-action="click->admin-tabs#switch"
+                  data-index="<%= index %>"
+                  data-slug="<%= title.parameterize %>"
+                  class="admin-tabs__button<%= ' admin-tabs__button--active' if index == 0 %>">
+            <%= title %>
+          </button>
         <% end %>
-      </ul>
-    </div>
-  <% end %>
+      </div>
 
-  <div data-controller="admin-tabs" class="admin-tabs">
-    <%# Tab navigation %>
-    <div class="admin-tabs__nav">
-      <% page.attributes(controller.action_name).each_with_index do |(title, _), index| %>
-        <button type="button"
-                data-admin-tabs-target="tab"
-                data-action="click->admin-tabs#switch"
-                data-index="<%= index %>"
-                data-slug="<%= title.parameterize %>"
-                class="admin-tabs__button<%= ' admin-tabs__button--active' if index == 0 %>">
-          <%= title %>
-        </button>
+      <%# Tab panels %>
+      <% page.attributes(controller.action_name).each_with_index do |(title, attributes), index| %>
+        <fieldset data-admin-tabs-target="panel" class="admin-tabs__panel" <%= 'hidden' if index > 0 %>>
+          <% attributes.each do |attribute| %>
+            <div class="field-unit field-unit--<%= attribute.html_class %> field-unit--<%= requireness(attribute) %>">
+              <%= render_field attribute, f: f %>
+
+              <% hint_key = "administrate.field_hints.#{page.resource_name}.#{attribute.name}" %>
+              <% if I18n.exists?(hint_key) -%>
+                <div class="field-unit__hint">
+                  <%= I18n.t(hint_key) %>
+                </div>
+              <% end -%>
+            </div>
+          <% end %>
+
+        </fieldset>
       <% end %>
     </div>
 
-    <%# Tab panels %>
-    <% page.attributes(controller.action_name).each_with_index do |(title, attributes), index| %>
-      <fieldset data-admin-tabs-target="panel" class="admin-tabs__panel" <%= 'hidden' if index > 0 %>>
-        <% attributes.each do |attribute| %>
-          <div class="field-unit field-unit--<%= attribute.html_class %> field-unit--<%= requireness(attribute) %>">
-            <%= render_field attribute, f: f %>
+    <div class="form-actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
 
-            <% hint_key = "administrate.field_hints.#{page.resource_name}.#{attribute.name}" %>
-            <% if I18n.exists?(hint_key) -%>
-              <div class="field-unit__hint">
-                <%= I18n.t(hint_key) %>
-              </div>
-            <% end -%>
-          </div>
-        <% end %>
+  <%# Telegram actions (only for existing tenants and Telegram tab) %>
+  <% if page.resource.persisted? %>
+    <div data-admin-tabs-target="conditional" data-show-for-tab="telegram" hidden>
+      <hr class="tenant-telegram-separator">
+      <div class="tenant-telegram-actions">
+        <span class="tenant-telegram-actions__label"><%= t("admin.tenants.form.webhook_management") %></span>
+        <%= link_to(
+          t("admin.tenants.show.test_telegram"),
+          admin_tenant_webhook_path(page.resource),
+          class: "button button--primary"
+        ) %>
 
-      </fieldset>
-    <% end %>
-  </div>
+        <%= button_to(
+          t("admin.tenants.show.setup_webhook"),
+          admin_tenant_webhook_path(page.resource),
+          method: :post,
+          form: { data: { turbo: false } },
+          class: "button button--success"
+        ) %>
 
-  <div class="form-actions">
-    <%= f.submit %>
-  </div>
-<% end %>
-
-<%# Telegram actions (only for existing tenants, outside main form to avoid nested forms) %>
-<% if page.resource.persisted? %>
-  <hr class="tenant-telegram-separator">
-  <div class="tenant-telegram-actions">
-    <span class="tenant-telegram-actions__label"><%= t("admin.tenants.form.webhook_management") %></span>
-    <%= link_to(
-      t("admin.tenants.show.test_telegram"),
-      admin_tenant_webhook_path(page.resource),
-      class: "button button--primary"
-    ) %>
-
-    <%= button_to(
-      t("admin.tenants.show.setup_webhook"),
-      admin_tenant_webhook_path(page.resource),
-      method: :post,
-      form: { data: { turbo: false } },
-      class: "button button--success"
-    ) %>
-
-    <%= button_to(
-      t("admin.tenants.show.remove_webhook"),
-      admin_tenant_webhook_path(page.resource),
-      method: :delete,
-      form: { data: { turbo: false } },
-      class: "button button--danger",
-      data: { turbo_confirm: t("admin.tenants.show.remove_webhook_confirm") }
-    ) %>
-  </div>
-<% end %>
+        <%= button_to(
+          t("admin.tenants.show.remove_webhook"),
+          admin_tenant_webhook_path(page.resource),
+          method: :delete,
+          form: { data: { turbo: false } },
+          class: "button button--danger",
+          data: { turbo_confirm: t("admin.tenants.show.remove_webhook_confirm") }
+        ) %>
+      </div>
+    </div>
+  <% end %>
+</div>
