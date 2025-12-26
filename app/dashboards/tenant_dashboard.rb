@@ -84,12 +84,10 @@ class TenantDashboard < Administrate::BaseDashboard
       admin_chat_id
       owner_and_manager
     ],
-    "Контент" => %i[
-      company_info
-      price_list
-      system_prompt
-      welcome_message
-    ]
+    "Информация о компании" => %i[company_info],
+    "Прайс-лист" => %i[price_list],
+    "Системный промпт" => %i[system_prompt],
+    "Приветствие" => %i[welcome_message]
   }.freeze
 
   COLLECTION_FILTERS = {}.freeze
