@@ -47,7 +47,14 @@ class Tenant < ApplicationRecord
   #
   # @return [String] полный URL dashboard
   def dashboard_url
-    Rails.application.routes.url_helpers.tenant_root_url(subdomain: subdomain)
+    Rails.application.routes.url_helpers.tenant_root_url(subdomain:)
+  end
+
+  # URL для webhook тенанта
+  #
+  # @return [String] полный URL webhook
+  def webhook_url
+    Rails.application.routes.url_helpers.tenant_telegram_webhook_url(subdomain:)
   end
 
   # Возвращает system_prompt или дефолтное значение из конфига

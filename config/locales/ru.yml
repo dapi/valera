@@ -32,6 +32,22 @@ ru:
   hello: "Привет, мир"
 
   admin:
+    tenants:
+      show:
+        test_telegram: "Тест Telegram"
+        setup_webhook: "Установить Webhook"
+        remove_webhook: "Удалить Webhook"
+        remove_webhook_confirm: "Вы уверены, что хотите удалить webhook?"
+      test_telegram:
+        success: "Бот: @%{username}, Webhook: %{webhook}"
+        error: "Ошибка: %{message}"
+        webhook_not_set: "не установлен"
+      setup_webhook:
+        success: "Webhook успешно установлен"
+        error: "Ошибка: %{message}"
+      remove_webhook:
+        success: "Webhook удален"
+        error: "Ошибка: %{message}"
     impersonations:
       impersonate_button: Войти как
       confirm: "Вы уверены, что хотите войти как %{name}?"

@@ -1,6 +1,6 @@
 # Матрица авторизации Admin Panel
 
-**Дата обновления:** 2025-12-26
+**Дата обновления:** 2025-12-26 (добавлены Telegram actions для Tenants)
 
 ## Роли AdminUser
 
@@ -64,7 +64,22 @@
 | update | ❌ | ✅ |
 | destroy | ❌ | ✅ |
 
-### Tenants, Leads (полный CRUD)
+### Tenants (полный CRUD + Telegram actions)
+
+| Action | Manager | Superuser | Описание |
+|--------|---------|-----------|----------|
+| index | ✅ | ✅ | Список автосервисов |
+| show | ✅ | ✅ | Просмотр автосервиса |
+| new | ✅ | ✅ | Создание автосервиса |
+| create | ✅ | ✅ | Создание автосервиса |
+| edit | ✅ | ✅ | Редактирование автосервиса |
+| update | ✅ | ✅ | Обновление автосервиса |
+| destroy | ✅ | ✅ | Удаление автосервиса |
+| **test_telegram** | ✅ | ✅ | Тестирование подключения к Telegram API |
+| **setup_webhook** | ✅ | ✅ | Установка webhook в Telegram |
+| **remove_webhook** | ✅ | ✅ | Удаление webhook из Telegram |
+
+### Leads (полный CRUD)
 
 | Action | Manager | Superuser |
 |--------|---------|-----------|

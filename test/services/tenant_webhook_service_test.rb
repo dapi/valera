@@ -5,22 +5,13 @@ require 'test_helper'
 class TenantWebhookServiceTest < ActiveSupport::TestCase
   setup do
     @tenant = tenants(:one)
-    @base_url = 'https://example.com'
-    @service = TenantWebhookService.new(@tenant, base_url: @base_url)
+    @service = TenantWebhookService.new(@tenant)
   end
 
   # setup_webhook tests
 
-  test 'setup_webhook raises ArgumentError without base_url' do
-    service = TenantWebhookService.new(@tenant)
-
-    assert_raises(ArgumentError) do
-      service.setup_webhook
-    end
-  end
-
   test 'setup_webhook calls Telegram API with correct parameters' do
-    expected_url = "#{@base_url}/telegram/webhook/#{@tenant.key}"
+    expected_url = @tenant.webhook_url
 
     mock_client = mock('Telegram::Bot::Client')
     mock_client.expects(:set_webhook).with(
@@ -35,21 +26,6 @@ class TenantWebhookServiceTest < ActiveSupport::TestCase
     result = @service.setup_webhook
 
     assert_equal({ 'ok' => true }, result)
-  end
-
-  test 'setup_webhook handles trailing slash in base_url' do
-    service = TenantWebhookService.new(@tenant, base_url: 'https://example.com/')
-    expected_url = "https://example.com/telegram/webhook/#{@tenant.key}"
-
-    mock_client = mock('Telegram::Bot::Client')
-    mock_client.expects(:set_webhook).with(
-      url: expected_url,
-      secret_token: @tenant.webhook_secret
-    ).returns({ 'ok' => true })
-
-    Telegram::Bot::Client.stubs(:new).returns(mock_client)
-
-    service.setup_webhook
   end
 
   test 'setup_webhook raises TelegramApiError on API failure' do

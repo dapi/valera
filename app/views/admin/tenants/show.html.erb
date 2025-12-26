@@ -1,0 +1,77 @@
+<%#
+# Tenant Show Page
+
+Extends the default Administrate show page with Telegram management buttons.
+%>
+
+<% content_for(:title) { t("administrate.actions.show_resource", name: page.page_title) } %>
+
+<header class="main-content__header">
+  <h1 class="main-content__page-title">
+    <%= content_for(:title) %>
+  </h1>
+
+  <div class="tenant-telegram-actions">
+    <%= button_to(
+      t("admin.tenants.show.test_telegram"),
+      test_telegram_admin_tenant_path(page.resource),
+      method: :post,
+      class: "button button--primary"
+    ) %>
+
+    <%= button_to(
+      t("admin.tenants.show.setup_webhook"),
+      setup_webhook_admin_tenant_path(page.resource),
+      method: :post,
+      class: "button button--success"
+    ) %>
+
+    <%= button_to(
+      t("admin.tenants.show.remove_webhook"),
+      remove_webhook_admin_tenant_path(page.resource),
+      method: :delete,
+      class: "button button--danger",
+      data: { turbo_confirm: t("admin.tenants.show.remove_webhook_confirm") }
+    ) %>
+  </div>
+
+  <div>
+    <%= link_to(
+      t("administrate.actions.edit_resource", name: page.page_title),
+      [:edit, namespace, page.resource],
+      class: "button",
+    ) if accessible_action?(page.resource, :edit) %>
+
+    <%= button_to(
+      t("administrate.actions.destroy"),
+      [namespace, page.resource],
+      class: "button button--danger",
+      method: :delete,
+      data: { turbo_confirm: t("administrate.actions.confirm") }
+    ) if accessible_action?(page.resource, :destroy) %>
+  </div>
+</header>
+
+<section class="main-content__body">
+  <dl>
+    <% page.attributes.each do |title, attributes| %>
+      <fieldset class="<%= "field-unit--nested" if title.present? %>">
+        <% if title.present? %>
+          <legend><%= t "helpers.label.#{page.resource_name}.#{title}", default: title %></legend>
+        <% end %>
+
+        <% attributes.each do |attribute| %>
+          <dt class="attribute-label" id="<%= attribute.name %>">
+          <%= t(
+            "helpers.label.#{resource_name}.#{attribute.name}",
+            default: page.resource.class.human_attribute_name(attribute.name),
+          ) %>
+          </dt>
+
+          <dd class="attribute-data attribute-data--<%=attribute.html_class%>"
+              ><%= render_field attribute, page: page %></dd>
+        <% end %>
+      </fieldset>
+    <% end %>
+  </dl>
+</section>

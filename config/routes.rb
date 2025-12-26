@@ -14,7 +14,13 @@ Rails.application.routes.draw do
       delete 'logout', to: 'sessions#destroy', as: :logout
 
       # Administrate resources
-      resources :tenants
+      resources :tenants do
+        member do
+          post :test_telegram
+          post :setup_webhook
+          delete :remove_webhook
+        end
+      end
       resources :users
       resources :admin_users do
         post :impersonate, on: :member, to: 'impersonations#create'
