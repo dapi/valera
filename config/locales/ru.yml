@@ -83,6 +83,7 @@ ru:
     attributes:
       tenant:
         subdomain: Поддомен
+        admin_chat_id: Telegram Admin Chat ID
         manager: Менеджер
         chats_count: Чаты
         clients_count: Клиенты
