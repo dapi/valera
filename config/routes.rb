@@ -15,11 +15,8 @@ Rails.application.routes.draw do
 
       # Administrate resources
       resources :tenants do
-        member do
-          post :test_telegram
-          post :setup_webhook
-          delete :remove_webhook
-        end
+        # Telegram webhook management (singular resource)
+        resource :webhook, only: %i[show create destroy], module: :tenants
       end
       resources :users
       resources :admin_users do

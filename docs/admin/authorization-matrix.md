@@ -64,7 +64,7 @@
 | update | ❌ | ✅ |
 | destroy | ❌ | ✅ |
 
-### Tenants (полный CRUD + Telegram actions)
+### Tenants (полный CRUD)
 
 | Action | Manager | Superuser | Описание |
 |--------|---------|-----------|----------|
@@ -75,9 +75,14 @@
 | edit | ✅ | ✅ | Редактирование автосервиса |
 | update | ✅ | ✅ | Обновление автосервиса |
 | destroy | ✅ | ✅ | Удаление автосервиса |
-| **test_telegram** | ✅ | ✅ | Тестирование подключения к Telegram API |
-| **setup_webhook** | ✅ | ✅ | Установка webhook в Telegram |
-| **remove_webhook** | ✅ | ✅ | Удаление webhook из Telegram |
+
+### Tenant Webhook (nested resource `/admin/tenants/:tenant_id/webhook`)
+
+| Action | Manager | Superuser | Описание |
+|--------|---------|-----------|----------|
+| **show** (GET) | ✅ | ✅ | Тестирование подключения к Telegram API, проверка webhook URL |
+| **create** (POST) | ✅ | ✅ | Установка webhook в Telegram |
+| **destroy** (DELETE) | ✅ | ✅ | Удаление webhook из Telegram |
 
 ### Leads (полный CRUD)
 
@@ -145,6 +150,7 @@ end
 | `app/controllers/admin/users_controller.rb` | Авторизация Users |
 | `app/controllers/admin/tenant_memberships_controller.rb` | Авторизация TenantMemberships |
 | `app/controllers/admin/impersonations_controller.rb` | Авторизация имперсонации |
+| `app/controllers/admin/tenants/webhooks_controller.rb` | Управление webhook тенанта |
 | `config/routes.rb` | Read-only routes для некоторых ресурсов |
 
 ## Тесты
@@ -152,3 +158,4 @@ end
 - `test/controllers/admin/admin_users_controller_test.rb`
 - `test/controllers/admin/manager_authorization_test.rb`
 - `test/controllers/admin/impersonations_controller_test.rb`
+- `test/controllers/admin/tenants/webhooks_controller_test.rb`

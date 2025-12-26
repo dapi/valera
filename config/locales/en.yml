@@ -36,16 +36,19 @@ en:
         setup_webhook: "Setup Webhook"
         remove_webhook: "Remove Webhook"
         remove_webhook_confirm: "Are you sure you want to remove the webhook?"
-      test_telegram:
-        success: "Bot: @%{username}, Webhook: %{webhook}"
-        error: "Error: %{message}"
-        webhook_not_set: "not set"
-      setup_webhook:
-        success: "Webhook successfully installed"
-        error: "Error: %{message}"
-      remove_webhook:
-        success: "Webhook removed"
-        error: "Error: %{message}"
+      webhooks:
+        show:
+          success: "Bot: @%{username}, Webhook: %{webhook}"
+          error: "Error: %{message}"
+          webhook_not_set: "not set"
+          webhook_correct: "✓ %{url}"
+          webhook_mismatch: "✗ Current: %{current}, Expected: %{expected}"
+        create:
+          success: "Webhook successfully installed"
+          error: "Error: %{message}"
+        destroy:
+          success: "Webhook removed"
+          error: "Error: %{message}"
     impersonations:
       impersonate_button: Impersonate
       confirm: "Are you sure you want to impersonate %{name}?"
