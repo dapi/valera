@@ -44,6 +44,7 @@ ru:
         remove_webhook: "Удалить Webhook"
         remove_webhook_confirm: "Вы уверены, что хотите удалить webhook?"
       form:
+        dashboard: "Панель управления"
         webhook_management: "Управление Webhook"
       webhooks:
         show:
