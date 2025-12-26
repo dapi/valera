@@ -15,6 +15,6 @@ class ManagedTenantsCountField < Administrate::Field::Base
   def link_path
     return nil if resource.nil?
 
-    "/tenants?manager_id=#{resource.id}"
+    Rails.application.routes.url_helpers.admin_tenants_path(manager_id: resource.id)
   end
 end
