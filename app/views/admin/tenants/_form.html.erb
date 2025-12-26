@@ -30,6 +30,7 @@ Groups fields into "Основное" and "Контент" tabs.
                 data-admin-tabs-target="tab"
                 data-action="click->admin-tabs#switch"
                 data-index="<%= index %>"
+                data-slug="<%= title.parameterize %>"
                 class="admin-tabs__button<%= ' admin-tabs__button--active' if index == 0 %>">
           <%= title %>
         </button>
