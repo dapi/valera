@@ -1,7 +1,7 @@
-<div class="field-unit__label">
-  <%= f.label field.attribute %>
-</div>
-<div class="field-unit__field">
+<div class="text-with-default-wrapper">
+  <div class="text-with-default-label">
+    <%= f.label field.attribute %>
+  </div>
   <%= f.text_area field.attribute,
       placeholder: field.has_default? ? field.default_value : nil,
       rows: field.rows,
