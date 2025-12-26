@@ -1,0 +1,61 @@
+<%#
+Custom form for Tenant with tabbed interface.
+Groups fields into "Основное" and "Контент" tabs.
+%>
+
+<%= form_with(model: [namespace, page.resource], local: true, class: "form") do |f| %>
+  <% if page.resource.errors.any? %>
+    <div id="error_explanation">
+      <h2>
+        <%= t(
+          "administrate.form.errors",
+          pluralized_errors: pluralize(page.resource.errors.count, t("administrate.form.error")),
+          resource_name: display_resource_name(page.resource_name, singular: true)
+        ) %>
+      </h2>
+
+      <ul>
+        <% page.resource.errors.full_messages.each do |message| %>
+          <li class="flash-error"><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div data-controller="admin-tabs" class="admin-tabs">
+    <%# Tab navigation %>
+    <div class="admin-tabs__nav">
+      <% page.attributes(controller.action_name).each_with_index do |(title, _), index| %>
+        <button type="button"
+                data-admin-tabs-target="tab"
+                data-action="admin-tabs#switch"
+                data-index="<%= index %>"
+                class="admin-tabs__button <%= 'active' if index == 0 %>">
+          <%= title %>
+        </button>
+      <% end %>
+    </div>
+
+    <%# Tab panels %>
+    <% page.attributes(controller.action_name).each_with_index do |(title, attributes), index| %>
+      <fieldset data-admin-tabs-target="panel" <%= 'hidden' if index > 0 %> class="admin-tabs__panel">
+        <% attributes.each do |attribute| %>
+          <div class="field-unit field-unit--<%= attribute.html_class %> field-unit--<%= requireness(attribute) %>">
+            <%= render_field attribute, f: f %>
+
+            <% hint_key = "administrate.field_hints.#{page.resource_name}.#{attribute.name}" %>
+            <% if I18n.exists?(hint_key) -%>
+              <div class="field-unit__hint">
+                <%= I18n.t(hint_key) %>
+              </div>
+            <% end -%>
+          </div>
+        <% end %>
+      </fieldset>
+    <% end %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit %>
+  </div>
+<% end %>

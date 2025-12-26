@@ -75,18 +75,22 @@ class TenantDashboard < Administrate::BaseDashboard
     updated_at
   ].freeze
 
-  FORM_ATTRIBUTES = %i[
-    name
-    subdomain
-    bot_token
-    bot_username
-    admin_chat_id
-    owner_and_manager
-    company_info
-    price_list
-    system_prompt
-    welcome_message
-  ].freeze
+  FORM_ATTRIBUTES = {
+    "Основное" => %i[
+      name
+      subdomain
+      bot_token
+      bot_username
+      admin_chat_id
+      owner_and_manager
+    ],
+    "Контент" => %i[
+      company_info
+      price_list
+      system_prompt
+      welcome_message
+    ]
+  }.freeze
 
   COLLECTION_FILTERS = {}.freeze
 

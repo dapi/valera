@@ -9,9 +9,13 @@ module Admin
     end
 
     # Override permitted_attributes for custom fields
+    # Handles both Array and Hash (tabbed) FORM_ATTRIBUTES
     def permitted_attributes
       attrs = super
-      attrs = attrs.flat_map do |attr|
+      # If Hash (tabbed form), flatten all values into a single array
+      attrs = attrs.values.flatten if attrs.is_a?(Hash)
+
+      attrs.flat_map do |attr|
         case attr
         when :bot_token
           :new_bot_token # SecureTokenField uses virtual attribute
@@ -21,7 +25,6 @@ module Admin
           attr
         end
       end
-      attrs
     end
   end
 end
