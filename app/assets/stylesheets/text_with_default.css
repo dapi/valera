@@ -11,15 +11,21 @@
   line-height: 1.4;
 }
 
-/* Full-width layout for single-field tabs */
+/* Full-width layout with label on top */
 .field-unit--text-with-default-field {
-  display: block;
+  display: block !important;
+  grid-template-columns: none !important;
 }
 
 .field-unit--text-with-default-field .field-unit__label {
+  display: block;
+  width: 100%;
   margin-bottom: 0.5rem;
+  text-align: left;
 }
 
 .field-unit--text-with-default-field .field-unit__field {
+  display: block;
+  width: 100%;
   max-width: 100%;
 }
