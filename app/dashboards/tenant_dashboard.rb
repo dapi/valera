@@ -69,7 +69,6 @@ class TenantDashboard < Administrate::BaseDashboard
     owner
     manager
     last_message_at
-    created_at
   ].freeze
 
   SHOW_PAGE_ATTRIBUTES = {
