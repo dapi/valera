@@ -281,8 +281,8 @@ ru:
         description: Введите пароль для доступа к панели управления
       create:
         success: Вы успешно вошли в систему
-        invalid_password: Неверный пароль
-        no_owner: Владелец не настроен
+        invalid_credentials: Неверный email или пароль
+        no_access: У вас нет доступа к этому автосервису
       destroy:
         success: Вы успешно вышли из системы
     passwords:

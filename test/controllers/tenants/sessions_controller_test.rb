@@ -18,20 +18,20 @@ module Tenants
       assert_select 'input[type=password]'
     end
 
-    test 'redirects to set password when owner has no password' do
+    test 'redirects to set password when user has no password' do
       @owner.update_column(:password_digest, nil)
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
-      post '/session', params: { password: 'anything' }
+      post '/session', params: { email: @owner.email, password: 'anything' }
 
       assert_redirected_to '/password/new'
       assert_equal @owner.id, session[:pending_user_id]
     end
 
-    test 'logs in with correct password' do
+    test 'logs in with correct email and password' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       assert_redirected_to '/'
       assert_equal @owner.id, session[:user_id]
@@ -40,7 +40,27 @@ module Tenants
     test 'rejects incorrect password' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
-      post '/session', params: { password: 'wrongpassword' }
+      post '/session', params: { email: @owner.email, password: 'wrongpassword' }
+
+      assert_response :unprocessable_entity
+      assert_nil session[:user_id]
+    end
+
+    test 'rejects unknown email' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+
+      post '/session', params: { email: 'unknown@example.com', password: 'password123' }
+
+      assert_response :unprocessable_entity
+      assert_nil session[:user_id]
+    end
+
+    test 'rejects user without tenant access' do
+      other_user = users(:two)
+      other_user.update!(password: 'password123')
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+
+      post '/session', params: { email: other_user.email, password: 'password123' }
 
       assert_response :unprocessable_entity
       assert_nil session[:user_id]
@@ -48,7 +68,7 @@ module Tenants
 
     test 'logs out successfully' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       delete '/session'
 
@@ -56,13 +76,16 @@ module Tenants
       assert_nil session[:user_id]
     end
 
-    test 'shows error when tenant has no owner' do
-      @tenant.update!(owner: nil)
+    test 'allows tenant member to login' do
+      member = users(:two)
+      member.update!(password: 'memberpass')
+      @tenant.tenant_memberships.create!(user: member, role: :viewer)
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: member.email, password: 'memberpass' }
 
-      assert_response :unprocessable_entity
+      assert_redirected_to '/'
+      assert_equal member.id, session[:user_id]
     end
   end
 end
