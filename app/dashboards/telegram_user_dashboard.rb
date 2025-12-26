@@ -7,7 +7,7 @@ class TelegramUserDashboard < Administrate::BaseDashboard
     id: Field::Number,
     first_name: Field::String,
     last_name: Field::String,
-    username: Field::String,
+    username: TelegramUserLinkField,
     photo_url: Field::String,
     user: Field::HasOne,
     tenant_memberships: Field::HasMany,
@@ -18,10 +18,10 @@ class TelegramUserDashboard < Administrate::BaseDashboard
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[
+    username
     id
     first_name
     last_name
-    username
     user
     created_at
   ].freeze
