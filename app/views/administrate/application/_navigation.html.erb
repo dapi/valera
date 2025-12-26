@@ -16,4 +16,8 @@
       class: "navigation__link navigation__link--#{nav_link_state(resource)}"
     ) if accessible_action?(model_from_resource(resource), :index) %>
   <% end %>
+
+  <div class="navigation__version">
+    <%= SemVer.find.to_s %>
+  </div>
 </nav>

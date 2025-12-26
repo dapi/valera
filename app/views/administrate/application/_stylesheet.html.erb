@@ -5,6 +5,12 @@
 <%= yield :stylesheet %>
 
 <style>
+  .navigation {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
   .navigation__user {
     padding-bottom: 0.75rem;
     margin-bottom: 0.75rem;
@@ -46,5 +52,12 @@
   .navigation__logout:hover {
     background: rgba(26, 54, 93, 0.15);
     color: #1a365d;
+  }
+
+  .navigation__version {
+    margin-top: auto;
+    padding-top: 1rem;
+    color: rgba(26, 54, 93, 0.5);
+    font-size: 0.7rem;
   }
 </style>
