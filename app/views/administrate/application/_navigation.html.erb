@@ -2,19 +2,54 @@
   <% if current_admin_user %>
     <div class="navigation__user">
       <div class="navigation__user-info">
-        <span class="navigation__email"><%= current_admin_user.email %></span>
+        <%= link_to current_admin_user.email, [:admin, current_admin_user], class: "navigation__email" %>
         <span class="navigation__role"><%= current_admin_user.role %></span>
       </div>
       <%= link_to "Logout", admin_logout_path, data: { turbo_method: :delete }, class: "navigation__logout" %>
     </div>
   <% end %>
 
-  <% Administrate::Namespace.new(namespace).resources_with_index_route.each do |resource| %>
+  <%
+    all_resources = Administrate::Namespace.new(namespace).resources_with_index_route
+    priority_resources = %w[leads tenants]
+    tenant_resources = %w[clients chats vehicles bookings tenant_memberships tenant_invites]
+
+    # Order: priority first, then platform, then tenant data
+    priority = all_resources.select { |r| priority_resources.include?(r.to_s) }
+    platform_resources = all_resources.reject { |r| (tenant_resources + priority_resources).include?(r.to_s) }
+    tenant_data_resources = all_resources.select { |r| tenant_resources.include?(r.to_s) }
+  %>
+
+  <% priority.each do |resource| %>
     <%= link_to(
       display_resource_name(resource),
       resource_index_route(resource),
       class: "navigation__link navigation__link--#{nav_link_state(resource)}"
     ) if accessible_action?(model_from_resource(resource), :index) %>
+  <% end %>
+
+  <% if priority.any? && platform_resources.any? %>
+    <div class="navigation__divider"></div>
+  <% end %>
+
+  <% platform_resources.each do |resource| %>
+    <%= link_to(
+      display_resource_name(resource),
+      resource_index_route(resource),
+      class: "navigation__link navigation__link--#{nav_link_state(resource)}"
+    ) if accessible_action?(model_from_resource(resource), :index) %>
+  <% end %>
+
+  <% if tenant_data_resources.any? %>
+    <div class="navigation__divider"></div>
+    <div class="navigation__section-title">Tenant Data</div>
+    <% tenant_data_resources.each do |resource| %>
+      <%= link_to(
+        display_resource_name(resource),
+        resource_index_route(resource),
+        class: "navigation__link navigation__link--#{nav_link_state(resource)}"
+      ) if accessible_action?(model_from_resource(resource), :index) %>
+    <% end %>
   <% end %>
 
   <div class="navigation__version">

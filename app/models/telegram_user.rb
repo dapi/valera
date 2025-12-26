@@ -22,7 +22,7 @@
 # @since 0.1.0
 class TelegramUser < ApplicationRecord
   has_many :clients, dependent: :destroy
-  has_many :chats, dependent: :destroy
+  has_many :chats, through: :clients
   has_one :user, dependent: :nullify
   has_many :tenant_memberships, through: :user
 

@@ -38,7 +38,9 @@ class TenantMembershipDashboard < Administrate::BaseDashboard
     role
   ].freeze
 
-  COLLECTION_FILTERS = {}.freeze
+  COLLECTION_FILTERS = {
+    tenant: ->(resources, attr) { resources.where(tenant_id: attr) }
+  }.freeze
 
   def display_resource(tenant_membership)
     "#{tenant_membership.user&.name || 'User'} @ #{tenant_membership.tenant&.name || 'Tenant'}"

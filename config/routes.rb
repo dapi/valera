@@ -21,6 +21,10 @@ Rails.application.routes.draw do
       resources :telegram_users, only: %i[index show]
       resources :tenant_memberships
       resources :tenant_invites, only: %i[index show]
+      resources :clients, only: %i[index show]
+      resources :chats, only: %i[index show]
+      resources :vehicles, only: %i[index show]
+      resources :bookings, only: %i[index show]
 
       root to: 'tenants#index'
     end

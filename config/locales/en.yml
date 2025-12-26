@@ -29,3 +29,11 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    models:
+      tenant_membership:
+        one: Membership
+        other: Memberships
+      tenant_invite:
+        one: Invite
+        other: Invites

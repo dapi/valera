@@ -56,6 +56,7 @@ class TenantInviteDashboard < Administrate::BaseDashboard
   ].freeze
 
   COLLECTION_FILTERS = {
+    tenant: ->(resources, attr) { resources.where(tenant_id: attr) },
     pending: ->(resources) { resources.pending },
     accepted: ->(resources) { resources.accepted },
     cancelled: ->(resources) { resources.cancelled },

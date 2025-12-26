@@ -32,6 +32,13 @@ ru:
   hello: "Привет, мир"
 
   activerecord:
+    models:
+      tenant_membership:
+        one: Membership
+        other: Memberships
+      tenant_invite:
+        one: Invite
+        other: Invites
     errors:
       models:
         tenant:
