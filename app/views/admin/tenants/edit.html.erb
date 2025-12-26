@@ -14,7 +14,7 @@ Custom edit view with webhook management link in header.
   <div>
     <% if page.resource.persisted? %>
       <%= link_to(
-        t("admin.tenants.form.dashboard"),
+        "#{t('admin.tenants.form.dashboard')} ↗".html_safe,
         page.resource.dashboard_url,
         class: "button button--outline",
         target: "_blank"
