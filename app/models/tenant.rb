@@ -3,7 +3,6 @@
 class Tenant < ApplicationRecord
   include ErrorLogger
 
-  KEY_LENGTH = 3
   KEY_FORMAT = /\A[a-z0-9]+\z/
   WEBHOOK_SECRET_LENGTH = 32
   BOT_TOKEN_FORMAT = /\A\d+:[A-Za-z0-9_-]+\z/
@@ -22,7 +21,7 @@ class Tenant < ApplicationRecord
   validates :name, presence: true
   validates :bot_token, presence: true, uniqueness: true, format: { with: BOT_TOKEN_FORMAT, message: :invalid_format }
   validates :bot_username, presence: true
-  validates :key, presence: true, uniqueness: true, length: { is: KEY_LENGTH },
+  validates :key, presence: true, uniqueness: true, length: { minimum: 3, maximum: 64 },
                   format: { with: KEY_FORMAT, message: :invalid_key_format },
                   exclusion: { in: ->(_) { ApplicationConfig.reserved_subdomains || [] }, message: :reserved }
   validates :webhook_secret, presence: true
