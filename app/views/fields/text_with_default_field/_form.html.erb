@@ -1,0 +1,14 @@
+<div class="field-unit__label">
+  <%= f.label field.attribute %>
+</div>
+<div class="field-unit__field">
+  <%= f.text_area field.attribute,
+      placeholder: field.has_default? ? field.default_value : nil,
+      rows: 15,
+      class: "text-with-default-textarea" %>
+  <% if field.has_default? %>
+    <small class="form-text text-muted">
+      Если оставить пустым — используется значение по умолчанию
+    </small>
+  <% end %>
+</div>

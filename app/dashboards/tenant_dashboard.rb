@@ -7,6 +7,7 @@ require_relative '../fields/counter_link_field'
 require_relative '../fields/subdomain_field'
 require_relative '../fields/secure_token_field'
 require_relative '../fields/field_row_field'
+require_relative '../fields/text_with_default_field'
 
 class TenantDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
@@ -24,10 +25,10 @@ class TenantDashboard < Administrate::BaseDashboard
       fields: %i[owner manager],
       field_types: { owner: Field::BelongsTo, manager: Field::BelongsTo }
     ),
-    company_info: Field::Text,
-    price_list: Field::Text,
-    system_prompt: Field::Text,
-    welcome_message: Field::Text,
+    company_info: TextWithDefaultField.with_options(default_method: :company_info_or_default),
+    price_list: TextWithDefaultField.with_options(default_method: :price_list_or_default),
+    system_prompt: TextWithDefaultField.with_options(default_method: :system_prompt_or_default),
+    welcome_message: TextWithDefaultField.with_options(default_method: :welcome_message_or_default),
     clients: Field::HasMany,
     chats: Field::HasMany,
     chats_count: CounterLinkField.with_options(resource_name: :chats),

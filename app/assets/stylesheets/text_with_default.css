@@ -1,0 +1,12 @@
+/* Styles for TextWithDefaultField */
+.text-with-default-textarea::placeholder {
+  color: #999;
+  opacity: 0.7;
+  white-space: pre-wrap;
+}
+
+.text-with-default-textarea {
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.4;
+}
