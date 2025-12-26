@@ -78,7 +78,10 @@ class ApplicationConfig < Anyway::Config
     :admin_host,
 
     # Telegram Auth settings
-    :telegram_auth_expiration
+    :telegram_auth_expiration,
+
+    # Reserved subdomains that cannot be used as tenant keys
+    :reserved_subdomains
   )
 
   # Type coercions to ensure proper data types from environment variables

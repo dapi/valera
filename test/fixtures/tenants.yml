@@ -1,5 +1,5 @@
 one:
-  key: tenant01
+  key: t01
   name: AutoService One
   bot_token: "111111111:ABCdefGHIjklMNOpqrsTUVwxyz_one"
   bot_username: autoservice_one_bot
@@ -12,7 +12,7 @@ one:
   price_list: Test price list
 
 two:
-  key: tenant02
+  key: t02
   name: AutoService Two
   bot_token: "222222222:ABCdefGHIjklMNOpqrsTUVwxyz_two"
   bot_username: autoservice_two_bot

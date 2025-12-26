@@ -51,7 +51,7 @@ module Tenants
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { password: 'password123' }
 
-      new_key = 'newkey12'
+      new_key = 'nk1'
       patch '/settings', params: { tenant: { key: new_key } }
 
       @tenant.reload

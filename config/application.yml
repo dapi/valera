@@ -46,6 +46,13 @@ default: &default
   # Telegram Auth settings
   telegram_auth_expiration: 300
 
+  # Reserved subdomains (cannot be used as tenant keys)
+  reserved_subdomains:
+    - www
+    - admin
+    - public
+    - assets
+
 development:
   <<: *default
   llm_provider: 'openai'

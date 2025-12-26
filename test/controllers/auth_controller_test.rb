@@ -60,7 +60,7 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
   test 'redirects to select page when user has multiple tenants' do
     # Create second tenant for user
     second_tenant = Tenant.create!(
-      key: 'second01',
+      key: 's01',
       name: 'Second Tenant',
       owner: @user,
       bot_token: '333333333:ABCdefGHIjklMNOpqrsTUVwxyz_three',

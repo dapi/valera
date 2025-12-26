@@ -34,7 +34,7 @@ class TenantTest < ActiveSupport::TestCase
   end
 
   test 'does not regenerate key if provided' do
-    custom_key = 'custom12'
+    custom_key = 'c12'
     tenant = Tenant.create!(
       name: 'Test AutoService',
       bot_token: '123456792:ABCdefGHIjklMNOpqrsTUVwxyz',
@@ -100,18 +100,17 @@ class TenantTest < ActiveSupport::TestCase
 
   test 'validates key format - only letters and digits allowed' do
     # Keys with special characters should be invalid (after downcase)
-    invalid_keys = %w[with-das with_und with.dot with@sym ab!cd123]
+    # Each key is exactly KEY_LENGTH (3) and contains at least one invalid char
+    invalid_keys = %w[a-b a_b a.b a@b a!b]
 
     invalid_keys.each do |invalid_key|
-      # Pad to KEY_LENGTH with valid chars, but keep the invalid char
-      padded_key = invalid_key[0, Tenant::KEY_LENGTH].ljust(Tenant::KEY_LENGTH, 'a')
       tenant = Tenant.new(
         name: 'Test',
         bot_token: '123456796:ABCdefGHIjklMNOpqrsTUVwxyz',
-        key: padded_key
+        key: invalid_key
       )
-      assert_not tenant.valid?, "Key '#{padded_key}' should be invalid"
-      assert tenant.errors[:key].any?, "Key '#{padded_key}' should have error"
+      assert_not tenant.valid?, "Key '#{invalid_key}' should be invalid"
+      assert tenant.errors[:key].any?, "Key '#{invalid_key}' should have error"
     end
   end
 
@@ -119,19 +118,46 @@ class TenantTest < ActiveSupport::TestCase
     tenant = Tenant.new(
       name: 'Test',
       bot_token: '999456796:ABCdefGHIjklMNOpqrsTUVwxyz',
-      key: 'abcd1234'
+      key: 'ab1'
     )
     tenant.valid?
     assert_empty tenant.errors[:key]
+  end
+
+  test 'rejects reserved subdomain keys' do
+    ApplicationConfig.reserved_subdomains.each do |reserved_key|
+      # Pad to KEY_LENGTH if shorter
+      test_key = reserved_key[0, Tenant::KEY_LENGTH].ljust(Tenant::KEY_LENGTH, 'a')
+      # Only test if it matches the reserved key exactly (for 3-char keys like 'www')
+      next unless reserved_key.length == Tenant::KEY_LENGTH
+
+      tenant = Tenant.new(
+        name: 'Test',
+        bot_token: "123456796:ABCdefGHIjklMNOpqrsTUVwxyz#{reserved_key}",
+        key: reserved_key
+      )
+      assert_not tenant.valid?, "Key '#{reserved_key}' should be invalid (reserved)"
+      assert tenant.errors[:key].any?, "Key '#{reserved_key}' should have reserved error"
+    end
+  end
+
+  test 'accepts non-reserved key' do
+    tenant = Tenant.new(
+      name: 'Test',
+      bot_token: '997456796:ABCdefGHIjklMNOpqrsTUVwxyz',
+      key: 'xyz'
+    )
+    tenant.valid?
+    assert_empty tenant.errors[:key].select { |e| e.include?('reserved') || e.include?('зарезервирован') }
   end
 
   test 'downcases key before validation' do
     tenant = Tenant.create!(
       name: 'Test',
       bot_token: '998456796:ABCdefGHIjklMNOpqrsTUVwxyz',
-      key: 'ABCD1234'
+      key: 'ABC'
     )
-    assert_equal 'abcd1234', tenant.key
+    assert_equal 'abc', tenant.key
   end
 
   test 'bot_client returns Telegram Bot client' do
