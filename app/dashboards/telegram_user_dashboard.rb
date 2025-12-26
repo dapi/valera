@@ -46,6 +46,6 @@ class TelegramUserDashboard < Administrate::BaseDashboard
   COLLECTION_FILTERS = {}.freeze
 
   def display_resource(telegram_user)
-    telegram_user.name
+    telegram_user.magic_username || "##{telegram_user.id}"
   end
 end
