@@ -66,6 +66,13 @@
     <% else %>
       <span class="navigation__external-link navigation__external-link--disabled">Admin Chat (not set)</span>
     <% end %>
+    <% if ApplicationConfig.support_telegram.present? %>
+      <%= link_to "https://t.me/#{ApplicationConfig.support_telegram}", target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
+        Support <span class="navigation__external-icon">↗</span>
+      <% end %>
+    <% else %>
+      <span class="navigation__external-link navigation__external-link--disabled">Support (not set)</span>
+    <% end %>
   </div>
 
   <div class="navigation__version">
