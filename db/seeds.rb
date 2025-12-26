@@ -30,6 +30,7 @@ end
 # Create default admin user for development/staging
 # IMPORTANT: Change password in production!
 AdminUser.find_or_create_by!(email: 'admin@example.com') do |admin|
+  admin.name = 'Главный Администратор'
   admin.password = 'password'
   admin.password_confirmation = 'password'
   admin.role = :superuser

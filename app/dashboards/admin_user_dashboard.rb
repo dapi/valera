@@ -5,6 +5,7 @@ require 'administrate/base_dashboard'
 class AdminUserDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Field::Number,
+    name: Field::String,
     email: Field::Email,
     password: Field::Password,
     role: Field::Select.with_options(
@@ -19,6 +20,7 @@ class AdminUserDashboard < Administrate::BaseDashboard
 
   COLLECTION_ATTRIBUTES = %i[
     id
+    name
     email
     role
     created_at
@@ -26,6 +28,7 @@ class AdminUserDashboard < Administrate::BaseDashboard
 
   SHOW_PAGE_ATTRIBUTES = %i[
     id
+    name
     email
     role
     managed_tenants
@@ -35,6 +38,7 @@ class AdminUserDashboard < Administrate::BaseDashboard
   ].freeze
 
   FORM_ATTRIBUTES = %i[
+    name
     email
     password
     role
@@ -43,6 +47,6 @@ class AdminUserDashboard < Administrate::BaseDashboard
   COLLECTION_FILTERS = {}.freeze
 
   def display_resource(admin_user)
-    admin_user.email
+    admin_user.name.presence || admin_user.email
   end
 end
