@@ -38,6 +38,8 @@ ru:
         setup_webhook: "Установить Webhook"
         remove_webhook: "Удалить Webhook"
         remove_webhook_confirm: "Вы уверены, что хотите удалить webhook?"
+      form:
+        webhook_management: "Управление Webhook"
       webhooks:
         show:
           success: "Бот: @%{username}, Webhook: %{webhook}"

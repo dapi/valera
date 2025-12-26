@@ -1,7 +1,7 @@
 <%#
 # Tenant Show Page
 
-Extends the default Administrate show page with Telegram management buttons.
+Extends the default Administrate show page with grouped attributes.
 %>
 
 <% content_for(:title) { t("administrate.actions.show_resource", name: page.page_title) } %>
@@ -48,31 +48,6 @@ Extends the default Administrate show page with Telegram management buttons.
               ><%= render_field attribute, page: page %></dd>
         <% end %>
 
-        <%# Telegram actions in Telegram section %>
-        <% if title == "Telegram" %>
-          <div class="tenant-telegram-actions">
-            <%= link_to(
-              t("admin.tenants.show.test_telegram"),
-              admin_tenant_webhook_path(page.resource),
-              class: "button button--primary"
-            ) %>
-
-            <%= button_to(
-              t("admin.tenants.show.setup_webhook"),
-              admin_tenant_webhook_path(page.resource),
-              method: :post,
-              class: "button button--success"
-            ) %>
-
-            <%= button_to(
-              t("admin.tenants.show.remove_webhook"),
-              admin_tenant_webhook_path(page.resource),
-              method: :delete,
-              class: "button button--danger",
-              data: { turbo_confirm: t("admin.tenants.show.remove_webhook_confirm") }
-            ) %>
-          </div>
-        <% end %>
       </fieldset>
     <% end %>
   </dl>

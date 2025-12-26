@@ -49,3 +49,24 @@
 .admin-tabs__panel[hidden] {
   display: none !important;
 }
+
+/* Telegram Actions Styling */
+
+.tenant-telegram-separator {
+  margin: 2rem 0 1.5rem;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+.tenant-telegram-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.tenant-telegram-actions__label {
+  font-weight: 500;
+  color: #666;
+  margin-right: 0.5rem;
+}

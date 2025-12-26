@@ -51,11 +51,42 @@ Groups fields into "Основное" and "Контент" tabs.
             <% end -%>
           </div>
         <% end %>
+
       </fieldset>
     <% end %>
   </div>
 
   <div class="form-actions">
     <%= f.submit %>
+  </div>
+<% end %>
+
+<%# Telegram actions (only for existing tenants, outside main form to avoid nested forms) %>
+<% if page.resource.persisted? %>
+  <hr class="tenant-telegram-separator">
+  <div class="tenant-telegram-actions">
+    <span class="tenant-telegram-actions__label"><%= t("admin.tenants.form.webhook_management") %></span>
+    <%= link_to(
+      t("admin.tenants.show.test_telegram"),
+      admin_tenant_webhook_path(page.resource),
+      class: "button button--primary"
+    ) %>
+
+    <%= button_to(
+      t("admin.tenants.show.setup_webhook"),
+      admin_tenant_webhook_path(page.resource),
+      method: :post,
+      form: { data: { turbo: false } },
+      class: "button button--success"
+    ) %>
+
+    <%= button_to(
+      t("admin.tenants.show.remove_webhook"),
+      admin_tenant_webhook_path(page.resource),
+      method: :delete,
+      form: { data: { turbo: false } },
+      class: "button button--danger",
+      data: { turbo_confirm: t("admin.tenants.show.remove_webhook_confirm") }
+    ) %>
   </div>
 <% end %>
