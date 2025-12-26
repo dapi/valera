@@ -1,0 +1,33 @@
+<%#
+# Flash Partial with Impersonation Banner
+
+This partial renders flash messages on every page.
+It also shows an impersonation banner when a superuser is logged in as another admin.
+%>
+
+<% if impersonating? %>
+  <div class="impersonation-banner" style="background-color: #fbbf24; color: #1f2937; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; font-weight: 500; margin-bottom: 1rem;">
+    <span style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <%= t('admin.impersonations.banner_text', name: current_admin_user.name.presence || current_admin_user.email) %>
+    </span>
+    <%= button_to(
+      t('admin.impersonations.stop_button'),
+      admin_stop_impersonating_path,
+      method: :delete,
+      style: 'background-color: #1f2937; color: #ffffff; padding: 0.375rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem; text-decoration: none; border: none; cursor: pointer;'
+    ) %>
+  </div>
+<% end %>
+
+<% if flash.any? %>
+  <div class="flashes">
+    <% flash.each do |key, value| -%>
+      <% next unless value.respond_to?(:html_safe) %>
+      <div class="flash flash-<%= key %>"><%= value.html_safe %></div>
+    <% end -%>
+  </div>
+<% end %>

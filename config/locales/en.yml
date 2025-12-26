@@ -29,6 +29,17 @@
 
 en:
   hello: "Hello world"
+  admin:
+    impersonations:
+      impersonate_button: Impersonate
+      confirm: "Are you sure you want to impersonate %{name}?"
+      started: "You are now impersonating %{name}"
+      stopped: "You have stopped impersonating"
+      cannot_impersonate_self: "You cannot impersonate yourself"
+      not_impersonating: "You are not impersonating anyone"
+      access_denied: "Access denied. Superuser privileges required."
+      banner_text: "You are impersonating %{name}"
+      stop_button: Stop Impersonating
   activerecord:
     models:
       tenant_membership:

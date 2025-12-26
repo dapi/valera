@@ -16,7 +16,10 @@ Rails.application.routes.draw do
       # Administrate resources
       resources :tenants
       resources :users
-      resources :admin_users
+      resources :admin_users do
+        post :impersonate, on: :member, to: 'impersonations#create'
+      end
+      delete :stop_impersonating, to: 'impersonations#destroy', as: :stop_impersonating
       resources :leads
       resources :telegram_users, only: %i[index show]
       resources :tenant_memberships

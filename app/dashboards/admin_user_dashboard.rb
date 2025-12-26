@@ -16,7 +16,8 @@ class AdminUserDashboard < Administrate::BaseDashboard
     managed_tenants: Field::HasMany,
     managed_leads: Field::HasMany,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime
+    updated_at: Field::DateTime,
+    impersonate: ImpersonateField
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[
@@ -26,6 +27,7 @@ class AdminUserDashboard < Administrate::BaseDashboard
     role
     managed_tenants_count
     created_at
+    impersonate
   ].freeze
 
   SHOW_PAGE_ATTRIBUTES = %i[
@@ -38,6 +40,7 @@ class AdminUserDashboard < Administrate::BaseDashboard
     managed_leads
     created_at
     updated_at
+    impersonate
   ].freeze
 
   FORM_ATTRIBUTES = %i[

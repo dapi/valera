@@ -31,6 +31,18 @@
 ru:
   hello: "Привет, мир"
 
+  admin:
+    impersonations:
+      impersonate_button: Войти как
+      confirm: "Вы уверены, что хотите войти как %{name}?"
+      started: "Вы вошли как %{name}"
+      stopped: "Вы вернулись к своему аккаунту"
+      cannot_impersonate_self: "Вы не можете войти как вы сами"
+      not_impersonating: "Вы не используете режим impersonate"
+      access_denied: "Доступ запрещён. Требуются права суперпользователя."
+      banner_text: "Вы вошли как %{name}"
+      stop_button: Вернуться
+
   activerecord:
     models:
       tenant:

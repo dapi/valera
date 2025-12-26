@@ -47,16 +47,16 @@ class LeadNotificationJob < ApplicationJob
 
   def build_message(lead)
     parts = []
-    parts << "🆕 <b>Новый лид!</b>"
-    parts << ""
+    parts << '🆕 <b>Новый лид!</b>'
+    parts << ''
     parts << "👤 #{lead.name}"
     parts << "📞 #{lead.phone}"
     parts << "🏢 #{lead.company_name}" if lead.company_name.present?
     parts << "📍 #{lead.city}" if lead.city.present?
-    parts << ""
+    parts << ''
 
     if lead.utm_source.present? || lead.utm_medium.present? || lead.utm_campaign.present?
-      source_parts = [lead.utm_source, lead.utm_medium, lead.utm_campaign].compact.join(' / ')
+      source_parts = [ lead.utm_source, lead.utm_medium, lead.utm_campaign ].compact.join(' / ')
       parts << "📊 Источник: #{source_parts}"
     end
 

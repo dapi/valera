@@ -1,0 +1,9 @@
+<% if current_admin_user&.superuser? && field.admin_user != current_admin_user %>
+  <%= button_to(
+    t("admin.impersonations.impersonate_button"),
+    impersonate_admin_admin_user_path(field.admin_user),
+    method: :post,
+    class: "link",
+    data: { turbo_confirm: t("admin.impersonations.confirm", name: field.admin_user.name.presence || field.admin_user.email) }
+  ) %>
+<% end %>
