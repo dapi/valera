@@ -15,9 +15,13 @@
 }
 
 /* Remove Administrate's margin on field - make full width */
-.field-unit--text-with-default-field .field-unit__field {
+.field-unit--text-with-default-field .field-unit__field,
+.field-unit.field-unit--text-with-default-field .field-unit__field,
+.form .field-unit--text-with-default-field .field-unit__field {
   width: 100% !important;
   margin-left: 0 !important;
+  margin: 0 !important;
+  padding-left: 0 !important;
   float: none !important;
 }
 
