@@ -108,3 +108,6 @@ docker-push: ## Push Docker image to registry
 
 build-and-push: docker-build docker-push ## Build, push and deploy
 	@echo "✓ Build and push completed!"
+
+production-psql:
+	PGOPTIONS='' PGPASSWORD=${PRODUCTION_VALERA_DATABASE_PASSWORD} psql -h ${PRODUCTION_VALERA_DATABASE_HOST} -p 5433 -U ${PRODUCTION_VALERA_DATABASE_USERNAME} -d ${PRODUCTION_VALERA_DATABASE_NAME}
