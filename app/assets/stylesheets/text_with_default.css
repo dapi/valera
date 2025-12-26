@@ -1,9 +1,16 @@
 /* Styles for TextWithDefaultField */
 
+/* Override Administrate grid layout - make field full width */
+.field-unit--text-with-default-field {
+  display: block !important;
+  max-width: 100% !important;
+}
+
 /* Wrapper for full-width layout with label on top */
 .text-with-default-wrapper {
   display: block;
   width: 100%;
+  max-width: 100%;
 }
 
 .text-with-default-label {
@@ -15,6 +22,8 @@
 .text-with-default-textarea {
   display: block;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   font-family: monospace;
   font-size: 13px;
   line-height: 1.4;
@@ -24,9 +33,4 @@
   color: #999;
   opacity: 0.7;
   white-space: pre-wrap;
-}
-
-/* Override Administrate grid layout for this field type */
-.field-unit--text-with-default-field {
-  display: block !important;
 }
