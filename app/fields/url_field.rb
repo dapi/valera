@@ -9,7 +9,8 @@ class UrlField < Administrate::Field::Base
   end
 
   def link_text
-    options.fetch(:link_text, data)
+    text = options.fetch(:link_text, data)
+    text.respond_to?(:call) ? text.call(self) : text
   end
 
   def target
