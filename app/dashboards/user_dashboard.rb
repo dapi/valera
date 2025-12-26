@@ -7,7 +7,9 @@ class UserDashboard < Administrate::BaseDashboard
     id: Field::Number,
     email: Field::Email,
     name: Field::String,
+    telegram_user: Field::BelongsTo,
     owned_tenants: Field::HasMany,
+    tenant_memberships: Field::HasMany,
     created_at: Field::DateTime,
     updated_at: Field::DateTime
   }.freeze
@@ -16,6 +18,7 @@ class UserDashboard < Administrate::BaseDashboard
     id
     name
     email
+    telegram_user
     owned_tenants
   ].freeze
 
@@ -23,7 +26,9 @@ class UserDashboard < Administrate::BaseDashboard
     id
     name
     email
+    telegram_user
     owned_tenants
+    tenant_memberships
     created_at
     updated_at
   ].freeze
@@ -31,6 +36,7 @@ class UserDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = %i[
     name
     email
+    telegram_user
   ].freeze
 
   COLLECTION_FILTERS = {}.freeze

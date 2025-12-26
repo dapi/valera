@@ -9,6 +9,8 @@ class TelegramUserDashboard < Administrate::BaseDashboard
     last_name: Field::String,
     username: Field::String,
     photo_url: Field::String,
+    user: Field::HasOne,
+    tenant_memberships: Field::HasMany,
     clients: Field::HasMany,
     chats: Field::HasMany,
     created_at: Field::DateTime,
@@ -20,6 +22,7 @@ class TelegramUserDashboard < Administrate::BaseDashboard
     first_name
     last_name
     username
+    user
     created_at
   ].freeze
 
@@ -29,6 +32,8 @@ class TelegramUserDashboard < Administrate::BaseDashboard
     last_name
     username
     photo_url
+    user
+    tenant_memberships
     clients
     chats
     created_at
