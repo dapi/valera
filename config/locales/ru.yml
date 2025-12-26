@@ -66,6 +66,12 @@ ru:
       booking:
         one: Запись
         other: Записи
+    attributes:
+      tenant:
+        manager: Менеджер
+      admin_user:
+        managed_tenants: Автосервисы
+        managed_leads: Лиды
     errors:
       models:
         tenant:
