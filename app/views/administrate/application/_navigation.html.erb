@@ -80,6 +80,7 @@
     <% else %>
       <span class="navigation__external-link navigation__external-link--disabled">Demo Bot (not set)</span>
     <% end %>
+    <div class="navigation__divider"></div>
     <% if ApplicationConfig.offer_url.present? %>
       <%= link_to ApplicationConfig.offer_url, target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
         Оферта <span class="navigation__external-icon">↗</span>
