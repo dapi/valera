@@ -6,6 +6,7 @@ require_relative '../fields/telegram_bot_field'
 require_relative '../fields/counter_link_field'
 require_relative '../fields/subdomain_field'
 require_relative '../fields/secure_token_field'
+require_relative '../fields/field_row_field'
 
 class TenantDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
@@ -19,6 +20,10 @@ class TenantDashboard < Administrate::BaseDashboard
     admin_chat_id: Field::Number,
     owner: Field::BelongsTo,
     manager: Field::BelongsTo,
+    owner_and_manager: FieldRowField.with_options(
+      fields: %i[owner manager],
+      field_types: { owner: Field::BelongsTo, manager: Field::BelongsTo }
+    ),
     company_info: Field::Text,
     price_list: Field::Text,
     system_prompt: Field::Text,
@@ -73,8 +78,7 @@ class TenantDashboard < Administrate::BaseDashboard
     bot_token
     bot_username
     admin_chat_id
-    owner
-    manager
+    owner_and_manager
     company_info
     price_list
     system_prompt

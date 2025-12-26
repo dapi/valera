@@ -1,0 +1,14 @@
+<div style="display: flex; gap: 2rem;">
+  <% field.fields_config.each do |field_name| %>
+    <% field_class = field.field_types[field_name] || Administrate::Field::String %>
+    <% sub_field = field_class.new(field_name, field.resource.send(field_name), field.page) %>
+    <div>
+      <strong><%= t("activerecord.attributes.#{field.resource.class.name.underscore}.#{field_name}", default: field_name.to_s.humanize) %>:</strong>
+      <% if sub_field.data.present? %>
+        <%= link_to sub_field.display_associated_resource, [namespace, sub_field.data] %>
+      <% else %>
+        <span class="text-muted">—</span>
+      <% end %>
+    </div>
+  <% end %>
+</div>

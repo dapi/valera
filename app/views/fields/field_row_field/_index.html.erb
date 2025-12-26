@@ -1,0 +1,10 @@
+<% field.fields_config.each_with_index do |field_name, index| %>
+  <% field_class = field.field_types[field_name] || Administrate::Field::String %>
+  <% sub_field = field_class.new(field_name, field.resource.send(field_name), field.page) %>
+  <% if sub_field.data.present? %>
+    <%= link_to sub_field.display_associated_resource, [namespace, sub_field.data] %>
+  <% else %>
+    <span class="text-muted">—</span>
+  <% end %>
+  <%= " / " unless index == field.fields_config.length - 1 %>
+<% end %>

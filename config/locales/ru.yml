@@ -82,12 +82,25 @@ ru:
         other: Записи
     attributes:
       tenant:
+        name: Название
         subdomain: Поддомен
+        dashboard_url: Панель управления
+        bot_token: Токен бота
+        bot_username: Имя бота
+        webhook_secret: Секрет вебхука
         admin_chat_id: Telegram Admin Chat ID
+        owner: Владелец
         manager: Менеджер
+        owner_and_manager: Владелец и Менеджер
+        company_info: Информация о компании
+        price_list: Прайс-лист
+        system_prompt: Системный промпт
+        welcome_message: Приветственное сообщение
         chats_count: Чаты
         clients_count: Клиенты
         bookings_count: Записи
+        created_at: Создан
+        updated_at: Обновлён
       admin_user:
         name: Имя
         managed_tenants: Автосервисы

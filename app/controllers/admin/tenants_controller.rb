@@ -8,12 +8,20 @@ module Admin
       end
     end
 
-    # Override permitted_attributes to use new_bot_token instead of bot_token
-    # SecureTokenField uses virtual attribute for updates
+    # Override permitted_attributes for custom fields
     def permitted_attributes
       attrs = super
-      # Replace bot_token with new_bot_token for SecureTokenField
-      attrs.map { |attr| attr == :bot_token ? :new_bot_token : attr }
+      attrs = attrs.flat_map do |attr|
+        case attr
+        when :bot_token
+          :new_bot_token # SecureTokenField uses virtual attribute
+        when :owner_and_manager
+          %i[owner_id manager_id] # FieldRowField expands to actual attributes
+        else
+          attr
+        end
+      end
+      attrs
     end
   end
 end
