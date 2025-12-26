@@ -53,9 +53,8 @@
 }
 
 .navigation__link {
-  margin-bottom: 0;
-  padding-top: 0.35rem;
-  padding-bottom: 0.35rem;
+  margin-bottom: 0 !important;
+  padding: 0.35rem 0.6em !important;
   text-decoration: none;
 }
 
