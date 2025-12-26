@@ -1,0 +1,19 @@
+<% if existing_action?(collection_presenter.resource_name, :edit) %>
+  <td class="cell-label--action-button"><%= link_to(
+    "✎",
+    [:edit, namespace, resource],
+    class: "action-edit",
+    title: t("administrate.actions.edit"),
+  ) if accessible_action?(resource, :edit) %></td>
+<% end %>
+
+<% if existing_action?(collection_presenter.resource_name, :destroy) %>
+  <td class="cell-label--action-button"><%= button_to(
+    "✕",
+    [namespace, resource],
+    class: "link link--danger",
+    method: :delete,
+    title: t("administrate.actions.destroy"),
+    data: { turbo_confirm: t("administrate.actions.confirm") }
+  ) if accessible_action?(resource, :destroy) %></td>
+<% end %>

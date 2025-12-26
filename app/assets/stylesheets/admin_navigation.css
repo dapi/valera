@@ -105,3 +105,14 @@
   color: rgba(26, 54, 93, 0.5);
   font-size: 0.7rem;
 }
+
+/* Action icons in collection table */
+.action-edit {
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.cell-label--action-button .link--danger {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
