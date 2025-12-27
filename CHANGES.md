@@ -2,6 +2,67 @@
 
 Инструкции по обновлению для SRE и DevOps.
 
+## v0.23.0 — Migration from SolidQueue to GoodJob
+
+### Описание
+
+Миграция системы фоновых задач с SolidQueue на GoodJob для улучшенного мониторинга и эффективности.
+
+**Преимущества GoodJob:**
+- Лучший встроенный Web UI для мониторинга задач
+- LISTEN/NOTIFY вместо polling (эффективнее для PostgreSQL)
+- Единая база данных (queue DB больше не нужна)
+
+### Шаги миграции
+
+1. **Выполнить миграции базы данных:**
+   ```bash
+   bin/rails db:migrate
+   ```
+
+2. **Обновить команду запуска job worker:**
+   ```bash
+   # Было:
+   bin/rails solid_queue:start
+
+   # Стало:
+   bin/rails good_job:start
+   ```
+
+3. **Удалить старую queue базу данных** (после успешного деплоя):
+   ```bash
+   dropdb valera_production_queue
+   ```
+
+### Изменения в конфигурации
+
+| Компонент | Было | Стало |
+|-----------|------|-------|
+| Job adapter | `solid_queue` | `good_job` |
+| Dashboard URL | `/admin/jobs` (MissionControl) | `/admin/jobs` (GoodJob) |
+| Queue database | Отдельная БД `valera_production_queue` | Основная БД |
+| Job worker | `solid_queue:start` | `good_job:start` |
+
+### Procfile / Docker
+
+Обновить команду запуска worker:
+```yaml
+# Procfile
+jobs: bin/rails good_job:start
+```
+
+### Проверка
+
+```bash
+# Проверить что GoodJob работает
+bin/rails runner "puts GoodJob::Job.count"
+
+# Проверить dashboard (требует авторизации admin)
+curl -I https://admin.example.com/jobs
+```
+
+---
+
 ## v0.3.1 — Public Port Configuration
 
 ### Новая переменная окружения
