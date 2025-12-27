@@ -441,10 +441,10 @@ pipeline.add_step(method(:log_activity))
 - Показывайте индикаторы загрузки
 - Обрабатывайте таймауты ожидания
 
-**⚠️ ВАЖНО ДЛЯ ПРОЕКТА VALERA:**
-Данные паттерны являются общими для telegram-bot gem. В проекте Valera применяется **Product Constitution**, который запрещает:
+**⚠️ ВАЖНО ДЛЯ ПРОЕКТА SUPER VALERA:**
+Данные паттерны являются общими для telegram-bot gem. В проекте Super Valera применяется **Product Constitution**, который запрещает:
 - Inline клавиатуры и кнопки
 - Команды (/start, /help и т.д.)
 - Любые UI элементы кроме текста
 
-В Valera используется **dialogue-only подход** через естественное общение с AI.
+В Super Valera используется **dialogue-only подход** через естественное общение с AI.

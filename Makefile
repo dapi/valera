@@ -79,11 +79,11 @@ guard-tag-exists:
 deploy: guard-tag-exists
 	@test -n "$(INFRA_DIR)" || (echo "Error: INFRA_DIR is not set" && exit 1)
 	@test -n "$(STAGE)" || (echo "Error: STAGE is not set" && exit 1)
-	@echo "Deploying valera $(TAG) to $(STAGE)..."
-	cd $(INFRA_DIR) && direnv exec . $(MAKE) app-deploy APP=valera STAGE=$(STAGE) TAG=$(TAG)
+	@echo "Deploying super-valera $(TAG) to $(STAGE)..."
+	cd $(INFRA_DIR) && direnv exec . $(MAKE) app-deploy APP=super-valera STAGE=$(STAGE) TAG=$(TAG)
 	@echo ""
 	@echo "✓ Deploy completed!"
-	@echo "  Image: $(REGISTRY)/valera:$(TAG)"
+	@echo "  Image: $(REGISTRY)/super-valera:$(TAG)"
 	@echo "  Stage: $(STAGE)"
 
 docker-build: ## Build Docker image with version tags
@@ -94,17 +94,17 @@ docker-build: ## Build Docker image with version tags
 		--build-arg VERSION=$$VERSION \
 		--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 		--build-arg GIT_SHA=$$(git rev-parse HEAD) \
-		-t valera:dev -t valera:$$VERSION \
-		-t $(REGISTRY)/valera:latest -t $(REGISTRY)/valera:$$VERSION .; \
-	echo "✓ Docker image built: valera:dev, valera:$$VERSION, $(REGISTRY)/valera:latest, $(REGISTRY)/valera:$$VERSION"
+		-t super-valera:dev -t super-valera:$$VERSION \
+		-t $(REGISTRY)/super-valera:latest -t $(REGISTRY)/super-valera:$$VERSION .; \
+	echo "✓ Docker image built: super-valera:dev, super-valera:$$VERSION, $(REGISTRY)/super-valera:latest, $(REGISTRY)/super-valera:$$VERSION"
 
 docker-push: ## Push Docker image to registry
 	@echo "Pushing Docker image to $(REGISTRY)..."
 	@VERSION=$$(${SEMVER_BIN}); \
 	VERSION=$${VERSION#v}; \
-	docker push $(REGISTRY)/valera:latest && \
-	docker push $(REGISTRY)/valera:$$VERSION; \
-	echo "✓ Docker images pushed: $(REGISTRY)/valera:latest, $(REGISTRY)/valera:$$VERSION"
+	docker push $(REGISTRY)/super-valera:latest && \
+	docker push $(REGISTRY)/super-valera:$$VERSION; \
+	echo "✓ Docker images pushed: $(REGISTRY)/super-valera:latest, $(REGISTRY)/super-valera:$$VERSION"
 
 build-and-push: docker-build docker-push ## Build, push and deploy
 	@echo "✓ Build and push completed!"
@@ -147,7 +147,7 @@ guard-production-env:
 	@test -n "${PRODUCTION_VALERA_DATABASE_NAME}" || (echo "Error: PRODUCTION_VALERA_DATABASE_NAME is not set" && exit 1)
 
 production-logs:
-	kubectl logs -n production deployment/valera --tail=200
+	kubectl logs -n production deployment/super-valera --tail=200
 
 production-rails-runner:
-	kubectl exec -n production deployment/valera -c ror -- bundle exec rails runner ${ARGS}
+	kubectl exec -n production deployment/super-valera -c ror -- bundle exec rails runner ${ARGS}

@@ -1,4 +1,4 @@
-# 📊 Valera Analytics System
+# 📊 Super Valera Analytics System
 
 **Быстрый старт и руководство по использованию системы аналитики**
 

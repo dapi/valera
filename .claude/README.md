@@ -1,6 +1,6 @@
 # Claude AI Assistant Configuration
 
-This directory contains configuration and learning protocols for Claude AI assistant when working with the Valera project.
+This directory contains configuration and learning protocols for Claude AI assistant when working with the Super Valera project.
 
 ## 📁 Configuration Files
 
@@ -130,4 +130,4 @@ This system ensures:
 
 ---
 
-**This configuration system guarantees Claude has complete, current knowledge before making any telegram-related changes to the Valera project.**
+**This configuration system guarantees Claude has complete, current knowledge before making any telegram-related changes to the Super Valera project.**

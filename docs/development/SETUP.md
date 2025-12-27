@@ -1,4 +1,4 @@
-# 🚀 Quick Start: Разработка для Valera
+# 🚀 Quick Start: Разработка для Super Valera
 
 **Версия:** 1.0 | **Последнее обновление:** 27.10.2025
 > **Технологии проекта:** [Технологический стек](../TECHNOLOGY_STACK.md)
@@ -224,7 +224,7 @@ git commit -m "Add new chat functionality"
 # Тестирование AI запросов
 rails runner "
 include LlmHelper
-response = ask_ai('Hello, Valera!')
+response = ask_ai('Hello, Super Valera!')
 puts response
 "
 ```

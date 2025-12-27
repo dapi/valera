@@ -6,8 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: base
-    image: valera:latest
-    container_name: valera_app
+    image: super-valera:latest
+    container_name: super_valera_app
     restart: unless-stopped
     env_file:
       - .env.production
@@ -49,7 +49,7 @@ services:
 
   postgres:
     image: postgres:17-alpine
-    container_name: valera_postgres
+    container_name: super_valera_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -82,7 +82,7 @@ services:
 
   redis:
     image: valkey/valkey:8-alpine
-    container_name: valera_redis
+    container_name: super_valera_redis
     restart: unless-stopped
     command: valkey-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
@@ -110,7 +110,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: valera_nginx
+    container_name: super_valera_nginx
     restart: unless-stopped
     ports:
       - "80:80"
@@ -143,7 +143,7 @@ services:
 
   backup:
     image: postgres:17-alpine
-    container_name: valera_backup
+    container_name: super_valera_backup
     restart: "no"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -171,7 +171,7 @@ services:
 
   monitoring:
     image: prom/prometheus:latest
-    container_name: valera_monitoring
+    container_name: super_valera_monitoring
     restart: unless-stopped
     ports:
       - "9090:9090"
@@ -196,7 +196,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    container_name: valera_grafana
+    container_name: super_valera_grafana
     restart: unless-stopped
     ports:
       - "3001:3000"

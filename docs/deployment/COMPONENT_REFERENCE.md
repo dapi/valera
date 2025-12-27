@@ -1,4 +1,4 @@
-# Valera Component Reference
+# Super Valera Component Reference
 
 ## 🏗️ System Architecture Overview
 

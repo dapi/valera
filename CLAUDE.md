@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**Critical Rules для Claude Code при работе с проектом Valera**
+**Critical Rules для Claude Code при работе с проектом Super Valera**
 
 **Quick Start:** @docs/README.md
 

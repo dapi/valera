@@ -1,9 +1,9 @@
-# Valera API Reference
+# Super Valera API Reference
 
 ## 🤖 Telegram Webhook API v1
 
 ### Overview
-Valera exposes a single webhook endpoint for Telegram Bot API integration. The webhook receives updates from Telegram and processes them through the AI system.
+Super Valera exposes a single webhook endpoint for Telegram Bot API integration. The webhook receives updates from Telegram and processes them through the AI system.
 
 ### Base URL
 ```
@@ -226,7 +226,7 @@ class ApplicationConfig < Anyway::Config
   attr_config :llm_provider, :llm_model, :company_name, :company_address
 
   # Company Information for AI responses
-  attr_config :company_name, default: "Автосервис Валера"
+  attr_config :company_name, default: "Автосервис Супер Валера"
   attr_config :company_address, default: "г. Москва, ул. Примерная, 123"
   attr_config :company_phone, default: "+7 (495) 123-45-67"
 end

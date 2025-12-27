@@ -6,7 +6,7 @@
 
 ## 🚀 Быстрый старт
 
-YARD (Yet Another Ruby Documentation) успешно настроен в проекте Valera!
+YARD (Yet Another Ruby Documentation) успешно настроен в проекте Super Valera!
 
 ### Что уже сделано:
 - ✅ YARD gem добавлен в Gemfile

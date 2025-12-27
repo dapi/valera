@@ -151,7 +151,7 @@ describe User do
 end
 ```
 
-## Лучшая практика для проекта Valera
+## Лучшая практика для проекта Super Valera
 
 ### 1. Структура директорий
 
@@ -170,7 +170,7 @@ spec/
 │           └── car_service_api.yml
 ```
 
-### 2. Конфигурация для Valera
+### 2. Конфигурация для Super Valera
 
 ```ruby
 # spec/spec_helper.rb

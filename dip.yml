@@ -6,7 +6,7 @@ environment:
 compose:
   files:
     - docker-compose.yml
-  project_name: valera
+  project_name: super-valera
 
 interaction:
   # === Infrastructure ===

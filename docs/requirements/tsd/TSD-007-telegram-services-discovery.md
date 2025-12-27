@@ -81,7 +81,7 @@ end
 # config/prompts/services_discovery.yml
 welcome_with_services:
   system: |
-    Ты - AI-ассистент автосервиса Valera. Представься и представь топ-4 услуги.
+    Ты - AI-ассистент автосервиса Super Valera. Представься и представь топ-4 услуги.
     Услуги: %{services}
     Цены: %{prices}
 

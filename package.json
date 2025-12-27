@@ -1,7 +1,7 @@
 {
-  "name": "valera",
+  "name": "super-valera",
   "version": "1.0.0",
-  "description": "Node.js dependencies for Valera project (screenshots, etc.)",
+  "description": "Node.js dependencies for Super Valera project (screenshots, etc.)",
   "private": true,
   "scripts": {
     "screenshots:dashboard": "bin/rails screenshots:dashboard"

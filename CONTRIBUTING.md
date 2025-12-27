@@ -1,6 +1,6 @@
-# 🤝 Contributing to Valera
+# 🤝 Contributing to Super Valera
 
-Thank you for your interest in contributing to Valera! This guide will help you get started.
+Thank you for your interest in contributing to Super Valera! This guide will help you get started.
 
 ## 🚀 Quick Start
 
@@ -143,4 +143,4 @@ By contributing, you agree that your contributions will be licensed under the sa
 
 ---
 
-Thank you for contributing to Valera! 🎉
+Thank you for contributing to Super Valera! 🎉

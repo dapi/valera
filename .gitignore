@@ -58,5 +58,4 @@ dip.override.yml
 /node_modules/
 /package-lock.json
 
-.mcp.json
 .playwright-mcp/

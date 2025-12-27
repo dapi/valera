@@ -1,8 +1,8 @@
-# Valera Project Documentation Index
+# Super Valera Project Documentation Index
 
 ## 🎯 Project Overview
 
-**Valera** is an AI-powered Telegram bot for automotive service automation, built with Ruby on Rails 8.1 and integrated with advanced AI capabilities through the `ruby_llm` gem.
+**Super Valera** is an AI-powered Telegram bot for automotive service automation, built with Ruby on Rails 8.1 and integrated with advanced AI capabilities through the `ruby_llm` gem.
 
 ### 🏗️ Architecture Overview
 
