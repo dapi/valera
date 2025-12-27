@@ -41,6 +41,11 @@ module Telegram
     def message(message)
       return unless text_message?(message)
 
+      # Проверяем настроенность tenant только для приватных чатов
+      if private_chat?(message)
+        return unless tenant_configured_for_private_chat?
+      end
+
       current_tenant.touch(:last_message_at)
 
       chat_id = message.dig('chat', 'id')
@@ -185,6 +190,11 @@ module Telegram
     #   start!()
     #   #=> Пользователь получит приветственное сообщение
     def start!(*_args)
+      # Проверяем настроенность tenant только для приватных чатов
+      if private_chat?
+        return unless tenant_configured_for_private_chat?
+      end
+
       WelcomeService.new(current_tenant).send_welcome_message(telegram_user, self)
     end
 
@@ -318,6 +328,35 @@ module Telegram
         .by_event(AnalyticsService::Events::DIALOG_STARTED)
         .where('occurred_at >= ?', Date.current)
         .exists?
+    end
+
+    # Проверяет, является ли текущий чат приватным
+    #
+    # @param message [Hash, nil] данные сообщения (опционально, для message handler)
+    # @return [Boolean] true если чат приватный
+    # @api private
+    def private_chat?(message = nil)
+      chat_type = if message
+                    message.dig('chat', 'type')
+                  else
+                    chat&.dig('type') || chat&.try(:type)
+                  end
+      chat_type == 'private'
+    end
+
+    # Проверяет, что tenant настроен для работы в приватном чате
+    #
+    # Возвращает true если можно продолжать обработку, false если tenant не настроен.
+    # При false автоматически отправляет пользователю сообщение об ошибке.
+    #
+    # @return [Boolean] true если можно продолжать, false если не настроен
+    # @api private
+    def tenant_configured_for_private_chat?
+      return true if current_tenant.admin_chat_id.present?
+
+      Rails.logger.warn { "[WebhookController] Tenant #{current_tenant.key} has no admin_chat_id configured" }
+      respond_with :message, text: I18n.t('telegram.bot_not_configured')
+      false
     end
 
     # Определяет тип сообщения для аналитики

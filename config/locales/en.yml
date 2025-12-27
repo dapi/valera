@@ -29,6 +29,11 @@
 
 en:
   hello: "Hello world"
+  telegram:
+    bot_not_configured: |
+      ⚠️ Bot is temporarily not configured.
+
+      Please contact the service administrator.
   activerecord:
     errors:
       models:

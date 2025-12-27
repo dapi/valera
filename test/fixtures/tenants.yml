@@ -23,3 +23,17 @@ two:
   welcome_message: Welcome to AutoService Two!
   company_info: Test company info 2
   price_list: Test price list 2
+
+# Tenant without admin_chat_id - for testing unconfigured bot behavior
+unconfigured:
+  key: unconfigured
+  name: Unconfigured AutoService
+  bot_token: "333333333:ABCdefGHIjklMNOpqrsTUVwxyz_three"
+  bot_username: unconfigured_bot
+  webhook_secret: secret_unconfigured_abc123secret_unconfigured_abc123secret_unconfigured
+  admin_chat_id: ~
+  owner: one
+  system_prompt: Test system prompt
+  welcome_message: Welcome!
+  company_info: Test company info
+  price_list: Test price list
