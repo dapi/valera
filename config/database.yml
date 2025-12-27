@@ -27,7 +27,7 @@ default: &default
 development:
   primary:
     <<: *default
-    database: valera_development
+    database: <%= ENV.fetch('VALERA_DEV_DATABASE', "valera_development_#{Digest::MD5.hexdigest(Rails.root.to_s)[0..7]}") %>
   queue:
     <<: *default
     database: valera_development_queue
@@ -65,7 +65,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: valera_test
+  database: <%= ENV.fetch('VALERA_TEST_DATABASE', "valera_test_#{Digest::MD5.hexdigest(Rails.root.to_s)[0..7]}") %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
