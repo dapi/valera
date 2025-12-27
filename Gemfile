@@ -37,13 +37,12 @@ gem 'administrate', '~> 1.0'
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[windows jruby]
 
-# Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
+# Use the database-backed adapters for Rails.cache and Action Cable
 gem 'solid_cable'
 gem 'solid_cache'
-gem 'solid_queue'
 
-# Web UI for SolidQueue/ActiveJob monitoring [https://github.com/rails/mission_control-jobs]
-gem 'mission_control-jobs'
+# Background job processing with excellent Web UI [https://github.com/bensheldon/good_job]
+gem 'good_job'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', require: false
