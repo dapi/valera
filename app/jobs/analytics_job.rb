@@ -8,7 +8,8 @@
 class AnalyticsJob < ApplicationJob
   queue_as :analytics
 
-  retry_on StandardError, wait: :polynomially_longer, attempts: 3
+  # Используем lambda вместо :polynomially_longer для совместимости с SolidQueue
+  retry_on StandardError, wait: ->(executions) { (executions**2) + 2 }, attempts: 3
 
   # Выполнение задачи по сохранению аналитического события
   #
