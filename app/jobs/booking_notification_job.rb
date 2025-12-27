@@ -21,6 +21,11 @@ class BookingNotificationJob < ApplicationJob
 
   queue_as :default
 
+  # Не ретрить Telegram ошибки - они обычно постоянные (чат не найден, бот заблокирован)
+  discard_on Telegram::Bot::Error do |job, error|
+    Rails.logger.warn("[BookingNotificationJob] Discarding job due to Telegram error: #{error.message}")
+  end
+
   # Выполняет отправку уведомления о новой заявке
   #
   # @param booking [Booking] созданная заявка для уведомления
@@ -32,12 +37,17 @@ class BookingNotificationJob < ApplicationJob
   def perform(booking)
     tenant = booking.tenant
 
+    unless tenant.admin_chat_id.present?
+      Rails.logger.info("[BookingNotificationJob] Skipping: admin_chat_id not configured for tenant #{tenant.id}")
+      return
+    end
+
     # Используем Telegram API для отправки сообщения в менеджерский чат
     tenant.bot_client.send_message(
       chat_id: tenant.admin_chat_id,
       text: booking.details
     )
-  rescue StandardError => e
+  rescue Telegram::Bot::Error => e
     log_error(e,
               job: self.class.name,
               booking_id: booking.id,
