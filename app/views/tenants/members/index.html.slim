@@ -70,8 +70,8 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
             - else
               span.text-gray-400 = t('.telegram_not_linked')
           td.px-6.py-4.whitespace-nowrap.text-sm.text-gray-500
-            - if membership.invited_by
-              = membership.invited_by.name
+            - if membership.tenant_invite&.invited_by
+              = membership.tenant_invite.invited_by_name
             - else
               | —
           td.px-6.py-4.whitespace-nowrap.text-right.text-sm.font-medium
