@@ -252,9 +252,9 @@ module Telegram
       end
 
       if became_owner
-        respond_with :message, text: I18n.t('platform_bot.messages.became_owner', tenant_name: tenant.name)
+        respond_with :message, text: I18n.t('platform_bot.messages.became_owner', tenant_name: tenant.name, dashboard_url: tenant.dashboard_url)
       else
-        respond_with :message, text: I18n.t('platform_bot.messages.member_added', tenant_name: tenant.name, role: role_display_name(invite.role))
+        respond_with :message, text: I18n.t('platform_bot.messages.member_added', tenant_name: tenant.name, role: role_display_name(invite.role), dashboard_url: tenant.dashboard_url)
       end
     rescue ActiveRecord::RecordInvalid
       respond_with :message, text: I18n.t('platform_bot.errors.membership_failed')
