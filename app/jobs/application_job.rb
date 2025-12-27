@@ -15,8 +15,8 @@
 # @author Danil Pismenny
 # @since 0.1.0
 class ApplicationJob < ActiveJob::Base
-  # Повторяет выполнение при стандартных ошибках
-  # Использует lambda вместо :exponentially_longer для совместимости с SolidQueue
+  # Повторяет выполнение при стандартных ошибках с экспоненциальной задержкой
+  # Используем lambda для совместимости со стандартным test adapter
   retry_on StandardError, wait: ->(executions) { (executions**4) + 2 }, attempts: 10
 
   # Автоматически повторяет задачи при deadlock

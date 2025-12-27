@@ -86,10 +86,10 @@ Rails.application.configure do
   # Enable analytics in development
   config.analytics_enabled = true
 
-  # Use solid_queue for background jobs (same as production)
-  # Requires running SolidQueue worker via bin/dev or bin/jobs
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue, reading: :queue } }
+  # Use good_job for background jobs
+  # Runs in async mode (in-process) for development
+  config.active_job.queue_adapter = :good_job
+  config.good_job.execution_mode = :async
 
   # Allow subdomains for admin panel testing (configured via ALLOWED_HOSTS env var)
   ApplicationConfig.allowed_hosts.each { |host| config.hosts << host }
