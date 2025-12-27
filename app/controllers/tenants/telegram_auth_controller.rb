@@ -69,13 +69,13 @@ module Tenants
       user = User.find_by(telegram_user_id: telegram_user.id)
 
       unless user
-        redirect_to new_tenant_session_path, alert: 'Ваш Telegram не привязан к аккаунту владельца'
+        redirect_to new_tenant_session_path, alert: 'Ваш Telegram не привязан к аккаунту пользователя'
         return
       end
 
-      # Проверяем что этот User - владелец текущего tenant'а
-      unless user.id == current_tenant.owner_id
-        redirect_to new_tenant_session_path, alert: 'Вы не являетесь владельцем этого автосервиса'
+      # Проверяем что этот User - владелец или сотрудник текущего tenant'а
+      unless user.id == current_tenant.owner_id || current_tenant.member_ids.include?(user.id)
+        redirect_to new_tenant_session_path, alert: 'Вы не являетесь владельцем или сотрудником этого автосервиса'
         return
       end
 

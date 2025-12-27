@@ -59,3 +59,4 @@ dip.override.yml
 /package-lock.json
 
 .mcp.json
+.playwright-mcp/
