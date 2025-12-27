@@ -240,6 +240,7 @@ module Telegram
       membership = TenantMembership.find_by(tenant: tenant, user: new_user)
       assert_not_nil membership
       assert_equal invite.role, membership.role
+      assert_equal invite.id, membership.tenant_invite_id
     end
   end
 end

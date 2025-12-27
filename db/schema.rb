@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_27_085244) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_27_115613) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -203,11 +203,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_085244) do
     t.bigint "invited_by_id"
     t.integer "role", default: 0, null: false
     t.bigint "tenant_id", null: false
+    t.bigint "tenant_invite_id"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["invited_by_id"], name: "index_tenant_memberships_on_invited_by_id"
     t.index ["tenant_id", "user_id"], name: "index_tenant_memberships_on_tenant_id_and_user_id", unique: true
     t.index ["tenant_id"], name: "index_tenant_memberships_on_tenant_id"
+    t.index ["tenant_invite_id"], name: "index_tenant_memberships_on_tenant_invite_id"
     t.index ["user_id"], name: "index_tenant_memberships_on_user_id"
   end
 
@@ -285,6 +287,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_085244) do
   add_foreign_key "tenant_invites", "tenants"
   add_foreign_key "tenant_invites", "users", column: "accepted_by_id"
   add_foreign_key "tenant_invites", "users", column: "invited_by_user_id"
+  add_foreign_key "tenant_memberships", "tenant_invites"
   add_foreign_key "tenant_memberships", "tenants"
   add_foreign_key "tenant_memberships", "users"
   add_foreign_key "tenant_memberships", "users", column: "invited_by_id"

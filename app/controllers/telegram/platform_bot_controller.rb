@@ -246,7 +246,7 @@ module Telegram
           tenant: tenant,
           user: user,
           role: invite.role,
-          invited_by_id: invite.invited_by_user_id
+          tenant_invite: invite
         )
         invite.accept!(user)
       end

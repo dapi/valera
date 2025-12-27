@@ -18,6 +18,7 @@ class TenantMembership < ApplicationRecord
   belongs_to :tenant
   belongs_to :user
   belongs_to :invited_by, class_name: 'User', optional: true
+  belongs_to :tenant_invite, optional: true
 
   enum :role, { viewer: 0, operator: 1, admin: 2 }
 
