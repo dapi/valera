@@ -93,7 +93,7 @@ class Tenant < ApplicationRecord
 
   def generate_key
     alphabet = ('a'..'z').to_a + ('0'..'9').to_a
-    self.key = Nanoid.generate(size: KEY_LENGTH, alphabet: alphabet)
+    self.key = Nanoid.generate(size: 8, alphabet: alphabet)
   end
 
   def downcase_key

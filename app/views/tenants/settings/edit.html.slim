@@ -18,14 +18,15 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Настройки
           = f.text_field :key, \
             class: "flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono", \
             placeholder: "example", \
-            maxlength: Tenant::KEY_LENGTH, \
+            minlength: 3, \
+            maxlength: 64, \
             pattern: "[a-z0-9]+", \
             required: true
           span.text-gray-500
             = ".#{ApplicationConfig.host}"
 
         p.text-sm.text-gray-500.mt-1
-          | Ключ должен содержать ровно #{Tenant::KEY_LENGTH} символов: только строчные латинские буквы и цифры.
+          | Ключ должен содержать от 3 до 64 символов: только строчные латинские буквы и цифры.
         p.text-sm.text-amber-600.mt-1
           | После изменения вы будете перенаправлены на новый адрес.
 

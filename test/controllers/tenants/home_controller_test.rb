@@ -19,7 +19,7 @@ module Tenants
 
     test 'shows dashboard when authenticated' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       get '/'
 
@@ -29,7 +29,7 @@ module Tenants
 
     test 'shows tenant statistics' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       get '/'
 
@@ -40,7 +40,7 @@ module Tenants
 
     test 'displays tenant name in sidebar' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       get '/'
 
@@ -50,7 +50,7 @@ module Tenants
 
     test 'supports period parameter for chart' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       get '/', params: { period: 30 }
 
@@ -59,7 +59,7 @@ module Tenants
 
     test 'defaults to 7 days period for invalid period' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       get '/', params: { period: 999 }
 
@@ -68,7 +68,7 @@ module Tenants
 
     test 'shows activity chart section' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       get '/'
 
@@ -79,7 +79,7 @@ module Tenants
 
     test 'shows recent dialogs section' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       get '/'
 

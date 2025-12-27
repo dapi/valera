@@ -22,7 +22,7 @@ class TenantTest < ActiveSupport::TestCase
       bot_token: '123456790:ABCdefGHIjklMNOpqrsTUVwxyz'
     )
     assert_not_nil tenant.key
-    assert_equal Tenant::KEY_LENGTH, tenant.key.length
+    assert_equal 8, tenant.key.length
   end
 
   test 'generates webhook_secret on create' do
@@ -88,11 +88,11 @@ class TenantTest < ActiveSupport::TestCase
     assert tenant.errors[:key].any?
   end
 
-  test 'validates key length' do
+  test 'validates key length minimum' do
     tenant = Tenant.new(
       name: 'Test',
       bot_token: '123456796:ABCdefGHIjklMNOpqrsTUVwxyz',
-      key: 'short'
+      key: 'ab'
     )
     assert_not tenant.valid?
     assert tenant.errors[:key].any?
@@ -100,7 +100,6 @@ class TenantTest < ActiveSupport::TestCase
 
   test 'validates key format - only letters and digits allowed' do
     # Keys with special characters should be invalid (after downcase)
-    # Each key is exactly KEY_LENGTH (3) and contains at least one invalid char
     invalid_keys = %w[a-b a_b a.b a@b a!b]
 
     invalid_keys.each do |invalid_key|
@@ -126,10 +125,8 @@ class TenantTest < ActiveSupport::TestCase
 
   test 'rejects reserved subdomain keys' do
     ApplicationConfig.reserved_subdomains.each do |reserved_key|
-      # Pad to KEY_LENGTH if shorter
-      test_key = reserved_key[0, Tenant::KEY_LENGTH].ljust(Tenant::KEY_LENGTH, 'a')
-      # Only test if it matches the reserved key exactly (for 3-char keys like 'www')
-      next unless reserved_key.length == Tenant::KEY_LENGTH
+      # Only test keys with valid length (3-64 chars)
+      next unless reserved_key.length >= 3 && reserved_key.length <= 64
 
       tenant = Tenant.new(
         name: 'Test',

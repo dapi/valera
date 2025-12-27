@@ -19,7 +19,7 @@ module Tenants
 
     test 'shows settings form when authenticated as owner' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       get '/settings/edit'
 
@@ -35,7 +35,7 @@ module Tenants
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
       # Login as owner first
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       # Access settings as owner (should work)
       get '/settings/edit'
@@ -49,7 +49,7 @@ module Tenants
 
     test 'updates key successfully' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       new_key = 'nk1'
       patch '/settings', params: { tenant: { key: new_key } }
@@ -61,7 +61,7 @@ module Tenants
 
     test 'shows error for invalid key format' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       # Key with special chars (will be downcased first, so use something that fails after downcase)
       patch '/settings', params: { tenant: { key: 'inv@lid!' } }
@@ -72,9 +72,9 @@ module Tenants
 
     test 'shows error for key with wrong length' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
-      patch '/settings', params: { tenant: { key: 'short' } }
+      patch '/settings', params: { tenant: { key: 'ab' } }
 
       assert_response :unprocessable_entity
     end
@@ -82,7 +82,7 @@ module Tenants
     test 'shows error for duplicate key' do
       other_tenant = tenants(:two)
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       patch '/settings', params: { tenant: { key: other_tenant.key } }
 
@@ -92,7 +92,7 @@ module Tenants
 
     test 'displays current dashboard url' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'password123' }
+      post '/session', params: { email: @owner.email, password: 'password123' }
 
       get '/settings/edit'
 

@@ -19,7 +19,7 @@ module Tenants
 
     test 'shows set password form with pending user' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'anything' }
+      post '/session', params: { email: @owner.email, password: 'anything' }
 
       get '/password/new'
 
@@ -29,7 +29,7 @@ module Tenants
 
     test 'sets password and logs in' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'anything' }
+      post '/session', params: { email: @owner.email, password: 'anything' }
 
       post '/password', params: {
         user: {
@@ -46,7 +46,7 @@ module Tenants
 
     test 'rejects mismatched password confirmation' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'anything' }
+      post '/session', params: { email: @owner.email, password: 'anything' }
 
       post '/password', params: {
         user: {
@@ -60,7 +60,7 @@ module Tenants
 
     test 'rejects password shorter than 8 characters' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { password: 'anything' }
+      post '/session', params: { email: @owner.email, password: 'anything' }
 
       post '/password', params: {
         user: {
