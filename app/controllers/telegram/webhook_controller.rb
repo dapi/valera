@@ -20,7 +20,7 @@ module Telegram
     include RescueErrors
 
     before_action :telegram_user
-    before_action :require_configured_tenant!
+    before_action :require_configured_tenant!, except: %i[new_chat_members migrate_to_supergroup]
     before_action :llm_chat
     before_action :setup_analytics_context
 
