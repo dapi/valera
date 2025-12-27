@@ -11,6 +11,7 @@
 🚨 **Configuration:** Только `anyway_config`, никаких `.env*` файлов
 🚨 **Documentation:** НЕ архивировать FIP/US/TSD документы из `docs/requirements/`
 🚨 **Testing:** Без `File.write/File.delete` и изменения ENV в тестах
+🚨 **Jobs/SolidQueue:** НЕ использовать символы `:exponentially_longer` или `:polynomially_longer` в `retry_on` — SolidQueue их не поддерживает. Используй lambda: `wait: ->(executions) { (executions**4) + 2 }`
 
 ## 📸 Скриншоты для документации
 
