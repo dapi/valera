@@ -24,6 +24,20 @@ two:
   company_info: Test company info 2
   price_list: Test price list 2
 
+# Tenant without owner - for testing first invited user becomes owner
+no_owner:
+  key: noowner
+  name: AutoService Without Owner
+  bot_token: "555555555:ABCdefGHIjklMNOpqrsTUVwxyz_five"
+  bot_username: no_owner_bot
+  webhook_secret: secret_noowner_abc123secret_noowner_abc123secret_noowner_abc123secret
+  admin_chat_id: 111222333
+  owner: ~
+  system_prompt: Test system prompt
+  welcome_message: Welcome!
+  company_info: Test company info
+  price_list: Test price list
+
 # Tenant without admin_chat_id - for testing unconfigured bot behavior
 unconfigured:
   key: unconfigured

@@ -42,3 +42,12 @@ admin_pending_invite:
   role: 2
   status: 0
   expires_at: <%= 7.days.from_now.to_fs(:db) %>
+
+# Invite for tenant without owner - for testing first user becomes owner
+no_owner_invite:
+  tenant: no_owner
+  invited_by_admin: superuser
+  token: MBR_no_owner_test_token
+  role: 1
+  status: 0
+  expires_at: <%= 7.days.from_now.to_fs(:db) %>

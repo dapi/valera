@@ -233,17 +233,29 @@ module Telegram
       end
 
       # Создаём membership и принимаем инвайт атомарно
+      became_owner = false
       ActiveRecord::Base.transaction do
+        # Если у tenant нет владельца, назначаем первого приглашённого пользователя владельцем
+        if tenant.owner_id.nil?
+          tenant.update!(owner: user)
+          became_owner = true
+          Rails.logger.info("[TenantOwnership] User #{user.id} became owner of tenant #{tenant.id} via invite #{invite.id}")
+        end
+
         TenantMembership.create!(
           tenant: tenant,
           user: user,
           role: invite.role,
-          invited_by_id: invite.invited_by_id
+          invited_by_id: invite.invited_by_user_id
         )
         invite.accept!(user)
       end
 
-      respond_with :message, text: I18n.t('platform_bot.messages.member_added', tenant_name: tenant.name, role: role_display_name(invite.role))
+      if became_owner
+        respond_with :message, text: I18n.t('platform_bot.messages.became_owner', tenant_name: tenant.name)
+      else
+        respond_with :message, text: I18n.t('platform_bot.messages.member_added', tenant_name: tenant.name, role: role_display_name(invite.role))
+      end
     rescue ActiveRecord::RecordInvalid
       respond_with :message, text: I18n.t('platform_bot.errors.membership_failed')
     end
