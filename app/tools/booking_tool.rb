@@ -111,7 +111,7 @@ class BookingTool < RubyLLM::Tool
       }
     )
 
-    response_text = "Заявка под номером #{booking.id} отправлена администратору"
+    response_text = "Заявка под номером #{booking.public_number} отправлена администратору"
 
     # Добавляем предупреждение о development режиме
     if development_warnings_enabled?
