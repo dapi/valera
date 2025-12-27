@@ -102,5 +102,8 @@ Rails.application.routes.draw do
   get 'price', to: 'landing#price'
   get 'lp1', to: 'landing#lp1'
   get 'lp2', to: 'landing#lp2'
+  get 'lp-magic-1', to: 'landing#lp_magic_1'
+  get 'lp-magic-2', to: 'landing#lp_magic_2'
+  get 'lp-magic-3', to: 'landing#lp_magic_3'
   post 'leads', to: 'landing#create_lead', as: :leads
 end

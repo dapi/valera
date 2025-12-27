@@ -13,10 +13,23 @@ class LandingController < ApplicationController
 
   def lp1
     @lead = Lead.new
-    render layout: 'landing_lp1'
   end
 
   def lp2
+    @lead = Lead.new
+    @plans = PricingConfig.plans
+  end
+
+  def lp_magic_1
+    @lead = Lead.new
+    @plans = PricingConfig.plans
+  end
+
+  def lp_magic_2
+    @lead = Lead.new
+  end
+
+  def lp_magic_3
     @lead = Lead.new
     @plans = PricingConfig.plans
   end
