@@ -123,10 +123,15 @@ bin/rails screenshots:dashboard
 Доступ в administarte осуществляется через playwright mcp по адресу указанном в переменной окружения
 ADMIN_URL, а доступы бери из переменных окружеия ADMIN_EMAIL, ADMIN_PASSWORD
 
+# Окружения
+
+- **Production:** `admin.supervalera.ru` — боевой сервер
+- **Development:** `admin.3010.brandymint.ru` — development сервер (SSL self-signed, нужно принять сертификат)
+
 # Диагностика
 
-- Логи из production смотерти через make production-logs
-- Запустить в rails runner на production через production-rails-runner
+- Логи из production смотреть через `make production-logs`
+- Запустить в rails runner на production через `production-rails-runner`
 
 ### 🚨 Critical Rules для требований
 

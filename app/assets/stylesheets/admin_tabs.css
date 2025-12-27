@@ -18,7 +18,10 @@
   padding: 0;
 }
 
-.admin-tabs__button {
+/* Use button.class[type] to increase specificity over Administrate's button selectors
+   Base: button.class (0,0,1,1) beats [type="button"] (0,0,1,0)
+   Hover: button.class[type]:hover (0,0,3,1) beats button:not(.link):hover (0,0,2,1) */
+button.admin-tabs__button {
   padding: 0.75rem 1.25rem;
   border: none;
   border-bottom: 3px solid transparent;
@@ -33,13 +36,13 @@
   margin-right: 2px;
 }
 
-.admin-tabs__button:hover {
+button.admin-tabs__button[type="button"]:hover {
   color: #333;
   background: #e9ecef;
 }
 
-.admin-tabs__button--active,
-.admin-tabs__button.admin-tabs__button--active {
+button.admin-tabs__button--active,
+button.admin-tabs__button.admin-tabs__button--active {
   color: #0066cc;
   background: #fff;
   border-bottom-color: #0066cc;
