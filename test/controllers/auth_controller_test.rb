@@ -48,8 +48,9 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'redirects to tenant on login when user has one tenant' do
-    # Ensure user has only one tenant
-    assert_equal 1, @user.owned_tenants.count
+    # Remove extra tenants so user has only one
+    @user.owned_tenants.where.not(id: @tenant.id).update_all(owner_id: nil)
+    assert_equal 1, @user.owned_tenants.reload.count
 
     post login_path, params: { email: @user.email, password: 'password123' }
 
@@ -58,26 +59,18 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'redirects to select page when user has multiple tenants' do
-    # Create second tenant for user
-    second_tenant = Tenant.create!(
-      key: 's01',
-      name: 'Second Tenant',
-      owner: @user,
-      bot_token: '333333333:ABCdefGHIjklMNOpqrsTUVwxyz_three',
-      bot_username: 'second_bot',
-      webhook_secret: 'secret_three_ghi789secret_three_ghi789secret_three_ghi789secret_three_ghi789'
-    )
+    # User already has multiple tenants from fixtures (one and unconfigured)
+    assert @user.owned_tenants.count >= 2, 'User should have multiple tenants from fixtures'
 
     post login_path, params: { email: @user.email, password: 'password123' }
 
     assert_redirected_to select_tenant_path
-  ensure
-    second_tenant&.destroy
   end
 
   test 'shows error when user has no tenants' do
-    # Remove tenant ownership
-    @tenant.update!(owner: nil)
+    # Remove all tenant ownerships for this user
+    @user.owned_tenants.update_all(owner_id: nil)
+    assert_equal 0, @user.owned_tenants.reload.count
 
     post login_path, params: { email: @user.email, password: 'password123' }
 
