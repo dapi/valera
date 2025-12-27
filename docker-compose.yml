@@ -15,6 +15,7 @@ services:
       - "${PORT:-3000}:${PORT:-3000}"
     environment:
       RAILS_ENV: development
+      VALERA_DATABASE_HOST: postgres
       DATABASE_URL: postgresql://valera:password@postgres:5432/valera_development
       REDIS_URL: redis://redis:6379/0
       HISTFILE: /app/log/.bash_history

@@ -17,14 +17,21 @@ default: &default
   encoding: unicode
   <% if ENV.key? 'VALERA_DATABASE_HOST' %>
   host: <%= ENV.fetch('VALERA_DATABASE_HOST') %>
+  username: <%= ENV.fetch('VALERA_DATABASE_USER', 'valera') %>
+  password: <%= ENV.fetch('VALERA_DATABASE_PASSWORD', 'password') %>
   <% end %>
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
-  <<: *default
-  database: valera_development
+  primary:
+    <<: *default
+    database: valera_development
+  queue:
+    <<: *default
+    database: valera_development_queue
+    migrations_paths: db/queue_migrate
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -90,8 +97,6 @@ production:
   primary: &primary_production
     <<: *default
     database: valera_production
-    username: valera
-    password: <%= ENV["VALERA_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
     database: valera_production_cache
