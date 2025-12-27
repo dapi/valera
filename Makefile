@@ -145,3 +145,9 @@ guard-production-env:
 	@test -n "${PRODUCTION_VALERA_DATABASE_PASSWORD}" || (echo "Error: PRODUCTION_VALERA_DATABASE_PASSWORD is not set" && exit 1)
 	@test -n "${PRODUCTION_VALERA_DATABASE_USERNAME}" || (echo "Error: PRODUCTION_VALERA_DATABASE_USERNAME is not set" && exit 1)
 	@test -n "${PRODUCTION_VALERA_DATABASE_NAME}" || (echo "Error: PRODUCTION_VALERA_DATABASE_NAME is not set" && exit 1)
+
+production-logs:
+	kubectl logs -n production deployment/valera --tail=200
+
+production-rails-runner:
+	kubectl exec -n production deployment/valera -c ror -- bundle exec rails runner ${ARGS}

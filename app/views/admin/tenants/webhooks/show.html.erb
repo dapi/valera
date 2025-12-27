@@ -29,7 +29,10 @@ Displays detailed information about Telegram bot and webhook status.
         <h2><%= t("admin.tenants.webhooks.show.bot_info") %></h2>
         <dl class="webhook-status__details">
           <dt><%= t("admin.tenants.webhooks.show.bot_username") %></dt>
-          <dd>@<%= @bot_info.dig('result', 'username') %></dd>
+          <dd>
+            <% username = @bot_info.dig('result', 'username') %>
+            <%= link_to "@#{username}", "https://t.me/#{username}", target: "_blank", rel: "noopener" %>
+          </dd>
 
           <dt><%= t("admin.tenants.webhooks.show.bot_name") %></dt>
           <dd><%= @bot_info.dig('result', 'first_name') %></dd>

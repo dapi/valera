@@ -122,6 +122,11 @@ bin/rails screenshots:dashboard
 Доступ в administarte осуществляется через playwright mcp по адресу указанном в переменной окружения
 ADMIN_URL, а доступы бери из переменных окружеия ADMIN_EMAIL, ADMIN_PASSWORD
 
+# Диагностика
+
+- Логи из production смотерти через make production-logs
+- Запустить в rails runner на production через production-rails-runner
+
 ### 🚨 Critical Rules для требований
 
 🚨 **НЕ изменять** документы со статусом "Completed" или "Production"

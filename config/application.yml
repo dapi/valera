@@ -4,6 +4,9 @@ default: &default
   # Application branding
   app_name: 'Супер Валера'
 
+  llm_provider: 'deepseek'
+  llm_model: 'deepseek-chat'
+
   # Landing page and support
   demo_bot_username: 'super_valera_demo_bot'
   support_telegram: 'super_valera_support'
@@ -55,8 +58,6 @@ default: &default
 
 development:
   <<: *default
-  llm_provider: 'openai'
-  llm_model: 'gpt-4o-mini'
   host: '3010.brandymint.ru'
   protocol: 'https'
   # public_port: не указан, т.к. https = 443 по умолчанию
