@@ -367,3 +367,77 @@ ru:
       update:
         success: Настройки сохранены
         key_changed: Поддомен изменён. Вы перенаправлены на новый адрес.
+    clients:
+      index:
+        title: Клиенты
+        search_placeholder: Поиск по имени или телефону...
+        search_button: Найти
+        clear_search: Сбросить
+        headers:
+          name: Имя
+          phone: Телефон
+          telegram: Telegram
+          registered: Дата регистрации
+          vehicles: Авто
+          bookings: Заявки
+          actions: Действия
+        view: Просмотр
+        no_username: Нет username
+        no_results: Клиенты не найдены
+        empty: Клиентов пока нет
+      show:
+        back_to_list: К списку клиентов
+        registered: "Зарегистрирован: %{date}"
+        phone: Телефон
+        not_specified: Не указан
+        vehicles_count: Автомобилей
+        bookings_count: Заявок
+        vehicles_title: Автомобили
+        vehicle_headers:
+          brand: Марка
+          model: Модель
+          year: Год
+          plate_number: Гос. номер
+        no_vehicles: Автомобили не добавлены
+        bookings_title: Заявки
+        booking_headers:
+          number: Номер
+          date: Дата
+          details: Описание
+          actions: Действия
+        no_bookings: Заявок пока нет
+        view_booking: Открыть
+    bookings:
+      index:
+        title: Заявки
+        date_from: С
+        date_to: По
+        filter_button: Применить
+        clear_filter: Сбросить
+        headers:
+          number: Номер
+          client: Клиент
+          vehicle: Автомобиль
+          date: Дата
+          details: Описание
+          actions: Действия
+        view: Просмотр
+        no_vehicle: —
+        no_results: Заявки не найдены
+        empty: Заявок пока нет
+        invalid_date_format: Некорректный формат даты
+      show:
+        back_to_list: К списку заявок
+        title: "Заявка %{number}"
+        created_at: "Создана: %{date}"
+        client: Клиент
+        vehicle: Автомобиль
+        no_vehicle: Автомобиль не указан
+        details_title: Описание
+        context_title: Контекст
+        related_chat: Связанный чат
+        messages_count:
+          one: "%{count} сообщение"
+          few: "%{count} сообщения"
+          many: "%{count} сообщений"
+          other: "%{count} сообщений"
