@@ -89,6 +89,7 @@ Rails.application.configure do
   # Use solid_queue for background jobs (same as production)
   # Requires running SolidQueue worker via bin/dev or bin/jobs
   config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = { database: { writing: :queue, reading: :queue } }
 
   # Allow subdomains for admin panel testing (configured via ALLOWED_HOSTS env var)
   ApplicationConfig.allowed_hosts.each { |host| config.hosts << host }
