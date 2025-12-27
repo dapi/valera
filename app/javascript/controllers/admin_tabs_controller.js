@@ -4,6 +4,18 @@ export default class extends Controller {
   static targets = ["tab", "panel", "conditional"]
 
   connect() {
+    this.initializeTabs()
+
+    // Listen for hash changes (back/forward buttons)
+    this.boundHashChange = this.handleHashChange.bind(this)
+    window.addEventListener("hashchange", this.boundHashChange)
+
+    // Re-initialize on Turbo render to fix styling issues
+    this.boundTurboRender = this.initializeTabs.bind(this)
+    document.addEventListener("turbo:render", this.boundTurboRender)
+  }
+
+  initializeTabs() {
     // Read hash from URL or show first tab
     const hash = window.location.hash.slice(1)
     const index = hash ? this.findTabIndexBySlug(hash) : 0
@@ -11,14 +23,11 @@ export default class extends Controller {
 
     // Remove loading class to reveal content (prevents flash of wrong tab)
     this.element.classList.remove("admin-tabs--loading")
-
-    // Listen for hash changes (back/forward buttons)
-    this.boundHashChange = this.handleHashChange.bind(this)
-    window.addEventListener("hashchange", this.boundHashChange)
   }
 
   disconnect() {
     window.removeEventListener("hashchange", this.boundHashChange)
+    document.removeEventListener("turbo:render", this.boundTurboRender)
   }
 
   switch(event) {
