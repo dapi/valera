@@ -42,6 +42,9 @@ gem 'solid_cable'
 gem 'solid_cache'
 gem 'solid_queue'
 
+# Web UI for SolidQueue/ActiveJob monitoring [https://github.com/rails/mission_control-jobs]
+gem 'mission_control-jobs'
+
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', require: false
 

@@ -59,6 +59,10 @@
   <% end %>
 
   <div class="navigation__divider"></div>
+  <div class="navigation__section-title">System</div>
+  <%= link_to "Jobs", MissionControl::Jobs::Engine.routes.url_helpers.root_path, class: "navigation__link" %>
+
+  <div class="navigation__divider"></div>
   <div class="navigation__external-links">
     <% if ApplicationConfig.platform_bot_username.present? %>
       <%= link_to "https://t.me/#{ApplicationConfig.platform_bot_username}", target: "_blank", rel: "noopener", class: "navigation__external-link" do %>
