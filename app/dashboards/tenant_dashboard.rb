@@ -92,9 +92,9 @@ class TenantDashboard < Administrate::BaseDashboard
       webhook_secret
       admin_chat_id
     ],
+    'Приветствие' => %i[welcome_message],
     'Информация о компании' => %i[company_info],
     'Прайс-лист' => %i[price_list],
-    'Приветствие' => %i[welcome_message],
     'Системный промпт' => %i[system_prompt]
   }.freeze
 
@@ -109,9 +109,9 @@ class TenantDashboard < Administrate::BaseDashboard
       bot_username
       admin_chat_id
     ],
+    'Приветствие' => %i[welcome_message],
     'Информация о компании' => %i[company_info],
     'Прайс-лист' => %i[price_list],
-    'Приветствие' => %i[welcome_message],
     'Системный промпт' => %i[system_prompt]
   }.freeze
 

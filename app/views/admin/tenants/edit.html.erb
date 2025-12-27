@@ -4,7 +4,7 @@
 Custom edit view with webhook management link in header.
 %>
 
-<% content_for(:title) { t("administrate.actions.edit_resource", name: page.page_title) } %>
+<% content_for(:title) { "Автосервис ##{page.resource.id}" } %>
 
 <header class="main-content__header">
   <h1 class="main-content__page-title">
@@ -34,7 +34,7 @@ Custom edit view with webhook management link in header.
     <% end %>
 
     <%= link_to(
-      t("administrate.actions.show_resource", name: page.page_title),
+      "Просмотр",
       [namespace, page.resource],
       class: "button",
     ) if accessible_action?(page.resource, :show) %>
