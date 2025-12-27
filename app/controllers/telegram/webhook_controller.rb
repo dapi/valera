@@ -20,6 +20,7 @@ module Telegram
     include RescueErrors
 
     before_action :telegram_user
+    before_action :require_configured_tenant!
     before_action :llm_chat
     before_action :setup_analytics_context
 
@@ -318,6 +319,21 @@ module Telegram
         .by_event(AnalyticsService::Events::DIALOG_STARTED)
         .where('occurred_at >= ?', Date.current)
         .exists?
+    end
+
+    # Проверяет, что tenant полностью настроен для работы
+    #
+    # Если admin_chat_id не установлен, бот не должен принимать заявки,
+    # так как уведомления некуда отправлять.
+    #
+    # @return [void]
+    # @api private
+    def require_configured_tenant!
+      return if current_tenant.admin_chat_id.present?
+
+      Rails.logger.warn { "[WebhookController] Tenant #{current_tenant.key} has no admin_chat_id configured" }
+      respond_with :message, text: I18n.t('telegram.bot_not_configured')
+      throw :abort
     end
 
     # Определяет тип сообщения для аналитики
