@@ -9,6 +9,8 @@
 # @attr [Integer] client_id ID клиента
 # @attr [Integer] chat_id ID чата
 # @attr [Integer] vehicle_id ID автомобиля (опционально)
+# @attr [Integer] number порядковый номер заявки внутри тенанта (начинается с 1)
+# @attr [String] public_number публичный номер формата "{tenant_id}-{number}"
 # @attr [Hash] meta метаданные заявки (данные клиента, авто, услуги)
 # @attr [String] details детали заявки в формате Markdown
 # @attr [Hash] context контекст диалога
@@ -40,6 +42,24 @@ class Booking < ApplicationRecord
   # Сортирует заявки по времени создания (новые первые)
   scope :recent, -> { order(created_at: :desc) }
 
+  before_create :set_booking_numbers
+
+  # Находит заявку по публичному номеру (формат: "{tenant_id}-{number}")
+  #
+  # @param public_number [String] публичный номер заявки
+  # @return [Booking, nil] найденная заявка или nil
+  # @example
+  #   Booking.find_by_public_number("5-42") # => Booking с tenant_id=5, number=42
+  def self.find_by_public_number(public_number)
+    parts = public_number.to_s.split('-')
+    return nil unless parts.size == 2
+
+    tenant_id, number = parts.map(&:to_i)
+    return nil if tenant_id.zero? || number.zero?
+
+    find_by(tenant_id: tenant_id, number: number)
+  end
+
   # Отправляет уведомление о новой заявке в административный чат
   #
   # @return [void]
@@ -47,5 +67,17 @@ class Booking < ApplicationRecord
   # @see BookingNotificationJob для логики отправки
   after_commit on: :create do
     BookingNotificationJob.perform_later(self)
+  end
+
+  private
+
+  # Устанавливает номер заявки и публичный номер перед созданием
+  #
+  # Номер вычисляется как максимальный номер в рамках тенанта + 1.
+  # При конфликте (race condition) база данных откатит транзакцию
+  # благодаря уникальному индексу на (tenant_id, number).
+  def set_booking_numbers
+    self.number = (tenant.bookings.maximum(:number) || 0) + 1
+    self.public_number = "#{tenant_id}-#{number}"
   end
 end

@@ -2,6 +2,8 @@ one:
   tenant: one
   client: one
   chat: one
+  number: 1
+  public_number: <%= ActiveRecord::FixtureSet.identify(:one) %>-1
   meta:
     customer_name: 'Ivan Petrov'
     customer_phone: '+7(916)123-45-67'
@@ -11,3 +13,35 @@ one:
       year: 2018
     preferred_date: '2025-10-27'
     preferred_time: '10:00'
+
+two:
+  tenant: one
+  client: one
+  chat: one
+  number: 2
+  public_number: <%= ActiveRecord::FixtureSet.identify(:one) %>-2
+  meta:
+    customer_name: 'Petr Sidorov'
+    customer_phone: '+7(916)987-65-43'
+    car_info:
+      brand: 'Honda'
+      model: 'Accord'
+      year: 2020
+    preferred_date: '2025-10-28'
+    preferred_time: '14:00'
+
+tenant_two_booking:
+  tenant: two
+  client: two
+  chat: two
+  number: 1
+  public_number: <%= ActiveRecord::FixtureSet.identify(:two) %>-1
+  meta:
+    customer_name: 'Anna Ivanova'
+    customer_phone: '+7(916)111-22-33'
+    car_info:
+      brand: 'BMW'
+      model: 'X5'
+      year: 2021
+    preferred_date: '2025-10-29'
+    preferred_time: '16:00'

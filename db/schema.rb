@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_27_144935) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_27_174343) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -81,11 +81,15 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_144935) do
     t.datetime "created_at", null: false
     t.text "details"
     t.jsonb "meta", default: {}, null: false
+    t.integer "number", null: false
+    t.string "public_number", null: false
     t.bigint "tenant_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "vehicle_id"
     t.index ["chat_id"], name: "index_bookings_on_chat_id"
     t.index ["client_id"], name: "index_bookings_on_client_id"
+    t.index ["public_number"], name: "index_bookings_on_public_number", unique: true
+    t.index ["tenant_id", "number"], name: "index_bookings_on_tenant_id_and_number", unique: true
     t.index ["tenant_id"], name: "index_bookings_on_tenant_id"
     t.index ["vehicle_id"], name: "index_bookings_on_vehicle_id"
   end

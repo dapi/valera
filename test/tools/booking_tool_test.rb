@@ -31,7 +31,7 @@ class BookingToolTest < ActiveSupport::TestCase
       details: 'Test booking details'
     )
 
-    assert_match(/Заявка под номером \d+ отправлена/, result.text)
+    assert_match(/Заявка под номером \d+-\d+ отправлена/, result.text)
 
     # Verify booking was created with correct associations
     booking = Booking.last
