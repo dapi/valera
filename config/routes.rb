@@ -17,8 +17,6 @@ Rails.application.routes.draw do
       resources :tenants do
         # Telegram webhook management (singular resource)
         resource :webhook, only: %i[show create destroy], module: :tenants
-        # Tenant invites (для приглашения сотрудников менеджером)
-        resources :invites, only: %i[create destroy], controller: 'tenants/invites'
       end
       resources :users
       resources :admin_users do
@@ -28,7 +26,7 @@ Rails.application.routes.draw do
       resources :leads
       resources :telegram_users, only: %i[index show]
       resources :tenant_memberships
-      resources :tenant_invites, only: %i[index show]
+      resources :tenant_invites, only: %i[index show new create destroy]
       resources :clients, only: %i[index show]
       resources :chats, only: %i[index show]
       resources :vehicles, only: %i[index show]

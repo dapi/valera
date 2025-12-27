@@ -14,6 +14,12 @@ Custom edit view with webhook management link in header.
   <div>
     <% if page.resource.persisted? %>
       <%= link_to(
+        "Создать приглашение",
+        new_admin_tenant_invite_path(tenant_id: page.resource.id),
+        class: "button button--primary"
+      ) %>
+
+      <%= link_to(
         "#{t('admin.tenants.form.dashboard')} ↗".html_safe,
         page.resource.dashboard_url,
         class: "button button--outline",

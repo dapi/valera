@@ -1,0 +1,14 @@
+<% if field.data.present? && field.resource.pending? %>
+  <div style="display: flex; align-items: center; gap: 0.25rem;">
+    <a href="<%= field.full_url %>" target="_blank" rel="noopener" title="<%= field.full_url %>">
+      <%= field.truncated_url %> ↗
+    </a>
+    <span style="cursor: pointer;"
+          onclick="navigator.clipboard.writeText('<%= field.full_url %>').then(() => alert('Ссылка скопирована!'))"
+          title="Копировать ссылку">📋</span>
+  </div>
+<% elsif field.data.present? %>
+  <span style="color: #999;"><%= field.truncated_url %></span>
+<% else %>
+  <span style="color: #999;">—</span>
+<% end %>

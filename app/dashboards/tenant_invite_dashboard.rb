@@ -21,7 +21,7 @@ class TenantInviteDashboard < Administrate::BaseDashboard
     cancelled_at: Field::DateTime,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
-    telegram_url: Field::String
+    telegram_url: TelegramLinkField
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[
@@ -29,8 +29,8 @@ class TenantInviteDashboard < Administrate::BaseDashboard
     tenant
     role
     status
+    telegram_url
     expires_at
-    created_at
   ].freeze
 
   SHOW_PAGE_ATTRIBUTES = %i[
@@ -53,7 +53,6 @@ class TenantInviteDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = %i[
     tenant
     role
-    expires_at
   ].freeze
 
   COLLECTION_FILTERS = {

@@ -3,16 +3,6 @@
   <legend>Приглашения</legend>
 
   <div class="invites-section">
-    <%# Кнопки создания приглашений %>
-    <div class="invites-actions" style="margin-bottom: 1rem;">
-      <% TenantInvite.roles.keys.each do |role| %>
-        <%= form_with url: admin_tenant_invites_path(tenant), method: :post, style: "display: inline-block; margin-right: 0.5rem;" do |f| %>
-          <%= f.hidden_field :role, value: role %>
-          <%= f.submit "Пригласить #{t("platform_bot.roles.#{role}", default: role)}", class: "button" %>
-        <% end %>
-      <% end %>
-    </div>
-
     <%# Список активных приглашений %>
     <% active_invites = tenant.tenant_invites.active %>
     <% if active_invites.any? %>
@@ -34,19 +24,18 @@
               <td><%= l(invite.created_at, format: :short) %></td>
               <td><%= l(invite.expires_at, format: :short) %></td>
               <td>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <code style="font-size: 0.8em; max-width: 300px; overflow: hidden; text-overflow: ellipsis;"><%= invite.telegram_url %></code>
-                  <button type="button"
-                          class="button button--small"
-                          onclick="navigator.clipboard.writeText('<%= invite.telegram_url %>').then(() => alert('Ссылка скопирована!'))"
-                          title="Копировать ссылку">
-                    Копировать
-                  </button>
+                <div style="display: flex; align-items: center; gap: 0.25rem;">
+                  <a href="<%= invite.telegram_url %>" target="_blank" rel="noopener" title="<%= invite.telegram_url %>">
+                    t.me/...<%= invite.token[-6..] %> ↗
+                  </a>
+                  <span style="cursor: pointer;"
+                        onclick="navigator.clipboard.writeText('<%= invite.telegram_url %>').then(() => alert('Ссылка скопирована!'))"
+                        title="Копировать ссылку">📋</span>
                 </div>
               </td>
               <td>
                 <%= button_to "Отменить",
-                              admin_tenant_invite_path(tenant, invite),
+                              admin_tenant_invite_path(invite),
                               method: :delete,
                               class: "button button--small button--danger",
                               data: { turbo_confirm: "Отменить это приглашение?" } %>
