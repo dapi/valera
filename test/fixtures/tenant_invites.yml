@@ -2,7 +2,7 @@
 
 pending_invite:
   tenant: one
-  invited_by: one
+  invited_by_user: one
   token: MBR_pending_test_token
   role: 1
   status: 0
@@ -10,7 +10,7 @@ pending_invite:
 
 accepted_invite:
   tenant: one
-  invited_by: one
+  invited_by_user: one
   accepted_by: two
   token: MBR_accepted_test_token
   role: 1
@@ -20,7 +20,7 @@ accepted_invite:
 
 expired_invite:
   tenant: one
-  invited_by: one
+  invited_by_user: one
   token: MBR_expired_test_token
   role: 0
   status: 0
@@ -28,9 +28,17 @@ expired_invite:
 
 cancelled_invite:
   tenant: two
-  invited_by: two
+  invited_by_user: two
   token: MBR_cancelled_test_token
   role: 2
   status: 3
   expires_at: <%= 7.days.from_now.to_fs(:db) %>
   cancelled_at: <%= 1.day.ago.to_fs(:db) %>
+
+admin_pending_invite:
+  tenant: one
+  invited_by_admin: superuser
+  token: MBR_admin_pending_token
+  role: 2
+  status: 0
+  expires_at: <%= 7.days.from_now.to_fs(:db) %>

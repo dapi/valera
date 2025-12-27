@@ -1,0 +1,10 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "713c413be63edd287ab2d1ebf540dbfe5431c82f93fa1f5dd5d92984c8f15a05",
+      "note": "Role is an enum field, validated by the model. Only :viewer, :operator, :admin are accepted. False positive."
+    }
+  ],
+  "updated": "2025-12-27 12:10:00 +0300",
+  "brakeman_version": "7.1.2"
+}

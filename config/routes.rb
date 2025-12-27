@@ -17,6 +17,8 @@ Rails.application.routes.draw do
       resources :tenants do
         # Telegram webhook management (singular resource)
         resource :webhook, only: %i[show create destroy], module: :tenants
+        # Tenant invites (для приглашения сотрудников менеджером)
+        resources :invites, only: %i[create destroy], controller: 'tenants/invites'
       end
       resources :users
       resources :admin_users do
@@ -33,7 +35,7 @@ Rails.application.routes.draw do
       resources :bookings, only: %i[index show]
 
       # Mission Control Jobs - SolidQueue monitoring dashboard
-      mount MissionControl::Jobs::Engine, at: "/jobs"
+      mount MissionControl::Jobs::Engine, at: '/jobs'
 
       root to: 'tenants#index'
     end

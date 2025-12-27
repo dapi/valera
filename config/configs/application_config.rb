@@ -81,7 +81,10 @@ class ApplicationConfig < Anyway::Config
     :telegram_auth_expiration,
 
     # Reserved subdomains that cannot be used as tenant keys
-    :reserved_subdomains
+    :reserved_subdomains,
+
+    # Tenant invite expiration (in days)
+    :tenant_invite_expiration_days
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -135,6 +138,9 @@ class ApplicationConfig < Anyway::Config
     platform_bot_username: :string,
     platform_admin_chat_id: :string,
     telegram_auth_expiration: :integer,
+
+    # Tenant invites
+    tenant_invite_expiration_days: :integer,
 
     # Admin host
     admin_host: :string,
