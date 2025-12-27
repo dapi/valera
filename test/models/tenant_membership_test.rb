@@ -102,7 +102,13 @@ class TenantMembershipTest < ActiveSupport::TestCase
     assert membership.can_manage_members?
   end
 
-  test 'invited_by association' do
-    assert_equal users(:one), @membership.invited_by
+  test 'tenant_invite association is optional' do
+    membership = TenantMembership.new(
+      tenant: tenants(:one),
+      user: users(:viewer_user),
+      role: :viewer,
+      tenant_invite: nil
+    )
+    assert membership.valid?
   end
 end

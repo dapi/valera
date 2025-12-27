@@ -3,18 +3,15 @@ operator_on_tenant_one:
   tenant: one
   user: operator_user
   role: 1
-  invited_by: one
 
 # Admin membership for tenant one
 admin_on_tenant_one:
   tenant: one
   user: admin_member
   role: 2
-  invited_by: one
 
 # Viewer membership for tenant two
 viewer_on_tenant_two:
   tenant: two
   user: viewer_user
   role: 0
-  invited_by: two
