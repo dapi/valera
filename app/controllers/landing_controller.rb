@@ -11,6 +11,16 @@ class LandingController < ApplicationController
     @plans = PricingConfig.plans
   end
 
+  def lp1
+    @lead = Lead.new
+    render layout: 'landing_lp1'
+  end
+
+  def lp2
+    @lead = Lead.new
+    @plans = PricingConfig.plans
+  end
+
   def create_lead
     @lead = Lead.new(lead_params)
     @lead.source = 'landing_page'

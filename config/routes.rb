@@ -100,5 +100,7 @@ Rails.application.routes.draw do
   # Landing page (main domain without subdomain)
   root 'landing#show'
   get 'price', to: 'landing#price'
+  get 'lp1', to: 'landing#lp1'
+  get 'lp2', to: 'landing#lp2'
   post 'leads', to: 'landing#create_lead', as: :leads
 end
