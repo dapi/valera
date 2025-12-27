@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 module Tenants
-  # Контроллер для управления участниками tenant'а
+  # Контроллер для управления сотрудниками tenant'а
   #
-  # Позволяет owner'у и admin'ам приглашать новых участников
-  # и управлять существующими членами команды.
+  # Позволяет owner'у и admin'ам приглашать новых сотрудников,
+  # управлять существующими членами команды и изменять их роли.
   class MembersController < ApplicationController
     before_action :require_admin!
+    before_action :set_membership, only: %i[update destroy]
 
     # GET /members
     def index
@@ -46,14 +47,28 @@ module Tenants
       @invite_url = @invite&.telegram_url || "https://t.me/#{ApplicationConfig.platform_bot_username}?start=#{@token}"
     end
 
+    # PATCH /members/:id
+    def update
+      new_role = params[:role]
+
+      unless TenantMembership.roles.key?(new_role)
+        redirect_to tenant_members_path, alert: t('.invalid_role')
+        return
+      end
+
+      if @membership.update(role: new_role)
+        redirect_to tenant_members_path, notice: t('.role_updated', name: @membership.user.name, role: t(".roles.#{new_role}"))
+      else
+        redirect_to tenant_members_path, alert: t('.update_failed')
+      end
+    end
+
     # DELETE /members/:id
     def destroy
-      membership = current_tenant.tenant_memberships.find(params[:id])
-
-      if membership.destroy
-        redirect_to tenant_members_path, notice: 'Участник удалён из команды'
+      if @membership.destroy
+        redirect_to tenant_members_path, notice: t('.member_removed')
       else
-        redirect_to tenant_members_path, alert: 'Не удалось удалить участника'
+        redirect_to tenant_members_path, alert: t('.remove_failed')
       end
     end
 
@@ -66,10 +81,14 @@ module Tenants
 
     private
 
+    def set_membership
+      @membership = current_tenant.tenant_memberships.find(params[:id])
+    end
+
     def require_admin!
       return if current_user_can_manage_members?
 
-      redirect_to tenant_root_path, alert: 'У вас нет прав для управления участниками'
+      redirect_to tenant_root_path, alert: t('tenants.members.access_denied')
     end
   end
 end

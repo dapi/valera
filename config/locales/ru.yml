@@ -318,13 +318,14 @@ ru:
         chats: Чаты
         analytics_events: События
     members:
+      access_denied: У вас нет прав для управления сотрудниками
       index:
-        title: Команда
+        title: Сотрудники
         owner: Владелец
         invite_viewer: Пригласить наблюдателя
         invite_operator: Пригласить оператора
         invite_admin: Пригласить администратора
-        no_members: Пока нет участников команды
+        no_members: Пока нет сотрудников
         remove: Удалить
         remove_confirm: "Удалить %{name} из команды?"
         headers:
@@ -341,6 +342,10 @@ ru:
           viewer: "просмотр чатов, клиентов, статистики"
           operator: "наблюдатель + ответы клиентам, управление записями"
           admin: "оператор + настройки, управление командой"
+        roles:
+          viewer: Наблюдатель
+          operator: Оператор
+          admin: Администратор
       invite:
         title: Приглашение в команду
         link_title: Ссылка для приглашения
@@ -354,15 +359,24 @@ ru:
         send_link: "Отправьте эту ссылку приглашаемому:"
         copy: Копировать
         copy_alert: Ссылка скопирована!
-        back: Вернуться к команде
+        back: Вернуться к сотрудникам
       roles:
         viewer: Наблюдатель
         operator: Оператор
         admin: Администратор
       create:
-        success: Участник успешно добавлен
+        success: Сотрудник успешно добавлен
+      update:
+        invalid_role: Недопустимая роль
+        role_updated: "Роль %{name} изменена на %{role}"
+        update_failed: Не удалось изменить роль
+        roles:
+          viewer: Наблюдатель
+          operator: Оператор
+          admin: Администратор
       destroy:
-        success: Участник удален
+        member_removed: Сотрудник удалён из команды
+        remove_failed: Не удалось удалить сотрудника
     settings:
       update:
         success: Настройки сохранены

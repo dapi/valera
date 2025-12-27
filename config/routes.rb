@@ -65,7 +65,7 @@ Rails.application.routes.draw do
 
       resources :clients, only: %i[index show]
       resources :bookings, only: %i[index show]
-      resources :members, only: %i[index create destroy] do
+      resources :members, only: %i[index create update destroy] do
         collection do
           get :invite
           delete 'invites/:id', action: :cancel_invite, as: :cancel_invite

@@ -54,16 +54,8 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
           td.px-6.py-4.whitespace-nowrap
             .text-sm.text-gray-500 = membership.user.email || '—'
           td.px-6.py-4.whitespace-nowrap
-            - case membership.role
-            - when 'viewer'
-              span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-gray-100.text-gray-800
-                = t('.roles.viewer')
-            - when 'operator'
-              span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-blue-100.text-blue-800
-                = t('.roles.operator')
-            - when 'admin'
-              span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-green-100.text-green-800
-                = t('.roles.admin')
+            = form_with url: tenant_member_path(membership), method: :patch, class: "inline" do |f|
+              = f.select :role, options_for_select(TenantMembership.roles.keys.map { |r| [t(".roles.#{r}"), r] }, membership.role), {}, class: "text-xs border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500", onchange: "this.form.submit()"
           td.px-6.py-4.whitespace-nowrap
             - if membership.user.telegram_linked?
               span.text-green-600 = t('.telegram_linked')
