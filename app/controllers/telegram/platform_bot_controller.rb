@@ -156,7 +156,7 @@ module Telegram
       confirm_url = build_confirm_url(return_url, confirm_token)
 
       respond_with :message,
-                   text: I18n.t('platform_bot.messages.auth_confirmed', confirm_url: confirm_url),
+                   text: I18n.t('platform_bot.messages.auth_confirmed'),
                    reply_markup: {
                      inline_keyboard: [
                        [ { text: I18n.t('platform_bot.messages.login_button'), url: confirm_url } ]
@@ -195,7 +195,7 @@ module Telegram
       confirm_url = build_global_confirm_url(return_url, confirm_token)
 
       respond_with :message,
-                   text: I18n.t('platform_bot.messages.auth_confirmed', confirm_url: confirm_url),
+                   text: I18n.t('platform_bot.messages.auth_confirmed'),
                    reply_markup: {
                      inline_keyboard: [
                        [ { text: I18n.t('platform_bot.messages.login_personal_button'), url: confirm_url } ]
