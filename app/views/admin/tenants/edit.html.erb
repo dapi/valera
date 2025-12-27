@@ -16,7 +16,7 @@ Custom edit view with webhook management link in header.
       <%= link_to(
         "Создать приглашение",
         new_admin_tenant_invite_path(tenant_id: page.resource.id),
-        class: "button button--primary"
+        class: "button button--outline"
       ) %>
 
       <%= link_to(
@@ -36,7 +36,7 @@ Custom edit view with webhook management link in header.
     <%= link_to(
       "Просмотр",
       [namespace, page.resource],
-      class: "button",
+      class: "button button--outline",
     ) if accessible_action?(page.resource, :show) %>
   </div>
 </header>
