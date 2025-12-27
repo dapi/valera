@@ -32,8 +32,8 @@ Rails.application.routes.draw do
       resources :vehicles, only: %i[index show]
       resources :bookings, only: %i[index show]
 
-      # Mission Control Jobs - SolidQueue monitoring dashboard
-      mount MissionControl::Jobs::Engine, at: '/jobs'
+      # GoodJob dashboard - background jobs monitoring
+      mount GoodJob::Engine, at: '/jobs'
 
       root to: 'tenants#index'
     end

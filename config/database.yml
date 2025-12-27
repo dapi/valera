@@ -25,13 +25,8 @@ default: &default
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
-  primary:
-    <<: *default
-    database: <%= ENV.fetch('VALERA_DEV_DATABASE', "valera_development_#{Digest::MD5.hexdigest(Rails.root.to_s)[0..7]}") %>
-  queue:
-    <<: *default
-    database: valera_development_queue
-    migrations_paths: db/queue_migrate
+  <<: *default
+  database: <%= ENV.fetch('VALERA_DEV_DATABASE', "valera_development_#{Digest::MD5.hexdigest(Rails.root.to_s)[0..7]}") %>
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -101,10 +96,6 @@ production:
     <<: *primary_production
     database: valera_production_cache
     migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: valera_production_queue
-    migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
     database: valera_production_cable
