@@ -77,6 +77,11 @@ ru:
         destroy:
           success: "Webhook удален"
           error: "Ошибка: %{message}"
+      invites:
+        create:
+          success: "Приглашение создано. Telegram ссылка: %{telegram_url}"
+        destroy:
+          success: "Приглашение отменено"
     impersonations:
       impersonate_button: Войти как
       confirm: "Вы уверены, что хотите войти как %{name}?"

@@ -6,7 +6,8 @@ class TenantInviteDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Field::Number,
     tenant: Field::BelongsTo,
-    invited_by: Field::BelongsTo.with_options(class_name: 'User'),
+    invited_by_user: Field::BelongsTo.with_options(class_name: 'User'),
+    invited_by_admin: Field::BelongsTo.with_options(class_name: 'AdminUser'),
     accepted_by: Field::BelongsTo.with_options(class_name: 'User'),
     token: Field::String,
     role: Field::Select.with_options(
@@ -19,13 +20,13 @@ class TenantInviteDashboard < Administrate::BaseDashboard
     accepted_at: Field::DateTime,
     cancelled_at: Field::DateTime,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime
+    updated_at: Field::DateTime,
+    telegram_url: Field::String
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[
     id
     tenant
-    invited_by
     role
     status
     expires_at
@@ -35,9 +36,11 @@ class TenantInviteDashboard < Administrate::BaseDashboard
   SHOW_PAGE_ATTRIBUTES = %i[
     id
     tenant
-    invited_by
+    invited_by_user
+    invited_by_admin
     accepted_by
     token
+    telegram_url
     role
     status
     expires_at
@@ -49,9 +52,7 @@ class TenantInviteDashboard < Administrate::BaseDashboard
 
   FORM_ATTRIBUTES = %i[
     tenant
-    invited_by
     role
-    status
     expires_at
   ].freeze
 

@@ -23,7 +23,8 @@
 #
 class TenantInvite < ApplicationRecord
   belongs_to :tenant
-  belongs_to :invited_by, class_name: 'User'
+  belongs_to :invited_by_user, class_name: 'User', optional: true
+  belongs_to :invited_by_admin, class_name: 'AdminUser', optional: true
   belongs_to :accepted_by, class_name: 'User', optional: true
 
   enum :role, { viewer: 0, operator: 1, admin: 2 }
@@ -32,8 +33,23 @@ class TenantInvite < ApplicationRecord
   validates :token, presence: true, uniqueness: true
   validates :role, presence: true
   validates :expires_at, presence: true
+  validate :inviter_must_be_present
 
   scope :active, -> { pending.where('expires_at > ?', Time.current) }
+
+  # Единый интерфейс для обратной совместимости
+  #
+  # @return [User, AdminUser, nil]
+  def invited_by
+    invited_by_user || invited_by_admin
+  end
+
+  # Имя пригласившего
+  #
+  # @return [String, nil]
+  def invited_by_name
+    invited_by&.name || invited_by&.email
+  end
 
   before_validation :generate_token, on: :create
 
@@ -70,5 +86,11 @@ class TenantInvite < ApplicationRecord
 
   def generate_token
     self.token ||= "MBR_#{SecureRandom.urlsafe_base64(12)}"
+  end
+
+  def inviter_must_be_present
+    return if invited_by_user_id.present? || invited_by_admin_id.present?
+
+    errors.add(:base, :inviter_required, message: 'Должен быть указан пригласивший (User или AdminUser)')
   end
 end

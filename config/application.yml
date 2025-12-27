@@ -49,6 +49,9 @@ default: &default
   # Telegram Auth settings
   telegram_auth_expiration: 300
 
+  # Tenant invite expiration (in days)
+  tenant_invite_expiration_days: 7
+
   # Reserved subdomains (cannot be used as tenant keys)
   reserved_subdomains:
     - www

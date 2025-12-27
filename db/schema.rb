@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_26_182120) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_27_085244) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -183,14 +183,16 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_26_182120) do
     t.datetime "cancelled_at"
     t.datetime "created_at", null: false
     t.datetime "expires_at", null: false
-    t.bigint "invited_by_id", null: false
+    t.bigint "invited_by_admin_id"
+    t.bigint "invited_by_user_id"
     t.integer "role", default: 0, null: false
     t.integer "status", default: 0, null: false
     t.bigint "tenant_id", null: false
     t.string "token", null: false
     t.datetime "updated_at", null: false
     t.index ["accepted_by_id"], name: "index_tenant_invites_on_accepted_by_id"
-    t.index ["invited_by_id"], name: "index_tenant_invites_on_invited_by_id"
+    t.index ["invited_by_admin_id"], name: "index_tenant_invites_on_invited_by_admin_id"
+    t.index ["invited_by_user_id"], name: "index_tenant_invites_on_invited_by_user_id"
     t.index ["tenant_id", "status"], name: "index_tenant_invites_on_tenant_id_and_status"
     t.index ["tenant_id"], name: "index_tenant_invites_on_tenant_id"
     t.index ["token"], name: "index_tenant_invites_on_token", unique: true
@@ -279,9 +281,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_26_182120) do
   add_foreign_key "clients", "tenants"
   add_foreign_key "leads", "admin_users", column: "manager_id"
   add_foreign_key "messages", "chats"
+  add_foreign_key "tenant_invites", "admin_users", column: "invited_by_admin_id"
   add_foreign_key "tenant_invites", "tenants"
   add_foreign_key "tenant_invites", "users", column: "accepted_by_id"
-  add_foreign_key "tenant_invites", "users", column: "invited_by_id"
+  add_foreign_key "tenant_invites", "users", column: "invited_by_user_id"
   add_foreign_key "tenant_memberships", "tenants"
   add_foreign_key "tenant_memberships", "users"
   add_foreign_key "tenant_memberships", "users", column: "invited_by_id"

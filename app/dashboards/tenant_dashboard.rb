@@ -72,7 +72,7 @@ class TenantDashboard < Administrate::BaseDashboard
   ].freeze
 
   SHOW_PAGE_ATTRIBUTES = {
-    "" => %i[
+    '' => %i[
       id
       name
       subdomain
@@ -86,33 +86,33 @@ class TenantDashboard < Administrate::BaseDashboard
       created_at
       updated_at
     ],
-    "Telegram" => %i[
+    'Telegram' => %i[
       bot_username
       bot_token
       webhook_secret
       admin_chat_id
     ],
-    "Информация о компании" => %i[company_info],
-    "Прайс-лист" => %i[price_list],
-    "Приветствие" => %i[welcome_message],
-    "Системный промпт" => %i[system_prompt]
+    'Информация о компании' => %i[company_info],
+    'Прайс-лист' => %i[price_list],
+    'Приветствие' => %i[welcome_message],
+    'Системный промпт' => %i[system_prompt]
   }.freeze
 
   FORM_ATTRIBUTES = {
-    "Основное" => %i[
+    'Основное' => %i[
       name
       subdomain
       owner_and_manager
     ],
-    "Telegram" => %i[
+    'Telegram' => %i[
       bot_token
       bot_username
       admin_chat_id
     ],
-    "Информация о компании" => %i[company_info],
-    "Прайс-лист" => %i[price_list],
-    "Приветствие" => %i[welcome_message],
-    "Системный промпт" => %i[system_prompt]
+    'Информация о компании' => %i[company_info],
+    'Прайс-лист' => %i[price_list],
+    'Приветствие' => %i[welcome_message],
+    'Системный промпт' => %i[system_prompt]
   }.freeze
 
   COLLECTION_FILTERS = {}.freeze
