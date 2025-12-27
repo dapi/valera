@@ -57,7 +57,7 @@ class ChatIdNotificationJobTest < ActiveJob::TestCase
     ChatIdNotificationJob.perform_now(chat.id)
   end
 
-  test 'logs error when send_message fails' do
+  test 'logs error and retries when send_message fails' do
     chat = chats(:one)
     mock_bot_client = mock('bot_client')
     error_message = 'Telegram API error'
@@ -75,8 +75,8 @@ class ChatIdNotificationJobTest < ActiveJob::TestCase
       chat_id: chat.id
     ).once
 
-    # Проверяем что ошибка пробрасывается дальше (для retry логики)
-    assert_raises StandardError do
+    # Проверяем что job запланирован на retry (retry_on StandardError в ApplicationJob)
+    assert_enqueued_with(job: ChatIdNotificationJob) do
       ChatIdNotificationJob.perform_now(chat.id)
     end
   end

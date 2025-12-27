@@ -16,7 +16,8 @@
 # @since 0.1.0
 class ApplicationJob < ActiveJob::Base
   # Повторяет выполнение при стандартных ошибках
-  retry_on StandardError, wait: :exponentially_longer, attempts: 10
+  # Использует lambda вместо :exponentially_longer для совместимости с SolidQueue
+  retry_on StandardError, wait: ->(executions) { (executions**4) + 2 }, attempts: 10
 
   # Автоматически повторяет задачи при deadlock
   # retry_on ActiveRecord::Deadlocked
