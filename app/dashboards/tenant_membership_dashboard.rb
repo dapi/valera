@@ -7,7 +7,7 @@ class TenantMembershipDashboard < Administrate::BaseDashboard
     id: Field::Number,
     tenant: Field::BelongsTo,
     user: Field::BelongsTo,
-    invited_by: Field::BelongsTo.with_options(class_name: 'User'),
+    tenant_invite: Field::BelongsTo,
     role: Field::Select.with_options(searchable: false, collection: ->(field) { field.resource.class.roles.keys }),
     created_at: Field::DateTime,
     updated_at: Field::DateTime
@@ -25,7 +25,7 @@ class TenantMembershipDashboard < Administrate::BaseDashboard
     id
     tenant
     user
-    invited_by
+    tenant_invite
     role
     created_at
     updated_at
@@ -34,7 +34,7 @@ class TenantMembershipDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = %i[
     tenant
     user
-    invited_by
+    tenant_invite
     role
   ].freeze
 

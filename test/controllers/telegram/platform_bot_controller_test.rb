@@ -182,5 +182,65 @@ module Telegram
       result = @controller.send(:message_addressed_to_bot?, message)
       assert_not result
     end
+
+    # Тесты для handle_member_invite - назначение владельца
+
+    test 'handle_member_invite assigns user as owner when tenant has no owner' do
+      tenant = tenants(:no_owner)
+      invite = tenant_invites(:no_owner_invite)
+      new_user = users(:viewer_user)
+      telegram_user = telegram_users(:two)
+
+      assert_nil tenant.owner_id, 'Tenant должен быть без владельца'
+
+      # Мокаем методы контроллера
+      @controller.stubs(:find_or_create_telegram_user).returns(telegram_user)
+      @controller.stubs(:find_or_create_user_by_telegram).returns(new_user)
+      @controller.expects(:respond_with).with(:message, has_entry(:text, includes('Поздравляем')))
+
+      @controller.send(:handle_member_invite, invite.token)
+
+      tenant.reload
+      assert_equal new_user.id, tenant.owner_id, 'Пользователь должен стать владельцем'
+    end
+
+    test 'handle_member_invite does not change owner when tenant already has owner' do
+      tenant = tenants(:one)
+      invite = tenant_invites(:pending_invite)
+      original_owner = tenant.owner
+      new_user = users(:viewer_user)
+      telegram_user = telegram_users(:two)
+
+      assert_not_nil tenant.owner_id, 'Tenant должен иметь владельца'
+
+      @controller.stubs(:find_or_create_telegram_user).returns(telegram_user)
+      @controller.stubs(:find_or_create_user_by_telegram).returns(new_user)
+      @controller.expects(:respond_with).with(:message, has_entry(:text, includes('добавлены в команду')))
+
+      @controller.send(:handle_member_invite, invite.token)
+
+      tenant.reload
+      assert_equal original_owner.id, tenant.owner_id, 'Владелец не должен измениться'
+    end
+
+    test 'handle_member_invite creates membership for new owner' do
+      tenant = tenants(:no_owner)
+      invite = tenant_invites(:no_owner_invite)
+      new_user = users(:viewer_user)
+      telegram_user = telegram_users(:two)
+
+      @controller.stubs(:find_or_create_telegram_user).returns(telegram_user)
+      @controller.stubs(:find_or_create_user_by_telegram).returns(new_user)
+      @controller.stubs(:respond_with)
+
+      assert_difference 'TenantMembership.count', 1 do
+        @controller.send(:handle_member_invite, invite.token)
+      end
+
+      membership = TenantMembership.find_by(tenant: tenant, user: new_user)
+      assert_not_nil membership
+      assert_equal invite.role, membership.role
+      assert_equal invite.id, membership.tenant_invite_id
+    end
   end
 end

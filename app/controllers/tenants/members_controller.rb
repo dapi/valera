@@ -10,8 +10,8 @@ module Tenants
 
     # GET /members
     def index
-      @memberships = current_tenant.tenant_memberships.includes(:user, :invited_by)
-      @pending_invites = current_tenant.tenant_invites.active.includes(:invited_by)
+      @memberships = current_tenant.tenant_memberships.includes(:user, tenant_invite: %i[invited_by_user invited_by_admin])
+      @pending_invites = current_tenant.tenant_invites.active.includes(:invited_by_user, :invited_by_admin)
       @owner = current_tenant.owner
     end
 
@@ -24,7 +24,7 @@ module Tenants
       end
 
       invite = current_tenant.tenant_invites.create!(
-        invited_by: current_user,
+        invited_by_user: current_user,
         role: role,
         expires_at: 7.days.from_now
       )
