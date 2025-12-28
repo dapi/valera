@@ -340,7 +340,7 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     result = DashboardStatsService.new(@tenant).call
 
     result.funnel_trend.each do |week_data|
-      assert_equal 1, week_data.week_start.cwday, "week_start should be Monday"
+      assert_equal 1, week_data.week_start.cwday, 'week_start should be Monday'
     end
   end
 
@@ -348,7 +348,7 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     result = DashboardStatsService.new(@tenant).call
 
     result.funnel_trend.each do |week_data|
-      assert_equal 0, week_data.week_end.wday, "week_end should be Sunday"
+      assert_equal 0, week_data.week_end.wday, 'week_end should be Sunday'
     end
   end
 
