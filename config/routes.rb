@@ -65,12 +65,12 @@ Rails.application.routes.draw do
 
       resources :clients, only: %i[index show] do
         collection do
-          resource :export, only: :create, module: :clients
+          resource :export, only: :create, module: :clients, as: :clients_export
         end
       end
       resources :bookings, only: %i[index show] do
         collection do
-          resource :export, only: :create, module: :bookings
+          resource :export, only: :create, module: :bookings, as: :bookings_export
         end
       end
       resources :chats, only: %i[index show]

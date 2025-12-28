@@ -338,9 +338,9 @@ module Telegram
     def private_chat?(message = nil)
       chat_type = if message
                     message.dig('chat', 'type')
-                  else
+      else
                     chat&.dig('type') || chat&.try(:type)
-                  end
+      end
       chat_type == 'private'
     end
 
