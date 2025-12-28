@@ -94,7 +94,7 @@
 
   - if @client.chats.any?
     .divide-y.divide-gray-200
-      - @client.chats.order(created_at: :desc).each do |chat|
+      - @client.chats.sort_by(&:created_at).reverse.each do |chat|
         .px-6.py-4.flex.items-center.justify-between.hover:bg-gray-50
           .flex.items-center.gap-3
             span.text-xl 💬
