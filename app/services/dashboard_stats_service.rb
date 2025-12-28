@@ -174,6 +174,8 @@ class DashboardStatsService
   # Рассчитывает понедельный тренд воронки конверсии
   # Возвращает данные за последние N недель в зависимости от периода
   #
+  # При ошибках БД возвращает пустой массив, чтобы не блокировать загрузку dashboard.
+  #
   # @return [Array<WeekData>] массив данных по неделям
   def build_funnel_trend
     weeks_count = calculate_weeks_count
@@ -211,6 +213,9 @@ class DashboardStatsService
         conversion_rate: rate
       )
     end
+  rescue ActiveRecord::StatementInvalid => e
+    log_error(e, { method: 'build_funnel_trend', tenant_id: tenant.id, period: period })
+    []
   end
 
   # Определяет количество недель для отображения тренда

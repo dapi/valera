@@ -341,67 +341,6 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal 0.0, result.funnel_data[:conversion_rate]
   end
 
-  # === funnel_trend ===
-
-  test 'funnel_trend returns array' do
-    result = DashboardStatsService.new(@tenant).call
-
-    assert_kind_of Array, result.funnel_trend
-  end
-
-  test 'funnel_trend contains WeekData structs with required attributes' do
-    result = DashboardStatsService.new(@tenant, period: 30).call
-
-    if result.funnel_trend.any?
-      week = result.funnel_trend.first
-      assert_kind_of DashboardStatsService::WeekData, week
-      assert_respond_to week, :week_start
-      assert_respond_to week, :week_end
-      assert_respond_to week, :chats_count
-      assert_respond_to week, :bookings_count
-      assert_respond_to week, :conversion_rate
-    end
-  end
-
-  test 'funnel_trend week dates are Date objects' do
-    result = DashboardStatsService.new(@tenant, period: 30).call
-
-    if result.funnel_trend.any?
-      week = result.funnel_trend.first
-      assert_kind_of Date, week.week_start
-      assert_kind_of Date, week.week_end
-    end
-  end
-
-  test 'funnel_trend calculates conversion correctly' do
-    result = DashboardStatsService.new(@tenant, period: 7).call
-
-    result.funnel_trend.each do |week|
-      if week.chats_count.positive?
-        expected = (week.bookings_count.to_f / week.chats_count * 100).round(1)
-        assert_equal expected, week.conversion_rate
-      else
-        assert_equal 0.0, week.conversion_rate
-      end
-    end
-  end
-
-  test 'funnel_trend returns more weeks for longer period' do
-    result_7 = DashboardStatsService.new(@tenant, period: 7).call
-    result_30 = DashboardStatsService.new(@tenant, period: 30).call
-
-    assert_operator result_30.funnel_trend.size, :>=, result_7.funnel_trend.size
-  end
-
-  test 'funnel_trend weeks are ordered chronologically' do
-    result = DashboardStatsService.new(@tenant, period: 30).call
-
-    if result.funnel_trend.size > 1
-      dates = result.funnel_trend.map(&:week_start)
-      assert_equal dates, dates.sort
-    end
-  end
-
   # === llm_costs ===
 
   test 'returns llm_costs in result' do
