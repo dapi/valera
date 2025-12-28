@@ -1,75 +1,78 @@
 h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
 
-/ KPI Карточки
-.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-4.gap-6
-  / Clients card — кликабельная
-  = link_to tenant_clients_path, class: "bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow block"
-    .flex.items-center.justify-between
-      .text-sm.font-medium.text-gray-500 Клиенты
-      span.text-2xl 👥
-    .text-3xl.font-bold.text-gray-800.mt-2 = @stats.clients_total
-    .text-sm.mt-1
-      span.text-green-600 +#{@stats.clients_today} сегодня
-      span.text-gray-400.mx-1 •
-      span.text-green-600 +#{@stats.clients_week} за неделю
+= turbo_frame_tag "dashboard_stats" do
+  / KPI Карточки
+  .grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-4.gap-6
+    / Clients card — кликабельная
+    = link_to tenant_clients_path, class: "bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow block"
+      .flex.items-center.justify-between
+        .text-sm.font-medium.text-gray-500 Клиенты
+        span.text-2xl 👥
+      .text-3xl.font-bold.text-gray-800.mt-2 = @stats.clients_total
+      .text-sm.mt-1
+        span.text-green-600 +#{@stats.clients_today} сегодня
+        span.text-gray-400.mx-1 •
+        span.text-green-600 +#{@stats.clients_week} за неделю
 
-  / Bookings card — кликабельная
-  = link_to tenant_bookings_path, class: "bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow block"
-    .flex.items-center.justify-between
-      .text-sm.font-medium.text-gray-500 Заявки
-      span.text-2xl 📝
-    .text-3xl.font-bold.text-gray-800.mt-2 = @stats.bookings_total
-    .text-sm.text-green-600.mt-1 +#{@stats.bookings_today} сегодня
+    / Bookings card — кликабельная
+    = link_to tenant_bookings_path, class: "bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow block"
+      .flex.items-center.justify-between
+        .text-sm.font-medium.text-gray-500 Заявки
+        span.text-2xl 📝
+      .text-3xl.font-bold.text-gray-800.mt-2 = @stats.bookings_total
+      .text-sm.text-green-600.mt-1 +#{@stats.bookings_today} сегодня
 
-  / Active chats card
-  .bg-white.rounded-lg.shadow.p-6
-    .flex.items-center.justify-between
-      .text-sm.font-medium.text-gray-500 Активные чаты
-      span.text-2xl 💬
-    .text-3xl.font-bold.text-gray-800.mt-2 = @stats.active_chats
-    .text-sm.text-gray-500.mt-1 за последние 24ч
+    / Active chats card
+    .bg-white.rounded-lg.shadow.p-6
+      .flex.items-center.justify-between
+        .text-sm.font-medium.text-gray-500 Активные чаты
+        span.text-2xl 💬
+      .text-3xl.font-bold.text-gray-800.mt-2 = @stats.active_chats
+      .text-sm.text-gray-500.mt-1 за последние 24ч
 
-  / Messages today card
-  .bg-white.rounded-lg.shadow.p-6
-    .flex.items-center.justify-between
-      .text-sm.font-medium.text-gray-500 Сообщений сегодня
-      span.text-2xl 📨
-    .text-3xl.font-bold.text-gray-800.mt-2 = @stats.messages_today
+    / Messages today card
+    .bg-white.rounded-lg.shadow.p-6
+      .flex.items-center.justify-between
+        .text-sm.font-medium.text-gray-500 Сообщений сегодня
+        span.text-2xl 📨
+      .text-3xl.font-bold.text-gray-800.mt-2 = @stats.messages_today
 
-/ График активности
-.mt-8.bg-white.rounded-lg.shadow.p-6 data-controller="chart"
-  .flex.items-center.justify-between.mb-4
-    h2.text-lg.font-semibold.text-gray-800 📈 Активность
-    .flex.gap-2
-      = link_to "7 дней", tenant_root_path(period: 7), class: "px-3 py-1 text-sm rounded transition-colors #{@period == 7 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
-      = link_to "30 дней", tenant_root_path(period: 30), class: "px-3 py-1 text-sm rounded transition-colors #{@period == 30 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+  / График активности
+  .mt-8.bg-white.rounded-lg.shadow.p-6 data-controller="chart"
+    .flex.items-center.justify-between.mb-4
+      h2.text-lg.font-semibold.text-gray-800 📈 Активность
+      .flex.gap-2
+        = link_to "7 дней", tenant_root_path(period: 7), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 7 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+        = link_to "30 дней", tenant_root_path(period: 30), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 30 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+        = link_to "90 дней", tenant_root_path(period: 90), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 90 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+        = link_to "Всё время", tenant_root_path(period: "all"), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period.nil? ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
 
-  .h-64
-    canvas data-chart-target="canvas" data-chart-labels=@stats.chart_data[:labels].to_json data-chart-values=@stats.chart_data[:values].to_json
+    .h-64
+      canvas data-chart-target="canvas" data-chart-labels=@stats.chart_data[:labels].to_json data-chart-values=@stats.chart_data[:values].to_json
 
-/ Последние диалоги
-.mt-8.bg-white.rounded-lg.shadow.p-6
-  h2.text-lg.font-semibold.text-gray-800.mb-4 🕐 Последние диалоги
+  / Последние диалоги
+  .mt-8.bg-white.rounded-lg.shadow.p-6
+    h2.text-lg.font-semibold.text-gray-800.mb-4 🕐 Последние диалоги
 
-  - if @stats.recent_chats.any?
-    .space-y-4
-      - @stats.recent_chats.each do |chat|
-        .border.rounded-lg.p-4.hover:bg-gray-50.transition-colors
-          / Заголовок чата
-          .flex.items-center.justify-between.mb-3
-            .flex.items-center.gap-2
-              span.text-sm.font-medium.text-gray-800 = chat.client.display_name
-              - if chat.messages.any?
-                span.text-xs.text-gray-400 = time_ago_in_words(chat.messages.last.created_at) + " назад"
+    - if @stats.recent_chats.any?
+      .space-y-4
+        - @stats.recent_chats.each do |chat|
+          .border.rounded-lg.p-4.hover:bg-gray-50.transition-colors
+            / Заголовок чата
+            .flex.items-center.justify-between.mb-3
+              .flex.items-center.gap-2
+                span.text-sm.font-medium.text-gray-800 = chat.client.display_name
+                - if chat.messages.any?
+                  span.text-xs.text-gray-400 = time_ago_in_words(chat.messages.last.created_at) + " назад"
 
-          / Последние сообщения чата
-          - if chat.messages.any?
-            .space-y-2.pl-2.border-l-2.border-gray-200
-              - chat.messages.order(created_at: :desc).limit(4).reverse.each do |msg|
-                .flex.items-start.gap-2
-                  span.text-xs.flex-shrink-0 = msg.role == "user" ? "👤" : "🤖"
-                  p.text-sm.text-gray-600.truncate = truncate(msg.content, length: 60)
-  - else
-    .text-center.py-8
-      p.text-gray-500 Диалогов пока нет
-      p.text-sm.text-gray-400.mt-1 Когда клиенты начнут общаться с ботом, здесь появятся их диалоги
+            / Последние сообщения чата
+            - if chat.messages.any?
+              .space-y-2.pl-2.border-l-2.border-gray-200
+                - chat.messages.order(created_at: :desc).limit(4).reverse.each do |msg|
+                  .flex.items-start.gap-2
+                    span.text-xs.flex-shrink-0 = msg.role == "user" ? "👤" : "🤖"
+                    p.text-sm.text-gray-600.truncate = truncate(msg.content, length: 60)
+    - else
+      .text-center.py-8
+        p.text-gray-500 Диалогов пока нет
+        p.text-sm.text-gray-400.mt-1 Когда клиенты начнут общаться с ботом, здесь появятся их диалоги

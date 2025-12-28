@@ -26,12 +26,16 @@ class DashboardStatsService
   )
 
   # @param tenant [Tenant] тенант для которого собирается статистика
-  # @param period [Integer] период для графика в днях (по умолчанию 7)
+  # @param period [Integer, nil] период для графика в днях (по умолчанию 7, nil = всё время)
   def initialize(tenant, period: 7)
     raise ArgumentError, 'tenant is required' if tenant.nil?
 
     @tenant = tenant
     @period = period
+  end
+
+  def all_time?
+    period.nil?
   end
 
   # Собирает и возвращает все метрики дашборда
@@ -87,17 +91,30 @@ class DashboardStatsService
   end
 
   def build_chart_data
-    raw_data = Message.joins(:chat)
-                      .where(chats: { tenant_id: tenant.id })
-                      .where(created_at: period.days.ago.beginning_of_day..)
-                      .group('DATE(messages.created_at)')
-                      .count
+    base_query = Message.joins(:chat).where(chats: { tenant_id: tenant.id })
+    chart_period = effective_chart_period
 
-    date_range = (period.days.ago.to_date..Date.current)
+    raw_data = base_query
+               .where(created_at: chart_period.days.ago.beginning_of_day..)
+               .group('DATE(messages.created_at)')
+               .count
+
+    date_range = (chart_period.days.ago.to_date..Date.current)
     labels = date_range.map { |d| d.strftime('%d.%m') }
     values = date_range.map { |d| raw_data[d] || 0 }
 
     { labels: labels, values: values }
+  end
+
+  def effective_chart_period
+    return period if period
+
+    first_message = Message.joins(:chat)
+                           .where(chats: { tenant_id: tenant.id })
+                           .minimum(:created_at)
+    return 30 unless first_message
+
+    [ (Date.current - first_message.to_date).to_i, 365 ].min
   end
 
   def fetch_recent_chats
