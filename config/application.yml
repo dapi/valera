@@ -35,6 +35,13 @@ default: &default
   # LLM configuration
   llm_temperature: 0.5
 
+  # Topic classifier configuration
+  topic_classifier:
+    # Модель для классификации (nil = deepseek-chat по умолчанию)
+    # DeepSeek Chat самый дешёвый: $0.14/1M input, $0.28/1M output
+    model: 'deepseek-chat'
+    inactivity_hours: 24
+
   # Development warnings
   development_warning: true
 

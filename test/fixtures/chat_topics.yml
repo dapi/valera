@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# Глобальные топики (tenant: nil) - используются если у тенанта нет своих
+global_service_booking:
+  key: service_booking
+  label: Запись на обслуживание
+  active: true
+
+global_other:
+  key: other
+  label: Другое
+  active: true
+
+global_price_inquiry:
+  key: price_inquiry
+  label: Запрос цены
+  active: true
+
+# Неактивный глобальный топик для тестирования scope active
+global_inactive:
+  key: inactive_global
+  label: Неактивный глобальный
+  active: false

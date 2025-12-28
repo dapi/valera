@@ -127,6 +127,40 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
                   - else
                     span.text-gray-400 —
 
+  / Популярные темы обращений
+  - if @stats.popular_topics.any?
+    .mt-8.bg-white.rounded-lg.shadow.p-6
+      h2.text-lg.font-semibold.text-gray-800.mb-4 🏷️ Популярные темы обращений
+
+      .grid.grid-cols-1.md:grid-cols-2.gap-4
+        - @stats.popular_topics.each_with_index do |topic_data, index|
+          .flex.items-center.gap-3.p-3.rounded-lg class=(index < 3 ? 'bg-blue-50' : 'bg-gray-50')
+            / Позиция
+            .flex-shrink-0.w-8.h-8.rounded-full.flex.items-center.justify-center.text-sm.font-bold class=(index < 3 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700')
+              = index + 1
+
+            / Название и статистика
+            .flex-1.min-w-0
+              .font-medium.text-gray-800.truncate = topic_data.topic.label
+              .text-sm.text-gray-500
+                = "#{topic_data.count} "
+                = topic_data.count == 1 ? 'чат' : topic_data.count < 5 ? 'чата' : 'чатов'
+
+            / Процент
+            .flex-shrink-0.text-right
+              .text-lg.font-bold class=(index < 3 ? 'text-blue-600' : 'text-gray-600')
+                = "#{topic_data.percentage}%"
+
+      / Примечание о не классифицированных чатах
+      - total_chats = @stats.funnel_data[:chats_count]
+      - classified_chats = @stats.popular_topics.sum(&:count)
+      - unclassified = total_chats - classified_chats
+      - if unclassified > 0
+        .mt-4.pt-4.border-t.border-gray-200.text-sm.text-gray-500
+          = "Ещё #{unclassified} "
+          = unclassified == 1 ? 'чат' : unclassified < 5 ? 'чата' : 'чатов'
+          |  без классификации
+
   / Расходы на AI
   .mt-8.bg-white.rounded-lg.shadow.p-6
     h2.text-lg.font-semibold.text-gray-800.mb-4 💰 Расходы на AI
