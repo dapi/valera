@@ -469,6 +469,7 @@ ru:
       chat_list:
         no_messages: Нет сообщений
         empty: Чатов пока нет
+        unknown_client: Неизвестный клиент
       chat_header:
         messages_count:
           one: "%{count} сообщение"

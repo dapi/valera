@@ -5,11 +5,11 @@
       .flex.items-start.gap-3
         / Avatar
         .w-10.h-10.rounded-full.bg-blue-500.flex.items-center.justify-center.text-white.font-medium.flex-shrink-0
-          = chat.client.display_name.first.upcase
+          = chat.client&.display_name&.first&.upcase || '?'
         / Chat info
         .flex-1.min-w-0
           .flex.items-center.justify-between
-            span.font-medium.text-gray-900.truncate = chat.client.display_name
+            span.font-medium.text-gray-900.truncate = chat.client&.display_name || t('.unknown_client')
             span.text-xs.text-gray-400 = chat_time_ago(chat.last_message_at || chat.created_at)
           - if (last_message = chat.messages.last)
             p.text-sm.text-gray-500.truncate
