@@ -37,12 +37,12 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
         span.text-2xl 📨
       .text-3xl.font-bold.text-gray-800.mt-2 = @stats.messages_today
 
-    / Avg messages per chat card
+    / Average messages per dialog card
     .bg-white.rounded-lg.shadow.p-6
       .flex.items-center.justify-between
-        .text-sm.font-medium.text-gray-500 Ср. сообщений в диалоге
+        .text-sm.font-medium.text-gray-500 Сообщений в диалоге
         span.text-2xl 📊
-      .text-3xl.font-bold.text-gray-800.mt-2 = @stats.avg_messages_per_chat
+      .text-3xl.font-bold.text-gray-800.mt-2 = @stats.avg_messages_per_dialog
       .text-sm.text-gray-500.mt-1 в среднем
 
   / График активности и Воронка конверсии
