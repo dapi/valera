@@ -1,0 +1,74 @@
+/ Back link
+.mb-6
+  = link_to tenant_bookings_path, class: "text-blue-600 hover:text-blue-800 flex items-center gap-2"
+    span ←
+    span = t('.back_to_list')
+
+/ Booking header
+.bg-white.rounded-lg.shadow.p-6.mb-6
+  .flex.items-center.justify-between
+    div
+      .flex.items-center.gap-3.mb-2
+        span.text-3xl 📝
+        h1.text-2xl.font-bold.text-gray-800
+          = t('.title', number: @booking.public_number)
+      .text-sm.text-gray-500 = t('.created_at', date: l(@booking.created_at, format: :long))
+    .text-right
+      = link_to tenant_client_path(@booking.client), class: "inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
+        span 👤
+        span = @booking.client.display_name
+
+/ Info cards
+.grid.grid-cols-1.md:grid-cols-2.gap-6.mb-6
+  / Client card
+  .bg-white.rounded-lg.shadow.p-4
+    .text-sm.font-medium.text-gray-500.mb-2 = t('.client')
+    .flex.items-center.gap-3
+      .w-10.h-10.bg-gray-200.rounded-full.flex.items-center.justify-center
+        span 👤
+      div
+        .font-semibold.text-gray-800 = @booking.client.display_name
+        - if @booking.client.phone.present?
+          .text-sm.text-gray-500 = @booking.client.phone
+        - if @booking.client.telegram_user_username.present?
+          a.text-sm.text-blue-600.hover:text-blue-800 href="https://t.me/#{@booking.client.telegram_user_username}" target="_blank"
+            = "@#{@booking.client.telegram_user_username}"
+
+  / Vehicle card
+  .bg-white.rounded-lg.shadow.p-4
+    .text-sm.font-medium.text-gray-500.mb-2 = t('.vehicle')
+    - if @booking.vehicle.present?
+      .flex.items-center.gap-3
+        .w-10.h-10.bg-gray-200.rounded-full.flex.items-center.justify-center
+          span 🚗
+        div
+          .font-semibold.text-gray-800
+            = [@booking.vehicle.brand, @booking.vehicle.model].compact.join(' ')
+          - if @booking.vehicle.year.present?
+            .text-sm.text-gray-500 = @booking.vehicle.year
+          - if @booking.vehicle.plate_number.present?
+            .text-sm.text-gray-500.font-mono = @booking.vehicle.plate_number
+    - else
+      .text-gray-400 = t('.no_vehicle')
+
+/ Details section
+- if @booking.details.present?
+  .bg-white.rounded-lg.shadow.p-6.mb-6
+    h2.text-lg.font-semibold.text-gray-800.mb-3 = t('.details_title')
+    .text-gray-600.whitespace-pre-wrap = @booking.details
+
+/ Context section
+- if @booking.context.present?
+  .bg-white.rounded-lg.shadow.p-6.mb-6
+    h2.text-lg.font-semibold.text-gray-800.mb-3 = t('.context_title')
+    .text-gray-600.whitespace-pre-wrap = @booking.context
+
+/ Chat link
+- if @booking.chat.present?
+  .bg-white.rounded-lg.shadow.p-4
+    .flex.items-center.justify-between
+      .flex.items-center.gap-3
+        span.text-2xl 💬
+        div
+          .font-semibold.text-gray-800 = t('.related_chat')
+          .text-sm.text-gray-500 = t('.messages_count', count: @booking.chat.messages.count)

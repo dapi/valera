@@ -599,6 +599,7 @@ DEPENDENCIES
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
+  kaminari (~> 1.2)
   kramdown (~> 2.5)
   minitest (~> 5.0)
   minitest-stub_any_instance

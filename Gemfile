@@ -124,3 +124,6 @@ gem 'valid_email2', '~> 7.0'
 # Markdown processing for Telegram Bot API compatibility
 gem 'kramdown', '~> 2.5'
 gem 'sanitize', '~> 7.0'
+
+# Pagination for lists
+gem 'kaminari', '~> 1.2'
