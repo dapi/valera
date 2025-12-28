@@ -2,10 +2,10 @@
 
 module Tenants
   # Settings controller for tenant dashboard.
-  # Allows owner to edit tenant settings like key (subdomain).
+  # Allows admin to edit tenant settings like key (subdomain).
   #
   class SettingsController < ApplicationController
-    before_action :require_owner!
+    before_action :require_admin!
 
     # GET /settings/edit
     def edit

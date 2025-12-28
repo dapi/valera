@@ -15,7 +15,6 @@ html
     aside.fixed.inset-y-0.left-0.w-64.bg-white.shadow-lg.hidden.lg:block
       .p-6
         h1.text-xl.font-bold.text-gray-800 = current_tenant&.name
-        p.text-sm.text-gray-500 Панель управления
 
       nav.mt-6
         = link_to tenant_root_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_root_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
@@ -31,7 +30,7 @@ html
           = link_to tenant_members_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_members_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
             span.ml-3 Команда
 
-        - if current_user_is_owner?
+        - if current_user_is_admin?
           = link_to edit_tenant_settings_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(edit_tenant_settings_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
             span.ml-3 Настройки
 
@@ -40,6 +39,7 @@ html
           .text-sm.text-gray-600 = current_user.display_name
           = button_to tenant_session_path, method: :delete, class: "text-sm text-red-600 hover:text-red-800"
             | Выход
+        .text-xs.text-gray-400.mt-2 = AppVersion
 
     / Main content
     main.lg:ml-64.p-8
