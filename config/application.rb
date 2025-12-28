@@ -48,7 +48,9 @@ module Valera
     config.action_dispatch.tld_length = ApplicationConfig.tld_length
 
     # Session cookie shared across all subdomains
-    config.session_store :cookie_store, key: '_session', domain: :all
+    # In development, include port in key to avoid conflicts between parallel worktrees
+    session_key = Rails.env.development? ? "_session_#{ApplicationConfig.port}" : '_session'
+    config.session_store :cookie_store, key: session_key, domain: :all
 
     # Configure default URL options for route helpers and mailers
     Rails.application.routes.default_url_options = ApplicationConfig.default_url_options

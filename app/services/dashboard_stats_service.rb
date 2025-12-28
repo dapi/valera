@@ -28,8 +28,13 @@ class DashboardStatsService
     :funnel_data,
     :funnel_trend,
     :llm_costs,
+    :hourly_distribution,
+    :popular_topics,
     keyword_init: true
   )
+
+  # Структура для данных популярных топиков
+  TopicData = Struct.new(:topic, :count, :percentage, keyword_init: true)
 
   # Структура для понедельных данных воронки
   WeekData = Struct.new(:week_start, :week_end, :chats_count, :bookings_count, :conversion_rate, keyword_init: true)
@@ -64,7 +69,9 @@ class DashboardStatsService
       recent_chats: fetch_recent_chats,
       funnel_data: build_funnel_data,
       funnel_trend: build_funnel_trend,
-      llm_costs: build_llm_costs
+      llm_costs: build_llm_costs,
+      hourly_distribution: build_hourly_distribution,
+      popular_topics: build_popular_topics
     )
   end
 
@@ -246,5 +253,88 @@ class DashboardStatsService
         values: by_day.map { |d| d.total_cost.round(4) }
       }
     }
+  end
+
+  # Рассчитывает распределение пользовательских сообщений по часам суток
+  #
+  # Учитывает только сообщения от пользователей (role: 'user') за выбранный период.
+  # Возвращает массив из 24 элементов, по одному на каждый час суток.
+  # Часы группируются по локальному времени приложения (Time.zone).
+  #
+  # При ошибках БД возвращает массив из 24 часов с нулевыми значениями,
+  # чтобы не блокировать загрузку dashboard.
+  #
+  # @return [Array<Hash>] массив из 24 хэшей { hour: 0..23, count: Integer }
+  def build_hourly_distribution
+    chart_period = effective_chart_period
+    period_range = chart_period.days.ago.beginning_of_day..Time.current
+
+    raw_data = Message.joins(:chat)
+                      .where(chats: { tenant_id: tenant.id })
+                      .where(role: 'user')
+                      .where(created_at: period_range)
+                      .group(hour_extraction_sql)
+                      .count
+                      .transform_keys(&:to_i)
+
+    # Заполняем все 24 часа, даже если нет данных
+    (0..23).map { |hour| { hour: hour, count: raw_data[hour] || 0 } }
+  rescue ActiveRecord::StatementInvalid => e
+    log_error(e, { method: 'build_hourly_distribution', tenant_id: tenant.id, period: period })
+    (0..23).map { |hour| { hour: hour, count: 0 } }
+  end
+
+  # Безопасный SQL для извлечения часа в локальном времени
+  # Timezone валидируется через ActiveSupport::TimeZone
+  def hour_extraction_sql
+    tz_name = validated_timezone_name
+    # brakeman:ignore - timezone name validated via ActiveSupport::TimeZone
+    Arel.sql("EXTRACT(HOUR FROM messages.created_at AT TIME ZONE 'UTC' AT TIME ZONE '#{tz_name}')::integer")
+  end
+
+  # Возвращает валидированное имя timezone
+  # @return [String] имя timezone или 'UTC' как fallback
+  def validated_timezone_name
+    tz = Time.zone
+    return 'UTC' unless tz
+
+    # ActiveSupport::TimeZone гарантирует валидность имени
+    tz_name = tz.tzinfo&.name || tz.name
+    ActiveSupport::TimeZone[tz_name] ? tz_name : 'UTC'
+  end
+
+  # Рассчитывает топ-10 популярных тем диалогов
+  #
+  # Считает количество чатов по каждой теме (только классифицированные чаты),
+  # сортирует по убыванию и возвращает топ-10 с процентами.
+  #
+  # При ошибках БД возвращает пустой массив, чтобы не блокировать загрузку dashboard.
+  #
+  # @return [Array<TopicData>] массив данных по топикам
+  def build_popular_topics
+    # Считаем чаты по топикам (только классифицированные)
+    topic_counts = tenant.chats
+                         .where.not(chat_topic_id: nil)
+                         .group(:chat_topic_id)
+                         .count
+
+    return [] if topic_counts.empty?
+
+    total_classified = topic_counts.values.sum
+
+    # Загружаем топики одним запросом
+    topics = ChatTopic.where(id: topic_counts.keys).index_by(&:id)
+
+    # Формируем результат, сортируем по count и берём топ-10
+    topic_counts.map do |topic_id, count|
+      topic = topics[topic_id]
+      next unless topic
+
+      percentage = (count.to_f / total_classified * 100).round(1)
+      TopicData.new(topic: topic, count: count, percentage: percentage)
+    end.compact.sort_by { |td| -td.count }.take(10)
+  rescue ActiveRecord::StatementInvalid => e
+    log_error(e, { method: 'build_popular_topics', tenant_id: tenant.id })
+    []
   end
 end

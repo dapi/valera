@@ -29,6 +29,7 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_respond_to result, :recent_chats
     assert_respond_to result, :funnel_data
     assert_respond_to result, :funnel_trend
+    assert_respond_to result, :hourly_distribution
   end
 
   test 'counts total clients for tenant' do
@@ -577,5 +578,333 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal 2, current_week.chats_count
     assert_equal 1, current_week.bookings_count
     assert_equal 50.0, current_week.conversion_rate
+  end
+
+  # === hourly_distribution ===
+
+  test 'hourly_distribution returns array of 24 hours' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_kind_of Array, result.hourly_distribution
+    assert_equal 24, result.hourly_distribution.size
+  end
+
+  test 'hourly_distribution contains hash with hour and count keys' do
+    result = DashboardStatsService.new(@tenant).call
+
+    result.hourly_distribution.each do |hour_data|
+      assert_kind_of Hash, hour_data
+      assert_includes hour_data.keys, :hour
+      assert_includes hour_data.keys, :count
+    end
+  end
+
+  test 'hourly_distribution hours are ordered 0 to 23' do
+    result = DashboardStatsService.new(@tenant).call
+
+    hours = result.hourly_distribution.map { |h| h[:hour] }
+    assert_equal (0..23).to_a, hours
+  end
+
+  test 'hourly_distribution counts are non-negative integers' do
+    result = DashboardStatsService.new(@tenant).call
+
+    result.hourly_distribution.each do |hour_data|
+      assert_kind_of Integer, hour_data[:count]
+      assert_operator hour_data[:count], :>=, 0
+    end
+  end
+
+  test 'hourly_distribution counts only user messages' do
+    # Создаём изолированный тенант
+    user = User.create!(name: 'Hourly User', email: 'hourly_user@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Hourly Tenant', bot_token: '444444444:HOURLYTEST', bot_username: 'hourly_test_bot', owner: user)
+    tg_user = TelegramUser.create!(username: 'hourly_user', first_name: 'Hourly')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'Hourly Client')
+    chat = tenant.chats.create!(client: client)
+
+    # Создаём 3 user сообщения и 2 assistant сообщения
+    3.times { chat.messages.create!(role: 'user', content: 'User message') }
+    2.times { chat.messages.create!(role: 'assistant', content: 'Assistant message') }
+
+    result = DashboardStatsService.new(tenant).call
+    total_count = result.hourly_distribution.sum { |h| h[:count] }
+
+    # Должно быть 3 (только user сообщения)
+    assert_equal 3, total_count
+  end
+
+  test 'hourly_distribution respects period filter' do
+    # Создаём изолированный тенант
+    user = User.create!(name: 'Hourly Period', email: 'hourly_period@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Hourly Period Tenant', bot_token: '555555555:HOURLYPERIOD', bot_username: 'hourly_period_bot', owner: user)
+    tg_user = TelegramUser.create!(username: 'hourly_period_user', first_name: 'HourlyPeriod')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'Hourly Period Client')
+    chat = tenant.chats.create!(client: client)
+
+    # Создаём сообщение сегодня
+    chat.messages.create!(role: 'user', content: 'Today message')
+
+    # Создаём сообщение 10 дней назад (вне 7-дневного периода)
+    chat.messages.create!(role: 'user', content: 'Old message', created_at: 10.days.ago)
+
+    result = DashboardStatsService.new(tenant, period: 7).call
+    total_count = result.hourly_distribution.sum { |h| h[:count] }
+
+    # Должно быть 1 (только сегодняшнее сообщение)
+    assert_equal 1, total_count
+  end
+
+  test 'hourly_distribution groups messages by hour in local timezone' do
+    # Создаём изолированный тенант
+    user = User.create!(name: 'Hourly Group', email: 'hourly_group@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Hourly Group Tenant', bot_token: '666666666:HOURLYGROUP', bot_username: 'hourly_group_bot', owner: user)
+    tg_user = TelegramUser.create!(username: 'hourly_group_user', first_name: 'HourlyGroup')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'Hourly Group Client')
+    chat = tenant.chats.create!(client: client)
+
+    # Создаём сообщения в локальном времени (Time.zone)
+    # Сервис группирует по локальному часу, а не UTC
+    today_10am_local = Time.zone.now.beginning_of_day + 10.hours + 30.minutes
+    today_2pm_local = Time.zone.now.beginning_of_day + 14.hours + 15.minutes
+
+    2.times { chat.messages.create!(role: 'user', content: 'Morning message', created_at: today_10am_local) }
+    3.times { chat.messages.create!(role: 'user', content: 'Afternoon message', created_at: today_2pm_local) }
+
+    result = DashboardStatsService.new(tenant).call
+
+    hour_10_count = result.hourly_distribution.find { |h| h[:hour] == 10 }[:count]
+    hour_14_count = result.hourly_distribution.find { |h| h[:hour] == 14 }[:count]
+
+    assert_equal 2, hour_10_count
+    assert_equal 3, hour_14_count
+  end
+
+  test 'hourly_distribution isolates data by tenant' do
+    # Tenant 1 с 2 сообщениями
+    user1 = User.create!(name: 'Hourly Iso 1', email: 'hourly_iso1@test.com', password: 'password123')
+    tenant1 = Tenant.create!(name: 'Hourly Iso Tenant 1', bot_token: '777777777:HOURLYiso1', bot_username: 'hourly_iso_bot1', owner: user1)
+    tg_user1 = TelegramUser.create!(username: 'hourly_iso_user1', first_name: 'HourlyIso1')
+    client1 = tenant1.clients.create!(telegram_user: tg_user1, name: 'Hourly Iso Client 1')
+    chat1 = tenant1.chats.create!(client: client1)
+    2.times { chat1.messages.create!(role: 'user', content: 'Tenant1 message') }
+
+    # Tenant 2 с 5 сообщениями
+    user2 = User.create!(name: 'Hourly Iso 2', email: 'hourly_iso2@test.com', password: 'password123')
+    tenant2 = Tenant.create!(name: 'Hourly Iso Tenant 2', bot_token: '888888888:HOURLYiso2', bot_username: 'hourly_iso_bot2', owner: user2)
+    tg_user2 = TelegramUser.create!(username: 'hourly_iso_user2', first_name: 'HourlyIso2')
+    client2 = tenant2.clients.create!(telegram_user: tg_user2, name: 'Hourly Iso Client 2')
+    chat2 = tenant2.chats.create!(client: client2)
+    5.times { chat2.messages.create!(role: 'user', content: 'Tenant2 message') }
+
+    result1 = DashboardStatsService.new(tenant1).call
+    result2 = DashboardStatsService.new(tenant2).call
+
+    total1 = result1.hourly_distribution.sum { |h| h[:count] }
+    total2 = result2.hourly_distribution.sum { |h| h[:count] }
+
+    # Каждый тенант видит только свои данные
+    assert_equal 2, total1
+    assert_equal 5, total2
+  end
+
+  test 'hourly_distribution returns zeros when no messages' do
+    # Создаём тенант без сообщений
+    user = User.create!(name: 'Empty Hourly', email: 'empty_hourly@test.com', password: 'password123')
+    empty_tenant = Tenant.create!(name: 'Empty Hourly Tenant', bot_token: '999999999:EMPTYHOURLY', bot_username: 'empty_hourly_bot', owner: user)
+
+    result = DashboardStatsService.new(empty_tenant).call
+
+    # Все часы должны иметь count = 0
+    result.hourly_distribution.each do |hour_data|
+      assert_equal 0, hour_data[:count]
+    end
+  end
+
+  test 'result struct includes hourly_distribution' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_respond_to result, :hourly_distribution
+  end
+
+  # === popular_topics ===
+
+  test 'returns popular_topics in result' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_respond_to result, :popular_topics
+    assert_kind_of Array, result.popular_topics
+  end
+
+  test 'popular_topics returns TopicData structs' do
+    # Создаём тенант с чатами и топиками
+    user = User.create!(name: 'Topic Owner', email: 'topic_owner@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Topic Tenant', bot_token: '444444444:TOPICtest', bot_username: 'topic_test_bot', owner: user)
+
+    topic = ChatTopic.create!(key: 'test_topic', label: 'Test Topic')
+
+    tg_user = TelegramUser.create!(username: 'topic_test_user', first_name: 'TopicTest')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'Topic Test Client')
+    tenant.chats.create!(client: client, chat_topic: topic)
+
+    result = DashboardStatsService.new(tenant).call
+
+    assert result.popular_topics.any?
+    result.popular_topics.each do |topic_data|
+      assert_kind_of DashboardStatsService::TopicData, topic_data
+      assert_respond_to topic_data, :topic
+      assert_respond_to topic_data, :count
+      assert_respond_to topic_data, :percentage
+    end
+  end
+
+  test 'popular_topics returns empty array when no classified chats' do
+    # Создаём тенант без классифицированных чатов
+    user = User.create!(name: 'No Topic Owner', email: 'no_topic@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'No Topic Tenant', bot_token: '555555555:NOTOPICtest', bot_username: 'no_topic_bot', owner: user)
+
+    tg_user = TelegramUser.create!(username: 'no_topic_user', first_name: 'NoTopic')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'No Topic Client')
+    tenant.chats.create!(client: client) # chat_topic_id = nil
+
+    result = DashboardStatsService.new(tenant).call
+
+    assert_empty result.popular_topics
+  end
+
+  test 'popular_topics counts chats by topic correctly' do
+    user = User.create!(name: 'Count Owner', email: 'count_topics@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Count Tenant', bot_token: '666666666:COUNTtopics', bot_username: 'count_topics_bot', owner: user)
+
+    topic1 = ChatTopic.create!(key: 'count_topic1', label: 'Count Topic 1')
+    topic2 = ChatTopic.create!(key: 'count_topic2', label: 'Count Topic 2')
+
+    # Создаём 3 чата с topic1 и 2 чата с topic2
+    3.times do |i|
+      tg_user = TelegramUser.create!(username: "count_user_t1_#{i}", first_name: "CountT1_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Count Client T1 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic1)
+    end
+
+    2.times do |i|
+      tg_user = TelegramUser.create!(username: "count_user_t2_#{i}", first_name: "CountT2_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Count Client T2 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic2)
+    end
+
+    result = DashboardStatsService.new(tenant).call
+
+    topic1_data = result.popular_topics.find { |td| td.topic.key == 'count_topic1' }
+    topic2_data = result.popular_topics.find { |td| td.topic.key == 'count_topic2' }
+
+    assert_equal 3, topic1_data.count
+    assert_equal 2, topic2_data.count
+  end
+
+  test 'popular_topics calculates percentage correctly' do
+    user = User.create!(name: 'Percent Owner', email: 'percent_topics@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Percent Tenant', bot_token: '777777777:PERCENTtopics', bot_username: 'percent_topics_bot', owner: user)
+
+    topic1 = ChatTopic.create!(key: 'percent_topic1', label: 'Percent Topic 1')
+    topic2 = ChatTopic.create!(key: 'percent_topic2', label: 'Percent Topic 2')
+
+    # 3 чата с topic1, 1 чат с topic2 = 75% и 25%
+    3.times do |i|
+      tg_user = TelegramUser.create!(username: "percent_user_t1_#{i}", first_name: "PercentT1_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Percent Client T1 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic1)
+    end
+
+    tg_user2 = TelegramUser.create!(username: 'percent_user_t2', first_name: 'PercentT2')
+    client2 = tenant.clients.create!(telegram_user: tg_user2, name: 'Percent Client T2')
+    tenant.chats.create!(client: client2, chat_topic: topic2)
+
+    result = DashboardStatsService.new(tenant).call
+
+    topic1_data = result.popular_topics.find { |td| td.topic.key == 'percent_topic1' }
+    topic2_data = result.popular_topics.find { |td| td.topic.key == 'percent_topic2' }
+
+    assert_equal 75.0, topic1_data.percentage
+    assert_equal 25.0, topic2_data.percentage
+  end
+
+  test 'popular_topics sorts by count descending' do
+    user = User.create!(name: 'Sort Owner', email: 'sort_topics@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Sort Tenant', bot_token: '888888888:SORTtopics', bot_username: 'sort_topics_bot', owner: user)
+
+    topic1 = ChatTopic.create!(key: 'sort_topic1', label: 'Sort Topic 1')
+    topic2 = ChatTopic.create!(key: 'sort_topic2', label: 'Sort Topic 2')
+    topic3 = ChatTopic.create!(key: 'sort_topic3', label: 'Sort Topic 3')
+
+    # Создаём: topic2 - 5 чатов, topic1 - 3 чата, topic3 - 1 чат
+    5.times do |i|
+      tg_user = TelegramUser.create!(username: "sort_user_t2_#{i}", first_name: "SortT2_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Sort Client T2 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic2)
+    end
+
+    3.times do |i|
+      tg_user = TelegramUser.create!(username: "sort_user_t1_#{i}", first_name: "SortT1_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Sort Client T1 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic1)
+    end
+
+    tg_user3 = TelegramUser.create!(username: 'sort_user_t3', first_name: 'SortT3')
+    client3 = tenant.clients.create!(telegram_user: tg_user3, name: 'Sort Client T3')
+    tenant.chats.create!(client: client3, chat_topic: topic3)
+
+    result = DashboardStatsService.new(tenant).call
+
+    assert_equal 'sort_topic2', result.popular_topics[0].topic.key
+    assert_equal 'sort_topic1', result.popular_topics[1].topic.key
+    assert_equal 'sort_topic3', result.popular_topics[2].topic.key
+  end
+
+  test 'popular_topics limits to 10 results' do
+    user = User.create!(name: 'Limit Owner', email: 'limit_topics@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Limit Tenant', bot_token: '999999999:LIMITtopics', bot_username: 'limit_topics_bot', owner: user)
+
+    # Создаём 15 топиков с чатами
+    15.times do |i|
+      topic = ChatTopic.create!(key: "limit_topic_#{i}", label: "Limit Topic #{i}")
+      tg_user = TelegramUser.create!(username: "limit_user_#{i}", first_name: "Limit#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Limit Client #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic)
+    end
+
+    result = DashboardStatsService.new(tenant).call
+
+    assert_equal 10, result.popular_topics.size
+  end
+
+  test 'popular_topics isolates data by tenant' do
+    user1 = User.create!(name: 'Iso Topics 1', email: 'iso_topics1@test.com', password: 'password123')
+    tenant1 = Tenant.create!(name: 'Iso Topics Tenant 1', bot_token: '111111111:ISOtopics1', bot_username: 'iso_topics_bot1', owner: user1)
+
+    user2 = User.create!(name: 'Iso Topics 2', email: 'iso_topics2@test.com', password: 'password123')
+    tenant2 = Tenant.create!(name: 'Iso Topics Tenant 2', bot_token: '222222222:ISOtopics2', bot_username: 'iso_topics_bot2', owner: user2)
+
+    topic = ChatTopic.create!(key: 'iso_topic', label: 'Isolation Topic')
+
+    # Tenant1: 3 чата с топиком
+    3.times do |i|
+      tg_user = TelegramUser.create!(username: "iso_t1_user_#{i}", first_name: "IsoT1_#{i}")
+      client = tenant1.clients.create!(telegram_user: tg_user, name: "Iso T1 Client #{i}")
+      tenant1.chats.create!(client: client, chat_topic: topic)
+    end
+
+    # Tenant2: 1 чат с топиком
+    tg_user2 = TelegramUser.create!(username: 'iso_t2_user', first_name: 'IsoT2')
+    client2 = tenant2.clients.create!(telegram_user: tg_user2, name: 'Iso T2 Client')
+    tenant2.chats.create!(client: client2, chat_topic: topic)
+
+    result1 = DashboardStatsService.new(tenant1).call
+    result2 = DashboardStatsService.new(tenant2).call
+
+    topic_data1 = result1.popular_topics.find { |td| td.topic.key == 'iso_topic' }
+    topic_data2 = result2.popular_topics.find { |td| td.topic.key == 'iso_topic' }
+
+    assert_equal 3, topic_data1.count
+    assert_equal 1, topic_data2.count
   end
 end

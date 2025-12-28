@@ -16,6 +16,16 @@ Rails.application.configure do
   # Replaces the cron job from config/recurring.yml
   config.good_job.cleanup_preserved_jobs_before_seconds_ago = 14.days.to_i
   config.good_job.cleanup_interval_seconds = 1.hour.to_i
+
+  # Cron-style scheduled jobs
+  config.good_job.cron = {
+    # Классификация неактивных чатов каждый час
+    classify_inactive_chats: {
+      cron: '0 * * * *', # каждый час в 0 минут
+      class: 'ClassifyInactiveChatsJob',
+      description: 'Classify inactive chats by topic using LLM'
+    }
+  }
 end
 
 # GoodJob Dashboard authentication

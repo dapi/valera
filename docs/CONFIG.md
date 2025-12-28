@@ -1,6 +1,6 @@
 # Configuration Guide
 
-**Обновлено:** 2025-12-22
+**Обновлено:** 2025-12-28
 
 Руководство по настройке переменных окружения для приложения Super Valera.
 
@@ -182,6 +182,27 @@
 |------------|-----|---------|----------|
 | `ANALYTICS_ENABLED` | boolean | `true` | Включить аналитику |
 | `FORCE_ANALYTICS` | boolean | — | Принудительно включить аналитику (для тестов) |
+
+---
+
+## Topic Classification (LLM)
+
+Конфигурация автоматической классификации тем чатов с помощью LLM.
+
+| Переменная | Тип | Default | Описание |
+|------------|-----|---------|----------|
+| `TOPIC_CLASSIFIER_ENABLED` | boolean | `false` | Включить классификацию топиков чатов |
+| `TOPIC_CLASSIFIER_MODEL` | string | — | Модель LLM для классификации (если не указана, используется `LLM_MODEL`) |
+| `TOPIC_CLASSIFIER_INACTIVITY_HOURS` | integer | `24` | Часы неактивности до автоклассификации чата |
+
+**Примечание:** Классификация отключена по умолчанию. Для включения установите `TOPIC_CLASSIFIER_ENABLED=true`.
+
+**Использование в коде:**
+```ruby
+TopicClassifierConfig.enabled           # => false (по умолчанию)
+TopicClassifierConfig.model_with_fallback # => LLM_MODEL если не задан TOPIC_CLASSIFIER_MODEL
+TopicClassifierConfig.inactivity_hours  # => 24
+```
 
 ---
 
@@ -532,5 +553,5 @@ ANALYTICS_ENABLED=true
 ---
 
 **Документ создан:** 2025-12-19
-**Обновлён:** 2025-12-22
+**Обновлён:** 2025-12-28
 **Ответственный:** Development Team

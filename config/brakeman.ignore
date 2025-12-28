@@ -3,8 +3,12 @@
     {
       "fingerprint": "ac42ce868243ca41b5d7122756942135f929fa3ac0a54b5549f89a989e782402",
       "note": "Admin controller - admin must set tenant_id and role for invite. Role is validated by model enum. False positive."
+    },
+    {
+      "fingerprint": "48364ea808037173f00bb3a9e3d47f795bc54195baa91617a498f21833798bbf",
+      "note": "Timezone name is validated via ActiveSupport::TimeZone before SQL interpolation. Cannot be user-controlled."
     }
   ],
-  "updated": "2025-12-28 12:25:00 +0300",
+  "updated": "2025-12-28 21:40:00 +0300",
   "brakeman_version": "7.1.2"
 }

@@ -3,6 +3,7 @@
 require 'test_helper'
 
 class BookingTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
   test 'assigns sequential number within tenant on create' do
     tenant = tenants(:one)
     client = clients(:one)
@@ -200,5 +201,51 @@ class BookingTest < ActiveSupport::TestCase
     chat.reload
     assert_equal second_booking.created_at, chat.last_booking_at
     assert_not_equal first_booking.created_at, chat.last_booking_at
+  end
+
+  # === after_commit callbacks ===
+
+  test 'enqueues ClassifyChatTopicJob after create when enabled' do
+    TopicClassifierConfig.stubs(:enabled).returns(true)
+    chat = chats(:one)
+
+    assert_enqueued_with(job: ClassifyChatTopicJob, args: [chat.id]) do
+      Booking.create!(
+        tenant: chat.tenant,
+        client: chat.client,
+        chat: chat,
+        meta: { customer_name: 'Topic Classification Test' }
+      )
+    end
+  end
+
+  test 'does not enqueue ClassifyChatTopicJob when disabled' do
+    TopicClassifierConfig.stubs(:enabled).returns(false)
+    chat = chats(:one)
+
+    # Только BookingNotificationJob должен быть заэнкюен
+    assert_enqueued_jobs 1, only: BookingNotificationJob do
+      Booking.create!(
+        tenant: chat.tenant,
+        client: chat.client,
+        chat: chat,
+        meta: { customer_name: 'Disabled Classification Test' }
+      )
+    end
+  end
+
+  test 'enqueues both notification and classification jobs after create when enabled' do
+    TopicClassifierConfig.stubs(:enabled).returns(true)
+    chat = chats(:one)
+
+    # Должны быть заэнкюены оба job-а: BookingNotificationJob и ClassifyChatTopicJob
+    assert_enqueued_jobs 2 do
+      Booking.create!(
+        tenant: chat.tenant,
+        client: chat.client,
+        chat: chat,
+        meta: { customer_name: 'Multi Job Test' }
+      )
+    end
   end
 end

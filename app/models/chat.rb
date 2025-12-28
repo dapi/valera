@@ -26,6 +26,7 @@ class Chat < ApplicationRecord
 
   belongs_to :tenant, counter_cache: true
   belongs_to :client
+  belongs_to :chat_topic, optional: true
 
   has_one :telegram_user, through: :client
 

@@ -17,6 +17,7 @@ class Tenant < ApplicationRecord
   has_many :chats, dependent: :destroy
   has_many :bookings, dependent: :destroy
   has_many :analytics_events, dependent: :destroy
+  has_many :chat_topics, dependent: :destroy
 
   validates :name, presence: true
   validates :bot_token, presence: true, uniqueness: true, format: { with: BOT_TOKEN_FORMAT, message: :invalid_format }
