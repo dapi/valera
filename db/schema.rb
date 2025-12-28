@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_28_163510) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_28_180638) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -94,8 +94,21 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_163510) do
     t.index ["vehicle_id"], name: "index_bookings_on_vehicle_id"
   end
 
+  create_table "chat_topics", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.string "label", null: false
+    t.bigint "tenant_id"
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_chat_topics_on_active"
+    t.index ["tenant_id", "key"], name: "index_chat_topics_on_tenant_id_and_key", unique: true
+    t.index ["tenant_id"], name: "index_chat_topics_on_tenant_id"
+  end
+
   create_table "chats", force: :cascade do |t|
     t.integer "bookings_count", default: 0, null: false
+    t.bigint "chat_topic_id"
     t.bigint "client_id", null: false
     t.datetime "created_at", null: false
     t.datetime "first_booking_at"
@@ -103,14 +116,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_163510) do
     t.datetime "last_message_at"
     t.bigint "model_id"
     t.bigint "tenant_id", null: false
+    t.datetime "topic_classified_at"
     t.datetime "updated_at", null: false
     t.index ["bookings_count"], name: "index_chats_on_bookings_count"
+    t.index ["chat_topic_id"], name: "index_chats_on_chat_topic_id"
     t.index ["client_id"], name: "index_chats_on_client_id"
     t.index ["first_booking_at"], name: "index_chats_on_first_booking_at"
     t.index ["last_booking_at"], name: "index_chats_on_last_booking_at"
     t.index ["model_id"], name: "index_chats_on_model_id"
     t.index ["tenant_id", "last_message_at"], name: "index_chats_on_tenant_id_and_last_message_at"
     t.index ["tenant_id"], name: "index_chats_on_tenant_id"
+    t.index ["topic_classified_at"], name: "index_chats_on_topic_classified_at"
   end
 
   create_table "clients", force: :cascade do |t|
@@ -379,6 +395,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_163510) do
   add_foreign_key "bookings", "clients"
   add_foreign_key "bookings", "tenants"
   add_foreign_key "bookings", "vehicles"
+  add_foreign_key "chat_topics", "tenants"
+  add_foreign_key "chats", "chat_topics"
   add_foreign_key "chats", "clients"
   add_foreign_key "chats", "tenants"
   add_foreign_key "clients", "telegram_users"

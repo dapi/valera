@@ -68,6 +68,7 @@ class Booking < ApplicationRecord
   # @see BookingNotificationJob для логики отправки
   after_commit on: :create do
     BookingNotificationJob.perform_later(self)
+    ClassifyChatTopicJob.perform_later(chat_id)
   end
 
   private

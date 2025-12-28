@@ -578,4 +578,185 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal 1, current_week.bookings_count
     assert_equal 50.0, current_week.conversion_rate
   end
+
+  # === popular_topics ===
+
+  test 'returns popular_topics in result' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_respond_to result, :popular_topics
+    assert_kind_of Array, result.popular_topics
+  end
+
+  test 'popular_topics returns TopicData structs' do
+    # Создаём тенант с чатами и топиками
+    user = User.create!(name: 'Topic Owner', email: 'topic_owner@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Topic Tenant', bot_token: '444444444:TOPICtest', bot_username: 'topic_test_bot', owner: user)
+
+    topic = ChatTopic.create!(key: 'test_topic', label: 'Test Topic')
+
+    tg_user = TelegramUser.create!(username: 'topic_test_user', first_name: 'TopicTest')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'Topic Test Client')
+    tenant.chats.create!(client: client, chat_topic: topic)
+
+    result = DashboardStatsService.new(tenant).call
+
+    assert result.popular_topics.any?
+    result.popular_topics.each do |topic_data|
+      assert_kind_of DashboardStatsService::TopicData, topic_data
+      assert_respond_to topic_data, :topic
+      assert_respond_to topic_data, :count
+      assert_respond_to topic_data, :percentage
+    end
+  end
+
+  test 'popular_topics returns empty array when no classified chats' do
+    # Создаём тенант без классифицированных чатов
+    user = User.create!(name: 'No Topic Owner', email: 'no_topic@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'No Topic Tenant', bot_token: '555555555:NOTOPICtest', bot_username: 'no_topic_bot', owner: user)
+
+    tg_user = TelegramUser.create!(username: 'no_topic_user', first_name: 'NoTopic')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'No Topic Client')
+    tenant.chats.create!(client: client) # chat_topic_id = nil
+
+    result = DashboardStatsService.new(tenant).call
+
+    assert_empty result.popular_topics
+  end
+
+  test 'popular_topics counts chats by topic correctly' do
+    user = User.create!(name: 'Count Owner', email: 'count_topics@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Count Tenant', bot_token: '666666666:COUNTtopics', bot_username: 'count_topics_bot', owner: user)
+
+    topic1 = ChatTopic.create!(key: 'count_topic1', label: 'Count Topic 1')
+    topic2 = ChatTopic.create!(key: 'count_topic2', label: 'Count Topic 2')
+
+    # Создаём 3 чата с topic1 и 2 чата с topic2
+    3.times do |i|
+      tg_user = TelegramUser.create!(username: "count_user_t1_#{i}", first_name: "CountT1_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Count Client T1 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic1)
+    end
+
+    2.times do |i|
+      tg_user = TelegramUser.create!(username: "count_user_t2_#{i}", first_name: "CountT2_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Count Client T2 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic2)
+    end
+
+    result = DashboardStatsService.new(tenant).call
+
+    topic1_data = result.popular_topics.find { |td| td.topic.key == 'count_topic1' }
+    topic2_data = result.popular_topics.find { |td| td.topic.key == 'count_topic2' }
+
+    assert_equal 3, topic1_data.count
+    assert_equal 2, topic2_data.count
+  end
+
+  test 'popular_topics calculates percentage correctly' do
+    user = User.create!(name: 'Percent Owner', email: 'percent_topics@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Percent Tenant', bot_token: '777777777:PERCENTtopics', bot_username: 'percent_topics_bot', owner: user)
+
+    topic1 = ChatTopic.create!(key: 'percent_topic1', label: 'Percent Topic 1')
+    topic2 = ChatTopic.create!(key: 'percent_topic2', label: 'Percent Topic 2')
+
+    # 3 чата с topic1, 1 чат с topic2 = 75% и 25%
+    3.times do |i|
+      tg_user = TelegramUser.create!(username: "percent_user_t1_#{i}", first_name: "PercentT1_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Percent Client T1 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic1)
+    end
+
+    tg_user2 = TelegramUser.create!(username: 'percent_user_t2', first_name: 'PercentT2')
+    client2 = tenant.clients.create!(telegram_user: tg_user2, name: 'Percent Client T2')
+    tenant.chats.create!(client: client2, chat_topic: topic2)
+
+    result = DashboardStatsService.new(tenant).call
+
+    topic1_data = result.popular_topics.find { |td| td.topic.key == 'percent_topic1' }
+    topic2_data = result.popular_topics.find { |td| td.topic.key == 'percent_topic2' }
+
+    assert_equal 75.0, topic1_data.percentage
+    assert_equal 25.0, topic2_data.percentage
+  end
+
+  test 'popular_topics sorts by count descending' do
+    user = User.create!(name: 'Sort Owner', email: 'sort_topics@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Sort Tenant', bot_token: '888888888:SORTtopics', bot_username: 'sort_topics_bot', owner: user)
+
+    topic1 = ChatTopic.create!(key: 'sort_topic1', label: 'Sort Topic 1')
+    topic2 = ChatTopic.create!(key: 'sort_topic2', label: 'Sort Topic 2')
+    topic3 = ChatTopic.create!(key: 'sort_topic3', label: 'Sort Topic 3')
+
+    # Создаём: topic2 - 5 чатов, topic1 - 3 чата, topic3 - 1 чат
+    5.times do |i|
+      tg_user = TelegramUser.create!(username: "sort_user_t2_#{i}", first_name: "SortT2_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Sort Client T2 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic2)
+    end
+
+    3.times do |i|
+      tg_user = TelegramUser.create!(username: "sort_user_t1_#{i}", first_name: "SortT1_#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Sort Client T1 #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic1)
+    end
+
+    tg_user3 = TelegramUser.create!(username: 'sort_user_t3', first_name: 'SortT3')
+    client3 = tenant.clients.create!(telegram_user: tg_user3, name: 'Sort Client T3')
+    tenant.chats.create!(client: client3, chat_topic: topic3)
+
+    result = DashboardStatsService.new(tenant).call
+
+    assert_equal 'sort_topic2', result.popular_topics[0].topic.key
+    assert_equal 'sort_topic1', result.popular_topics[1].topic.key
+    assert_equal 'sort_topic3', result.popular_topics[2].topic.key
+  end
+
+  test 'popular_topics limits to 10 results' do
+    user = User.create!(name: 'Limit Owner', email: 'limit_topics@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Limit Tenant', bot_token: '999999999:LIMITtopics', bot_username: 'limit_topics_bot', owner: user)
+
+    # Создаём 15 топиков с чатами
+    15.times do |i|
+      topic = ChatTopic.create!(key: "limit_topic_#{i}", label: "Limit Topic #{i}")
+      tg_user = TelegramUser.create!(username: "limit_user_#{i}", first_name: "Limit#{i}")
+      client = tenant.clients.create!(telegram_user: tg_user, name: "Limit Client #{i}")
+      tenant.chats.create!(client: client, chat_topic: topic)
+    end
+
+    result = DashboardStatsService.new(tenant).call
+
+    assert_equal 10, result.popular_topics.size
+  end
+
+  test 'popular_topics isolates data by tenant' do
+    user1 = User.create!(name: 'Iso Topics 1', email: 'iso_topics1@test.com', password: 'password123')
+    tenant1 = Tenant.create!(name: 'Iso Topics Tenant 1', bot_token: '111111111:ISOtopics1', bot_username: 'iso_topics_bot1', owner: user1)
+
+    user2 = User.create!(name: 'Iso Topics 2', email: 'iso_topics2@test.com', password: 'password123')
+    tenant2 = Tenant.create!(name: 'Iso Topics Tenant 2', bot_token: '222222222:ISOtopics2', bot_username: 'iso_topics_bot2', owner: user2)
+
+    topic = ChatTopic.create!(key: 'iso_topic', label: 'Isolation Topic')
+
+    # Tenant1: 3 чата с топиком
+    3.times do |i|
+      tg_user = TelegramUser.create!(username: "iso_t1_user_#{i}", first_name: "IsoT1_#{i}")
+      client = tenant1.clients.create!(telegram_user: tg_user, name: "Iso T1 Client #{i}")
+      tenant1.chats.create!(client: client, chat_topic: topic)
+    end
+
+    # Tenant2: 1 чат с топиком
+    tg_user2 = TelegramUser.create!(username: 'iso_t2_user', first_name: 'IsoT2')
+    client2 = tenant2.clients.create!(telegram_user: tg_user2, name: 'Iso T2 Client')
+    tenant2.chats.create!(client: client2, chat_topic: topic)
+
+    result1 = DashboardStatsService.new(tenant1).call
+    result2 = DashboardStatsService.new(tenant2).call
+
+    topic_data1 = result1.popular_topics.find { |td| td.topic.key == 'iso_topic' }
+    topic_data2 = result2.popular_topics.find { |td| td.topic.key == 'iso_topic' }
+
+    assert_equal 3, topic_data1.count
+    assert_equal 1, topic_data2.count
+  end
 end
