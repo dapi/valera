@@ -61,9 +61,10 @@ default: &default
 
 development:
   <<: *default
-  host: '3010.brandymint.ru'
-  protocol: 'https'
-  # public_port: не указан, т.к. https = 443 по умолчанию
+  # Базовый домен для subdomain routing (без субдомена!)
+  # Переопределяется через HOST env var (например HOST=brandymint.ru)
+  host: 'lvh.me'
+  protocol: 'http'
   allowed_hosts:
     - '.lvh.me'
     - 'lvh.me'

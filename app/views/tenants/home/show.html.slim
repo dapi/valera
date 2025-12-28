@@ -88,35 +88,44 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
             span.text-sm.font-medium.text-gray-600 Конверсия
             span.text-2xl.font-bold.text-green-600 #{@stats.funnel_data[:conversion_rate]}%
 
-      / Тренд конверсии по неделям
-      - if @stats.funnel_trend.present? && @stats.funnel_trend.size > 1
-        .mt-6.pt-4.border-t.border-gray-200
-          h3.text-sm.font-medium.text-gray-500.mb-3 Тренд по неделям
-          .overflow-x-auto
-            table.w-full.text-sm
-              thead
-                tr.text-left.text-gray-500.border-b
-                  th.py-2.pr-2 Неделя
-                  th.py-2.px-2.text-right Диалоги
-                  th.py-2.px-2.text-right Заявки
-                  th.py-2.pl-2.text-right Конверсия
-              tbody
-                - prev_conversion = nil
-                - @stats.funnel_trend.each do |week|
-                  tr.border-b.border-gray-100
-                    td.py-2.pr-2.text-gray-600
-                      = "#{week[:week_start].strftime('%d.%m')} - #{week[:week_end].strftime('%d.%m')}"
-                    td.py-2.px-2.text-right.text-gray-800 = week[:chats]
-                    td.py-2.px-2.text-right.text-gray-800 = week[:bookings]
-                    td.py-2.pl-2.text-right
-                      span.font-medium class=(week[:conversion] > 0 ? 'text-green-600' : 'text-gray-400')
-                        = "#{week[:conversion]}%"
-                      - if prev_conversion.present?
-                        - if week[:conversion] > prev_conversion
-                          span.ml-1.text-green-500 ↑
-                        - elsif week[:conversion] < prev_conversion
-                          span.ml-1.text-red-500 ↓
-                      - prev_conversion = week[:conversion]
+  / Тренд воронки по неделям
+  - if @stats.funnel_trend.any?
+    .mt-8.bg-white.rounded-lg.shadow.p-6
+      h2.text-lg.font-semibold.text-gray-800.mb-4 📈 Тренд конверсии по неделям
+
+      .overflow-x-auto
+        table.min-w-full.divide-y.divide-gray-200
+          thead.bg-gray-50
+            tr
+              th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Неделя
+              th.px-4.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Диалоги
+              th.px-4.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Заявки
+              th.px-4.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Конверсия
+              th.px-4.py-3.text-center.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Тренд
+          tbody.bg-white.divide-y.divide-gray-200
+            - @stats.funnel_trend.each_with_index do |week, index|
+              - prev_week = index > 0 ? @stats.funnel_trend[index - 1] : nil
+              - trend_diff = prev_week ? (week.conversion_rate - prev_week.conversion_rate).round(1) : nil
+              tr
+                td.px-4.py-3.whitespace-nowrap.text-sm.text-gray-900
+                  = "#{week.week_start.strftime('%d.%m')} - #{week.week_end.strftime('%d.%m')}"
+                td.px-4.py-3.whitespace-nowrap.text-sm.text-gray-900.text-right
+                  = week.chats_count
+                td.px-4.py-3.whitespace-nowrap.text-sm.text-gray-900.text-right
+                  = week.bookings_count
+                td.px-4.py-3.whitespace-nowrap.text-sm.font-medium.text-right
+                  span class=(week.conversion_rate >= 10 ? 'text-green-600' : week.conversion_rate >= 5 ? 'text-yellow-600' : 'text-gray-600')
+                    = "#{week.conversion_rate}%"
+                td.px-4.py-3.whitespace-nowrap.text-sm.text-center
+                  - if trend_diff
+                    - if trend_diff > 0
+                      span.text-green-600 ↑ +#{trend_diff}%
+                    - elsif trend_diff < 0
+                      span.text-red-600 ↓ #{trend_diff}%
+                    - else
+                      span.text-gray-400 —
+                  - else
+                    span.text-gray-400 —
 
   / Расходы на AI
   .mt-8.bg-white.rounded-lg.shadow.p-6

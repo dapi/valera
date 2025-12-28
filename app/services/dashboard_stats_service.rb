@@ -31,6 +31,9 @@ class DashboardStatsService
     keyword_init: true
   )
 
+  # Структура для понедельных данных воронки
+  WeekData = Struct.new(:week_start, :week_end, :chats_count, :bookings_count, :conversion_rate, keyword_init: true)
+
   # @param tenant [Tenant] тенант для которого собирается статистика
   # @param period [Integer, nil] период для графика в днях (по умолчанию 7, nil = всё время)
   def initialize(tenant, period: 7)
@@ -168,40 +171,63 @@ class DashboardStatsService
     }
   end
 
+  # Рассчитывает понедельный тренд воронки конверсии
+  # Возвращает данные за последние N недель в зависимости от периода
+  #
+  # При ошибках БД возвращает пустой массив, чтобы не блокировать загрузку dashboard.
+  #
+  # @return [Array<WeekData>] массив данных по неделям
   def build_funnel_trend
-    weeks = period_weeks
-    return [] if weeks.empty?
+    weeks_count = calculate_weeks_count
+    return [] if weeks_count.zero?
 
-    weeks.map do |week_start, week_end|
-      chats_count = tenant.chats.where(created_at: week_start..week_end).count
-      bookings_count = tenant.bookings.where(created_at: week_start..week_end).count
-      conversion = chats_count.positive? ? (bookings_count.to_f / chats_count * 100).round(1) : 0.0
+    start_date = (Date.current - (weeks_count - 1).weeks).beginning_of_week.beginning_of_day
+    end_date = Date.current.end_of_week.end_of_day
+    date_range = start_date..end_date
 
-      {
-        week_start: week_start.to_date,
-        week_end: week_end.to_date,
-        chats: chats_count,
-        bookings: bookings_count,
-        conversion: conversion
-      }
+    # 2 SQL запроса вместо 2×N (группировка по дате начала недели)
+    chats_by_week = tenant.chats
+                          .where(created_at: date_range)
+                          .group("DATE(DATE_TRUNC('week', created_at))")
+                          .count
+
+    bookings_by_week = bookings
+                       .where(created_at: date_range)
+                       .group("DATE(DATE_TRUNC('week', created_at))")
+                       .count
+
+    # Собираем недели от старой к новой
+    (0...weeks_count).map do |i|
+      week_start = (Date.current - (weeks_count - 1 - i).weeks).beginning_of_week
+      week_key = week_start.to_date
+
+      chats_count = chats_by_week[week_key] || 0
+      bookings_count = bookings_by_week[week_key] || 0
+      rate = chats_count.positive? ? (bookings_count.to_f / chats_count * 100).round(1) : 0.0
+
+      WeekData.new(
+        week_start: week_start,
+        week_end: week_start.end_of_week,
+        chats_count: chats_count,
+        bookings_count: bookings_count,
+        conversion_rate: rate
+      )
     end
+  rescue ActiveRecord::StatementInvalid => e
+    log_error(e, { method: 'build_funnel_trend', tenant_id: tenant.id, period: period })
+    []
   end
 
-  def period_weeks
-    chart_period = effective_chart_period
-    end_date = Date.current.end_of_week
-    start_date = (chart_period.days.ago.to_date).beginning_of_week
+  # Определяет количество недель для отображения тренда
+  def calculate_weeks_count
+    return 8 if period.nil? # Для "всё время" показываем 8 недель
 
-    weeks = []
-    current_week_start = start_date
-
-    while current_week_start <= end_date
-      week_end = [ current_week_start.end_of_week, Date.current ].min
-      weeks << [ current_week_start.beginning_of_day, week_end.end_of_day ]
-      current_week_start += 1.week
+    case period
+    when 7 then 4    # 4 недели для 7-дневного периода
+    when 30 then 8   # 8 недель для 30-дневного периода
+    when 90 then 12  # 12 недель для 90-дневного периода
+    else 4
     end
-
-    weeks
   end
 
   def build_llm_costs

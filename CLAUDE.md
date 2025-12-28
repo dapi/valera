@@ -8,6 +8,7 @@
 
 🚨 **Models:** ВСЕГДА `rails generate model` (модель + миграция вместе)
 🚨 **Error Handling:** `ErrorLogger` вместо `Bugsnag.notify()` — проект использует Bugsnag для error tracking
+🚨 **Fatal DB Errors:** НЕ ловить фатальные ошибки БД (`ActiveRecord::ConnectionNotEstablished`, `PG::ConnectionBad`, `ActiveRecord::QueryCanceled`) — это инфраструктурные проблемы, ожидаемое поведение: 500 ошибка + лог в Bugsnag. Ловить только `ActiveRecord::StatementInvalid` для graceful degradation бизнес-логики.
 🚨 **Configuration:** Только `anyway_config`, никаких `.env*` файлов
 🚨 **Documentation:** НЕ архивировать FIP/US/TSD документы из `docs/requirements/`
 🚨 **Testing:** Без `File.write/File.delete` и изменения ENV в тестах
