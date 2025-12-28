@@ -28,7 +28,8 @@
 1. [product/constitution.md](product/constitution.md) — конституция продукта
 2. [ROADMAP.md](ROADMAP.md) — дорожная карта развития
 3. [product/business-metrics.md](product/business-metrics.md) — бизнес-метрики
-4. [requirements/README.md](requirements/README.md) — пользовательские истории
+4. [product/customer-profiles.md](product/customer-profiles.md) — профили клиентов (CustDev)
+5. [requirements/README.md](requirements/README.md) — пользовательские истории
 
 ---
 
@@ -65,6 +66,7 @@
 - **Начать разработку:** `development/README.md`
 
 ### 📊 Бизнес {#бизнес}
+- **Профили клиентов:** `product/customer-profiles.md` — для CustDev и сегментации
 - **Анализ показателей:** `product/business-metrics.md`
 - **Бизнес-цели:** `product/constitution.md`
 - **Прогресс по целям:** `ROADMAP.md`
