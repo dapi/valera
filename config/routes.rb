@@ -31,6 +31,7 @@ Rails.application.routes.draw do
       resources :chats, only: %i[index show]
       resources :vehicles, only: %i[index show]
       resources :bookings, only: %i[index show]
+      resources :models, only: %i[index show]
 
       # GoodJob dashboard - background jobs monitoring
       mount GoodJob::Engine, at: '/jobs'
