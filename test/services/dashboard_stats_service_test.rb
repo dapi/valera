@@ -182,6 +182,31 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal 6.0, result.avg_messages_per_chat
   end
 
+  test 'avg_messages_per_chat isolates data by tenant' do
+    # Tenant 1 с 2 сообщениями в 1 чате
+    user1 = User.create!(name: 'Isolation Owner 1', email: 'isolation1@test.com', password: 'password123')
+    tenant1 = Tenant.create!(name: 'Isolation Tenant 1', bot_token: '111111111:ISOLATEabc', bot_username: 'isolation_bot1', owner: user1)
+    tg_user1 = TelegramUser.create!(username: 'isolation_user1', first_name: 'Iso1')
+    client1 = tenant1.clients.create!(telegram_user: tg_user1, name: 'Isolation Client 1')
+    chat1 = tenant1.chats.create!(client: client1)
+    2.times { |i| chat1.messages.create!(role: 'user', content: "Tenant1 Msg #{i}") }
+
+    # Tenant 2 с 10 сообщениями в 1 чате
+    user2 = User.create!(name: 'Isolation Owner 2', email: 'isolation2@test.com', password: 'password123')
+    tenant2 = Tenant.create!(name: 'Isolation Tenant 2', bot_token: '222222222:ISOLATEdef', bot_username: 'isolation_bot2', owner: user2)
+    tg_user2 = TelegramUser.create!(username: 'isolation_user2', first_name: 'Iso2')
+    client2 = tenant2.clients.create!(telegram_user: tg_user2, name: 'Isolation Client 2')
+    chat2 = tenant2.chats.create!(client: client2)
+    10.times { |i| chat2.messages.create!(role: 'user', content: "Tenant2 Msg #{i}") }
+
+    result1 = DashboardStatsService.new(tenant1).call
+    result2 = DashboardStatsService.new(tenant2).call
+
+    # Каждый тенант видит только свои данные
+    assert_equal 2.0, result1.avg_messages_per_chat
+    assert_equal 10.0, result2.avg_messages_per_chat
+  end
+
   test 'builds chart_data with labels and values' do
     result = DashboardStatsService.new(@tenant, period: 7).call
 

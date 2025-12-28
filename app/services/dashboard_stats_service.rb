@@ -12,6 +12,8 @@
 #
 # @see Tenants::HomeController
 class DashboardStatsService
+  include ErrorLogger
+
   Result = Struct.new(
     :clients_total,
     :clients_today,
@@ -101,6 +103,8 @@ class DashboardStatsService
   # Использует два COUNT запроса вместо загрузки данных в память,
   # что оптимально для тенантов с большим количеством чатов.
   #
+  # При ошибках БД возвращает 0.0, чтобы не блокировать загрузку dashboard.
+  #
   # @return [Float] среднее количество сообщений, округленное до 1 знака
   def calculate_avg_messages_per_chat
     chats_with_messages_count = tenant.chats.joins(:messages).distinct.count
@@ -108,6 +112,9 @@ class DashboardStatsService
 
     total_messages = Message.joins(:chat).where(chats: { tenant_id: tenant.id }).count
     (total_messages.to_f / chats_with_messages_count).round(1)
+  rescue ActiveRecord::StatementInvalid => e
+    log_error(e, { method: 'calculate_avg_messages_per_chat', tenant_id: tenant.id })
+    0.0
   end
 
   def build_chart_data
