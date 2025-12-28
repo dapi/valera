@@ -1,0 +1,60 @@
+Категория,Фича,Описание,Статус,Документ/Код
+Core Bot,AI-диалоги,Обработка диалогов с LLM и сохранение контекста,Реализовано,Chat.rb / Message.rb
+Core Bot,System Prompt,Динамический промпт с данными тенанта,Реализовано,SystemPromptService.rb
+Core Bot,Tool Integration,AI вызывает инструменты (создание заявок),Реализовано,BookingTool.rb
+Core Bot,Сброс диалога,Команда /reset для очистки контекста,Реализовано,WebhookController.rb
+Core Bot,Подсчёт токенов,Сохранение input/output tokens для расчёта стоимости,Реализовано,Message.rb
+Core Bot,Фото-анализ,Анализ фото повреждений через AI,План,US-003
+Core Bot,Голосовые сообщения,Распознавание и обработка голоса,План,-
+Booking,Создание заявок,AI создаёт заявки через tool call,Реализовано,Booking.rb
+Booking,Нумерация заявок,Уникальные номера {tenant_id}-{number},Реализовано,Booking.rb
+Booking,Уведомления о заявках,Push в admin_chat_id при создании,Реализовано,BookingNotificationJob.rb
+Booking,Список заявок,Dashboard со списком и фильтрами,Реализовано,BookingsController
+Booking,Экспорт заявок,CSV экспорт,Реализовано,BookingsExporter.rb
+Booking,Подтверждение заявок,Уникальный ID и статус-трекинг,План,US-005
+Booking,Callback запросы,Запрос обратного звонка через AI,План,US-009 / FIP-015
+Clients,База клиентов,Хранение клиентов с Telegram данными,Реализовано,Client.rb
+Clients,Автомобили клиентов,Связь клиент → автомобили,Реализовано,Vehicle.rb
+Clients,Поиск клиентов,Поиск по имени и телефону,Реализовано,ClientsController
+Clients,Экспорт клиентов,CSV экспорт,Реализовано,ClientsExporter.rb
+Clients,Сегментация,Классификация: new/engaged/returning,Реализовано,UserSegmentationService.rb
+Dashboard,KPI метрики,clients_total / bookings_today / active_chats,Реализовано,DashboardStatsService.rb
+Dashboard,График активности,Сообщения по дням,Реализовано,DashboardStatsService.rb
+Dashboard,Воронка конверсии,Chats → Bookings → %,Реализовано,DashboardStatsService.rb
+Dashboard,Расходы на LLM,График и таблица по моделям,Реализовано,LlmCostCalculator.rb
+Dashboard,Выбор периода,7/30/90 дней или всё время,Реализовано,HomeController
+Dashboard,Последние чаты,3 последних активных чата,Реализовано,DashboardStatsService.rb
+Multi-tenancy,Tenant модель,Изоляция данных автосервисов,Реализовано,Tenant.rb
+Multi-tenancy,Webhook роутинг,Разные боты → разные тенанты,Реализовано,WebhookController
+Multi-tenancy,Поддомены,tenant-key.domain.com,Реализовано,Tenant.rb
+Multi-tenancy,Webhook Setup,Регистрация webhook в Telegram,Реализовано,TenantWebhookService.rb
+Team,Список сотрудников,Роли: viewer/operator/admin,Реализовано,MembersController
+Team,Приглашения,Invite через Telegram,Реализовано,TenantInvite.rb
+Team,Управление ролями,Изменение/удаление ролей,Реализовано,TenantMembership.rb
+Team,Перехват чата,Менеджер берёт диалог на себя,План,US-010
+Settings,Bot Token,Настройка токена бота,Реализовано,SettingsController
+Settings,Webhook статус,Проверка и отображение URL,Реализовано,SettingsController
+Settings,Admin Chat ID,Chat для уведомлений,Реализовано,SettingsController
+Settings,Welcome Message,Кастомное приветствие,Реализовано,SettingsController
+Settings,Company Info,Информация для AI,Реализовано,SettingsController
+Settings,Price List,Прайс для AI,Реализовано,SettingsController
+Settings,Custom System Prompt,Полная кастомизация промпта,Реализовано,SettingsController
+Analytics,Event Tracking,DIALOG_STARTED / BOOKING_CREATED и др.,Реализовано,AnalyticsService.rb
+Analytics,Response Time,Измерение времени ответа AI,Реализовано,ResponseTimeTracker.rb
+Analytics,UTM трекинг,Отслеживание источников трафика,В работе,FIP-011
+Analytics,Расширенная аналитика,Predictive analytics,План,ICEBOX
+Auth,Email/Password,Стандартная авторизация,Реализовано,SessionsController
+Auth,Telegram Auth,Вход через Telegram,Реализовано,TelegramAuthService.rb
+Auth,RBAC,Owner/Admin/Operator/Viewer,Реализовано,TenantMembership.rb
+Telegram,Webhook обработка,Приём и обработка сообщений,Реализовано,WebhookController
+Telegram,Отправка сообщений,Ответы пользователям,Реализовано,Telegram::Bot::Client
+Telegram,Chat ID Detection,Автоопределение при добавлении в группу,Реализовано,ChatIdNotificationJob
+Telegram,Callback Queries,Обработка inline кнопок,Реализовано,WebhookController
+Telegram,Приветствие,Персонализированное при /start,Реализовано,WelcomeService.rb
+Insurance,Страховая автоматизация,OCR документов / европротокол,План,US-004
+Services,Каталог услуг,Навигация по услугам через диалог,План,US-007
+Marketing,Подарочные сертификаты,AI-персонализированные сертификаты,План,US-008
+Quality,Feedback система,Сбор обратной связи,План,FIP-012
+Escalation,Эскалация менеджеру,Автопередача сложных кейсов,План,FIP-013
+Voice,Voice Recognition,Голосовое управление ботом,План,ICEBOX
+Video,Video Analysis,Анализ видео повреждений,План,ICEBOX
