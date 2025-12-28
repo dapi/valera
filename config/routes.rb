@@ -72,6 +72,7 @@ Rails.application.routes.draw do
         end
       end
       resource :settings, only: %i[edit update]
+      resource :webhook, only: %i[create destroy]
     end
   end
 
