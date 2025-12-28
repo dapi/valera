@@ -1,0 +1,22 @@
+/ Chat header with client info
+.p-4.border-b.border-gray-200.bg-white
+  .flex.items-center.gap-3
+    / Avatar
+    .w-10.h-10.rounded-full.bg-blue-500.flex.items-center.justify-center.text-white.font-medium
+      = chat.client.display_name.first.upcase
+    / Client info
+    div
+      = link_to chat.client.display_name, tenant_client_path(chat.client), class: "font-medium text-gray-900 hover:text-blue-600"
+      .text-sm.text-gray-500
+        - if chat.client.phone.present?
+          span = chat.client.phone
+        - elsif chat.client.telegram_user_username.present?
+          a.text-blue-600.hover:underline href="https://t.me/#{chat.client.telegram_user_username}" target="_blank"
+            = "@#{chat.client.telegram_user_username}"
+    / Stats
+    .ml-auto.flex.items-center.gap-4.text-sm.text-gray-500
+      span
+        = t('.messages_count', count: chat.messages.size)
+      - if chat.bookings.any?
+        = link_to tenant_bookings_path(client_id: chat.client_id), class: "text-blue-600 hover:underline"
+          = t('.bookings_count', count: chat.bookings.size)

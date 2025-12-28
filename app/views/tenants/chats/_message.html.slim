@@ -1,0 +1,34 @@
+- case message.role
+- when 'user'
+  / User message (right side, blue)
+  .flex.justify-end
+    .max-w-[70%]
+      .bg-blue-500.text-white.rounded-2xl.rounded-br-sm.px-4.py-2
+        .whitespace-pre-wrap = message.content
+      .text-right.text-xs.text-gray-400.mt-1
+        = l(message.created_at, format: :time)
+
+- when 'assistant'
+  / Assistant message (left side, gray)
+  .flex.justify-start
+    .max-w-[70%]
+      .bg-white.border.border-gray-200.rounded-2xl.rounded-bl-sm.px-4.py-2.shadow-sm
+        .whitespace-pre-wrap.text-gray-800 = message.content
+        - if message.tool_calls.any?
+          .mt-2.pt-2.border-t.border-gray-100
+            - message.tool_calls.each do |tool_call|
+              = render 'tool_call', tool_call: tool_call
+      .text-xs.text-gray-400.mt-1
+        = l(message.created_at, format: :time)
+        - if message.model.present?
+          span.ml-2.text-gray-300 = message.model.model_id
+
+- when 'tool'
+  / Tool result (system message, centered)
+  .flex.justify-center
+    .text-xs.text-gray-400.bg-gray-100.rounded-full.px-3.py-1
+      = t('.tool_result')
+
+- when 'system'
+  / System message (hidden or minimal)
+  / Usually not shown to users

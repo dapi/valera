@@ -15,4 +15,13 @@ module ApplicationHelper
     else many
     end
   end
+
+  # Форматирует время в относительный формат для чатов
+  # chat_time_ago(1.hour.ago) => "около 1 часа назад"
+  # chat_time_ago(3.days.ago) => "3 дня назад"
+  def chat_time_ago(time)
+    return '' unless time
+
+    time_ago_in_words(time, include_seconds: false)
+  end
 end

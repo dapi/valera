@@ -1,0 +1,23 @@
+- if chats.any?
+  - chats.each do |chat|
+    - is_active = current_chat&.id == chat.id
+    = link_to tenant_chat_path(chat), class: "block p-4 border-b border-gray-100 hover:bg-gray-50 #{is_active ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}"
+      .flex.items-start.gap-3
+        / Avatar
+        .w-10.h-10.rounded-full.bg-blue-500.flex.items-center.justify-center.text-white.font-medium.flex-shrink-0
+          = chat.client.display_name.first.upcase
+        / Chat info
+        .flex-1.min-w-0
+          .flex.items-center.justify-between
+            span.font-medium.text-gray-900.truncate = chat.client.display_name
+            span.text-xs.text-gray-400 = chat_time_ago(chat.last_message_at || chat.created_at)
+          - if (last_message = chat.messages.last)
+            p.text-sm.text-gray-500.truncate
+              - if last_message.role == 'assistant'
+                span.text-gray-400> Bot:
+              = truncate(last_message.content.to_s, length: 40)
+          - else
+            p.text-sm.text-gray-400.italic = t('.no_messages')
+- else
+  .p-8.text-center.text-gray-500
+    = t('.empty')
