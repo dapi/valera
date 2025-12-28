@@ -2,7 +2,7 @@
 
 module Tenants
   # Settings controller for tenant dashboard.
-  # Allows admin to edit tenant settings: subdomain, Telegram config, and content.
+  # Allows owner or admin to edit tenant settings: subdomain, Telegram config, and content.
   #
   class SettingsController < ApplicationController
     before_action :require_admin!
@@ -53,7 +53,8 @@ module Tenants
 
     def redirect_to_new_subdomain
       new_host = "#{@tenant.key}.#{ApplicationConfig.host}"
-      new_url = "#{request.protocol}#{new_host}:#{request.port}#{edit_tenant_settings_path}"
+      port_suffix = request.port.in?([80, 443]) ? '' : ":#{request.port}"
+      new_url = "#{request.protocol}#{new_host}#{port_suffix}#{edit_tenant_settings_path}"
 
       redirect_to new_url, notice: t('.key_changed'), allow_other_host: true
     end
