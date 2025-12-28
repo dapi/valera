@@ -112,12 +112,40 @@ module Tenants
       assert_equal 'admin', @admin_membership.role
     end
 
+    test 'viewer cannot change member role' do
+      viewer_user = users(:viewer_user_one)
+      viewer_user.update!(password: 'password123')
+
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: viewer_user.email, password: 'password123' }
+
+      patch "/members/#{@admin_membership.id}", params: { role: 'operator' }
+
+      assert_redirected_to '/'
+      @admin_membership.reload
+      assert_equal 'admin', @admin_membership.role
+    end
+
     test 'operator cannot remove member' do
       operator_user = users(:operator_user)
       operator_user.update!(password: 'password123')
 
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
       post '/session', params: { email: operator_user.email, password: 'password123' }
+
+      assert_no_difference 'TenantMembership.count' do
+        delete "/members/#{@admin_membership.id}"
+      end
+
+      assert_redirected_to '/'
+    end
+
+    test 'viewer cannot remove member' do
+      viewer_user = users(:viewer_user_one)
+      viewer_user.update!(password: 'password123')
+
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: viewer_user.email, password: 'password123' }
 
       assert_no_difference 'TenantMembership.count' do
         delete "/members/#{@admin_membership.id}"
@@ -189,6 +217,112 @@ module Tenants
       end
 
       assert_redirected_to '/members'
+    end
+
+    # === Invite page ===
+
+    test 'owner can access invite page' do
+      login_as_owner
+      invite = tenant_invites(:pending_invite)
+
+      get "/members/invite?token=#{invite.token}&role=operator"
+
+      assert_response :success
+    end
+
+    test 'admin can access invite page' do
+      admin_user = users(:admin_member)
+      admin_user.update!(password: 'password123')
+      invite = tenant_invites(:pending_invite)
+
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: admin_user.email, password: 'password123' }
+
+      get "/members/invite?token=#{invite.token}&role=operator"
+
+      assert_response :success
+    end
+
+    test 'operator cannot access invite page' do
+      operator_user = users(:operator_user)
+      operator_user.update!(password: 'password123')
+
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: operator_user.email, password: 'password123' }
+
+      get '/members/invite?token=test_token&role=operator'
+
+      assert_redirected_to '/'
+    end
+
+    test 'viewer cannot access invite page' do
+      viewer_user = users(:viewer_user_one)
+      viewer_user.update!(password: 'password123')
+
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: viewer_user.email, password: 'password123' }
+
+      get '/members/invite?token=test_token&role=operator'
+
+      assert_redirected_to '/'
+    end
+
+    # === Cancel invite ===
+
+    test 'owner can cancel pending invite' do
+      login_as_owner
+      invite = tenant_invites(:pending_invite)
+
+      delete "/members/invites/#{invite.id}"
+
+      assert_redirected_to '/members'
+      invite.reload
+      assert_equal 'cancelled', invite.status
+    end
+
+    test 'admin can cancel pending invite' do
+      admin_user = users(:admin_member)
+      admin_user.update!(password: 'password123')
+      invite = tenant_invites(:pending_invite)
+
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: admin_user.email, password: 'password123' }
+
+      delete "/members/invites/#{invite.id}"
+
+      assert_redirected_to '/members'
+      invite.reload
+      assert_equal 'cancelled', invite.status
+    end
+
+    test 'operator cannot cancel invite' do
+      operator_user = users(:operator_user)
+      operator_user.update!(password: 'password123')
+      invite = tenant_invites(:pending_invite)
+
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: operator_user.email, password: 'password123' }
+
+      delete "/members/invites/#{invite.id}"
+
+      assert_redirected_to '/'
+      invite.reload
+      assert_equal 'pending', invite.status
+    end
+
+    test 'viewer cannot cancel invite' do
+      viewer_user = users(:viewer_user_one)
+      viewer_user.update!(password: 'password123')
+      invite = tenant_invites(:pending_invite)
+
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: viewer_user.email, password: 'password123' }
+
+      delete "/members/invites/#{invite.id}"
+
+      assert_redirected_to '/'
+      invite.reload
+      assert_equal 'pending', invite.status
     end
 
     private
