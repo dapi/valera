@@ -34,6 +34,17 @@ class LandingController < ApplicationController
     @plans = PricingConfig.plans
   end
 
+  def index
+    @landings = [
+      { path: root_path, name: 'Главная', description: 'Основной лендинг' },
+      { path: lp1_path, name: 'LP1', description: 'Вариант 1' },
+      { path: lp2_path, name: 'LP2', description: 'Вариант 2 с тарифами' },
+      { path: lp_magic_1_path, name: 'LP Magic 1', description: 'ROI-фокус с калькулятором' },
+      { path: lp_magic_2_path, name: 'LP Magic 2', description: 'Минималистичный дизайн' },
+      { path: lp_magic_3_path, name: 'LP Magic 3', description: 'Сторителлинг с countdown' }
+    ]
+  end
+
   def create_lead
     @lead = Lead.new(lead_params)
     @lead.source = 'landing_page'

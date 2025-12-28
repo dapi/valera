@@ -1,0 +1,37 @@
+/ Landing Pages Index
+doctype html
+html lang="ru"
+  head
+    meta charset="UTF-8"
+    meta name="viewport" content="width=device-width, initial-scale=1.0"
+    title Лендинги | #{ApplicationConfig.app_name}
+    = stylesheet_link_tag "application", "data-turbo-track": "reload"
+
+  body.bg-slate-900.min-h-screen.text-white
+    .max-w-4xl.mx-auto.px-4.py-16
+
+      / Header
+      .text-center.mb-16
+        .inline-flex.items-center.justify-center.w-16.h-16.bg-gradient-to-br.from-blue-500.to-blue-600.rounded-2xl.mb-6
+          span.text-white.font-bold.text-2xl V
+        h1.text-4xl.md:text-5xl.font-bold.mb-4 Лендинги
+        p.text-slate-400.text-lg Все варианты посадочных страниц
+
+      / Landings Grid
+      .grid.gap-4
+        - @landings.each do |landing|
+          = link_to landing[:path], target: "_blank", rel: "noopener", class: "group block p-6 bg-slate-800 rounded-2xl border border-slate-700 hover:border-blue-500 hover:bg-slate-800/80 transition-all duration-300" do
+            .flex.items-center.justify-between
+              .flex-1
+                h3.text-xl.font-semibold.text-white.group-hover:text-blue-400.transition-colors.mb-1
+                  = landing[:name]
+                p.text-slate-400.text-sm
+                  = landing[:description]
+              .flex-shrink-0.ml-4
+                .w-10.h-10.rounded-full.bg-slate-700.group-hover:bg-blue-500.flex.items-center.justify-center.transition-all
+                  svg.w-5.h-5.text-slate-400.group-hover:text-white.transition-colors xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+
+      / Footer
+      .mt-16.text-center.text-slate-500.text-sm
+        p © #{Time.current.year} #{ApplicationConfig.app_name}
