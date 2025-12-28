@@ -1,0 +1,669 @@
+/ Landing Page LP-Magic-1: ROI-focused with calculator
+/ Dark gradient design with glassmorphism
+
+/ Flash messages
+- if notice.present?
+  .fixed.top-4.right-4.z-50.bg-green-100.border.border-green-400.text-green-700.px-4.py-3.rounded-xl
+    p = notice
+
+/ ========================================
+/ HEADER
+/ ========================================
+header.fixed.top-0.left-0.right-0.z-50.bg-slate-900.bg-opacity-80.backdrop-blur-lg.border-b.border-slate-800
+  .max-w-7xl.mx-auto.px-4.py-4.flex.items-center.justify-between
+    / Logo
+    = link_to root_path, class: "flex items-center gap-3" do
+      .w-10.h-10.bg-gradient-to-br.from-blue-500.to-blue-700.rounded-xl.flex.items-center.justify-center.shadow-lg.shadow-blue-500/25
+        span.text-white.font-bold.text-lg V
+      span.text-xl.font-bold.text-white = ApplicationConfig.app_name
+
+    / Navigation (Desktop)
+    nav.hidden.lg:flex.items-center.gap-8
+      a.text-slate-400.hover:text-white.transition-colors.text-sm.font-medium href="#problems" Проблемы
+      a.text-slate-400.hover:text-white.transition-colors.text-sm.font-medium href="#solution" Решение
+      a.text-slate-400.hover:text-white.transition-colors.text-sm.font-medium href="#results" Результаты
+      a.text-slate-400.hover:text-white.transition-colors.text-sm.font-medium href="#testimonials" Отзывы
+      a.text-slate-400.hover:text-white.transition-colors.text-sm.font-medium href="#faq" FAQ
+
+    / CTA Buttons
+    .flex.items-center.gap-4
+      = link_to login_path, class: "hidden sm:block text-slate-400 hover:text-white transition-colors text-sm font-medium" do
+        | Войти
+      = link_to "#form", class: "px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all text-sm shadow-lg shadow-blue-500/25" do
+        | Получить консультацию
+
+/ ========================================
+/ HERO SECTION with ROI Calculator
+/ ========================================
+section.relative.min-h-screen.flex.items-center.overflow-hidden.bg-gradient-to-br.from-slate-900.via-blue-900.to-slate-900 data-controller="calculator"
+  / Animated background grid
+  .absolute.inset-0.opacity-20
+    .absolute.inset-0 style="background-image: radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.2) 0%, transparent 50%);"
+  .absolute.inset-0.opacity-10 style="background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 60px 60px;"
+
+  .relative.max-w-7xl.mx-auto.px-4.pt-32.pb-20.md:pt-40.md:pb-32
+    .grid.lg:grid-cols-2.gap-12.lg:gap-16.items-center
+
+      / Left: Content
+      .space-y-8
+        / Badge
+        .inline-flex.items-center.gap-2.px-4.py-2.bg-blue-500.bg-opacity-15.rounded-full.border.border-blue-400.border-opacity-30.backdrop-blur-sm
+          span.w-2.h-2.bg-emerald-400.rounded-full.animate-pulse
+          span.text-sm.text-blue-200 ROI +300% за первый месяц
+
+        / Headline
+        h1.text-4xl.md:text-5xl.lg:text-6xl.font-bold.text-white.leading-tight
+          | Увеличьте продажи
+          br
+          span.text-transparent.bg-clip-text.bg-gradient-to-r.from-blue-400.to-cyan-400 на 40%
+          |  с AI-ассистентом
+
+        / Subheadline
+        p.text-xl.text-slate-300.max-w-lg
+          | Перестаньте терять клиентов из-за медленных ответов.
+          span.text-white.font-semibold  AI отвечает за 3 секунды, 24/7.
+
+        / Trust badges
+        .flex.flex-wrap.gap-4.pt-2
+          .flex.items-center.gap-2.px-3.py-1.5.bg-slate-800.bg-opacity-50.rounded-lg.border.border-slate-700
+            svg.w-4.h-4.text-emerald-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+            span.text-sm.text-slate-300 14 дней бесплатно
+          .flex.items-center.gap-2.px-3.py-1.5.bg-slate-800.bg-opacity-50.rounded-lg.border.border-slate-700
+            svg.w-4.h-4.text-emerald-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            span.text-sm.text-slate-300 Гарантия возврата
+          .flex.items-center.gap-2.px-3.py-1.5.bg-slate-800.bg-opacity-50.rounded-lg.border.border-slate-700
+            svg.w-4.h-4.text-emerald-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            span.text-sm.text-slate-300 Настроим за вас
+
+        / CTA buttons
+        .flex.flex-col.sm:flex-row.gap-4.pt-4
+          a.group.inline-flex.items-center.justify-center.gap-2.bg-gradient-to-r.from-blue-500.to-blue-600.text-white.font-bold.py-4.px-8.rounded-xl.text-lg.hover:from-blue-600.hover:to-blue-700.transition-all.shadow-xl.shadow-blue-500/30 href="#form"
+            | Попробовать бесплатно
+            svg.w-5.h-5.group-hover:translate-x-1.transition-transform xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"
+
+          a.inline-flex.items-center.justify-center.gap-2.border-2.border-slate-600.text-white.font-bold.py-4.px-8.rounded-xl.text-lg.hover:bg-slate-800.hover:border-slate-500.transition-all href="https://t.me/#{ApplicationConfig.demo_bot_username}" target="_blank"
+            svg.w-5.h-5 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.242-1.865-.44-.751-.245-1.349-.374-1.297-.789.027-.216.324-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.121.1.155.234.17.332.015.098.034.321.019.496z"
+            | Демо в Telegram
+
+      / Right: ROI Calculator
+      .relative
+        / Glow effect
+        .absolute.-inset-4.bg-gradient-to-r.from-blue-500.to-cyan-500.opacity-20.blur-3xl.rounded-3xl
+
+        / Calculator card
+        .relative.bg-slate-800.bg-opacity-50.backdrop-blur-xl.rounded-3xl.p-8.border.border-slate-700.shadow-2xl
+          .text-center.mb-6
+            .inline-flex.items-center.gap-2.px-3.py-1.bg-blue-500.bg-opacity-20.rounded-full.text-sm.text-blue-300.mb-4
+              svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+              | Калькулятор выгоды
+            h3.text-2xl.font-bold.text-white Сколько заявок теряете?
+
+          / Slider
+          .mb-8
+            .flex.justify-between.items-center.mb-3
+              span.text-slate-400 Потерянных заявок в месяц:
+              span.text-2xl.font-bold.text-white data-calculator-target="lostLeads" 15
+            input.w-full.h-2.bg-slate-700.rounded-full.appearance-none.cursor-pointer type="range" min="5" max="100" value="15" data-calculator-target="slider" data-action="input->calculator#calculate" style="accent-color: #3b82f6;"
+            .flex.justify-between.text-xs.text-slate-500.mt-1
+              span 5
+              span 100
+
+          / Results
+          .space-y-4
+            / Monthly loss
+            .bg-red-500.bg-opacity-10.rounded-xl.p-4.border.border-red-500.border-opacity-30
+              .flex.justify-between.items-center
+                span.text-red-300 Теряете в месяц:
+                .text-right
+                  span.text-2xl.font-bold.text-red-400 data-calculator-target="monthlyLoss" 450 000
+                  span.text-red-400.ml-1 P
+
+            / Potential recovery
+            .bg-emerald-500.bg-opacity-10.rounded-xl.p-4.border.border-emerald-500.border-opacity-30
+              .flex.justify-between.items-center
+                span.text-emerald-300 Вернете с AI:
+                .text-right
+                  span.text-2xl.font-bold.text-emerald-400 data-calculator-target="recoveredRevenue" 180 000
+                  span.text-emerald-400.ml-1 P/мес
+
+            / Annual savings
+            .bg-gradient-to-r.from-blue-500.to-cyan-500.bg-opacity-20.rounded-xl.p-4.border.border-blue-400.border-opacity-30
+              .flex.justify-between.items-center
+                span.text-blue-200 Выгода за год:
+                .text-right
+                  span.text-3xl.font-bold.text-white data-calculator-target="annualSavings" 2 160 000
+                  span.text-blue-200.ml-1 P
+
+          / CTA in calculator
+          .mt-6
+            a.block.w-full.text-center.bg-gradient-to-r.from-blue-500.to-blue-600.text-white.font-bold.py-3.rounded-xl.hover:from-blue-600.hover:to-blue-700.transition-all href="#form"
+              | Начать экономить
+
+/ ========================================
+/ PROBLEMS SECTION
+/ ========================================
+section#problems.py-20.md:py-32.bg-slate-900
+  .max-w-7xl.mx-auto.px-4
+    .text-center.mb-16
+      .inline-flex.items-center.gap-2.px-4.py-2.bg-red-500.bg-opacity-15.rounded-full.text-sm.text-red-300.mb-6
+        svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+        | Знакомые проблемы?
+      h2.text-3xl.md:text-4xl.lg:text-5xl.font-bold.text-white.mb-4
+        | Почему автосервисы
+        span.text-red-400  теряют клиентов
+
+    .grid.grid-cols-1.md:grid-cols-3.gap-6.lg:gap-8
+
+      / Card 1 - Overloaded managers
+      .group.relative.bg-slate-800.bg-opacity-50.backdrop-blur-sm.p-8.rounded-2xl.border.border-slate-700.hover:border-red-500.hover:border-opacity-50.transition-all.duration-300
+        .absolute.inset-0.bg-gradient-to-br.from-red-500.to-orange-500.opacity-0.group-hover:opacity-5.rounded-2xl.transition-opacity
+        .relative
+          .w-14.h-14.bg-red-500.bg-opacity-15.rounded-xl.flex.items-center.justify-center.mb-6
+            svg.w-7.h-7.text-red-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          h3.text-xl.font-bold.text-white.mb-3 Менеджеры перегружены
+          p.text-slate-400.leading-relaxed.mb-6
+            | Тратят 70% времени на однотипные вопросы: "Сколько стоит?", "Когда можно приехать?", "Есть ли запчасти?"
+          .pt-6.border-t.border-slate-700
+            .flex.items-center.gap-2.text-red-400
+              span.text-3xl.font-bold -30%
+              span.text-sm.text-slate-400 производительности команды
+
+      / Card 2 - Clients leave
+      .group.relative.bg-slate-800.bg-opacity-50.backdrop-blur-sm.p-8.rounded-2xl.border.border-slate-700.hover:border-red-500.hover:border-opacity-50.transition-all.duration-300
+        .absolute.inset-0.bg-gradient-to-br.from-red-500.to-orange-500.opacity-0.group-hover:opacity-5.rounded-2xl.transition-opacity
+        .relative
+          .w-14.h-14.bg-red-500.bg-opacity-15.rounded-xl.flex.items-center.justify-center.mb-6
+            svg.w-7.h-7.text-red-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          h3.text-xl.font-bold.text-white.mb-3 Клиенты уходят к конкурентам
+          p.text-slate-400.leading-relaxed.mb-6
+            | Не дождавшись ответа за 5 минут, звонят в другой сервис. Каждый потерянный клиент — минус 30-100 тыс. руб.
+          .pt-6.border-t.border-slate-700
+            .flex.items-center.gap-2.text-red-400
+              span.text-3xl.font-bold 67%
+              span.text-sm.text-slate-400 уходят при ожидании > 5 мин
+
+      / Card 3 - No night coverage
+      .group.relative.bg-slate-800.bg-opacity-50.backdrop-blur-sm.p-8.rounded-2xl.border.border-slate-700.hover:border-red-500.hover:border-opacity-50.transition-all.duration-300
+        .absolute.inset-0.bg-gradient-to-br.from-red-500.to-orange-500.opacity-0.group-hover:opacity-5.rounded-2xl.transition-opacity
+        .relative
+          .w-14.h-14.bg-red-500.bg-opacity-15.rounded-xl.flex.items-center.justify-center.mb-6
+            svg.w-7.h-7.text-red-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+          h3.text-xl.font-bold.text-white.mb-3 Вечером никто не отвечает
+          p.text-slate-400.leading-relaxed.mb-6
+            | После 18:00 и в выходные заявки копятся. Утром половина клиентов уже записалась в другой сервис.
+          .pt-6.border-t.border-slate-700
+            .flex.items-center.gap-2.text-red-400
+              span.text-3xl.font-bold 40%
+              span.text-sm.text-slate-400 заявок вне рабочего времени
+
+/ ========================================
+/ SOLUTION SECTION - How it works
+/ ========================================
+section#solution.py-20.md:py-32.bg-gradient-to-b.from-slate-900.to-slate-800
+  .max-w-7xl.mx-auto.px-4
+    .text-center.mb-16
+      .inline-flex.items-center.gap-2.px-4.py-2.bg-blue-500.bg-opacity-15.rounded-full.text-sm.text-blue-300.mb-6
+        svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"
+        | Простое решение
+      h2.text-3xl.md:text-4xl.lg:text-5xl.font-bold.text-white.mb-4
+        | Как #{ApplicationConfig.app_name} решает эти проблемы
+      p.text-xl.text-slate-400.max-w-2xl.mx-auto
+        | 4 простых шага от обращения клиента до готовой заявки
+
+    .grid.lg:grid-cols-2.gap-12.lg:gap-16.items-center
+
+      / Left: Steps
+      .space-y-6
+        / Step 1
+        .group.flex.items-start.gap-5.bg-slate-800.bg-opacity-50.p-6.rounded-2xl.border.border-slate-700.hover:border-blue-500.hover:border-opacity-50.transition-all
+          .flex-shrink-0.w-12.h-12.bg-gradient-to-br.from-blue-500.to-blue-600.text-white.rounded-xl.flex.items-center.justify-center.font-bold.text-lg.shadow-lg.shadow-blue-500/30 1
+          div
+            h3.text-lg.font-bold.text-white.mb-1 Клиент пишет в Telegram
+            p.text-slate-400 Находит ваш бот через рекламу, визитку или QR-код на автомобиле
+
+        / Step 2
+        .group.flex.items-start.gap-5.bg-slate-800.bg-opacity-50.p-6.rounded-2xl.border.border-slate-700.hover:border-blue-500.hover:border-opacity-50.transition-all
+          .flex-shrink-0.w-12.h-12.bg-gradient-to-br.from-blue-500.to-blue-600.text-white.rounded-xl.flex.items-center.justify-center.font-bold.text-lg.shadow-lg.shadow-blue-500/30 2
+          div
+            h3.text-lg.font-bold.text-white.mb-1 AI мгновенно отвечает
+            p.text-slate-400 Консультирует по услугам, ценам, срокам. Отвечает на любые вопросы 24/7
+
+        / Step 3
+        .group.flex.items-start.gap-5.bg-slate-800.bg-opacity-50.p-6.rounded-2xl.border.border-slate-700.hover:border-blue-500.hover:border-opacity-50.transition-all
+          .flex-shrink-0.w-12.h-12.bg-gradient-to-br.from-blue-500.to-blue-600.text-white.rounded-xl.flex.items-center.justify-center.font-bold.text-lg.shadow-lg.shadow-blue-500/30 3
+          div
+            h3.text-lg.font-bold.text-white.mb-1 Записывает на осмотр
+            p.text-slate-400 Собирает контакты, марку авто, описание проблемы и удобное время визита
+
+        / Step 4
+        .group.flex.items-start.gap-5.bg-emerald-500.bg-opacity-10.p-6.rounded-2xl.border.border-emerald-500.border-opacity-30.transition-all
+          .flex-shrink-0.w-12.h-12.bg-gradient-to-br.from-emerald-500.to-emerald-600.text-white.rounded-xl.flex.items-center.justify-center.shadow-lg.shadow-emerald-500/30
+            svg.w-6.h-6 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+          div
+            h3.text-lg.font-bold.text-white.mb-1 Вы получаете готовую заявку
+            p.text-slate-400 Лид с контактами и описанием в личном кабинете + уведомление в Telegram
+
+      / Right: Phone mockup
+      .relative.hidden.lg:block
+        / Glow
+        .absolute.-inset-8.bg-gradient-to-r.from-blue-500.to-cyan-500.opacity-10.blur-3xl.rounded-3xl
+
+        / Phone frame
+        .relative.mx-auto.w-80
+          .bg-slate-800.rounded-3xl.p-3.shadow-2xl.border.border-slate-700
+            / Notch
+            .absolute.top-3.left-1/2.transform.-translate-x-1/2.w-24.h-6.bg-slate-900.rounded-full.z-10
+            / Screen
+            .bg-slate-900.rounded-3xl.overflow-hidden.pt-8
+              / Chat header
+              .bg-gradient-to-r.from-blue-600.to-blue-700.px-5.py-4.flex.items-center.gap-4
+                .w-12.h-12.bg-blue-500.rounded-full.flex.items-center.justify-center.shadow-lg
+                  span.text-white.font-bold.text-xl V
+                div
+                  .text-white.font-semibold.text-lg = ApplicationConfig.app_name
+                  .flex.items-center.gap-2
+                    span.w-2.h-2.bg-emerald-400.rounded-full.animate-pulse
+                    span.text-sm.text-blue-200 онлайн
+
+              / Chat messages
+              .p-5.space-y-4.h-96.bg-slate-800
+                / Bot message
+                .flex.justify-start
+                  .bg-slate-700.rounded-2xl.rounded-tl-none.px-4.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm Здравствуйте! Чем могу помочь?
+
+                / User message
+                .flex.justify-end
+                  .bg-gradient-to-r.from-blue-500.to-blue-600.rounded-2xl.rounded-tr-none.px-4.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm Сколько стоит покраска бампера BMW X5?
+
+                / Bot message
+                .flex.justify-start
+                  .bg-slate-700.rounded-2xl.rounded-tl-none.px-4.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm Покраска бампера BMW X5 - от 12 000 P. Срок работы 2-3 дня. Записать на осмотр?
+
+                / User message
+                .flex.justify-end
+                  .bg-gradient-to-r.from-blue-500.to-blue-600.rounded-2xl.rounded-tr-none.px-4.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm Да, на завтра
+
+                / Bot message
+                .flex.justify-start
+                  .bg-slate-700.rounded-2xl.rounded-tl-none.px-4.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm Отлично! Укажите, пожалуйста, ваш номер телефона для связи.
+
+        / Floating notification
+        .absolute.-right-4.top-32.bg-white.rounded-2xl.p-4.shadow-2xl.animate-bounce
+          .flex.items-center.gap-3
+            .w-10.h-10.bg-emerald-100.rounded-full.flex.items-center.justify-center
+              svg.w-5.h-5.text-emerald-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+            div
+              .font-bold.text-slate-800 Новая заявка!
+              .text-sm.text-slate-500 BMW X5, покраска
+
+/ ========================================
+/ RESULTS SECTION - Big numbers
+/ ========================================
+section#results.py-20.md:py-32.bg-gradient-to-br.from-blue-600.via-blue-700.to-blue-800.relative.overflow-hidden
+  / Background decoration
+  .absolute.inset-0.opacity-30
+    .absolute.top-0.right-0.w-96.h-96.bg-cyan-400.rounded-full.blur-3xl
+    .absolute.bottom-0.left-0.w-96.h-96.bg-blue-400.rounded-full.blur-3xl
+
+  .relative.max-w-7xl.mx-auto.px-4
+    .text-center.mb-16
+      .inline-flex.items-center.gap-2.px-4.py-2.bg-white.bg-opacity-15.rounded-full.text-sm.text-white.mb-6
+        svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+        | Реальные результаты
+      h2.text-3xl.md:text-4xl.lg:text-5xl.font-bold.text-white.mb-4
+        | Что получают наши клиенты
+      p.text-xl.text-blue-100.max-w-2xl.mx-auto
+        | Цифры, которые говорят сами за себя
+
+    .grid.grid-cols-2.lg:grid-cols-4.gap-6
+      / Stat 1
+      .text-center.p-8.bg-white.bg-opacity-10.backdrop-blur-sm.rounded-2xl.border.border-white.border-opacity-20
+        .text-5xl.md:text-6xl.font-bold.text-white.mb-2 +40%
+        .text-blue-100.font-medium Рост конверсии
+        .text-sm.text-blue-200.mt-2 в заявки
+
+      / Stat 2
+      .text-center.p-8.bg-white.bg-opacity-10.backdrop-blur-sm.rounded-2xl.border.border-white.border-opacity-20
+        .text-5xl.md:text-6xl.font-bold.text-white.mb-2 15
+        .text-blue-100.font-medium Часов экономии
+        .text-sm.text-blue-200.mt-2 в неделю
+
+      / Stat 3
+      .text-center.p-8.bg-white.bg-opacity-10.backdrop-blur-sm.rounded-2xl.border.border-white.border-opacity-20
+        .text-5xl.md:text-6xl.font-bold.text-white.mb-2 3
+        .text-blue-100.font-medium Секунды
+        .text-sm.text-blue-200.mt-2 время ответа
+
+      / Stat 4
+      .text-center.p-8.bg-white.bg-opacity-10.backdrop-blur-sm.rounded-2xl.border.border-white.border-opacity-20
+        .text-5xl.md:text-6xl.font-bold.text-white.mb-2 24/7
+        .text-blue-100.font-medium Без выходных
+        .text-sm.text-blue-200.mt-2 и перерывов
+
+/ ========================================
+/ TESTIMONIALS SECTION
+/ ========================================
+section#testimonials.py-20.md:py-32.bg-slate-900
+  .max-w-7xl.mx-auto.px-4
+    .text-center.mb-16
+      .inline-flex.items-center.gap-2.px-4.py-2.bg-yellow-500.bg-opacity-15.rounded-full.text-sm.text-yellow-300.mb-6
+        svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+        | Отзывы клиентов
+      h2.text-3xl.md:text-4xl.lg:text-5xl.font-bold.text-white.mb-4
+        | Что говорят владельцы автосервисов
+
+    .grid.grid-cols-1.md:grid-cols-3.gap-6.lg:gap-8
+
+      / Testimonial 1
+      .bg-slate-800.bg-opacity-50.backdrop-blur-sm.p-8.rounded-2xl.border.border-slate-700
+        .flex.items-center.gap-1.mb-6
+          - 5.times do
+            svg.w-5.h-5.text-yellow-400 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+        p.text-slate-300.leading-relaxed.mb-6
+          | "Раньше теряли до 40% заявок из-за долгого ответа. Сейчас #{ApplicationConfig.app_name} отвечает мгновенно - конверсия выросла на 35%. Окупился за первую неделю."
+        .flex.items-center.gap-4.pt-6.border-t.border-slate-700
+          .w-14.h-14.bg-gradient-to-br.from-blue-500.to-blue-600.rounded-full.flex.items-center.justify-center.shadow-lg
+            span.text-white.font-bold.text-lg АМ
+          div
+            .font-semibold.text-white Алексей Морозов
+            .text-sm.text-slate-400 AutoPro, Москва
+
+      / Testimonial 2
+      .bg-slate-800.bg-opacity-50.backdrop-blur-sm.p-8.rounded-2xl.border.border-slate-700
+        .flex.items-center.gap-1.mb-6
+          - 5.times do
+            svg.w-5.h-5.text-yellow-400 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+        p.text-slate-300.leading-relaxed.mb-6
+          | "Менеджеры освободились от рутины и занимаются сложными вопросами. Выручка выросла на 25% за 2 месяца. Бот реально понимает специфику автосервиса."
+        .flex.items-center.gap-4.pt-6.border-t.border-slate-700
+          .w-14.h-14.bg-gradient-to-br.from-emerald-500.to-emerald-600.rounded-full.flex.items-center.justify-center.shadow-lg
+            span.text-white.font-bold.text-lg ИК
+          div
+            .font-semibold.text-white Ирина Козлова
+            .text-sm.text-slate-400 CarFix, Санкт-Петербург
+
+      / Testimonial 3
+      .bg-slate-800.bg-opacity-50.backdrop-blur-sm.p-8.rounded-2xl.border.border-slate-700
+        .flex.items-center.gap-1.mb-6
+          - 5.times do
+            svg.w-5.h-5.text-yellow-400 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+        p.text-slate-300.leading-relaxed.mb-6
+          | "Бот работает ночью и в выходные - это дало нам +30% заявок, которые раньше уходили конкурентам. Подключились за 2 дня, все настроили сами."
+        .flex.items-center.gap-4.pt-6.border-t.border-slate-700
+          .w-14.h-14.bg-gradient-to-br.from-purple-500.to-purple-600.rounded-full.flex.items-center.justify-center.shadow-lg
+            span.text-white.font-bold.text-lg ДС
+          div
+            .font-semibold.text-white Дмитрий Соколов
+            .text-sm.text-slate-400 МоторСервис, Казань
+
+/ ========================================
+/ FAQ SECTION
+/ ========================================
+section#faq.py-20.md:py-32.bg-slate-800
+  .max-w-3xl.mx-auto.px-4
+    .text-center.mb-16
+      .inline-flex.items-center.gap-2.px-4.py-2.bg-cyan-500.bg-opacity-15.rounded-full.text-sm.text-cyan-300.mb-6
+        svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        | Частые вопросы
+      h2.text-3xl.md:text-4xl.lg:text-5xl.font-bold.text-white.mb-4
+        | Ответы на популярные вопросы
+
+    .space-y-4
+
+      / FAQ 1
+      details.group.bg-slate-900.bg-opacity-50.rounded-2xl.border.border-slate-700.overflow-hidden open=true
+        summary.w-full.px-6.py-5.text-left.flex.items-center.justify-between.hover:bg-slate-800.transition-colors.cursor-pointer.list-none
+          span.font-semibold.text-white.text-lg Сколько стоит подключение?
+          .w-8.h-8.bg-slate-700.rounded-full.flex.items-center.justify-center.group-open:rotate-180.transition-transform
+            svg.w-4.h-4.text-slate-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+        .px-6.pb-6.text-slate-400.leading-relaxed
+          | Первые 14 дней бесплатно. Далее от 2 990 P/мес в зависимости от тарифа. Подключение и первичная настройка - бесплатно. Мы сами создаем бота, загружаем прайс и обучаем AI.
+
+      / FAQ 2
+      details.group.bg-slate-900.bg-opacity-50.rounded-2xl.border.border-slate-700.overflow-hidden
+        summary.w-full.px-6.py-5.text-left.flex.items-center.justify-between.hover:bg-slate-800.transition-colors.cursor-pointer.list-none
+          span.font-semibold.text-white.text-lg Как быстро можно запустить бота?
+          .w-8.h-8.bg-slate-700.rounded-full.flex.items-center.justify-center.group-open:rotate-180.transition-transform
+            svg.w-4.h-4.text-slate-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+        .px-6.pb-6.text-slate-400.leading-relaxed
+          | Настройка занимает 1-2 дня. Мы сами создаем бота, настраиваем прайс-лист и обучаем AI на основе информации о вашем автосервисе. Вам нужно только предоставить данные.
+
+      / FAQ 3
+      details.group.bg-slate-900.bg-opacity-50.rounded-2xl.border.border-slate-700.overflow-hidden
+        summary.w-full.px-6.py-5.text-left.flex.items-center.justify-between.hover:bg-slate-800.transition-colors.cursor-pointer.list-none
+          span.font-semibold.text-white.text-lg Бот понимает специфику автосервиса?
+          .w-8.h-8.bg-slate-700.rounded-full.flex.items-center.justify-center.group-open:rotate-180.transition-transform
+            svg.w-4.h-4.text-slate-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+        .px-6.pb-6.text-slate-400.leading-relaxed
+          | Да! AI обучен на тысячах диалогов автосервисов. Понимает марки авто, типы работ, может консультировать по срокам и ценам. Знает разницу между покраской и полировкой, ремонтом АКПП и МКПП.
+
+      / FAQ 4
+      details.group.bg-slate-900.bg-opacity-50.rounded-2xl.border.border-slate-700.overflow-hidden
+        summary.w-full.px-6.py-5.text-left.flex.items-center.justify-between.hover:bg-slate-800.transition-colors.cursor-pointer.list-none
+          span.font-semibold.text-white.text-lg Что если клиент задаст сложный вопрос?
+          .w-8.h-8.bg-slate-700.rounded-full.flex.items-center.justify-center.group-open:rotate-180.transition-transform
+            svg.w-4.h-4.text-slate-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+        .px-6.pb-6.text-slate-400.leading-relaxed
+          | Бот умеет передавать диалог менеджеру, если вопрос выходит за рамки его компетенции. Вы получите мгновенное уведомление в Telegram и сможете подключиться к разговору.
+
+      / FAQ 5
+      details.group.bg-slate-900.bg-opacity-50.rounded-2xl.border.border-slate-700.overflow-hidden
+        summary.w-full.px-6.py-5.text-left.flex.items-center.justify-between.hover:bg-slate-800.transition-colors.cursor-pointer.list-none
+          span.font-semibold.text-white.text-lg Можно ли интегрировать с CRM?
+          .w-8.h-8.bg-slate-700.rounded-full.flex.items-center.justify-center.group-open:rotate-180.transition-transform
+            svg.w-4.h-4.text-slate-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+        .px-6.pb-6.text-slate-400.leading-relaxed
+          | Да, есть интеграция с популярными CRM (Битрикс24, AmoCRM). Заявки автоматически попадают в вашу систему. Также доступен webhook для кастомных интеграций.
+
+/ ========================================
+/ CTA SECTION with Form
+/ ========================================
+section#form.py-20.md:py-32.bg-gradient-to-br.from-slate-900.via-blue-900.to-slate-900.relative.overflow-hidden
+  / Background decoration
+  .absolute.inset-0.opacity-30
+    .absolute.top-1/4.right-0.w-96.h-96.bg-blue-500.rounded-full.blur-3xl
+    .absolute.bottom-1/4.left-0.w-96.h-96.bg-cyan-500.rounded-full.blur-3xl
+
+  .relative.max-w-5xl.mx-auto.px-4
+    .grid.lg:grid-cols-2.gap-12.items-center
+
+      / Left: Content
+      .space-y-8
+        .inline-flex.items-center.gap-2.px-4.py-2.bg-emerald-500.bg-opacity-15.rounded-full.text-sm.text-emerald-300
+          svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+          | Начните зарабатывать больше
+
+        h2.text-3xl.md:text-4xl.lg:text-5xl.font-bold.text-white
+          | Готовы увеличить продажи?
+
+        p.text-xl.text-slate-300
+          | Оставьте заявку, и мы покажем, как #{ApplicationConfig.app_name} может работать для вашего автосервиса
+
+        .space-y-4
+          .flex.items-center.gap-4
+            .w-10.h-10.bg-emerald-500.bg-opacity-15.rounded-full.flex.items-center.justify-center
+              svg.w-5.h-5.text-emerald-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+            span.text-slate-300 14 дней бесплатного тестирования
+          .flex.items-center.gap-4
+            .w-10.h-10.bg-emerald-500.bg-opacity-15.rounded-full.flex.items-center.justify-center
+              svg.w-5.h-5.text-emerald-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+            span.text-slate-300 Бесплатная настройка под ваш сервис
+          .flex.items-center.gap-4
+            .w-10.h-10.bg-emerald-500.bg-opacity-15.rounded-full.flex.items-center.justify-center
+              svg.w-5.h-5.text-emerald-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+            span.text-slate-300 Запуск за 1-2 дня
+          .flex.items-center.gap-4
+            .w-10.h-10.bg-emerald-500.bg-opacity-15.rounded-full.flex.items-center.justify-center
+              svg.w-5.h-5.text-emerald-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+            span.text-slate-300 100% возврат денег, если не подойдет
+
+      / Right: Form
+      .relative
+        / Glow
+        .absolute.-inset-4.bg-gradient-to-r.from-blue-500.to-cyan-500.opacity-20.blur-2xl.rounded-3xl
+
+        .relative.bg-white.rounded-3xl.p-8.shadow-2xl
+          .text-center.mb-6
+            h3.text-2xl.font-bold.text-slate-900 Получите консультацию
+            p.text-slate-600.mt-1 Перезвоним в течение 15 минут
+
+          = form_with model: @lead, url: leads_path, local: true, class: "space-y-5", data: { controller: "utm" } do |f|
+            - if @lead.errors.any?
+              .bg-red-50.border.border-red-200.text-red-700.px-4.py-3.rounded-xl.mb-4
+                ul.list-disc.list-inside
+                  - @lead.errors.full_messages.each do |message|
+                    li = message
+
+            / Hidden UTM fields
+            = f.hidden_field :utm_source, data: { utm_target: "source" }
+            = f.hidden_field :utm_medium, data: { utm_target: "medium" }
+            = f.hidden_field :utm_campaign, data: { utm_target: "campaign" }
+
+            div
+              = f.label :phone, "Телефон", class: "block text-sm font-semibold text-slate-700 mb-2"
+              = f.telephone_field :phone, class: "w-full px-4 py-4 text-lg border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 placeholder-slate-400 text-slate-900 transition-all", placeholder: "+7 (999) 123-45-67", required: true, inputmode: "tel", autofocus: true
+
+            div
+              = f.label :name, "Ваше имя", class: "block text-sm font-semibold text-slate-700 mb-2"
+              = f.text_field :name, class: "w-full px-4 py-4 text-lg border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 placeholder-slate-400 text-slate-900 transition-all", placeholder: "Иван Петров", autocomplete: "name"
+
+            = f.submit "Получить консультацию", class: "w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 px-8 rounded-xl text-lg hover:from-blue-600 hover:to-blue-700 active:from-blue-700 active:to-blue-800 transition-all cursor-pointer shadow-lg shadow-blue-500/30"
+
+          / Guarantees under form
+          .flex.items-center.justify-center.gap-6.mt-6.pt-6.border-t.border-slate-100
+            .flex.items-center.gap-2.text-sm.text-slate-500
+              svg.w-4.h-4.text-emerald-500 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              | Данные защищены
+            .flex.items-center.gap-2.text-sm.text-slate-500
+              svg.w-4.h-4.text-emerald-500 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              | Без спама
+
+    p.text-center.mt-10.text-slate-400
+      | Или напишите нам напрямую:
+      a.text-blue-400.hover:text-blue-300.transition-colors.ml-2.font-medium href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank"
+        | @#{ApplicationConfig.support_telegram}
+
+/ ========================================
+/ FOOTER
+/ ========================================
+footer.py-12.bg-slate-900.border-t.border-slate-800
+  .max-w-7xl.mx-auto.px-4
+    .grid.md:grid-cols-4.gap-8.mb-12
+
+      / Logo & description
+      .md:col-span-2
+        .flex.items-center.gap-3.mb-4
+          .w-10.h-10.bg-gradient-to-br.from-blue-500.to-blue-700.rounded-xl.flex.items-center.justify-center
+            span.text-white.font-bold.text-lg V
+          span.text-xl.font-bold.text-white = ApplicationConfig.app_name
+        p.text-slate-400.max-w-md.leading-relaxed
+          | AI-ассистент для автосервисов. Отвечает клиентам 24/7, записывает на осмотр, консультирует по ценам. Увеличивает конверсию на 40%.
+
+      / Navigation
+      div
+        h4.font-semibold.text-white.mb-4 Навигация
+        ul.space-y-3
+          li
+            a.text-slate-400.hover:text-white.transition-colors href="#problems" Проблемы
+          li
+            a.text-slate-400.hover:text-white.transition-colors href="#solution" Решение
+          li
+            a.text-slate-400.hover:text-white.transition-colors href="#results" Результаты
+          li
+            a.text-slate-400.hover:text-white.transition-colors href="#faq" FAQ
+
+      / Contacts
+      div
+        h4.font-semibold.text-white.mb-4 Контакты
+        ul.space-y-3
+          li
+            a.text-slate-400.hover:text-white.transition-colors.flex.items-center.gap-2 href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank"
+              svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.242-1.865-.44-.751-.245-1.349-.374-1.297-.789.027-.216.324-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.121.1.155.234.17.332.015.098.034.321.019.496z"
+              | Telegram
+          li
+            a.text-slate-400.hover:text-white.transition-colors.flex.items-center.gap-2 href="mailto:#{ApplicationConfig.support_email}"
+              svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              | Email
+
+    .pt-8.border-t.border-slate-800.flex.flex-col.md:flex-row.justify-between.items-center.gap-4
+      p.text-sm.text-slate-500
+        | &copy; #{Time.current.year} #{ApplicationConfig.app_name}. Все права защищены.
+      .flex.gap-6.text-sm
+        a.text-slate-500.hover:text-white.transition-colors href=ApplicationConfig.offer_url target="_blank" Оферта
+        a.text-slate-500.hover:text-white.transition-colors href=ApplicationConfig.requisites_url target="_blank" Реквизиты
+
+/ ========================================
+/ Calculator Stimulus Controller (inline)
+/ ========================================
+javascript:
+  // Simple ROI Calculator without Stimulus for immediate functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.querySelector('[data-calculator-target="slider"]');
+    const lostLeadsDisplay = document.querySelector('[data-calculator-target="lostLeads"]');
+    const monthlyLossDisplay = document.querySelector('[data-calculator-target="monthlyLoss"]');
+    const recoveredRevenueDisplay = document.querySelector('[data-calculator-target="recoveredRevenue"]');
+    const annualSavingsDisplay = document.querySelector('[data-calculator-target="annualSavings"]');
+
+    if (slider) {
+      const AVERAGE_DEAL = 30000; // Average deal value in rubles
+      const RECOVERY_RATE = 0.4;  // 40% recovery rate with AI
+
+      function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      }
+
+      function calculate() {
+        const lostLeads = parseInt(slider.value);
+        const monthlyLoss = lostLeads * AVERAGE_DEAL;
+        const recoveredRevenue = Math.round(monthlyLoss * RECOVERY_RATE);
+        const annualSavings = recoveredRevenue * 12;
+
+        if (lostLeadsDisplay) lostLeadsDisplay.textContent = lostLeads;
+        if (monthlyLossDisplay) monthlyLossDisplay.textContent = formatNumber(monthlyLoss);
+        if (recoveredRevenueDisplay) recoveredRevenueDisplay.textContent = formatNumber(recoveredRevenue);
+        if (annualSavingsDisplay) annualSavingsDisplay.textContent = formatNumber(annualSavings);
+      }
+
+      slider.addEventListener('input', calculate);
+      calculate(); // Initial calculation
+    }
+  });

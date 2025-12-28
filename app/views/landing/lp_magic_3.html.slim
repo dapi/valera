@@ -1,0 +1,478 @@
+/ Landing Page LP-Magic-3: Storytelling + Urgency + Social Proof
+/ Emotional design with urgency elements, countdown timer, scarcity
+
+/ Flash messages
+- if notice.present?
+  .fixed.top-4.right-4.z-50.bg-emerald-100.border.border-emerald-400.text-emerald-700.px-4.py-3.rounded-xl.shadow-lg
+    p = notice
+
+/ ========================================
+/ HEADER with urgency
+/ ========================================
+header.fixed.top-0.left-0.right-0.z-50.bg-white.shadow-sm
+  / Urgency bar
+  .bg-gradient-to-r.from-orange-500.to-red-500.text-white.text-center.py-2.text-sm.font-medium
+    span.animate-pulse.mr-2 🔥
+    | Бесплатная настройка только до конца декабря!
+    span.ml-2.animate-pulse 🔥
+
+  .max-w-7xl.mx-auto.px-6.py-4.flex.items-center.justify-between
+    / Logo
+    = link_to root_path, class: "flex items-center gap-3" do
+      .w-10.h-10.bg-blue-600.rounded-xl.flex.items-center.justify-center
+        span.text-white.font-bold.text-lg V
+      span.text-xl.font-bold.text-slate-900 = ApplicationConfig.app_name
+
+    / CTA
+    = link_to "#form", class: "px-5 py-2.5 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 transition-all text-sm shadow-lg shadow-orange-500/30" do
+      | Забронировать место
+
+/ ========================================
+/ HERO - Emotional with urgency
+/ ========================================
+section.pt-32.pb-20.bg-gradient-to-br.from-slate-900.via-slate-800.to-slate-900
+  .max-w-5xl.mx-auto.px-6.text-center
+
+    / Urgency badge
+    .inline-flex.items-center.gap-2.px-4.py-2.bg-orange-500.bg-opacity-20.rounded-full.border.border-orange-400.border-opacity-40.text-orange-300.text-sm.font-medium.mb-8.animate-pulse
+      svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+      | Осталось 5 мест на бесплатную настройку
+
+    / Emotional headline
+    h1.text-4xl.md:text-5xl.lg:text-6xl.font-bold.text-white.leading-tight.mb-6
+      | Устали терять клиентов,
+      br.hidden.md:block
+      span.text-red-400  пока менеджер занят?
+
+    / Pain point
+    p.text-xl.md:text-2xl.text-slate-300.mb-8.max-w-3xl.mx-auto
+      | Каждый день автосервисы теряют до
+      span.text-red-400.font-bold  100 000 P
+      |  из-за медленных ответов на заявки
+
+    / Countdown timer
+    .bg-slate-800.bg-opacity-50.backdrop-blur-sm.rounded-2xl.p-6.max-w-lg.mx-auto.mb-10.border.border-slate-700 data-controller="countdown"
+      p.text-slate-400.text-sm.mb-3 До конца акции:
+      .flex.justify-center.gap-4
+        .text-center
+          .text-4xl.font-bold.text-white data-countdown-target="days" 5
+          .text-xs.text-slate-400 дней
+        .text-4xl.font-bold.text-slate-500
+          | :
+        .text-center
+          .text-4xl.font-bold.text-white data-countdown-target="hours" 23
+          .text-xs.text-slate-400 часов
+        .text-4xl.font-bold.text-slate-500
+          | :
+        .text-center
+          .text-4xl.font-bold.text-white data-countdown-target="minutes" 59
+          .text-xs.text-slate-400 минут
+        .text-4xl.font-bold.text-slate-500
+          | :
+        .text-center
+          .text-4xl.font-bold.text-orange-400 data-countdown-target="seconds" 59
+          .text-xs.text-slate-400 секунд
+
+    / CTA
+    a.inline-flex.items-center.justify-center.gap-2.bg-gradient-to-r.from-orange-500.to-red-500.text-white.font-bold.py-4.px-10.rounded-xl.text-lg.hover:from-orange-600.hover:to-red-600.transition-all.shadow-xl.shadow-orange-500/30 href="#form"
+      | Забронировать бесплатную настройку
+      svg.w-5.h-5 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"
+
+/ ========================================
+/ SUCCESS STORY - Storytelling section
+/ ========================================
+section.py-20.bg-white
+  .max-w-5xl.mx-auto.px-6
+    .text-center.mb-12
+      .inline-flex.items-center.gap-2.px-4.py-2.bg-emerald-100.text-emerald-700.rounded-full.text-sm.font-medium.mb-4
+        svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+        | История успеха
+      h2.text-3xl.md:text-4xl.font-bold.text-slate-900
+        | Как автосервис "Мастер" увеличил продажи на 40%
+
+    / Story timeline
+    .relative
+      / Vertical line
+      .hidden.md:block.absolute.left-1/2.top-0.bottom-0.w-1.bg-gradient-to-b.from-red-400.via-yellow-400.to-emerald-400.transform.-translate-x-1/2
+
+      .space-y-12.md:space-y-0
+
+        / Step 1 - Problem
+        .md:flex.items-center.gap-12
+          .md:w-1/2.md:text-right.mb-4.md:mb-0.md:pr-12
+            .inline-flex.items-center.gap-2.px-3.py-1.bg-red-100.text-red-700.rounded-full.text-sm.font-medium.mb-2
+              | Проблема
+            h3.text-xl.font-bold.text-slate-900.mb-2 Теряли 30% заявок
+            p.text-slate-600 Клиенты не дожидались ответа менеджера и уходили к конкурентам
+          .hidden.md:flex.w-8.h-8.bg-red-500.rounded-full.items-center.justify-center.text-white.font-bold.z-10 1
+          .md:w-1/2.md:pl-12
+
+        / Step 2 - Decision
+        .md:flex.items-center.gap-12.md:mt-8
+          .md:w-1/2.md:text-right.mb-4.md:mb-0.md:pr-12
+          .hidden.md:flex.w-8.h-8.bg-yellow-500.rounded-full.items-center.justify-center.text-white.font-bold.z-10 2
+          .md:w-1/2.md:pl-12
+            .inline-flex.items-center.gap-2.px-3.py-1.bg-yellow-100.text-yellow-700.rounded-full.text-sm.font-medium.mb-2
+              | Решение
+            h3.text-xl.font-bold.text-slate-900.mb-2 Подключили #{ApplicationConfig.app_name}
+            p.text-slate-600 За 2 дня настроили бота под свой прайс-лист и специфику работы
+
+        / Step 3 - Result
+        .md:flex.items-center.gap-12.md:mt-8
+          .md:w-1/2.md:text-right.mb-4.md:mb-0.md:pr-12
+            .inline-flex.items-center.gap-2.px-3.py-1.bg-emerald-100.text-emerald-700.rounded-full.text-sm.font-medium.mb-2
+              | Результат
+            h3.text-xl.font-bold.text-slate-900.mb-2 +40% к продажам
+            p.text-slate-600 Бот отвечает мгновенно 24/7, конверсия выросла с 15% до 40%
+          .hidden.md:flex.w-8.h-8.bg-emerald-500.rounded-full.items-center.justify-center.text-white.font-bold.z-10 3
+          .md:w-1/2.md:pl-12
+
+    / Before/After cards
+    .grid.md:grid-cols-2.gap-6.mt-12
+      / Before
+      .bg-red-50.rounded-2xl.p-6.border.border-red-100
+        h4.font-bold.text-red-700.mb-4 ДО подключения:
+        ul.space-y-2.text-slate-700
+          li.flex.items-center.gap-2
+            span.text-red-500 ✗
+            | 30+ минут время ответа
+          li.flex.items-center.gap-2
+            span.text-red-500 ✗
+            | 30% потерянных заявок
+          li.flex.items-center.gap-2
+            span.text-red-500 ✗
+            | Менеджер перегружен
+
+      / After
+      .bg-emerald-50.rounded-2xl.p-6.border.border-emerald-200
+        h4.font-bold.text-emerald-700.mb-4 ПОСЛЕ подключения:
+        ul.space-y-2.text-slate-700
+          li.flex.items-center.gap-2
+            span.text-emerald-500 ✓
+            | 3 секунды время ответа
+          li.flex.items-center.gap-2
+            span.text-emerald-500 ✓
+            | +40% рост продаж
+          li.flex.items-center.gap-2
+            span.text-emerald-500 ✓
+            | Менеджер занимается сложными вопросами
+
+/ ========================================
+/ PROBLEMS - Emotional scenarios
+/ ========================================
+section.py-20.bg-slate-50
+  .max-w-6xl.mx-auto.px-6
+    .text-center.mb-12
+      h2.text-3xl.md:text-4xl.font-bold.text-slate-900.mb-4
+        span.text-red-500 Знакомо?
+
+    .grid.md:grid-cols-3.gap-6
+
+      / Scenario 1
+      .bg-white.rounded-2xl.p-6.border-l-4.border-red-500.shadow-lg
+        .text-4xl.mb-4 😤
+        h3.text-lg.font-bold.text-slate-900.mb-2 "Менеджер снова занят!"
+        p.text-slate-600.text-sm.mb-4
+          | Клиент звонит 3-й раз, менеджер на другой линии. Клиент бросает трубку и звонит конкурентам.
+        .text-red-500.font-bold.text-sm
+          | −50 000 P потерянный заказ
+
+      / Scenario 2
+      .bg-white.rounded-2xl.p-6.border-l-4.border-red-500.shadow-lg
+        .text-4xl.mb-4 😰
+        h3.text-lg.font-bold.text-slate-900.mb-2 "Уже поздно, никто не отвечает"
+        p.text-slate-600.text-sm.mb-4
+          | В 21:00 клиент пишет в WhatsApp. Утром видите сообщение, но клиент уже записался в другой сервис.
+        .text-red-500.font-bold.text-sm
+          | −80 000 P ушёл к конкуренту
+
+      / Scenario 3
+      .bg-white.rounded-2xl.p-6.border-l-4.border-red-500.shadow-lg
+        .text-4xl.mb-4 😩
+        h3.text-lg.font-bold.text-slate-900.mb-2 "Снова одни и те же вопросы"
+        p.text-slate-600.text-sm.mb-4
+          | "Сколько стоит покраска?", "Какие сроки?", "Есть гарантия?" — менеджер отвечает 50 раз в день.
+        .text-red-500.font-bold.text-sm
+          | −4 часа потраченного времени
+
+/ ========================================
+/ SOLUTION - How Valera solves
+/ ========================================
+section.py-20.bg-white
+  .max-w-5xl.mx-auto.px-6
+    .text-center.mb-12
+      h2.text-3xl.md:text-4xl.font-bold.text-slate-900.mb-4
+        | Как #{ApplicationConfig.app_name}
+        span.text-emerald-500  решает эти проблемы
+
+    .grid.md:grid-cols-3.gap-8
+
+      / Solution 1
+      .text-center
+        .w-16.h-16.mx-auto.bg-emerald-100.rounded-2xl.flex.items-center.justify-center.mb-4
+          svg.w-8.h-8.text-emerald-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"
+        h3.text-lg.font-bold.text-slate-900.mb-2 Мгновенный ответ
+        p.text-slate-600 AI отвечает за 3 секунды. Клиент не успевает уйти к конкурентам.
+
+      / Solution 2
+      .text-center
+        .w-16.h-16.mx-auto.bg-emerald-100.rounded-2xl.flex.items-center.justify-center.mb-4
+          svg.w-8.h-8.text-emerald-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        h3.text-lg.font-bold.text-slate-900.mb-2 Работает 24/7
+        p.text-slate-600 Ночью, в выходные, в праздники — бот всегда на связи.
+
+      / Solution 3
+      .text-center
+        .w-16.h-16.mx-auto.bg-emerald-100.rounded-2xl.flex.items-center.justify-center.mb-4
+          svg.w-8.h-8.text-emerald-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+        h3.text-lg.font-bold.text-slate-900.mb-2 Готовые заявки
+        p.text-slate-600 Собирает контакты, описание проблемы, записывает на осмотр.
+
+/ ========================================
+/ SOCIAL PROOF - Testimonials carousel + counter
+/ ========================================
+section.py-20.bg-gradient-to-br.from-blue-600.to-blue-800.text-white
+  .max-w-6xl.mx-auto.px-6
+    .text-center.mb-8
+      / Counter
+      .inline-flex.items-center.gap-3.px-6.py-3.bg-white.bg-opacity-15.rounded-full.mb-6
+        svg.w-6.h-6.text-emerald-300 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        span.text-xl.font-bold 127
+        span.text-blue-200 автосервисов уже подключились
+
+      h2.text-3xl.md:text-4xl.font-bold.mb-4
+        | Отзывы клиентов
+
+    / Testimonials
+    .grid.md:grid-cols-3.gap-6
+
+      / Testimonial 1
+      .bg-white.bg-opacity-10.backdrop-blur-sm.rounded-2xl.p-6.border.border-white.border-opacity-20
+        .flex.gap-1.mb-4
+          - 5.times do
+            svg.w-5.h-5.text-yellow-400 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+        p.text-blue-100.mb-4 "Конверсия выросла на 35% за первый месяц. Бот реально понимает специфику автосервиса."
+        .flex.items-center.gap-3
+          .w-10.h-10.bg-blue-500.rounded-full.flex.items-center.justify-center.font-bold АМ
+          div
+            .font-semibold Алексей М.
+            .text-sm.text-blue-200 AutoPro, Москва
+
+      / Testimonial 2
+      .bg-white.bg-opacity-10.backdrop-blur-sm.rounded-2xl.p-6.border.border-white.border-opacity-20
+        .flex.gap-1.mb-4
+          - 5.times do
+            svg.w-5.h-5.text-yellow-400 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+        p.text-blue-100.mb-4 "Менеджеры освободились от рутины. Выручка +25% за 2 месяца."
+        .flex.items-center.gap-3
+          .w-10.h-10.bg-emerald-500.rounded-full.flex.items-center.justify-center.font-bold ИК
+          div
+            .font-semibold Ирина К.
+            .text-sm.text-blue-200 CarFix, СПб
+
+      / Testimonial 3
+      .bg-white.bg-opacity-10.backdrop-blur-sm.rounded-2xl.p-6.border.border-white.border-opacity-20
+        .flex.gap-1.mb-4
+          - 5.times do
+            svg.w-5.h-5.text-yellow-400 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+        p.text-blue-100.mb-4 "+30% заявок из вечернего и ночного времени. Окупился за неделю."
+        .flex.items-center.gap-3
+          .w-10.h-10.bg-purple-500.rounded-full.flex.items-center.justify-center.font-bold ДС
+          div
+            .font-semibold Дмитрий С.
+            .text-sm.text-blue-200 МоторСервис, Казань
+
+    / Logos placeholder
+    .mt-12.pt-8.border-t.border-white.border-opacity-20
+      p.text-center.text-blue-200.text-sm.mb-4 Нам доверяют:
+      .flex.flex-wrap.justify-center.gap-8.opacity-60
+        - ["AutoPro", "CarFix", "МоторСервис", "АвтоМастер", "ProService"].each do |logo|
+          span.text-xl.font-bold.text-white = logo
+
+/ ========================================
+/ GUARANTEES
+/ ========================================
+section.py-20.bg-white
+  .max-w-5xl.mx-auto.px-6
+    .text-center.mb-12
+      h2.text-3xl.md:text-4xl.font-bold.text-slate-900.mb-4
+        | Наши гарантии
+
+    .grid.md:grid-cols-3.gap-8
+
+      / Guarantee 1
+      .text-center.p-6.bg-emerald-50.rounded-2xl.border.border-emerald-100
+        .w-16.h-16.mx-auto.bg-emerald-500.rounded-full.flex.items-center.justify-center.mb-4
+          svg.w-8.h-8.text-white xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        h3.text-lg.font-bold.text-slate-900.mb-2 Возврат 100%
+        p.text-slate-600.text-sm Если за 14 дней не увидите результат — вернём деньги
+
+      / Guarantee 2
+      .text-center.p-6.bg-emerald-50.rounded-2xl.border.border-emerald-100
+        .w-16.h-16.mx-auto.bg-emerald-500.rounded-full.flex.items-center.justify-center.mb-4
+          svg.w-8.h-8.text-white xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        h3.text-lg.font-bold.text-slate-900.mb-2 Бесплатная настройка
+        p.text-slate-600.text-sm Полностью настроим бота под ваш автосервис за 1-2 дня
+
+      / Guarantee 3
+      .text-center.p-6.bg-emerald-50.rounded-2xl.border.border-emerald-100
+        .w-16.h-16.mx-auto.bg-emerald-500.rounded-full.flex.items-center.justify-center.mb-4
+          svg.w-8.h-8.text-white xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+        h3.text-lg.font-bold.text-slate-900.mb-2 Поддержка 24/7
+        p.text-slate-600.text-sm Всегда на связи в Telegram, поможем с любым вопросом
+
+/ ========================================
+/ CTA - With scarcity and bonuses
+/ ========================================
+section#form.py-20.bg-gradient-to-br.from-orange-500.to-red-600.text-white.relative.overflow-hidden
+  / Background decoration
+  .absolute.inset-0.opacity-30
+    .absolute.top-0.right-0.w-96.h-96.bg-yellow-400.rounded-full.blur-3xl
+    .absolute.bottom-0.left-0.w-96.h-96.bg-red-400.rounded-full.blur-3xl
+
+  .relative.max-w-4xl.mx-auto.px-6
+    .text-center.mb-8
+      / Scarcity
+      .inline-flex.items-center.gap-2.px-4.py-2.bg-white.bg-opacity-20.rounded-full.text-sm.font-bold.mb-6.animate-pulse
+        svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+        | Осталось 5 мест в этом месяце!
+
+      h2.text-3xl.md:text-4xl.font-bold.mb-4
+        | Забронируйте бесплатную настройку
+
+      / Bonuses
+      p.text-xl.text-orange-100.mb-8
+        | При регистрации сегодня вы получите:
+
+    .grid.md:grid-cols-2.gap-8.items-center
+
+      / Left: Bonuses
+      .space-y-4
+        .flex.items-center.gap-4.bg-white.bg-opacity-10.backdrop-blur-sm.rounded-xl.p-4
+          .w-12.h-12.bg-emerald-500.rounded-full.flex.items-center.justify-center.flex-shrink-0
+            svg.w-6.h-6.text-white xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
+          div
+            .font-bold 14 дней бесплатно
+            .text-sm.text-orange-100 Полный функционал без ограничений
+
+        .flex.items-center.gap-4.bg-white.bg-opacity-10.backdrop-blur-sm.rounded-xl.p-4
+          .w-12.h-12.bg-emerald-500.rounded-full.flex.items-center.justify-center.flex-shrink-0
+            svg.w-6.h-6.text-white xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
+          div
+            .font-bold Настройка под ваш сервис
+            .text-sm.text-orange-100 Загрузим прайс, настроим ответы
+
+        .flex.items-center.gap-4.bg-white.bg-opacity-10.backdrop-blur-sm.rounded-xl.p-4
+          .w-12.h-12.bg-emerald-500.rounded-full.flex.items-center.justify-center.flex-shrink-0
+            svg.w-6.h-6.text-white xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+          div
+            .font-bold Обучение команды
+            .text-sm.text-orange-100 Покажем как работать с ботом
+
+      / Right: Form
+      .bg-white.rounded-2xl.p-6.shadow-2xl
+        = form_with model: @lead, url: leads_path, local: true, class: "space-y-4", data: { controller: "utm" } do |f|
+          - if @lead.errors.any?
+            .bg-red-50.border.border-red-200.text-red-700.px-4.py-3.rounded-xl.mb-4
+              ul.list-disc.list-inside
+                - @lead.errors.full_messages.each do |message|
+                  li = message
+
+          / Hidden UTM fields
+          = f.hidden_field :utm_source, data: { utm_target: "source" }
+          = f.hidden_field :utm_medium, data: { utm_target: "medium" }
+          = f.hidden_field :utm_campaign, data: { utm_target: "campaign" }
+
+          div
+            = f.label :phone, "Телефон", class: "block text-sm font-semibold text-slate-700 mb-2"
+            = f.telephone_field :phone, class: "w-full px-4 py-4 text-lg border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-slate-50 text-slate-900", placeholder: "+7 (999) 123-45-67", required: true, inputmode: "tel", autofocus: true
+
+          div
+            = f.label :name, "Ваше имя", class: "block text-sm font-semibold text-slate-700 mb-2"
+            = f.text_field :name, class: "w-full px-4 py-4 text-lg border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-slate-50 text-slate-900", placeholder: "Иван Петров", autocomplete: "name"
+
+          = f.submit "Забронировать место", class: "w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-4 rounded-xl text-lg hover:from-orange-600 hover:to-red-600 transition-all cursor-pointer shadow-lg"
+
+        p.text-center.text-sm.text-slate-500.mt-3
+          | Перезвоним в течение 15 минут
+
+/ ========================================
+/ FOOTER
+/ ========================================
+footer.py-12.bg-slate-900
+  .max-w-7xl.mx-auto.px-6
+    .flex.flex-col.md:flex-row.justify-between.items-center.gap-6
+      / Logo
+      .flex.items-center.gap-3
+        .w-10.h-10.bg-blue-600.rounded-xl.flex.items-center.justify-center
+          span.text-white.font-bold V
+        span.text-white.font-bold = ApplicationConfig.app_name
+
+      / Links
+      .flex.gap-6.text-sm
+        a.text-slate-400.hover:text-white.transition-colors href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank" Telegram
+        a.text-slate-400.hover:text-white.transition-colors href="mailto:#{ApplicationConfig.support_email}" Email
+        a.text-slate-400.hover:text-white.transition-colors href=ApplicationConfig.offer_url target="_blank" Оферта
+
+      / Copyright
+      p.text-slate-500.text-sm
+        | &copy; #{Time.current.year} #{ApplicationConfig.app_name}
+
+/ ========================================
+/ Countdown Timer Script
+/ ========================================
+javascript:
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get end of current month
+    const now = new Date();
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+    const daysEl = document.querySelector('[data-countdown-target="days"]');
+    const hoursEl = document.querySelector('[data-countdown-target="hours"]');
+    const minutesEl = document.querySelector('[data-countdown-target="minutes"]');
+    const secondsEl = document.querySelector('[data-countdown-target="seconds"]');
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = endOfMonth - now;
+
+      if (diff <= 0) {
+        daysEl.textContent = '0';
+        hoursEl.textContent = '0';
+        minutesEl.textContent = '0';
+        secondsEl.textContent = '0';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      if (daysEl) daysEl.textContent = days;
+      if (hoursEl) hoursEl.textContent = hours;
+      if (minutesEl) minutesEl.textContent = minutes;
+      if (secondsEl) secondsEl.textContent = seconds;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  });

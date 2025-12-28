@@ -1,0 +1,473 @@
+/ Landing Page LP-Magic-2: Minimalist design with focus on demo
+/ Light background, много whitespace, акцентный синий, плавные анимации, крупная типографика
+
+/ Flash messages
+- if notice.present?
+  .fixed.top-4.right-4.z-50.bg-emerald-100.border.border-emerald-400.text-emerald-700.px-4.py-3.rounded-xl.shadow-lg.animate-fade-in
+    p = notice
+
+/ ========================================
+/ HEADER - Minimal transparent
+/ ========================================
+header.fixed.top-0.left-0.right-0.z-50.bg-white.bg-opacity-80.backdrop-blur-xl.border-b.border-slate-100/50
+  .max-w-7xl.mx-auto.px-6.lg:px-8.py-4.flex.items-center.justify-between
+    / Logo
+    = link_to root_path, class: "flex items-center gap-3 group" do
+      .w-11.h-11.bg-gradient-to-br.from-blue-500.to-blue-600.rounded-xl.flex.items-center.justify-center.shadow-md.shadow-blue-500/20.group-hover:shadow-lg.group-hover:shadow-blue-500/30.transition-all
+        span.text-white.font-bold.text-lg V
+      span.text-xl.font-bold.text-slate-900 = ApplicationConfig.app_name
+
+    / Navigation - hidden on mobile
+    nav.hidden.md:flex.items-center.gap-8
+      a.text-slate-500.hover:text-slate-900.transition-colors.text-sm.font-medium href="#how" Как работает
+      a.text-slate-500.hover:text-slate-900.transition-colors.text-sm.font-medium href="#compare" Сравнение
+      a.text-slate-500.hover:text-slate-900.transition-colors.text-sm.font-medium href="#review" Отзыв
+
+    / CTA
+    .flex.items-center.gap-4
+      = link_to login_path, class: "hidden sm:block text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium" do
+        | Войти
+      = link_to "#form", class: "px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all text-sm shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30" do
+        | Оставить заявку
+
+/ ========================================
+/ HERO - Minimalist with LARGE phone mockup (60% screen)
+/ ========================================
+section.min-h-screen.flex.items-center.bg-gradient-to-b.from-white.via-slate-50.to-white.pt-24.pb-16
+  .max-w-7xl.mx-auto.px-6.lg:px-8.w-full
+    .grid.lg:grid-cols-5.gap-12.lg:gap-16.items-center
+
+      / Left: Content (40% = 2/5 columns)
+      .lg:col-span-2.space-y-10
+        / Headline - Large typography
+        h1.text-4xl.sm:text-5xl.lg:text-6xl.font-bold.text-slate-900.leading-tight.tracking-tight
+          | AI-ассистент для вашего автосервиса
+
+        / One-liner subheadline
+        p.text-xl.lg:text-2xl.text-slate-600.leading-relaxed
+          | Отвечает клиентам 24/7.
+          span.text-slate-900.font-medium  Вы получаете готовые заявки.
+
+        / CTA buttons - only 2
+        .flex.flex-col.sm:flex-row.gap-4.pt-2
+          a.group.inline-flex.items-center.justify-center.gap-3.bg-blue-600.text-white.font-semibold.py-4.px-8.rounded-2xl.text-lg.hover:bg-blue-700.transition-all.duration-300.shadow-xl.shadow-blue-600/25.hover:shadow-2xl.hover:shadow-blue-600/30.hover:-translate-y-0.5 href="https://t.me/#{ApplicationConfig.demo_bot_username}" target="_blank"
+            svg.w-6.h-6 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.242-1.865-.44-.751-.245-1.349-.374-1.297-.789.027-.216.324-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.121.1.155.234.17.332.015.098.034.321.019.496z"
+            span Попробовать демо
+            svg.w-5.h-5.opacity-0.group-hover:opacity-100.group-hover:translate-x-1.transition-all.duration-300 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"
+
+          a.inline-flex.items-center.justify-center.gap-2.text-slate-600.font-semibold.py-4.px-8.rounded-2xl.text-lg.border-2.border-slate-200.hover:border-slate-300.hover:bg-slate-50.transition-all.duration-300 href="#how"
+            | Узнать больше
+            svg.w-5.h-5.animate-bounce xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"
+
+      / Right: LARGE Phone Mockup (60% = 3/5 columns)
+      .lg:col-span-3.relative
+        / Glow effect behind phone
+        .absolute.inset-0.bg-gradient-to-r.from-blue-400.to-blue-600.opacity-20.rounded-3xl.blur-3xl.transform.scale-90
+
+        / Phone frame - LARGE
+        .relative.mx-auto.w-full.max-w-md.lg:max-w-lg
+          .bg-slate-900.rounded-3xl.p-4.shadow-2xl
+            / Screen
+            .bg-slate-800.rounded-3xl.overflow-hidden
+
+              / Chat header
+              .bg-gradient-to-r.from-blue-500.to-blue-600.px-6.py-5.flex.items-center.gap-4
+                .w-14.h-14.bg-white.bg-opacity-20.backdrop-blur-sm.rounded-full.flex.items-center.justify-center.shadow-lg
+                  span.text-white.font-bold.text-2xl V
+                .flex-1
+                  .text-white.font-semibold.text-xl = ApplicationConfig.app_name
+                  .flex.items-center.gap-2
+                    span.w-2.h-2.bg-emerald-400.rounded-full.animate-pulse
+                    span.text-blue-100.text-sm онлайн
+                / Menu dots
+                .w-8.h-8.flex.flex-col.items-center.justify-center.gap-1.text-white.opacity-60
+                  .w-1.h-1.bg-current.rounded-full
+                  .w-1.h-1.bg-current.rounded-full
+                  .w-1.h-1.bg-current.rounded-full
+
+              / Chat messages - Interactive demo area
+              .p-6.space-y-4.min-h-96.bg-gradient-to-b.from-slate-700.to-slate-800
+                / Bot greeting
+                .flex.justify-start
+                  .bg-slate-600.bg-opacity-80.backdrop-blur-sm.rounded-2xl.rounded-tl-none.px-5.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm Здравствуйте! Чем могу помочь?
+
+                / User message
+                .flex.justify-end
+                  .bg-blue-500.rounded-2xl.rounded-tr-none.px-5.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm Сколько стоит покраска бампера?
+
+                / Bot response
+                .flex.justify-start
+                  .bg-slate-600.bg-opacity-80.backdrop-blur-sm.rounded-2xl.rounded-tl-none.px-5.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm.leading-relaxed
+                      | Покраска бампера — от 8 000 Р.
+                      br
+                      | Записать на осмотр?
+
+                / User
+                .flex.justify-end
+                  .bg-blue-500.rounded-2xl.rounded-tr-none.px-5.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm Да, на завтра в 10:00
+
+                / Bot confirmation
+                .flex.justify-start
+                  .bg-slate-600.bg-opacity-80.backdrop-blur-sm.rounded-2xl.rounded-tl-none.px-5.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm.leading-relaxed
+                      | Отлично! Оставьте номер телефона для подтверждения.
+
+                / User phone
+                .flex.justify-end
+                  .bg-blue-500.rounded-2xl.rounded-tr-none.px-5.py-3.max-w-xs.shadow-lg
+                    p.text-white.text-sm +7 999 123-45-67
+
+                / Bot success
+                .flex.justify-start
+                  .bg-emerald-500.bg-opacity-90.backdrop-blur-sm.rounded-2xl.rounded-tl-none.px-5.py-3.max-w-xs.shadow-lg
+                    .flex.items-center.gap-2
+                      svg.w-5.h-5.text-white xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+                      p.text-white.text-sm.font-medium Заявка создана!
+
+              / Input area
+              .px-4.py-4.bg-slate-800.flex.items-center.gap-3
+                .flex-1.bg-slate-700.bg-opacity-50.rounded-full.px-5.py-3
+                  span.text-slate-400.text-sm Написать сообщение...
+                .w-11.h-11.bg-blue-500.rounded-full.flex.items-center.justify-center.shadow-lg
+                  svg.w-5.h-5.text-white xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                    path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"
+
+          / Floating notification - left
+          .absolute.-left-4.lg:-left-16.top-28.bg-white.rounded-2xl.p-4.shadow-xl.border.border-slate-100.animate-float
+            .flex.items-center.gap-3
+              .w-11.h-11.bg-emerald-100.rounded-xl.flex.items-center.justify-center
+                svg.w-6.h-6.text-emerald-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+              div
+                .text-sm.font-semibold.text-slate-900 Новая заявка!
+                .text-xs.text-slate-500 Иван Петров
+
+          / Stats badge - right bottom
+          .absolute.-right-4.lg:-right-12.bottom-40.bg-white.rounded-2xl.p-4.shadow-xl.border.border-slate-100.animate-float style="animation-delay: 1s"
+            .flex.items-center.gap-3
+              .w-11.h-11.bg-blue-100.rounded-xl.flex.items-center.justify-center
+                svg.w-6.h-6.text-blue-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"
+              div
+                .text-sm.font-semibold.text-slate-900 3 сек
+                .text-xs.text-slate-500 время ответа
+
+/ Custom animations
+css:
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  .animate-fade-in {
+    animation: fade-in-up 0.3s ease-out;
+  }
+
+/ ========================================
+/ HOW IT WORKS - Horizontal Timeline with animations
+/ ========================================
+section#how.py-28.lg:py-36.bg-white
+  .max-w-6xl.mx-auto.px-6.lg:px-8
+    / Section header - Large typography
+    .text-center.mb-20
+      span.inline-block.px-4.py-1.5.bg-blue-50.text-blue-600.rounded-full.text-sm.font-medium.mb-4 Простой процесс
+      h2.text-3xl.md:text-4xl.lg:text-5xl.font-bold.text-slate-900.tracking-tight
+        | Как это работает
+
+    / Timeline
+    .relative
+      / Connecting line (desktop)
+      .hidden.lg:block.absolute.top-14.h-1.bg-gradient-to-r.from-blue-100.via-blue-300.to-emerald-300.rounded-full style="left: 10%; right: 10%"
+
+      .grid.grid-cols-1.sm:grid-cols-2.lg:grid-cols-4.gap-10.lg:gap-8
+
+        / Step 1
+        .text-center.group
+          .relative.mx-auto.w-24.h-24.mb-8
+            .absolute.inset-0.bg-blue-100.rounded-3xl.group-hover:bg-blue-600.transition-all.duration-300.shadow-lg.group-hover:shadow-xl.group-hover:shadow-blue-600/20.group-hover:-translate-y-1
+            .absolute.inset-0.flex.items-center.justify-center
+              svg.w-10.h-10.text-blue-600.group-hover:text-white.transition-colors.duration-300 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            .absolute.-top-2.-right-2.w-8.h-8.bg-white.rounded-full.flex.items-center.justify-center.shadow-md.text-blue-600.font-bold.text-sm.border.border-blue-100 1
+          h3.text-lg.font-bold.text-slate-900.mb-2 Клиент пишет
+          p.text-slate-500.text-sm.leading-relaxed.max-w-44.mx-auto Находит бота через рекламу или QR-код
+
+        / Step 2
+        .text-center.group
+          .relative.mx-auto.w-24.h-24.mb-8
+            .absolute.inset-0.bg-blue-100.rounded-3xl.group-hover:bg-blue-600.transition-all.duration-300.shadow-lg.group-hover:shadow-xl.group-hover:shadow-blue-600/20.group-hover:-translate-y-1
+            .absolute.inset-0.flex.items-center.justify-center
+              svg.w-10.h-10.text-blue-600.group-hover:text-white.transition-colors.duration-300 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            .absolute.-top-2.-right-2.w-8.h-8.bg-white.rounded-full.flex.items-center.justify-center.shadow-md.text-blue-600.font-bold.text-sm.border.border-blue-100 2
+          h3.text-lg.font-bold.text-slate-900.mb-2 AI отвечает
+          p.text-slate-500.text-sm.leading-relaxed.max-w-44.mx-auto Мгновенно консультирует по услугам и ценам
+
+        / Step 3
+        .text-center.group
+          .relative.mx-auto.w-24.h-24.mb-8
+            .absolute.inset-0.bg-blue-100.rounded-3xl.group-hover:bg-blue-600.transition-all.duration-300.shadow-lg.group-hover:shadow-xl.group-hover:shadow-blue-600/20.group-hover:-translate-y-1
+            .absolute.inset-0.flex.items-center.justify-center
+              svg.w-10.h-10.text-blue-600.group-hover:text-white.transition-colors.duration-300 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            .absolute.-top-2.-right-2.w-8.h-8.bg-white.rounded-full.flex.items-center.justify-center.shadow-md.text-blue-600.font-bold.text-sm.border.border-blue-100 3
+          h3.text-lg.font-bold.text-slate-900.mb-2 Записывает
+          p.text-slate-500.text-sm.leading-relaxed.max-w-44.mx-auto Собирает контакты и удобное время
+
+        / Step 4 - Success
+        .text-center.group
+          .relative.mx-auto.w-24.h-24.mb-8
+            .absolute.inset-0.bg-emerald-100.rounded-3xl.group-hover:bg-emerald-600.transition-all.duration-300.shadow-lg.group-hover:shadow-xl.group-hover:shadow-emerald-600/20.group-hover:-translate-y-1
+            .absolute.inset-0.flex.items-center.justify-center
+              svg.w-10.h-10.text-emerald-600.group-hover:text-white.transition-colors.duration-300 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            .absolute.-top-2.-right-2.w-8.h-8.bg-white.rounded-full.flex.items-center.justify-center.shadow-md.text-emerald-600.font-bold.text-sm.border.border-emerald-100 4
+          h3.text-lg.font-bold.text-slate-900.mb-2 Вы получаете
+          p.text-slate-500.text-sm.leading-relaxed.max-w-44.mx-auto Готовую заявку с контактами
+
+/ ========================================
+/ BEFORE / AFTER Comparison
+/ ========================================
+section#compare.py-28.lg:py-36.bg-slate-50
+  .max-w-5xl.mx-auto.px-6.lg:px-8
+    / Section header
+    .text-center.mb-20
+      span.inline-block.px-4.py-1.5.bg-blue-50.text-blue-600.rounded-full.text-sm.font-medium.mb-4 Сравнение
+      h2.text-3xl.md:text-4xl.lg:text-5xl.font-bold.text-slate-900.tracking-tight
+        | До и После
+
+    .grid.md:grid-cols-2.gap-8
+
+      / Before card
+      .bg-white.rounded-3xl.p-8.lg:p-10.border-2.border-slate-200.relative.overflow-hidden
+        .absolute.top-0.right-0.w-40.h-40.bg-red-50.rounded-bl-full.opacity-50
+        .relative
+          .flex.items-center.gap-4.mb-8
+            .w-14.h-14.bg-red-100.rounded-2xl.flex.items-center.justify-center
+              svg.w-7.h-7.text-red-500 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
+            h3.text-2xl.font-bold.text-slate-900 Без бота
+
+          .space-y-5
+            .flex.items-start.gap-4
+              .w-8.h-8.bg-red-100.rounded-full.flex.items-center.justify-center.flex-shrink-0.mt-0.5
+                svg.w-4.h-4.text-red-500 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
+              div
+                .font-semibold.text-slate-900 Ответ за 30+ минут
+                .text-slate-500.text-sm Клиенты устают ждать
+
+            .flex.items-start.gap-4
+              .w-8.h-8.bg-red-100.rounded-full.flex.items-center.justify-center.flex-shrink-0.mt-0.5
+                svg.w-4.h-4.text-red-500 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
+              div
+                .font-semibold.text-slate-900 Работа 9:00-18:00
+                .text-slate-500.text-sm 40% заявок теряется вечером
+
+            .flex.items-start.gap-4
+              .w-8.h-8.bg-red-100.rounded-full.flex.items-center.justify-center.flex-shrink-0.mt-0.5
+                svg.w-4.h-4.text-red-500 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
+              div
+                .font-semibold.text-slate-900 Конверсия 15-20%
+                .text-slate-500.text-sm Много упущенных клиентов
+
+            .flex.items-start.gap-4
+              .w-8.h-8.bg-red-100.rounded-full.flex.items-center.justify-center.flex-shrink-0.mt-0.5
+                svg.w-4.h-4.text-red-500 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
+              div
+                .font-semibold.text-slate-900 Менеджер перегружен
+                .text-slate-500.text-sm Рутинные вопросы отнимают время
+
+      / After card - highlighted
+      .bg-white.rounded-3xl.p-8.lg:p-10.border-2.border-blue-200.relative.overflow-hidden.shadow-xl.shadow-blue-100/50
+        .absolute.top-0.right-0.w-40.h-40.bg-blue-50.rounded-bl-full.opacity-50
+        .absolute.top-5.right-5
+          .px-3.py-1.bg-blue-600.text-white.text-xs.font-semibold.rounded-full Рекомендуем
+        .relative
+          .flex.items-center.gap-4.mb-8
+            .w-14.h-14.bg-blue-100.rounded-2xl.flex.items-center.justify-center
+              svg.w-7.h-7.text-blue-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+            h3.text-2xl.font-bold.text-slate-900
+              | С #{ApplicationConfig.app_name}
+
+          .space-y-5
+            .flex.items-start.gap-4
+              .w-8.h-8.bg-emerald-100.rounded-full.flex.items-center.justify-center.flex-shrink-0.mt-0.5
+                svg.w-4.h-4.text-emerald-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+              div
+                .font-semibold.text-slate-900 Ответ за 3 секунды
+                .text-slate-500.text-sm Мгновенная реакция
+
+            .flex.items-start.gap-4
+              .w-8.h-8.bg-emerald-100.rounded-full.flex.items-center.justify-center.flex-shrink-0.mt-0.5
+                svg.w-4.h-4.text-emerald-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+              div
+                .font-semibold.text-slate-900 Работа 24/7
+                .text-slate-500.text-sm Даже ночью и в выходные
+
+            .flex.items-start.gap-4
+              .w-8.h-8.bg-emerald-100.rounded-full.flex.items-center.justify-center.flex-shrink-0.mt-0.5
+                svg.w-4.h-4.text-emerald-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+              div
+                .font-semibold.text-slate-900 Конверсия 35-45%
+                .text-slate-500.text-sm В 2 раза больше клиентов
+
+            .flex.items-start.gap-4
+              .w-8.h-8.bg-emerald-100.rounded-full.flex.items-center.justify-center.flex-shrink-0.mt-0.5
+                svg.w-4.h-4.text-emerald-600 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+              div
+                .font-semibold.text-slate-900 Менеджер свободен
+                .text-slate-500.text-sm Занимается важными задачами
+
+/ ========================================
+/ TESTIMONIAL - One large prominent review
+/ ========================================
+section#review.py-28.lg:py-36.bg-white
+  .max-w-4xl.mx-auto.px-6.lg:px-8
+    / Large quote icon
+    .text-center.mb-10
+      .inline-flex.items-center.justify-center.w-20.h-20.bg-blue-50.rounded-full
+        svg.w-10.h-10.text-blue-400 xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+          path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"
+
+    / Quote text - Large typography
+    blockquote.text-center.mb-12
+      p.text-2xl.md:text-3xl.lg:text-4xl.font-medium.text-slate-900.leading-relaxed.tracking-tight
+        | "Раньше теряли до 40% клиентов из-за долгого ответа. Сейчас #{ApplicationConfig.app_name} отвечает мгновенно — конверсия выросла на 40%, а менеджеры занимаются только важными задачами."
+
+    / Author section
+    .flex.flex-col.items-center
+      / Avatar with video play overlay
+      .relative.mb-6.group.cursor-pointer
+        .w-24.h-24.bg-gradient-to-br.from-blue-500.to-blue-600.rounded-full.flex.items-center.justify-center.shadow-xl.shadow-blue-500/30
+          span.text-3xl.font-bold.text-white АМ
+        / Play button overlay (for future video)
+        .absolute.inset-0.flex.items-center.justify-center.opacity-0.group-hover:opacity-100.transition-opacity.duration-300
+          .w-14.h-14.bg-white.rounded-full.flex.items-center.justify-center.shadow-xl
+            svg.w-6.h-6.text-blue-600.ml-1 xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+              path d="M8 5v14l11-7z"
+
+      / Author info
+      .text-center
+        .font-bold.text-slate-900.text-xl Алексей Морозов
+        .text-slate-500 Владелец AutoPro, Москва
+
+        / Stars
+        .flex.items-center.justify-center.gap-1.mt-4
+          - 5.times do
+            svg.w-6.h-6.text-yellow-400 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+
+/ ========================================
+/ CTA - Simple phone-only form
+/ ========================================
+section#form.py-28.lg:py-36.bg-gradient-to-br.from-blue-600.via-blue-700.to-blue-800.relative.overflow-hidden
+  / Background decorations
+  .absolute.inset-0.overflow-hidden
+    .absolute.top-0.right-0.w-96.h-96.bg-blue-500.rounded-full.opacity-20.blur-3xl.transform.translate-x-1/2.-translate-y-1/2
+    .absolute.bottom-0.left-0.w-96.h-96.bg-blue-400.rounded-full.opacity-20.blur-3xl.transform.-translate-x-1/2.translate-y-1/2
+
+  .relative.max-w-lg.mx-auto.px-6.lg:px-8.text-center
+    / Heading
+    h2.text-3xl.md:text-4xl.lg:text-5xl.font-bold.text-white.mb-4.tracking-tight
+      | Готовы начать?
+
+    / Subheading - minimal
+    p.text-xl.text-blue-100.mb-12
+      | Перезвоним за 15 минут
+
+    / Simple form - phone only
+    .bg-white.rounded-3xl.p-8.shadow-2xl.shadow-blue-900/30
+      = form_with model: @lead, url: leads_path, local: true, class: "space-y-5", data: { controller: "utm" } do |f|
+        - if @lead.errors.any?
+          .bg-red-50.border.border-red-200.text-red-700.px-4.py-3.rounded-2xl.mb-4
+            ul.list-disc.list-inside
+              - @lead.errors.full_messages.each do |message|
+                li.text-sm = message
+
+        / Hidden UTM fields
+        = f.hidden_field :utm_source, data: { utm_target: "source" }
+        = f.hidden_field :utm_medium, data: { utm_target: "medium" }
+        = f.hidden_field :utm_campaign, data: { utm_target: "campaign" }
+
+        / Phone input - large
+        = f.telephone_field :phone, class: "w-full px-6 py-5 text-lg border-2 border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 bg-slate-50 text-slate-900 transition-all placeholder-slate-400", placeholder: "+7 (999) 123-45-67", required: true, inputmode: "tel", autofocus: true
+
+        / Submit button
+        = f.submit "Жду звонка", class: "w-full bg-blue-600 text-white font-bold py-5 rounded-2xl text-lg hover:bg-blue-700 active:bg-blue-800 transition-all cursor-pointer shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 hover:-translate-y-0.5"
+
+      / Trust indicators
+      .flex.items-center.justify-center.gap-6.mt-6.text-slate-400.text-sm
+        .flex.items-center.gap-2
+          svg.w-4.h-4 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+          span Данные защищены
+
+    / Alternative contact
+    p.text-blue-100.mt-10
+      | Или напишите в
+      a.text-white.font-semibold.underline.underline-offset-4.decoration-2.hover:decoration-blue-300.transition-colors.ml-1 href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank"
+        | Telegram
+
+/ ========================================
+/ FOOTER - Minimal
+/ ========================================
+footer.py-12.bg-slate-900
+  .max-w-6xl.mx-auto.px-6.lg:px-8
+    .flex.flex-col.md:flex-row.justify-between.items-center.gap-8
+
+      / Logo & copyright
+      .flex.items-center.gap-4
+        .w-11.h-11.bg-blue-600.rounded-xl.flex.items-center.justify-center
+          span.text-white.font-bold.text-lg V
+        div
+          .text-white.font-semibold = ApplicationConfig.app_name
+          .text-slate-500.text-sm
+            | (c) #{Time.current.year}
+
+      / Links
+      .flex.flex-wrap.justify-center.gap-6.text-sm
+        a.text-slate-400.hover:text-white.transition-colors href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank" Telegram
+        a.text-slate-400.hover:text-white.transition-colors href="mailto:#{ApplicationConfig.support_email}" Email
+        a.text-slate-400.hover:text-white.transition-colors href=ApplicationConfig.offer_url target="_blank" Оферта
+        a.text-slate-400.hover:text-white.transition-colors href=ApplicationConfig.requisites_url target="_blank" Реквизиты
+
+      / Telegram icon
+      a.w-11.h-11.bg-slate-800.rounded-xl.flex.items-center.justify-center.hover:bg-slate-700.transition-colors href="https://t.me/#{ApplicationConfig.support_telegram}" target="_blank"
+        svg.w-5.h-5.text-slate-400 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+          path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.242-1.865-.44-.751-.245-1.349-.374-1.297-.789.027-.216.324-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.121.1.155.234.17.332.015.098.034.321.019.496z"
