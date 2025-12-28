@@ -318,7 +318,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_174343) do
     t.string "key", null: false
     t.datetime "last_message_at"
     t.bigint "manager_id"
-    t.string "name"
+    t.string "name", null: false
     t.bigint "owner_id"
     t.text "price_list"
     t.text "system_prompt"
@@ -327,6 +327,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_174343) do
     t.text "welcome_message"
     t.index ["key"], name: "index_tenants_on_key", unique: true
     t.index ["manager_id"], name: "index_tenants_on_manager_id"
+    t.index ["name"], name: "index_tenants_on_name", unique: true
     t.index ["owner_id"], name: "index_tenants_on_owner_id"
   end
 
@@ -344,7 +345,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_174343) do
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "email"
+    t.string "email", null: false
     t.string "name"
     t.string "password_digest"
     t.bigint "telegram_user_id"
