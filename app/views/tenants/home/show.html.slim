@@ -219,6 +219,14 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
         .h-48
           canvas data-cost-chart-target="canvas" data-cost-chart-labels=@stats.llm_costs[:chart_data][:labels].to_json data-cost-chart-values=@stats.llm_costs[:chart_data][:values].to_json
 
+  / Активность по времени суток
+  - if @stats.hourly_distribution.sum { |h| h[:count] } > 0
+    .mt-8.bg-white.rounded-lg.shadow.p-6 data-controller="hourly-chart"
+      h2.text-lg.font-semibold.text-gray-800.mb-4 🕐 Активность по времени суток
+
+      .h-96
+        canvas data-hourly-chart-target="canvas" data-hourly-chart-data=hourly_distribution_chart_data(@stats.hourly_distribution)
+
   / Последние диалоги
   .mt-8.bg-white.rounded-lg.shadow.p-6
     h2.text-lg.font-semibold.text-gray-800.mb-4 🕐 Последние диалоги

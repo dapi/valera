@@ -29,6 +29,7 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_respond_to result, :recent_chats
     assert_respond_to result, :funnel_data
     assert_respond_to result, :funnel_trend
+    assert_respond_to result, :hourly_distribution
   end
 
   test 'counts total clients for tenant' do
@@ -577,6 +578,153 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal 2, current_week.chats_count
     assert_equal 1, current_week.bookings_count
     assert_equal 50.0, current_week.conversion_rate
+  end
+
+  # === hourly_distribution ===
+
+  test 'hourly_distribution returns array of 24 hours' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_kind_of Array, result.hourly_distribution
+    assert_equal 24, result.hourly_distribution.size
+  end
+
+  test 'hourly_distribution contains hash with hour and count keys' do
+    result = DashboardStatsService.new(@tenant).call
+
+    result.hourly_distribution.each do |hour_data|
+      assert_kind_of Hash, hour_data
+      assert_includes hour_data.keys, :hour
+      assert_includes hour_data.keys, :count
+    end
+  end
+
+  test 'hourly_distribution hours are ordered 0 to 23' do
+    result = DashboardStatsService.new(@tenant).call
+
+    hours = result.hourly_distribution.map { |h| h[:hour] }
+    assert_equal (0..23).to_a, hours
+  end
+
+  test 'hourly_distribution counts are non-negative integers' do
+    result = DashboardStatsService.new(@tenant).call
+
+    result.hourly_distribution.each do |hour_data|
+      assert_kind_of Integer, hour_data[:count]
+      assert_operator hour_data[:count], :>=, 0
+    end
+  end
+
+  test 'hourly_distribution counts only user messages' do
+    # Создаём изолированный тенант
+    user = User.create!(name: 'Hourly User', email: 'hourly_user@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Hourly Tenant', bot_token: '444444444:HOURLYTEST', bot_username: 'hourly_test_bot', owner: user)
+    tg_user = TelegramUser.create!(username: 'hourly_user', first_name: 'Hourly')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'Hourly Client')
+    chat = tenant.chats.create!(client: client)
+
+    # Создаём 3 user сообщения и 2 assistant сообщения
+    3.times { chat.messages.create!(role: 'user', content: 'User message') }
+    2.times { chat.messages.create!(role: 'assistant', content: 'Assistant message') }
+
+    result = DashboardStatsService.new(tenant).call
+    total_count = result.hourly_distribution.sum { |h| h[:count] }
+
+    # Должно быть 3 (только user сообщения)
+    assert_equal 3, total_count
+  end
+
+  test 'hourly_distribution respects period filter' do
+    # Создаём изолированный тенант
+    user = User.create!(name: 'Hourly Period', email: 'hourly_period@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Hourly Period Tenant', bot_token: '555555555:HOURLYPERIOD', bot_username: 'hourly_period_bot', owner: user)
+    tg_user = TelegramUser.create!(username: 'hourly_period_user', first_name: 'HourlyPeriod')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'Hourly Period Client')
+    chat = tenant.chats.create!(client: client)
+
+    # Создаём сообщение сегодня
+    chat.messages.create!(role: 'user', content: 'Today message')
+
+    # Создаём сообщение 10 дней назад (вне 7-дневного периода)
+    chat.messages.create!(role: 'user', content: 'Old message', created_at: 10.days.ago)
+
+    result = DashboardStatsService.new(tenant, period: 7).call
+    total_count = result.hourly_distribution.sum { |h| h[:count] }
+
+    # Должно быть 1 (только сегодняшнее сообщение)
+    assert_equal 1, total_count
+  end
+
+  test 'hourly_distribution groups messages by hour in local timezone' do
+    # Создаём изолированный тенант
+    user = User.create!(name: 'Hourly Group', email: 'hourly_group@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Hourly Group Tenant', bot_token: '666666666:HOURLYGROUP', bot_username: 'hourly_group_bot', owner: user)
+    tg_user = TelegramUser.create!(username: 'hourly_group_user', first_name: 'HourlyGroup')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'Hourly Group Client')
+    chat = tenant.chats.create!(client: client)
+
+    # Создаём сообщения в локальном времени (Time.zone)
+    # Сервис группирует по локальному часу, а не UTC
+    today_10am_local = Time.zone.now.beginning_of_day + 10.hours + 30.minutes
+    today_2pm_local = Time.zone.now.beginning_of_day + 14.hours + 15.minutes
+
+    2.times { chat.messages.create!(role: 'user', content: 'Morning message', created_at: today_10am_local) }
+    3.times { chat.messages.create!(role: 'user', content: 'Afternoon message', created_at: today_2pm_local) }
+
+    result = DashboardStatsService.new(tenant).call
+
+    hour_10_count = result.hourly_distribution.find { |h| h[:hour] == 10 }[:count]
+    hour_14_count = result.hourly_distribution.find { |h| h[:hour] == 14 }[:count]
+
+    assert_equal 2, hour_10_count
+    assert_equal 3, hour_14_count
+  end
+
+  test 'hourly_distribution isolates data by tenant' do
+    # Tenant 1 с 2 сообщениями
+    user1 = User.create!(name: 'Hourly Iso 1', email: 'hourly_iso1@test.com', password: 'password123')
+    tenant1 = Tenant.create!(name: 'Hourly Iso Tenant 1', bot_token: '777777777:HOURLYiso1', bot_username: 'hourly_iso_bot1', owner: user1)
+    tg_user1 = TelegramUser.create!(username: 'hourly_iso_user1', first_name: 'HourlyIso1')
+    client1 = tenant1.clients.create!(telegram_user: tg_user1, name: 'Hourly Iso Client 1')
+    chat1 = tenant1.chats.create!(client: client1)
+    2.times { chat1.messages.create!(role: 'user', content: 'Tenant1 message') }
+
+    # Tenant 2 с 5 сообщениями
+    user2 = User.create!(name: 'Hourly Iso 2', email: 'hourly_iso2@test.com', password: 'password123')
+    tenant2 = Tenant.create!(name: 'Hourly Iso Tenant 2', bot_token: '888888888:HOURLYiso2', bot_username: 'hourly_iso_bot2', owner: user2)
+    tg_user2 = TelegramUser.create!(username: 'hourly_iso_user2', first_name: 'HourlyIso2')
+    client2 = tenant2.clients.create!(telegram_user: tg_user2, name: 'Hourly Iso Client 2')
+    chat2 = tenant2.chats.create!(client: client2)
+    5.times { chat2.messages.create!(role: 'user', content: 'Tenant2 message') }
+
+    result1 = DashboardStatsService.new(tenant1).call
+    result2 = DashboardStatsService.new(tenant2).call
+
+    total1 = result1.hourly_distribution.sum { |h| h[:count] }
+    total2 = result2.hourly_distribution.sum { |h| h[:count] }
+
+    # Каждый тенант видит только свои данные
+    assert_equal 2, total1
+    assert_equal 5, total2
+  end
+
+  test 'hourly_distribution returns zeros when no messages' do
+    # Создаём тенант без сообщений
+    user = User.create!(name: 'Empty Hourly', email: 'empty_hourly@test.com', password: 'password123')
+    empty_tenant = Tenant.create!(name: 'Empty Hourly Tenant', bot_token: '999999999:EMPTYHOURLY', bot_username: 'empty_hourly_bot', owner: user)
+
+    result = DashboardStatsService.new(empty_tenant).call
+
+    # Все часы должны иметь count = 0
+    result.hourly_distribution.each do |hour_data|
+      assert_equal 0, hour_data[:count]
+    end
+  end
+
+  test 'result struct includes hourly_distribution' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_respond_to result, :hourly_distribution
   end
 
   # === popular_topics ===
