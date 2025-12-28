@@ -6,6 +6,7 @@ module Tenants
   # Показывает список заявок с пагинацией и фильтрацией по дате,
   # а также детальную информацию о заявке.
   class BookingsController < ApplicationController
+    include ErrorLogger
     PER_PAGE = 20
     PERIOD_FILTERS = {
       'today' => -> { Date.current.beginning_of_day },
@@ -53,7 +54,13 @@ module Tenants
       date = Date.parse(params[param])
       boundary = date.send(time_method)
       @bookings = @bookings.where("bookings.created_at #{operator} ?", boundary)
-    rescue Date::Error
+    rescue Date::Error => e
+      log_error(e, {
+        controller: 'Tenants::BookingsController',
+        action: 'apply_date_boundary',
+        param: param,
+        value: params[param]
+      })
       flash.now[:alert] = t('tenants.bookings.index.invalid_date_format')
     end
   end
