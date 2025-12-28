@@ -388,6 +388,13 @@ ru:
       update:
         success: Настройки сохранены
         key_changed: Поддомен изменён. Вы перенаправлены на новый адрес.
+    webhooks:
+      create:
+        success: Webhook успешно установлен
+        error: "Ошибка установки webhook: %{message}"
+      destroy:
+        success: Webhook удалён
+        error: "Ошибка удаления webhook: %{message}"
     clients:
       index:
         title: Клиенты
