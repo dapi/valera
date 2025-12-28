@@ -2,7 +2,7 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
 
 = turbo_frame_tag "dashboard_stats" do
   / KPI Карточки
-  .grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-4.gap-6
+  .grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-5.gap-6
     / Clients card — кликабельная
     = link_to tenant_clients_path, class: "bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow block"
       .flex.items-center.justify-between
@@ -36,6 +36,14 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
         .text-sm.font-medium.text-gray-500 Сообщений сегодня
         span.text-2xl 📨
       .text-3xl.font-bold.text-gray-800.mt-2 = @stats.messages_today
+
+    / Average messages per dialog card
+    .bg-white.rounded-lg.shadow.p-6
+      .flex.items-center.justify-between
+        .text-sm.font-medium.text-gray-500 Сообщений в диалоге
+        span.text-2xl 📊
+      .text-3xl.font-bold.text-gray-800.mt-2 = @stats.avg_messages_per_dialog
+      .text-sm.text-gray-500.mt-1 в среднем
 
   / График активности и Воронка конверсии
   .grid.grid-cols-1.lg:grid-cols-3.gap-6.mt-8
@@ -79,6 +87,36 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
           .flex.items-center.justify-between
             span.text-sm.font-medium.text-gray-600 Конверсия
             span.text-2xl.font-bold.text-green-600 #{@stats.funnel_data[:conversion_rate]}%
+
+      / Тренд конверсии по неделям
+      - if @stats.funnel_trend.present? && @stats.funnel_trend.size > 1
+        .mt-6.pt-4.border-t.border-gray-200
+          h3.text-sm.font-medium.text-gray-500.mb-3 Тренд по неделям
+          .overflow-x-auto
+            table.w-full.text-sm
+              thead
+                tr.text-left.text-gray-500.border-b
+                  th.py-2.pr-2 Неделя
+                  th.py-2.px-2.text-right Диалоги
+                  th.py-2.px-2.text-right Заявки
+                  th.py-2.pl-2.text-right Конверсия
+              tbody
+                - prev_conversion = nil
+                - @stats.funnel_trend.each do |week|
+                  tr.border-b.border-gray-100
+                    td.py-2.pr-2.text-gray-600
+                      = "#{week[:week_start].strftime('%d.%m')} - #{week[:week_end].strftime('%d.%m')}"
+                    td.py-2.px-2.text-right.text-gray-800 = week[:chats]
+                    td.py-2.px-2.text-right.text-gray-800 = week[:bookings]
+                    td.py-2.pl-2.text-right
+                      span.font-medium class=(week[:conversion] > 0 ? 'text-green-600' : 'text-gray-400')
+                        = "#{week[:conversion]}%"
+                      - if prev_conversion.present?
+                        - if week[:conversion] > prev_conversion
+                          span.ml-1.text-green-500 ↑
+                        - elsif week[:conversion] < prev_conversion
+                          span.ml-1.text-red-500 ↓
+                      - prev_conversion = week[:conversion]
 
   / Расходы на AI
   .mt-8.bg-white.rounded-lg.shadow.p-6

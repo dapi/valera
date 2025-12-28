@@ -53,7 +53,7 @@ module Tenants
 
     def redirect_to_new_subdomain
       new_host = "#{@tenant.key}.#{ApplicationConfig.host}"
-      port_suffix = request.port.in?([80, 443]) ? '' : ":#{request.port}"
+      port_suffix = request.port.in?([ 80, 443 ]) ? '' : ":#{request.port}"
       new_url = "#{request.protocol}#{new_host}#{port_suffix}#{edit_tenant_settings_path}"
 
       redirect_to new_url, notice: t('.key_changed'), allow_other_host: true

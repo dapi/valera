@@ -44,20 +44,32 @@ module Tenants
     end
 
     def apply_custom_date_range
-      apply_date_boundary(:date_from, :>=, :beginning_of_day)
-      apply_date_boundary(:date_to, :<=, :end_of_day)
+      apply_date_from_filter
+      apply_date_to_filter
     end
 
-    def apply_date_boundary(param, operator, time_method)
-      return unless params[param].present?
+    def apply_date_from_filter
+      return unless params[:date_from].present?
 
-      date = Date.parse(params[param])
-      boundary = date.send(time_method)
-      @bookings = @bookings.where("bookings.created_at #{operator} ?", boundary)
+      date = Date.parse(params[:date_from])
+      @bookings = @bookings.where(Booking.arel_table[:created_at].gteq(date.beginning_of_day))
     rescue Date::Error => e
-      log_error(e, {
+      handle_date_error(e, :date_from)
+    end
+
+    def apply_date_to_filter
+      return unless params[:date_to].present?
+
+      date = Date.parse(params[:date_to])
+      @bookings = @bookings.where(Booking.arel_table[:created_at].lteq(date.end_of_day))
+    rescue Date::Error => e
+      handle_date_error(e, :date_to)
+    end
+
+    def handle_date_error(error, param)
+      log_error(error, {
         controller: 'Tenants::BookingsController',
-        action: 'apply_date_boundary',
+        action: 'apply_custom_date_range',
         param: param,
         value: params[param]
       })
