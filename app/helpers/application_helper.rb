@@ -41,4 +41,14 @@ module ApplicationHelper
 
     number_with_delimiter(count)
   end
+
+  # Форматирует данные почасового распределения для Chart.js
+  # hourly_distribution_chart_data([{hour: 0, count: 5}, ...])
+  # => { labels: ["00:00", "01:00", ...], values: [5, ...] }.to_json
+  def hourly_distribution_chart_data(data)
+    {
+      labels: data.map { |h| format('%02d:00', h[:hour]) },
+      values: data.map { |h| h[:count] }
+    }.to_json
+  end
 end
