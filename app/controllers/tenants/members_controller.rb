@@ -3,10 +3,11 @@
 module Tenants
   # Контроллер для управления сотрудниками tenant'а
   #
-  # Позволяет owner'у и admin'ам приглашать новых сотрудников,
+  # Все члены команды могут просматривать список сотрудников (index).
+  # Owner и admin могут приглашать новых сотрудников,
   # управлять существующими членами команды и изменять их роли.
   class MembersController < ApplicationController
-    before_action :require_admin!
+    before_action :require_admin!, except: [:index]
     before_action :set_membership, only: %i[update destroy]
 
     # GET /members
