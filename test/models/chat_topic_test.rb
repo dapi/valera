@@ -154,7 +154,8 @@ class ChatTopicTest < ActiveSupport::TestCase
   end
 
   test 'fallback_topic returns global other when no tenant other exists' do
-    global_other = ChatTopic.create!(key: 'other', label: 'Other')
+    # global_other уже существует в fixtures
+    global_other = chat_topics(:global_other)
 
     result = ChatTopic.fallback_topic(@tenant)
 
@@ -162,6 +163,9 @@ class ChatTopicTest < ActiveSupport::TestCase
   end
 
   test 'fallback_topic returns nil when no other topic exists' do
+    # Удаляем all 'other' топики для теста
+    ChatTopic.where(key: 'other').destroy_all
+
     result = ChatTopic.fallback_topic(@tenant)
 
     assert_nil result

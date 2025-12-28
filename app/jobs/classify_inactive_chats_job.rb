@@ -18,11 +18,16 @@ class ClassifyInactiveChatsJob < ApplicationJob
   queue_as :low_priority
 
   # Не перезапускаем при ошибках - следующий запуск по расписанию обработает
-  discard_on StandardError
+  # Логируем ошибку перед discard для мониторинга
+  discard_on StandardError do |job, error|
+    job.send(:log_error, error, context: {
+      job: job.class.name,
+      error_type: 'job_discarded',
+      message: 'Job discarded - will be retried on next scheduled run'
+    })
+  end
 
   def perform
-    hours = TopicClassifierConfig.inactivity_hours
-
     inactive_chats.find_each do |chat|
       ClassifyChatTopicJob.perform_later(chat.id)
     rescue StandardError => e

@@ -6,8 +6,9 @@ class ChatTopicClassifierTest < ActiveSupport::TestCase
   setup do
     @tenant = tenants(:one)
     @chat = chats(:one)
-    @topic = ChatTopic.create!(key: 'service_booking', label: 'Запись на обслуживание')
-    ChatTopic.create!(key: 'other', label: 'Другое')
+    # Используем fixtures или find_or_create для избежания конфликтов
+    @topic = chat_topics(:global_service_booking)
+    # other топик уже есть в fixtures (global_other)
   end
 
   test 'returns existing topic if already classified' do
@@ -49,7 +50,7 @@ class ChatTopicClassifierTest < ActiveSupport::TestCase
     @chat.messages.destroy_all
     @chat.messages.create!(role: 'user', content: 'Непонятное сообщение')
 
-    fallback = ChatTopic.find_by(key: 'other')
+    fallback = chat_topics(:global_other)
 
     mock_response = stub(content: 'unknown_key_xyz')
     mock_chat = stub(ask: mock_response)
