@@ -211,4 +211,72 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal 0, result.funnel_data[:chats_count]
     assert_equal 0.0, result.funnel_data[:conversion_rate]
   end
+
+  # === llm_costs ===
+
+  test 'returns llm_costs in result' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_respond_to result, :llm_costs
+    assert_kind_of Hash, result.llm_costs
+  end
+
+  test 'llm_costs contains totals, by_model, by_day and chart_data' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_includes result.llm_costs.keys, :totals
+    assert_includes result.llm_costs.keys, :by_model
+    assert_includes result.llm_costs.keys, :by_day
+    assert_includes result.llm_costs.keys, :chart_data
+  end
+
+  test 'llm_costs totals is a Totals struct' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_kind_of LlmCostCalculator::Totals, result.llm_costs[:totals]
+    assert_respond_to result.llm_costs[:totals], :input_tokens
+    assert_respond_to result.llm_costs[:totals], :output_tokens
+    assert_respond_to result.llm_costs[:totals], :total_cost
+  end
+
+  test 'llm_costs by_model is an array' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_kind_of Array, result.llm_costs[:by_model]
+  end
+
+  test 'llm_costs by_day is an array' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_kind_of Array, result.llm_costs[:by_day]
+  end
+
+  test 'llm_costs chart_data has labels and values' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_includes result.llm_costs[:chart_data].keys, :labels
+    assert_includes result.llm_costs[:chart_data].keys, :values
+    assert_kind_of Array, result.llm_costs[:chart_data][:labels]
+    assert_kind_of Array, result.llm_costs[:chart_data][:values]
+  end
+
+  test 'llm_costs chart_data labels match period' do
+    result = DashboardStatsService.new(@tenant, period: 7).call
+
+    assert_equal 8, result.llm_costs[:chart_data][:labels].size
+    assert_equal 8, result.llm_costs[:chart_data][:values].size
+  end
+
+  test 'llm_costs includes token and cost data from messages' do
+    chat = chats(:one)
+    chat.messages.destroy_all
+
+    model = models(:one)
+    chat.messages.create!(role: 'user', content: 'Test', model: model, input_tokens: 1000, output_tokens: 500)
+
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_equal 1000, result.llm_costs[:totals].input_tokens
+    assert_equal 500, result.llm_costs[:totals].output_tokens
+  end
 end
