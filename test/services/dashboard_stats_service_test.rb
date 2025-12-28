@@ -279,4 +279,117 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal 1000, result.llm_costs[:totals].input_tokens
     assert_equal 500, result.llm_costs[:totals].output_tokens
   end
+
+  # === funnel_trend ===
+
+  test 'returns funnel_trend in result' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_respond_to result, :funnel_trend
+    assert_kind_of Array, result.funnel_trend
+  end
+
+  test 'funnel_trend returns WeekData structs' do
+    result = DashboardStatsService.new(@tenant).call
+
+    result.funnel_trend.each do |week_data|
+      assert_kind_of DashboardStatsService::WeekData, week_data
+      assert_respond_to week_data, :week_start
+      assert_respond_to week_data, :week_end
+      assert_respond_to week_data, :chats_count
+      assert_respond_to week_data, :bookings_count
+      assert_respond_to week_data, :conversion_rate
+    end
+  end
+
+  test 'funnel_trend returns 4 weeks for 7-day period' do
+    result = DashboardStatsService.new(@tenant, period: 7).call
+
+    assert_equal 4, result.funnel_trend.size
+  end
+
+  test 'funnel_trend returns 8 weeks for 30-day period' do
+    result = DashboardStatsService.new(@tenant, period: 30).call
+
+    assert_equal 8, result.funnel_trend.size
+  end
+
+  test 'funnel_trend returns 12 weeks for 90-day period' do
+    result = DashboardStatsService.new(@tenant, period: 90).call
+
+    assert_equal 12, result.funnel_trend.size
+  end
+
+  test 'funnel_trend returns 8 weeks for all-time period' do
+    result = DashboardStatsService.new(@tenant, period: nil).call
+
+    assert_equal 8, result.funnel_trend.size
+  end
+
+  test 'funnel_trend weeks are ordered chronologically (oldest first)' do
+    result = DashboardStatsService.new(@tenant).call
+
+    return if result.funnel_trend.size < 2
+
+    result.funnel_trend.each_cons(2) do |earlier, later|
+      assert_operator earlier.week_start, :<, later.week_start
+    end
+  end
+
+  test 'funnel_trend week_start is always a Monday' do
+    result = DashboardStatsService.new(@tenant).call
+
+    result.funnel_trend.each do |week_data|
+      assert_equal 1, week_data.week_start.cwday, "week_start should be Monday"
+    end
+  end
+
+  test 'funnel_trend week_end is always a Sunday' do
+    result = DashboardStatsService.new(@tenant).call
+
+    result.funnel_trend.each do |week_data|
+      assert_equal 0, week_data.week_end.wday, "week_end should be Sunday"
+    end
+  end
+
+  test 'funnel_trend counts chats and bookings correctly' do
+    # Создаём чат и букинг на текущей неделе
+    tg_user = TelegramUser.create!(username: 'trend_test_user', first_name: 'Trend')
+    client = @tenant.clients.create!(telegram_user: tg_user, name: 'Trend Client')
+    chat = @tenant.chats.create!(client: client)
+    @tenant.bookings.create!(chat: chat, client: client)
+
+    result = DashboardStatsService.new(@tenant).call
+    current_week = result.funnel_trend.last
+
+    assert_operator current_week.chats_count, :>=, 1
+    assert_operator current_week.bookings_count, :>=, 1
+  end
+
+  test 'funnel_trend calculates conversion_rate correctly' do
+    result = DashboardStatsService.new(@tenant).call
+
+    result.funnel_trend.each do |week_data|
+      if week_data.chats_count.positive?
+        expected_rate = (week_data.bookings_count.to_f / week_data.chats_count * 100).round(1)
+        assert_equal expected_rate, week_data.conversion_rate
+      else
+        assert_equal 0.0, week_data.conversion_rate
+      end
+    end
+  end
+
+  test 'funnel_trend returns zero counts for weeks without data' do
+    # Создаём новый тенант без данных
+    user = User.create!(name: 'Empty Trend Owner', email: 'empty_trend@test.com', password: 'password123')
+    empty_tenant = Tenant.create!(name: 'Empty Trend Tenant', bot_token: '888888888:ABCdefGHIjklMNOpqrsTUVwxyz', bot_username: 'empty_trend_bot', owner: user)
+
+    result = DashboardStatsService.new(empty_tenant).call
+
+    result.funnel_trend.each do |week_data|
+      assert_equal 0, week_data.chats_count
+      assert_equal 0, week_data.bookings_count
+      assert_equal 0.0, week_data.conversion_rate
+    end
+  end
 end

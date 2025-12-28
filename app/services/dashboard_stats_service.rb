@@ -23,9 +23,13 @@ class DashboardStatsService
     :chart_data,
     :recent_chats,
     :funnel_data,
+    :funnel_trend,
     :llm_costs,
     keyword_init: true
   )
+
+  # Структура для понедельных данных воронки
+  WeekData = Struct.new(:week_start, :week_end, :chats_count, :bookings_count, :conversion_rate, keyword_init: true)
 
   # @param tenant [Tenant] тенант для которого собирается статистика
   # @param period [Integer, nil] период для графика в днях (по умолчанию 7, nil = всё время)
@@ -55,6 +59,7 @@ class DashboardStatsService
       chart_data: build_chart_data,
       recent_chats: fetch_recent_chats,
       funnel_data: build_funnel_data,
+      funnel_trend: build_funnel_trend,
       llm_costs: build_llm_costs
     )
   end
@@ -141,6 +146,60 @@ class DashboardStatsService
       bookings_count: bookings_count,
       conversion_rate: conversion_rate
     }
+  end
+
+  # Рассчитывает понедельный тренд воронки конверсии
+  # Возвращает данные за последние N недель в зависимости от периода
+  #
+  # @return [Array<WeekData>] массив данных по неделям
+  def build_funnel_trend
+    weeks_count = calculate_weeks_count
+    return [] if weeks_count.zero?
+
+    start_date = (Date.current - (weeks_count - 1).weeks).beginning_of_week.beginning_of_day
+    end_date = Date.current.end_of_week.end_of_day
+    date_range = start_date..end_date
+
+    # 2 SQL запроса вместо 2×N (группировка по дате начала недели)
+    chats_by_week = tenant.chats
+                          .where(created_at: date_range)
+                          .group("DATE(DATE_TRUNC('week', created_at))")
+                          .count
+
+    bookings_by_week = bookings
+                       .where(created_at: date_range)
+                       .group("DATE(DATE_TRUNC('week', created_at))")
+                       .count
+
+    # Собираем недели от старой к новой
+    (0...weeks_count).map do |i|
+      week_start = (Date.current - (weeks_count - 1 - i).weeks).beginning_of_week
+      week_key = week_start.to_date
+
+      chats_count = chats_by_week[week_key] || 0
+      bookings_count = bookings_by_week[week_key] || 0
+      rate = chats_count.positive? ? (bookings_count.to_f / chats_count * 100).round(1) : 0.0
+
+      WeekData.new(
+        week_start: week_start,
+        week_end: week_start.end_of_week,
+        chats_count: chats_count,
+        bookings_count: bookings_count,
+        conversion_rate: rate
+      )
+    end
+  end
+
+  # Определяет количество недель для отображения тренда
+  def calculate_weeks_count
+    return 8 if period.nil? # Для "всё время" показываем 8 недель
+
+    case period
+    when 7 then 4    # 4 недели для 7-дневного периода
+    when 30 then 8   # 8 недель для 30-дневного периода
+    when 90 then 12  # 12 недель для 90-дневного периода
+    else 4
+    end
   end
 
   def build_llm_costs

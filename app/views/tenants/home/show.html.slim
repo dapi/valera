@@ -80,6 +80,45 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
             span.text-sm.font-medium.text-gray-600 Конверсия
             span.text-2xl.font-bold.text-green-600 #{@stats.funnel_data[:conversion_rate]}%
 
+  / Тренд воронки по неделям
+  - if @stats.funnel_trend.any?
+    .mt-8.bg-white.rounded-lg.shadow.p-6
+      h2.text-lg.font-semibold.text-gray-800.mb-4 📈 Тренд конверсии по неделям
+
+      .overflow-x-auto
+        table.min-w-full.divide-y.divide-gray-200
+          thead.bg-gray-50
+            tr
+              th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Неделя
+              th.px-4.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Диалоги
+              th.px-4.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Заявки
+              th.px-4.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Конверсия
+              th.px-4.py-3.text-center.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Тренд
+          tbody.bg-white.divide-y.divide-gray-200
+            - @stats.funnel_trend.each_with_index do |week, index|
+              - prev_week = index > 0 ? @stats.funnel_trend[index - 1] : nil
+              - trend_diff = prev_week ? (week.conversion_rate - prev_week.conversion_rate).round(1) : nil
+              tr
+                td.px-4.py-3.whitespace-nowrap.text-sm.text-gray-900
+                  = "#{week.week_start.strftime('%d.%m')} - #{week.week_end.strftime('%d.%m')}"
+                td.px-4.py-3.whitespace-nowrap.text-sm.text-gray-900.text-right
+                  = week.chats_count
+                td.px-4.py-3.whitespace-nowrap.text-sm.text-gray-900.text-right
+                  = week.bookings_count
+                td.px-4.py-3.whitespace-nowrap.text-sm.font-medium.text-right
+                  span class=(week.conversion_rate >= 10 ? 'text-green-600' : week.conversion_rate >= 5 ? 'text-yellow-600' : 'text-gray-600')
+                    = "#{week.conversion_rate}%"
+                td.px-4.py-3.whitespace-nowrap.text-sm.text-center
+                  - if trend_diff
+                    - if trend_diff > 0
+                      span.text-green-600 ↑ +#{trend_diff}%
+                    - elsif trend_diff < 0
+                      span.text-red-600 ↓ #{trend_diff}%
+                    - else
+                      span.text-gray-400 —
+                  - else
+                    span.text-gray-400 —
+
   / Расходы на AI
   .mt-8.bg-white.rounded-lg.shadow.p-6
     h2.text-lg.font-semibold.text-gray-800.mb-4 💰 Расходы на AI
