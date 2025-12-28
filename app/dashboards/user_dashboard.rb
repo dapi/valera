@@ -7,6 +7,7 @@ class UserDashboard < Administrate::BaseDashboard
     id: Field::Number,
     email: Field::Email,
     name: Field::String,
+    password: Field::Password,
     telegram_user: Field::BelongsTo,
     owned_tenants: Field::HasMany,
     tenant_memberships: Field::HasMany,
@@ -37,6 +38,7 @@ class UserDashboard < Administrate::BaseDashboard
     name
     email
     telegram_user
+    password
   ].freeze
 
   COLLECTION_FILTERS = {}.freeze
