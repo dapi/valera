@@ -47,6 +47,9 @@ module Valera
     # For '3010.brandymint.ru' -> tld_length=2 -> subdomain 'admin' (not 'admin.3010')
     config.action_dispatch.tld_length = ApplicationConfig.tld_length
 
+    # Session cookie shared across all subdomains
+    config.session_store :cookie_store, key: '_session', domain: :all
+
     # Configure default URL options for route helpers and mailers
     Rails.application.routes.default_url_options = ApplicationConfig.default_url_options
   end

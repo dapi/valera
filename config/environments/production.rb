@@ -103,10 +103,6 @@ Rails.application.configure do
   # Rate limiting configuration
   config.action_dispatch.rescue_responses['ActionController::RoutingError'] = :not_found
 
-  # Production-specific performance optimizations
-  config.middleware.use ActionDispatch::Cookies
-  config.middleware.use ActionDispatch::Session::CookieStore
-
   # Enable detailed error logging for monitoring
   config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'info')
 
