@@ -116,5 +116,48 @@ module Tenants
 
       assert_response :not_found
     end
+
+    test 'filters bookings by period today' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/bookings', params: { period: 'today' }
+
+      assert_response :success
+      assert_select 'a.bg-blue-500', text: 'Сегодня'
+    end
+
+    test 'filters bookings by period week' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/bookings', params: { period: 'week' }
+
+      assert_response :success
+      assert_select 'a.bg-blue-500', text: 'Неделя'
+    end
+
+    test 'filters bookings by period month' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/bookings', params: { period: 'month' }
+
+      assert_response :success
+      assert_select 'a.bg-blue-500', text: 'Месяц'
+    end
+
+    test 'shows quick period filter buttons' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/bookings'
+
+      assert_response :success
+      assert_select 'a', text: 'Все'
+      assert_select 'a', text: 'Сегодня'
+      assert_select 'a', text: 'Неделя'
+      assert_select 'a', text: 'Месяц'
+    end
   end
 end

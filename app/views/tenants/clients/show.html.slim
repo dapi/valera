@@ -63,7 +63,7 @@
     .p-6.text-center.text-gray-500 = t('.no_vehicles')
 
 / Bookings section
-.bg-white.rounded-lg.shadow.overflow-hidden
+.bg-white.rounded-lg.shadow.overflow-hidden.mb-6
   .px-6.py-4.border-b.border-gray-200
     h2.text-lg.font-semibold.text-gray-800 = t('.bookings_title')
 
@@ -86,3 +86,24 @@
               = link_to t('.view_booking'), tenant_booking_path(booking), class: "text-blue-600 hover:text-blue-900"
   - else
     .p-6.text-center.text-gray-500 = t('.no_bookings')
+
+/ Chats section
+.bg-white.rounded-lg.shadow.overflow-hidden
+  .px-6.py-4.border-b.border-gray-200
+    h2.text-lg.font-semibold.text-gray-800 = t('.chats_title')
+
+  - if @client.chats.any?
+    .divide-y.divide-gray-200
+      - @client.chats.order(created_at: :desc).each do |chat|
+        .px-6.py-4.flex.items-center.justify-between.hover:bg-gray-50
+          .flex.items-center.gap-3
+            span.text-xl 💬
+            div
+              .text-sm.font-medium.text-gray-900
+                = t('.chat_default_title', id: chat.id)
+              .text-xs.text-gray-500
+                = t('.messages_count', count: chat.messages.size)
+                span.ml-2 = l(chat.created_at, format: :short)
+          = link_to t('.view_chat'), tenant_chat_path(chat), class: "text-blue-600 hover:text-blue-900 text-sm"
+  - else
+    .p-6.text-center.text-gray-500 = t('.no_chats')

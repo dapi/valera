@@ -99,6 +99,16 @@ module Tenants
       assert_select 'h2', /Заявки/
     end
 
+    test 'shows client chats section' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get "/clients/#{@client.id}"
+
+      assert_response :success
+      assert_select 'h2', /Чаты/
+    end
+
     test 'returns 404 for client from another tenant' do
       other_client = clients(:two)
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
@@ -107,6 +117,54 @@ module Tenants
       get "/clients/#{other_client.id}"
 
       assert_response :not_found
+    end
+
+    test 'sorts clients by name ascending' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/clients', params: { sort: 'name', direction: 'asc' }
+
+      assert_response :success
+      assert_select 'th a', /Имя.*▲/
+    end
+
+    test 'sorts clients by name descending' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/clients', params: { sort: 'name', direction: 'desc' }
+
+      assert_response :success
+      assert_select 'th a', /Имя.*▼/
+    end
+
+    test 'sorts clients by created_at' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/clients', params: { sort: 'created_at', direction: 'asc' }
+
+      assert_response :success
+      assert_select 'th a', /▲/
+    end
+
+    test 'ignores invalid sort column' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/clients', params: { sort: 'invalid_column', direction: 'asc' }
+
+      assert_response :success
+    end
+
+    test 'ignores invalid sort direction' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/clients', params: { sort: 'name', direction: 'invalid' }
+
+      assert_response :success
     end
   end
 end

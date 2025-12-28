@@ -1,5 +1,12 @@
 h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
 
+/ Quick period filters
+.flex.gap-2.mb-4
+  = link_to t('.period.all'), tenant_bookings_path, class: "px-3 py-1 rounded-full text-sm #{params[:period].blank? && params[:date_from].blank? && params[:date_to].blank? ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+  = link_to t('.period.today'), tenant_bookings_path(period: 'today'), class: "px-3 py-1 rounded-full text-sm #{params[:period] == 'today' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+  = link_to t('.period.week'), tenant_bookings_path(period: 'week'), class: "px-3 py-1 rounded-full text-sm #{params[:period] == 'week' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+  = link_to t('.period.month'), tenant_bookings_path(period: 'month'), class: "px-3 py-1 rounded-full text-sm #{params[:period] == 'month' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+
 / Date filter form
 .mb-6.bg-white.rounded-lg.shadow.p-4
   = form_with url: tenant_bookings_path, method: :get, class: "flex flex-wrap gap-4 items-end" do |f|
@@ -53,7 +60,7 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
               = link_to t('.view'), tenant_booking_path(booking), class: "text-blue-600 hover:text-blue-900"
   - else
     .p-8.text-center.text-gray-500
-      - if params[:date_from].present? || params[:date_to].present?
+      - if params[:date_from].present? || params[:date_to].present? || params[:period].present?
         p = t('.no_results')
       - else
         p = t('.empty')

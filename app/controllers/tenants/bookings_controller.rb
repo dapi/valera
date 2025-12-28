@@ -26,8 +26,20 @@ module Tenants
     private
 
     def apply_date_filter
+      apply_period_filter
       apply_date_from_filter
       apply_date_to_filter
+    end
+
+    def apply_period_filter
+      case params[:period]
+      when 'today'
+        @bookings = @bookings.where('bookings.created_at >= ?', Date.current.beginning_of_day)
+      when 'week'
+        @bookings = @bookings.where('bookings.created_at >= ?', 1.week.ago.beginning_of_day)
+      when 'month'
+        @bookings = @bookings.where('bookings.created_at >= ?', 1.month.ago.beginning_of_day)
+      end
     end
 
     def apply_date_from_filter
