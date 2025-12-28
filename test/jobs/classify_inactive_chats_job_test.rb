@@ -10,6 +10,17 @@ class ClassifyInactiveChatsJobTest < ActiveSupport::TestCase
     @chat = chats(:one)
     # Очищаем топики у всех чатов
     Chat.update_all(chat_topic_id: nil)
+    # По умолчанию включаем классификацию для тестов
+    TopicClassifierConfig.stubs(:enabled).returns(true)
+  end
+
+  test 'skips when classification is disabled' do
+    TopicClassifierConfig.stubs(:enabled).returns(false)
+    @chat.update!(last_message_at: 25.hours.ago, chat_topic_id: nil)
+
+    assert_no_enqueued_jobs(only: ClassifyChatTopicJob) do
+      ClassifyInactiveChatsJob.perform_now
+    end
   end
 
   test 'finds chats inactive longer than configured hours' do

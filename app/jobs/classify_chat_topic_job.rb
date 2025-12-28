@@ -32,6 +32,8 @@ class ClassifyChatTopicJob < ApplicationJob
 
   # @param chat_id [Integer] ID чата для классификации
   def perform(chat_id)
+    return unless TopicClassifierConfig.enabled
+
     chat = Chat.find_by(id: chat_id)
 
     if chat.nil?

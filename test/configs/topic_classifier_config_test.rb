@@ -12,6 +12,12 @@ class TopicClassifierConfigTest < ActiveSupport::TestCase
     TopicClassifierConfig.instance_variable_set(:@instance, nil)
   end
 
+  test 'enabled is false by default' do
+    config = TopicClassifierConfig.new
+
+    assert_equal false, config.enabled
+  end
+
   test 'has default inactivity_hours' do
     config = TopicClassifierConfig.new
 

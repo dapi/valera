@@ -12,6 +12,17 @@ class ClassifyChatTopicJobTest < ActiveSupport::TestCase
     @topic = ChatTopic.find_or_create_by!(key: 'job_test_booking') do |t|
       t.label = 'Запись на обслуживание'
     end
+    # По умолчанию включаем классификацию для тестов
+    TopicClassifierConfig.stubs(:enabled).returns(true)
+  end
+
+  test 'skips when classification is disabled' do
+    TopicClassifierConfig.stubs(:enabled).returns(false)
+    @chat.update!(chat_topic: nil)
+
+    ChatTopicClassifier.any_instance.expects(:classify).never
+
+    ClassifyChatTopicJob.perform_now(@chat.id)
   end
 
   test 'skips when chat does not exist and logs warning' do

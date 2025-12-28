@@ -205,7 +205,8 @@ class BookingTest < ActiveSupport::TestCase
 
   # === after_commit callbacks ===
 
-  test 'enqueues ClassifyChatTopicJob after create' do
+  test 'enqueues ClassifyChatTopicJob after create when enabled' do
+    TopicClassifierConfig.stubs(:enabled).returns(true)
     chat = chats(:one)
 
     assert_enqueued_with(job: ClassifyChatTopicJob, args: [chat.id]) do
@@ -218,7 +219,23 @@ class BookingTest < ActiveSupport::TestCase
     end
   end
 
-  test 'enqueues both notification and classification jobs after create' do
+  test 'does not enqueue ClassifyChatTopicJob when disabled' do
+    TopicClassifierConfig.stubs(:enabled).returns(false)
+    chat = chats(:one)
+
+    # Только BookingNotificationJob должен быть заэнкюен
+    assert_enqueued_jobs 1, only: BookingNotificationJob do
+      Booking.create!(
+        tenant: chat.tenant,
+        client: chat.client,
+        chat: chat,
+        meta: { customer_name: 'Disabled Classification Test' }
+      )
+    end
+  end
+
+  test 'enqueues both notification and classification jobs after create when enabled' do
+    TopicClassifierConfig.stubs(:enabled).returns(true)
     chat = chats(:one)
 
     # Должны быть заэнкюены оба job-а: BookingNotificationJob и ClassifyChatTopicJob

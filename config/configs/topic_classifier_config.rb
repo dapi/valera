@@ -14,6 +14,9 @@ class TopicClassifierConfig < Anyway::Config
   env_prefix ''
 
   attr_config(
+    # Включена ли классификация топиков (по умолчанию отключена)
+    enabled: false,
+
     # Модель для классификации (дешёвая)
     model: nil,
 
@@ -22,6 +25,7 @@ class TopicClassifierConfig < Anyway::Config
   )
 
   coerce_types(
+    enabled: :boolean,
     model: :string,
     inactivity_hours: :integer
   )

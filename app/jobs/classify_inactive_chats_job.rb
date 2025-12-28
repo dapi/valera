@@ -28,6 +28,8 @@ class ClassifyInactiveChatsJob < ApplicationJob
   end
 
   def perform
+    return unless TopicClassifierConfig.enabled
+
     inactive_chats.find_each do |chat|
       ClassifyChatTopicJob.perform_later(chat.id)
     rescue StandardError => e
