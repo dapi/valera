@@ -65,6 +65,7 @@ Rails.application.routes.draw do
 
       resources :clients, only: %i[index show]
       resources :bookings, only: %i[index show]
+      resources :chats, only: %i[index show]
       resources :members, only: %i[index create update destroy] do
         collection do
           get :invite

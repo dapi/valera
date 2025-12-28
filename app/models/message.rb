@@ -2,6 +2,6 @@
 
 # Represents a single message within a chat conversation
 class Message < ApplicationRecord
-  acts_as_message
+  acts_as_message touch_chat: :last_message_at
   has_many_attached :attachments
 end

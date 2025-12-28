@@ -31,6 +31,10 @@
 ru:
   hello: "Привет, мир"
 
+  time:
+    formats:
+      time: "%H:%M"
+
   helpers:
     submit:
       create: "Сохранить"
@@ -458,3 +462,27 @@ ru:
           few: "%{count} сообщения"
           many: "%{count} сообщений"
           other: "%{count} сообщений"
+    chats:
+      layout:
+        title: Чаты
+        sort_by: Сортировка
+        sort_last_message: по последнему сообщению
+        sort_created: по дате создания
+        select_chat: Выберите чат для просмотра
+      chat_list:
+        no_messages: Нет сообщений
+        empty: Чатов пока нет
+        unknown_client: Неизвестный клиент
+      chat_header:
+        messages_count:
+          one: "%{count} сообщение"
+          few: "%{count} сообщения"
+          many: "%{count} сообщений"
+          other: "%{count} сообщений"
+        bookings_count:
+          one: "%{count} заявка"
+          few: "%{count} заявки"
+          many: "%{count} заявок"
+          other: "%{count} заявок"
+      message:
+        tool_result: Результат инструмента

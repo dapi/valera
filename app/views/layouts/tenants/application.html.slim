@@ -26,6 +26,9 @@ html
         = link_to tenant_bookings_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_bookings_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
           span.ml-3 Заявки
 
+        = link_to tenant_chats_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_chats_path) || controller_name == 'chats' ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
+          span.ml-3 Чаты
+
         = link_to tenant_members_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_members_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
           span.ml-3 Команда
 
