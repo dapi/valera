@@ -18,6 +18,5 @@ viewer_user:
   email: viewer@example.com
   name: Viewer User
 
-telegram_only_user:
-  name: Telegram User
-  telegram_user: one
+# Note: telegram_only_user fixture removed because DB has NOT NULL constraint on email
+# Use User.new in tests for telegram_only_user scenarios
