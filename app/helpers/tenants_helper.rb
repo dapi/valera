@@ -16,10 +16,10 @@ module TenantsHelper
     return nil if token.blank?
 
     parts = token.split(':')
-    return token if parts.length < 2 || parts[1].length < 4
+    secret = parts[1]
+    return token if parts.length < 2 || secret.nil? || secret.length < 4
 
     bot_id = parts[0]
-    secret = parts[1]
     "#{bot_id}:#{secret[0..1]}...#{secret[-2..]}"
   end
 end

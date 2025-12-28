@@ -48,8 +48,8 @@ module Tenants
       get '/settings/edit'
       assert_response :success
 
-      # Now test that non-owner access is denied
-      # This is verified by require_owner! in controller
+      # Access requires admin role (owner or admin)
+      # This is verified by require_admin! in controller
       # Integration test would require separate session management
       assert_equal @owner.id, session[:user_id]
     end
@@ -200,6 +200,20 @@ module Tenants
       assert_select "textarea[name='tenant[welcome_message]']"
       assert_select "textarea[name='tenant[company_info]']"
       assert_select "textarea[name='tenant[price_list]']"
+    end
+
+    test 'shows webhook error when Telegram API fails' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      TenantWebhookService.any_instance.stubs(:webhook_info)
+        .raises(TenantWebhookService::TelegramApiError.new('Bot token invalid'))
+
+      get '/settings/edit'
+
+      assert_response :success
+      # Verify error container is displayed
+      assert_select '.bg-red-50'
     end
   end
 end
