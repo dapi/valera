@@ -9,7 +9,11 @@
         / Chat info
         .flex-1.min-w-0
           .flex.items-center.justify-between
-            span.font-medium.text-gray-900.truncate = chat.client&.display_name || t('.unknown_client')
+            .flex.items-center.gap-2
+              span.font-medium.text-gray-900.truncate = chat.client&.display_name || t('.unknown_client')
+              - if chat.bookings_count > 0
+                span.inline-flex.items-center.px-1.5.py-0.5.rounded-full.text-xs.font-medium.bg-green-100.text-green-800
+                  = chat.bookings_count
             span.text-xs.text-gray-400 = chat_time_ago(chat.last_message_at || chat.created_at)
           - if (last_message = chat.messages.last)
             p.text-sm.text-gray-500.truncate

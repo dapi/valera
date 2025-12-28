@@ -32,7 +32,7 @@
 # @author Danil Pismenny
 # @since 0.1.0
 class Booking < ApplicationRecord
-  belongs_to :chat
+  belongs_to :chat, counter_cache: true
   belongs_to :tenant, counter_cache: true
   belongs_to :client
   belongs_to :vehicle, optional: true
@@ -43,6 +43,7 @@ class Booking < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
 
   before_create :set_booking_numbers
+  after_create :update_chat_booking_timestamps
 
   # Находит заявку по публичному номеру (формат: "{tenant_id}-{number}")
   #
@@ -79,5 +80,22 @@ class Booking < ApplicationRecord
   def set_booking_numbers
     self.number = (tenant.bookings.maximum(:number) || 0) + 1
     self.public_number = "#{tenant_id}-#{number}"
+  end
+
+  # Обновляет статистику заявок в связанном чате
+  #
+  # Устанавливает first_booking_at при создании первой заявки,
+  # и всегда обновляет last_booking_at.
+  #
+  # Использует атомарный SQL UPDATE с COALESCE для предотвращения
+  # race condition при одновременном создании нескольких заявок.
+  #
+  # @return [void]
+  # @api private
+  def update_chat_booking_timestamps
+    Chat.where(id: chat_id).update_all([
+      'first_booking_at = COALESCE(first_booking_at, ?), last_booking_at = ?',
+      created_at, created_at
+    ])
   end
 end

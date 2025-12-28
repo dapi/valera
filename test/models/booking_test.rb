@@ -91,4 +91,114 @@ class BookingTest < ActiveSupport::TestCase
     assert_equal booking_one.number, booking_two.number
     assert_not_equal booking_one.public_number, booking_two.public_number
   end
+
+  test 'increments chat bookings_count on create' do
+    chat = chats(:one)
+    chat.update_columns(bookings_count: 0)
+    initial_count = chat.bookings_count
+
+    Booking.create!(
+      tenant: chat.tenant,
+      client: chat.client,
+      chat: chat,
+      meta: { customer_name: 'Test' }
+    )
+
+    assert_equal initial_count + 1, chat.reload.bookings_count
+  end
+
+  test 'decrements chat bookings_count on destroy' do
+    chat = chats(:one)
+    # Сбрасываем состояние и синхронизируем counter_cache
+    chat.bookings.destroy_all
+    Chat.reset_counters(chat.id, :bookings)
+    assert_equal 0, chat.reload.bookings_count
+
+    booking = Booking.create!(
+      tenant: chat.tenant,
+      client: chat.client,
+      chat: chat,
+      meta: { customer_name: 'To Delete' }
+    )
+    assert_equal 1, chat.reload.bookings_count
+
+    booking.destroy
+
+    assert_equal 0, chat.reload.bookings_count
+  end
+
+  test 'sets first_booking_at on first booking' do
+    chat = chats(:one)
+    chat.update_columns(first_booking_at: nil, last_booking_at: nil, bookings_count: 0)
+    chat.bookings.delete_all
+
+    freeze_time do
+      booking = Booking.create!(
+        tenant: chat.tenant,
+        client: chat.client,
+        chat: chat,
+        meta: { customer_name: 'First Booking' }
+      )
+
+      chat.reload
+      assert_equal booking.created_at, chat.first_booking_at
+      assert_equal booking.created_at, chat.last_booking_at
+    end
+  end
+
+  test 'does not change first_booking_at on subsequent bookings' do
+    chat = chats(:one)
+    first_booking_time = 1.day.ago
+    chat.update_columns(
+      first_booking_at: first_booking_time,
+      last_booking_at: first_booking_time,
+      bookings_count: 1
+    )
+
+    freeze_time do
+      Booking.create!(
+        tenant: chat.tenant,
+        client: chat.client,
+        chat: chat,
+        meta: { customer_name: 'Second Booking' }
+      )
+
+      chat.reload
+      assert_equal first_booking_time.to_i, chat.first_booking_at.to_i
+      assert_equal Time.current.to_i, chat.last_booking_at.to_i
+    end
+  end
+
+  test 'updates last_booking_at on each booking' do
+    chat = chats(:one)
+    chat.update_columns(bookings_count: 0)
+    chat.bookings.delete_all
+
+    first_booking = nil
+    travel_to 2.days.ago do
+      first_booking = Booking.create!(
+        tenant: chat.tenant,
+        client: chat.client,
+        chat: chat,
+        meta: { customer_name: 'First' }
+      )
+    end
+
+    chat.reload
+    assert_equal first_booking.created_at, chat.last_booking_at
+
+    second_booking = nil
+    travel_to 1.day.ago do
+      second_booking = Booking.create!(
+        tenant: chat.tenant,
+        client: chat.client,
+        chat: chat,
+        meta: { customer_name: 'Second' }
+      )
+    end
+
+    chat.reload
+    assert_equal second_booking.created_at, chat.last_booking_at
+    assert_not_equal first_booking.created_at, chat.last_booking_at
+  end
 end
