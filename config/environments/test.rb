@@ -69,7 +69,7 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 
-  # Force tld_length = 1 for lvh.me subdomain testing
-  # This overrides ApplicationConfig.tld_length which may be affected by HOST env var
-  config.action_dispatch.tld_length = 1
+  # Use tld_length from ApplicationConfig (for lvh.me it will be 2)
+  # This ensures consistent subdomain handling between tests and application
+  config.action_dispatch.tld_length = ApplicationConfig.tld_length
 end
