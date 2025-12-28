@@ -254,8 +254,10 @@ class DashboardStatsService
   #
   # Учитывает только сообщения от пользователей (role: 'user') за выбранный период.
   # Возвращает массив из 24 элементов, по одному на каждый час суток.
+  # Часы группируются по локальному времени приложения (Time.zone).
   #
-  # При ошибках БД возвращает пустой массив часов, чтобы не блокировать загрузку dashboard.
+  # При ошибках БД возвращает массив из 24 часов с нулевыми значениями,
+  # чтобы не блокировать загрузку dashboard.
   #
   # @return [Array<Hash>] массив из 24 хэшей { hour: 0..23, count: Integer }
   def build_hourly_distribution
@@ -266,7 +268,7 @@ class DashboardStatsService
                       .where(chats: { tenant_id: tenant.id })
                       .where(role: 'user')
                       .where(created_at: period_range)
-                      .group(Arel.sql('EXTRACT(HOUR FROM messages.created_at)::integer'))
+                      .group(hour_extraction_sql)
                       .count
                       .transform_keys(&:to_i)
 
@@ -275,5 +277,24 @@ class DashboardStatsService
   rescue ActiveRecord::StatementInvalid => e
     log_error(e, { method: 'build_hourly_distribution', tenant_id: tenant.id, period: period })
     (0..23).map { |hour| { hour: hour, count: 0 } }
+  end
+
+  # Безопасный SQL для извлечения часа в локальном времени
+  # Timezone валидируется через ActiveSupport::TimeZone
+  def hour_extraction_sql
+    tz_name = validated_timezone_name
+    # brakeman:ignore - timezone name validated via ActiveSupport::TimeZone
+    Arel.sql("EXTRACT(HOUR FROM messages.created_at AT TIME ZONE 'UTC' AT TIME ZONE '#{tz_name}')::integer")
+  end
+
+  # Возвращает валидированное имя timezone
+  # @return [String] имя timezone или 'UTC' как fallback
+  def validated_timezone_name
+    tz = Time.zone
+    return 'UTC' unless tz
+
+    # ActiveSupport::TimeZone гарантирует валидность имени
+    tz_name = tz.tzinfo&.name || tz.name
+    ActiveSupport::TimeZone[tz_name] ? tz_name : 'UTC'
   end
 end

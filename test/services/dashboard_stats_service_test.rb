@@ -655,7 +655,7 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal 1, total_count
   end
 
-  test 'hourly_distribution groups messages by hour correctly' do
+  test 'hourly_distribution groups messages by hour in local timezone' do
     # Создаём изолированный тенант
     user = User.create!(name: 'Hourly Group', email: 'hourly_group@test.com', password: 'password123')
     tenant = Tenant.create!(name: 'Hourly Group Tenant', bot_token: '666666666:HOURLYGROUP', bot_username: 'hourly_group_bot', owner: user)
@@ -663,13 +663,13 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     client = tenant.clients.create!(telegram_user: tg_user, name: 'Hourly Group Client')
     chat = tenant.chats.create!(client: client)
 
-    # Создаём 2 сообщения в 10:00 UTC и 3 сообщения в 14:00 UTC
-    # Используем UTC напрямую, так как PostgreSQL EXTRACT(HOUR) работает с UTC timestamp
-    today_10am_utc = Time.current.utc.beginning_of_day + 10.hours + 30.minutes
-    today_2pm_utc = Time.current.utc.beginning_of_day + 14.hours + 15.minutes
+    # Создаём сообщения в локальном времени (Time.zone)
+    # Сервис группирует по локальному часу, а не UTC
+    today_10am_local = Time.zone.now.beginning_of_day + 10.hours + 30.minutes
+    today_2pm_local = Time.zone.now.beginning_of_day + 14.hours + 15.minutes
 
-    2.times { chat.messages.create!(role: 'user', content: 'Morning message', created_at: today_10am_utc) }
-    3.times { chat.messages.create!(role: 'user', content: 'Afternoon message', created_at: today_2pm_utc) }
+    2.times { chat.messages.create!(role: 'user', content: 'Morning message', created_at: today_10am_local) }
+    3.times { chat.messages.create!(role: 'user', content: 'Afternoon message', created_at: today_2pm_local) }
 
     result = DashboardStatsService.new(tenant).call
 
