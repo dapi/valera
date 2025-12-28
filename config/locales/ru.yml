@@ -341,12 +341,15 @@ ru:
           actions: Действия
         telegram_linked: "✓ Привязан"
         telegram_not_linked: Не привязан
-        roles_description: Описание ролей
-        role_descriptions:
-          viewer: "просмотр чатов, клиентов, статистики"
-          operator: "наблюдатель + ответы клиентам, управление записями"
-          admin: "оператор + настройки, управление командой"
+        roles_matrix_title: Матрица прав доступа
+        matrix:
+          capability: Возможность
+          view_chats: Просмотр чатов и клиентов
+          respond_to_clients: Ответы клиентам
+          tenant_settings: Настройки автосервиса
+          manage_team: Управление командой
         roles:
+          owner: Владелец
           viewer: Наблюдатель
           operator: Оператор
           admin: Администратор
