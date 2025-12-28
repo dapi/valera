@@ -53,15 +53,22 @@ module Admin
     end
 
     def apply_collection_filters(resources)
-      filters = dashboard_class.const_get(:COLLECTION_FILTERS) rescue nil
-      return resources unless filters.present?
+      return resources unless dashboard_class.const_defined?(:COLLECTION_FILTERS)
 
+      filters = dashboard_class::COLLECTION_FILTERS
       filters.each do |filter_name, filter_proc|
         filter_value = params[filter_name]
         next if filter_value.blank?
 
-        resources = filter_proc.call(resources, filter_value)
+        resources = safe_apply_filter(resources, filter_name, filter_proc, filter_value)
       end
+      resources
+    end
+
+    def safe_apply_filter(resources, filter_name, filter_proc, filter_value)
+      filter_proc.call(resources, filter_value)
+    rescue ActiveRecord::StatementInvalid => e
+      Rails.logger.error "[Admin::Filters] Filter '#{filter_name}' failed: #{e.message}"
       resources
     end
 

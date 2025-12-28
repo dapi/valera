@@ -48,6 +48,63 @@ class Admin::ModelsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # === URL FILTERING (COLLECTION_FILTERS) ===
+  test 'superuser can filter models by provider' do
+    sign_in_admin(@superuser)
+    get admin_models_path, params: { provider: 'openai' }
+    assert_response :success
+    assert_select 'tr[data-url]', count: 1
+  end
+
+  test 'superuser can filter models by family' do
+    sign_in_admin(@superuser)
+    get admin_models_path, params: { family: 'claude' }
+    assert_response :success
+    assert_select 'tr[data-url]', count: 1
+  end
+
+  test 'superuser can filter models by name with ILIKE' do
+    sign_in_admin(@superuser)
+    get admin_models_path, params: { name: 'gpt' }
+    assert_response :success
+    assert_select 'tr[data-url]', count: 1
+  end
+
+  test 'superuser can filter models by name case-insensitive' do
+    sign_in_admin(@superuser)
+    get admin_models_path, params: { name: 'CLAUDE' }
+    assert_response :success
+    assert_select 'tr[data-url]', count: 1
+  end
+
+  test 'multiple filters are applied together' do
+    sign_in_admin(@superuser)
+    get admin_models_path, params: { provider: 'openai', family: 'gpt' }
+    assert_response :success
+    assert_select 'tr[data-url]', count: 1
+  end
+
+  test 'empty filter value is ignored' do
+    sign_in_admin(@superuser)
+    get admin_models_path, params: { provider: '' }
+    assert_response :success
+    assert_select 'tr[data-url]', count: 3
+  end
+
+  test 'non-matching filter returns empty results' do
+    sign_in_admin(@superuser)
+    get admin_models_path, params: { provider: 'nonexistent' }
+    assert_response :success
+    assert_select 'tr[data-url]', count: 0
+  end
+
+  test 'unknown filter parameter is ignored' do
+    sign_in_admin(@superuser)
+    get admin_models_path, params: { unknown_filter: 'test' }
+    assert_response :success
+    assert_select 'tr[data-url]', count: 3
+  end
+
   # === READ-ONLY ROUTES ===
   # Routes are defined with only: [:index, :show]
   # so new, create, edit, update, destroy return 404
