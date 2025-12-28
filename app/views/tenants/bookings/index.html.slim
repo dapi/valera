@@ -2,10 +2,10 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
 
 / Quick period filters
 .flex.gap-2.mb-4
-  = link_to t('.period.all'), tenant_bookings_path, class: "px-3 py-1 rounded-full text-sm #{params[:period].blank? && params[:date_from].blank? && params[:date_to].blank? ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
-  = link_to t('.period.today'), tenant_bookings_path(period: 'today'), class: "px-3 py-1 rounded-full text-sm #{params[:period] == 'today' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
-  = link_to t('.period.week'), tenant_bookings_path(period: 'week'), class: "px-3 py-1 rounded-full text-sm #{params[:period] == 'week' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
-  = link_to t('.period.month'), tenant_bookings_path(period: 'month'), class: "px-3 py-1 rounded-full text-sm #{params[:period] == 'month' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+  = render 'period_filter_button', period: nil, title: t('.period.all')
+  = render 'period_filter_button', period: 'today', title: t('.period.today')
+  = render 'period_filter_button', period: 'week', title: t('.period.week')
+  = render 'period_filter_button', period: 'month', title: t('.period.month')
 
 / Date filter form
 .mb-6.bg-white.rounded-lg.shadow.p-4
@@ -60,10 +60,8 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
               = link_to t('.view'), tenant_booking_path(booking), class: "text-blue-600 hover:text-blue-900"
   - else
     .p-8.text-center.text-gray-500
-      - if params[:date_from].present? || params[:date_to].present? || params[:period].present?
-        p = t('.no_results')
-      - else
-        p = t('.empty')
+      - message_key = (params[:date_from].present? || params[:date_to].present? || params[:period].present?) ? '.no_results' : '.empty'
+      p = t(message_key)
 
 / Pagination
 - if @bookings.total_pages > 1

@@ -24,7 +24,9 @@ module Tenants
 
     # GET /clients/:id
     def show
-      @client = current_tenant.clients.includes(:telegram_user, :vehicles, :bookings, chats: :messages).find(params[:id])
+      @client = current_tenant.clients
+                              .includes(:telegram_user, :vehicles, :bookings, chats: :messages)
+                              .find(params[:id])
     end
 
     private

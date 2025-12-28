@@ -7,6 +7,11 @@ module Tenants
   # а также детальную информацию о заявке.
   class BookingsController < ApplicationController
     PER_PAGE = 20
+    PERIOD_FILTERS = {
+      'today' => -> { Date.current.beginning_of_day },
+      'week' => -> { 1.week.ago.beginning_of_day },
+      'month' => -> { 1.month.ago.beginning_of_day }
+    }.freeze
 
     # GET /bookings
     def index
@@ -27,35 +32,27 @@ module Tenants
 
     def apply_date_filter
       apply_period_filter
-      apply_date_from_filter
-      apply_date_to_filter
+      apply_custom_date_range
     end
 
     def apply_period_filter
-      case params[:period]
-      when 'today'
-        @bookings = @bookings.where('bookings.created_at >= ?', Date.current.beginning_of_day)
-      when 'week'
-        @bookings = @bookings.where('bookings.created_at >= ?', 1.week.ago.beginning_of_day)
-      when 'month'
-        @bookings = @bookings.where('bookings.created_at >= ?', 1.month.ago.beginning_of_day)
-      end
+      return unless PERIOD_FILTERS[params[:period]]
+
+      start_date = PERIOD_FILTERS[params[:period]].call
+      @bookings = @bookings.where('bookings.created_at >= ?', start_date)
     end
 
-    def apply_date_from_filter
-      return unless params[:date_from].present?
-
-      date = Date.parse(params[:date_from])
-      @bookings = @bookings.where('bookings.created_at >= ?', date.beginning_of_day)
-    rescue Date::Error
-      flash.now[:alert] = t('tenants.bookings.index.invalid_date_format')
+    def apply_custom_date_range
+      apply_date_boundary(:date_from, :>=, :beginning_of_day)
+      apply_date_boundary(:date_to, :<=, :end_of_day)
     end
 
-    def apply_date_to_filter
-      return unless params[:date_to].present?
+    def apply_date_boundary(param, operator, time_method)
+      return unless params[param].present?
 
-      date = Date.parse(params[:date_to])
-      @bookings = @bookings.where('bookings.created_at <= ?', date.end_of_day)
+      date = Date.parse(params[param])
+      boundary = date.send(time_method)
+      @bookings = @bookings.where("bookings.created_at #{operator} ?", boundary)
     rescue Date::Error
       flash.now[:alert] = t('tenants.bookings.index.invalid_date_format')
     end

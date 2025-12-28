@@ -1,0 +1,12 @@
+.divide-y.divide-gray-200
+  - chats.sort_by(&:created_at).reverse.each do |chat|
+    .px-6.py-4.flex.items-center.justify-between.hover:bg-gray-50
+      .flex.items-center.gap-3
+        span.text-xl 💬
+        div
+          .text-sm.font-medium.text-gray-900
+            = t('.chat_default_title', id: chat.id)
+          .text-xs.text-gray-500
+            = t('.messages_count', count: chat.messages.size)
+            span.ml-2 = l(chat.created_at, format: :short)
+      = link_to t('.view_chat'), tenant_chat_path(chat), class: "text-blue-600 hover:text-blue-900 text-sm"

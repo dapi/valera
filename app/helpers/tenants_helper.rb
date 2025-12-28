@@ -16,25 +16,25 @@ module TenantsHelper
   def sortable_column(column, title, default_direction: :asc)
     current_column = params[:sort]
     current_direction = params[:direction]
-
-    # Determine next direction
-    if column == current_column
-      next_direction = current_direction == 'asc' ? 'desc' : 'asc'
-    else
-      next_direction = default_direction.to_s
-    end
-
-    # Build URL preserving other params
+    next_direction = determine_sort_direction(column, current_column, current_direction, default_direction)
+    indicator = sort_indicator(column, current_column, current_direction)
     url_params = request.query_parameters.merge(sort: column, direction: next_direction)
 
-    # Build indicator
-    indicator = if column == current_column
-                  current_direction == 'asc' ? ' ▲' : ' ▼'
-    else
-                  ''
-    end
+    link_to("#{title}#{indicator}", url_for(url_params), class: 'hover:text-gray-700 cursor-pointer')
+  end
 
-    link_to(title + indicator, url_for(url_params), class: 'hover:text-gray-700 cursor-pointer')
+  private
+
+  def determine_sort_direction(column, current_column, current_direction, default_direction)
+    return (current_direction == 'asc' ? 'desc' : 'asc') if column == current_column
+
+    default_direction.to_s
+  end
+
+  def sort_indicator(column, current_column, current_direction)
+    return '' if column != current_column
+
+    current_direction == 'asc' ? ' ▲' : ' ▼'
   end
 
   # Masks bot token for secure display
@@ -50,11 +50,13 @@ module TenantsHelper
   def masked_bot_token(token)
     return nil if token.blank?
 
-    parts = token.split(':')
-    return token if parts.length < 2 || parts[1].length < 4
+    bot_id, secret = token.split(':')
+    return token if !secret || secret.length < 4
 
-    bot_id = parts[0]
-    secret = parts[1]
     "#{bot_id}:#{secret[0..1]}...#{secret[-2..]}"
+  end
+
+  def display_or_dash(value)
+    value.presence || '—'
   end
 end
