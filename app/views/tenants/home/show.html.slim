@@ -80,6 +80,64 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
             span.text-sm.font-medium.text-gray-600 Конверсия
             span.text-2xl.font-bold.text-green-600 #{@stats.funnel_data[:conversion_rate]}%
 
+  / Расходы на AI
+  .mt-8.bg-white.rounded-lg.shadow.p-6
+    h2.text-lg.font-semibold.text-gray-800.mb-4 💰 Расходы на AI
+
+    - totals = @stats.llm_costs[:totals]
+    - by_model = @stats.llm_costs[:by_model]
+
+    .grid.grid-cols-1.lg:grid-cols-2.gap-6
+      / Общая статистика токенов
+      div
+        .space-y-3
+          / Input tokens
+          .flex.items-center.justify-between.py-2.border-b.border-gray-100
+            span.text-sm.text-gray-600 Input tokens
+            .text-right
+              span.font-medium.text-gray-800 = format_tokens(totals.input_tokens)
+              span.text-gray-400.ml-2 = format_cost(totals.input_cost)
+
+          / Output tokens
+          .flex.items-center.justify-between.py-2.border-b.border-gray-100
+            span.text-sm.text-gray-600 Output tokens
+            .text-right
+              span.font-medium.text-gray-800 = format_tokens(totals.output_tokens)
+              span.text-gray-400.ml-2 = format_cost(totals.output_cost)
+
+          / Итого
+          .flex.items-center.justify-between.py-2.bg-gray-50.rounded-lg.px-3
+            span.text-sm.font-medium.text-gray-700 Итого
+            .text-right
+              span.font-bold.text-gray-800 = format_tokens(totals.total_tokens)
+              span.text-lg.font-bold.text-green-600.ml-2 = format_cost(totals.total_cost)
+
+      / Breakdown по моделям
+      div
+        - if by_model.any?
+          h3.text-sm.font-medium.text-gray-500.mb-3 По моделям:
+          .space-y-2
+            - by_model.each do |model_stats|
+              - percentage = totals.total_cost.positive? ? (model_stats.total_cost / totals.total_cost * 100).round(1) : 0
+              .flex.items-center.justify-between.py-2
+                .flex.items-center.gap-2
+                  span.text-sm.text-gray-700 = model_stats.model_name || model_stats.model_id
+                  span.text-xs.text-gray-400 = model_stats.provider
+                .text-right
+                  span.font-medium.text-gray-800 = format_cost(model_stats.total_cost)
+                  span.text-xs.text-gray-400.ml-1 = "(#{percentage}%)"
+        - else
+          .text-center.py-4
+            p.text-gray-500.text-sm Нет данных о расходах
+            p.text-xs.text-gray-400.mt-1 Расходы появятся после первых сообщений бота
+
+    / График расходов по дням
+    - if @stats.llm_costs[:chart_data][:values].any? { |v| v > 0 }
+      .mt-6.pt-6.border-t.border-gray-200 data-controller="cost-chart"
+        h3.text-sm.font-medium.text-gray-500.mb-3 График расходов
+        .h-48
+          canvas data-cost-chart-target="canvas" data-cost-chart-labels=@stats.llm_costs[:chart_data][:labels].to_json data-cost-chart-values=@stats.llm_costs[:chart_data][:values].to_json
+
   / Последние диалоги
   .mt-8.bg-white.rounded-lg.shadow.p-6
     h2.text-lg.font-semibold.text-gray-800.mb-4 🕐 Последние диалоги

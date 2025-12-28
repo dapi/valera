@@ -23,6 +23,7 @@ class DashboardStatsService
     :chart_data,
     :recent_chats,
     :funnel_data,
+    :llm_costs,
     keyword_init: true
   )
 
@@ -53,7 +54,8 @@ class DashboardStatsService
       messages_today: messages_today_count,
       chart_data: build_chart_data,
       recent_chats: fetch_recent_chats,
-      funnel_data: build_funnel_data
+      funnel_data: build_funnel_data,
+      llm_costs: build_llm_costs
     )
   end
 
@@ -138,6 +140,24 @@ class DashboardStatsService
       chats_count: chats_count,
       bookings_count: bookings_count,
       conversion_rate: conversion_rate
+    }
+  end
+
+  def build_llm_costs
+    calculator = LlmCostCalculator.new(tenant, period: effective_chart_period)
+
+    totals = calculator.calculate_totals
+    by_model = calculator.calculate_by_model
+    by_day = calculator.calculate_by_day
+
+    {
+      totals: totals,
+      by_model: by_model,
+      by_day: by_day,
+      chart_data: {
+        labels: by_day.map { |d| d.date.strftime('%d.%m') },
+        values: by_day.map { |d| d.total_cost.round(4) }
+      }
     }
   end
 end

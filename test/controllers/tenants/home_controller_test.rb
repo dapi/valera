@@ -114,5 +114,25 @@ module Tenants
       assert_response :success
       assert_select 'turbo-frame#dashboard_stats'
     end
+
+    test 'shows LLM costs section' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/'
+
+      assert_response :success
+      assert_select 'h2', /Расходы на AI/
+    end
+
+    test 'shows conversion funnel section' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/'
+
+      assert_response :success
+      assert_select 'h2', /Воронка конверсии/
+    end
   end
 end
