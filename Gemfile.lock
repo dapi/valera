@@ -163,6 +163,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
+    csv (3.3.5)
     date (3.5.1)
     debug (1.11.0)
       irb (~> 1.10)
@@ -593,6 +594,7 @@ DEPENDENCIES
   bundler-audit
   capybara
   claude-on-rails
+  csv
   debug
   good_job
   hiredis (~> 0.6.3)

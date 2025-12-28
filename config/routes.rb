@@ -63,8 +63,16 @@ Rails.application.routes.draw do
 
       root 'home#show'
 
-      resources :clients, only: %i[index show]
-      resources :bookings, only: %i[index show]
+      resources :clients, only: %i[index show] do
+        collection do
+          resource :export, only: :create, module: :clients
+        end
+      end
+      resources :bookings, only: %i[index show] do
+        collection do
+          resource :export, only: :create, module: :bookings
+        end
+      end
       resources :chats, only: %i[index show]
       resources :members, only: %i[index create update destroy] do
         collection do
