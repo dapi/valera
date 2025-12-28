@@ -197,7 +197,7 @@ class ApplicationConfig < Anyway::Config
   # Для 'localhost' (0 точек) -> 1 (default)
   def tld_length
     dots = host.to_s.count('.')
-    [dots, 1].max
+    [ dots, 1 ].max
   end
 
   # Возвращает ID платформенного бота (первая часть токена)
