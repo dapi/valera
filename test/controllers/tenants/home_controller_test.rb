@@ -86,5 +86,33 @@ module Tenants
       assert_response :success
       assert_select 'h2', /Последние диалоги/
     end
+
+    test 'supports 90 days period' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/', params: { period: 90 }
+
+      assert_response :success
+    end
+
+    test 'supports all time period' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/', params: { period: 'all' }
+
+      assert_response :success
+    end
+
+    test 'responds to turbo frame requests' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/', params: { period: 30 }, headers: { 'Turbo-Frame' => 'dashboard_stats' }
+
+      assert_response :success
+      assert_select 'turbo-frame#dashboard_stats'
+    end
   end
 end

@@ -26,6 +26,7 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_respond_to result, :messages_today
     assert_respond_to result, :chart_data
     assert_respond_to result, :recent_chats
+    assert_respond_to result, :funnel_data
   end
 
   test 'counts total clients for tenant' do
@@ -142,5 +143,72 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     # У разных тенантов разные данные
     assert_equal tenant_one.clients.count, result_one.clients_total
     assert_equal tenant_two.clients.count, result_two.clients_total
+  end
+
+  test 'accepts 90 days period' do
+    result = DashboardStatsService.new(@tenant, period: 90).call
+
+    assert_equal 91, result.chart_data[:labels].size
+    assert_equal 91, result.chart_data[:values].size
+  end
+
+  test 'accepts nil period for all time' do
+    result = DashboardStatsService.new(@tenant, period: nil).call
+
+    assert_kind_of Hash, result.chart_data
+    assert_operator result.chart_data[:labels].size, :>=, 1
+  end
+
+  test 'all_time? returns true when period is nil' do
+    service = DashboardStatsService.new(@tenant, period: nil)
+
+    assert service.all_time?
+  end
+
+  test 'all_time? returns false when period is set' do
+    service = DashboardStatsService.new(@tenant, period: 7)
+
+    refute service.all_time?
+  end
+
+  test 'funnel_data returns hash with chats_count, bookings_count, and conversion_rate' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_kind_of Hash, result.funnel_data
+    assert_includes result.funnel_data.keys, :chats_count
+    assert_includes result.funnel_data.keys, :bookings_count
+    assert_includes result.funnel_data.keys, :conversion_rate
+  end
+
+  test 'funnel_data counts all chats and bookings for tenant' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_equal @tenant.chats.count, result.funnel_data[:chats_count]
+    assert_equal @tenant.bookings.count, result.funnel_data[:bookings_count]
+  end
+
+  test 'funnel_data calculates conversion_rate correctly' do
+    result = DashboardStatsService.new(@tenant).call
+
+    chats_count = @tenant.chats.count
+    bookings_count = @tenant.bookings.count
+
+    if chats_count.positive?
+      expected_rate = (bookings_count.to_f / chats_count * 100).round(1)
+      assert_equal expected_rate, result.funnel_data[:conversion_rate]
+    else
+      assert_equal 0.0, result.funnel_data[:conversion_rate]
+    end
+  end
+
+  test 'funnel_data returns zero conversion_rate when no chats' do
+    # Создаём тенант без чатов
+    user = User.create!(name: 'Empty Owner', email: 'empty@test.com', password: 'password123')
+    empty_tenant = Tenant.create!(name: 'Empty Tenant', bot_token: '999999999:ABCdefGHIjklMNOpqrsTUVwxyz', bot_username: 'empty_bot', owner: user)
+
+    result = DashboardStatsService.new(empty_tenant).call
+
+    assert_equal 0, result.funnel_data[:chats_count]
+    assert_equal 0.0, result.funnel_data[:conversion_rate]
   end
 end

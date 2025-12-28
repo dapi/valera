@@ -9,8 +9,10 @@ one:
   modalities:
     text: true
   pricing:
-    input: 0.00003
-    output: 0.00006
+    text_tokens:
+      standard:
+        input_per_million: 30.0
+        output_per_million: 60.0
   metadata: {}
   knowledge_cutoff: 2024-09-01
   model_created_at: 2023-03-14
@@ -27,8 +29,10 @@ two:
     text: true
     image: true
   pricing:
-    input: 0.000003
-    output: 0.000015
+    text_tokens:
+      standard:
+        input_per_million: 3.0
+        output_per_million: 15.0
   metadata: {}
   knowledge_cutoff: 2024-04-01
   model_created_at: 2024-03-04
@@ -44,8 +48,10 @@ deepseek:
   modalities:
     text: true
   pricing:
-    input: 0.000001
-    output: 0.000002
+    text_tokens:
+      standard:
+        input_per_million: 1.0
+        output_per_million: 2.0
   metadata: {}
   knowledge_cutoff: 2024-06-01
   model_created_at: 2024-01-01

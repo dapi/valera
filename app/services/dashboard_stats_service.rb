@@ -22,16 +22,21 @@ class DashboardStatsService
     :messages_today,
     :chart_data,
     :recent_chats,
+    :funnel_data,
     keyword_init: true
   )
 
   # @param tenant [Tenant] тенант для которого собирается статистика
-  # @param period [Integer] период для графика в днях (по умолчанию 7)
+  # @param period [Integer, nil] период для графика в днях (по умолчанию 7, nil = всё время)
   def initialize(tenant, period: 7)
     raise ArgumentError, 'tenant is required' if tenant.nil?
 
     @tenant = tenant
     @period = period
+  end
+
+  def all_time?
+    period.nil?
   end
 
   # Собирает и возвращает все метрики дашборда
@@ -47,7 +52,8 @@ class DashboardStatsService
       active_chats: active_chats_count,
       messages_today: messages_today_count,
       chart_data: build_chart_data,
-      recent_chats: fetch_recent_chats
+      recent_chats: fetch_recent_chats,
+      funnel_data: build_funnel_data
     )
   end
 
@@ -87,17 +93,30 @@ class DashboardStatsService
   end
 
   def build_chart_data
-    raw_data = Message.joins(:chat)
-                      .where(chats: { tenant_id: tenant.id })
-                      .where(created_at: period.days.ago.beginning_of_day..)
-                      .group('DATE(messages.created_at)')
-                      .count
+    base_query = Message.joins(:chat).where(chats: { tenant_id: tenant.id })
+    chart_period = effective_chart_period
 
-    date_range = (period.days.ago.to_date..Date.current)
+    raw_data = base_query
+               .where(created_at: chart_period.days.ago.beginning_of_day..)
+               .group('DATE(messages.created_at)')
+               .count
+
+    date_range = (chart_period.days.ago.to_date..Date.current)
     labels = date_range.map { |d| d.strftime('%d.%m') }
     values = date_range.map { |d| raw_data[d] || 0 }
 
     { labels: labels, values: values }
+  end
+
+  def effective_chart_period
+    return period if period
+
+    first_message = Message.joins(:chat)
+                           .where(chats: { tenant_id: tenant.id })
+                           .minimum(:created_at)
+    return 30 unless first_message
+
+    [ (Date.current - first_message.to_date).to_i, 365 ].min
   end
 
   def fetch_recent_chats
@@ -108,5 +127,17 @@ class DashboardStatsService
           .order('messages.created_at DESC')
           .distinct
           .limit(3)
+  end
+
+  def build_funnel_data
+    chats_count = tenant.chats.count
+    bookings_count = bookings.count
+    conversion_rate = chats_count.positive? ? (bookings_count.to_f / chats_count * 100).round(1) : 0.0
+
+    {
+      chats_count: chats_count,
+      bookings_count: bookings_count,
+      conversion_rate: conversion_rate
+    }
   end
 end

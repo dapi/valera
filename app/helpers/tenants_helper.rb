@@ -50,9 +50,11 @@ module TenantsHelper
   def masked_bot_token(token)
     return nil if token.blank?
 
-    bot_id, secret = token.split(':')
-    return token if !secret || secret.length < 4
+    parts = token.split(':')
+    secret = parts[1]
+    return token if parts.length < 2 || secret.nil? || secret.length < 4
 
+    bot_id = parts[0]
     "#{bot_id}:#{secret[0..1]}...#{secret[-2..]}"
   end
 
