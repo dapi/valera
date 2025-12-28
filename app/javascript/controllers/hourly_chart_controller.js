@@ -7,14 +7,38 @@ export default class extends Controller {
   static targets = ["canvas"]
 
   connect() {
-    const data = JSON.parse(this.canvasTarget.dataset.hourlyChartData)
-    const labels = data.labels
-    const values = data.values
-    const maxValue = Math.max(...values)
+    try {
+      const rawData = this.canvasTarget.dataset.hourlyChartData
+      if (!rawData) {
+        console.error("[hourly-chart] Missing data-hourly-chart-data attribute")
+        return
+      }
 
-    // Генерируем цвета на основе интенсивности
-    const backgroundColors = values.map(v => this.getIntensityColor(v, maxValue))
+      const data = JSON.parse(rawData)
+      if (!data || !Array.isArray(data.labels) || !Array.isArray(data.values)) {
+        console.error("[hourly-chart] Invalid data structure:", data)
+        return
+      }
 
+      const labels = data.labels
+      const values = data.values
+
+      if (values.length === 0) {
+        return // Нечего отображать
+      }
+
+      const maxValue = Math.max(...values)
+
+      // Генерируем цвета на основе интенсивности
+      const backgroundColors = values.map(v => this.getIntensityColor(v, maxValue))
+
+      this.initChart(labels, values, backgroundColors)
+    } catch (error) {
+      console.error("[hourly-chart] Failed to initialize chart:", error)
+    }
+  }
+
+  initChart(labels, values, backgroundColors) {
     this.chart = new Chart(this.canvasTarget, {
       type: "bar",
       data: {
@@ -61,13 +85,19 @@ export default class extends Controller {
     })
   }
 
-  // Возвращает цвет от светло-синего до темно-синего в зависимости от значения
+  // Возвращает синий цвет с альфа-каналом от 0.2 до 1.0 в зависимости от интенсивности
   getIntensityColor(value, maxValue) {
-    if (maxValue === 0) return "rgba(59, 130, 246, 0.2)"
+    if (!Number.isFinite(maxValue) || maxValue <= 0) {
+      return "rgba(59, 130, 246, 0.2)"
+    }
 
-    const intensity = value / maxValue
-    const alpha = 0.2 + (intensity * 0.8) // от 0.2 до 1.0
-    return `rgba(59, 130, 246, ${alpha})`
+    if (!Number.isFinite(value) || value < 0) {
+      return "rgba(59, 130, 246, 0.2)"
+    }
+
+    const intensity = Math.min(value / maxValue, 1.0)
+    const alpha = 0.2 + (intensity * 0.8)
+    return `rgba(59, 130, 246, ${alpha.toFixed(2)})`
   }
 
   disconnect() {
