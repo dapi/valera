@@ -177,6 +177,33 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal 3.3, result.avg_messages_per_dialog
   end
 
+  test 'avg_messages_per_dialog isolates data by tenant' do
+    # Tenant 1: 1 чат с 5 сообщениями -> avg = 5.0
+    user1 = User.create!(name: 'Iso Owner 1', email: 'iso1@test.com', password: 'password123')
+    tenant1 = Tenant.create!(name: 'Iso Tenant 1', bot_token: '111111111:ABCdefGHIjklMNOpqrsTUVwxyz', bot_username: 'iso_bot1', owner: user1)
+
+    tg_user1 = TelegramUser.create!(username: 'iso_user1', first_name: 'Iso1')
+    client1 = tenant1.clients.create!(telegram_user: tg_user1, name: 'Iso Client 1')
+    chat1 = tenant1.chats.create!(client: client1, telegram_user: tg_user1)
+    5.times { chat1.messages.create!(role: 'user', content: 'Test') }
+
+    # Tenant 2: 1 чат с 100 сообщениями -> avg = 100.0
+    user2 = User.create!(name: 'Iso Owner 2', email: 'iso2@test.com', password: 'password123')
+    tenant2 = Tenant.create!(name: 'Iso Tenant 2', bot_token: '222222222:ABCdefGHIjklMNOpqrsTUVwxyz', bot_username: 'iso_bot2', owner: user2)
+
+    tg_user2 = TelegramUser.create!(username: 'iso_user2', first_name: 'Iso2')
+    client2 = tenant2.clients.create!(telegram_user: tg_user2, name: 'Iso Client 2')
+    chat2 = tenant2.chats.create!(client: client2, telegram_user: tg_user2)
+    100.times { chat2.messages.create!(role: 'user', content: 'Test') }
+
+    result1 = DashboardStatsService.new(tenant1).call
+    result2 = DashboardStatsService.new(tenant2).call
+
+    # Данные не должны смешиваться между tenants
+    assert_equal 5.0, result1.avg_messages_per_dialog
+    assert_equal 100.0, result2.avg_messages_per_dialog
+  end
+
   test 'builds chart_data with labels and values' do
     result = DashboardStatsService.new(@tenant, period: 7).call
 
