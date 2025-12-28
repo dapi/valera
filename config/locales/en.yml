@@ -81,3 +81,14 @@ en:
       tenant_invite:
         one: Invite
         other: Invites
+  tenants:
+    clients:
+      show:
+        bookings_count:
+          one: "%{count} booking"
+          other: "%{count} bookings"
+    chats:
+      chat_header:
+        bookings_count:
+          one: "%{count} booking"
+          other: "%{count} bookings"

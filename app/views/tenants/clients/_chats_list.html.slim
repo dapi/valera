@@ -6,7 +6,10 @@
         div
           .text-sm.font-medium.text-gray-900
             = t('.chat_default_title', id: chat.id)
-          .text-xs.text-gray-500
+          .text-xs.text-gray-500.flex.items-center.gap-2
             = t('.messages_count', count: chat.messages.size)
+            - if chat.bookings_count > 0
+              span.inline-flex.items-center.px-1.5.py-0.5.rounded-full.text-xs.font-medium.bg-green-100.text-green-800
+                = t('.bookings_count', count: chat.bookings_count)
             span.ml-2 = l(chat.created_at, format: :short)
       = link_to t('.view_chat'), tenant_chat_path(chat), class: "text-blue-600 hover:text-blue-900 text-sm"

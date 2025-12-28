@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_28_084946) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_28_163510) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -95,13 +95,19 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_084946) do
   end
 
   create_table "chats", force: :cascade do |t|
+    t.integer "bookings_count", default: 0, null: false
     t.bigint "client_id", null: false
     t.datetime "created_at", null: false
+    t.datetime "first_booking_at"
+    t.datetime "last_booking_at"
     t.datetime "last_message_at"
     t.bigint "model_id"
     t.bigint "tenant_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["bookings_count"], name: "index_chats_on_bookings_count"
     t.index ["client_id"], name: "index_chats_on_client_id"
+    t.index ["first_booking_at"], name: "index_chats_on_first_booking_at"
+    t.index ["last_booking_at"], name: "index_chats_on_last_booking_at"
     t.index ["model_id"], name: "index_chats_on_model_id"
     t.index ["tenant_id", "last_message_at"], name: "index_chats_on_tenant_id_and_last_message_at"
     t.index ["tenant_id"], name: "index_chats_on_tenant_id"

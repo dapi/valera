@@ -445,6 +445,11 @@ ru:
           other: "%{count} сообщений"
         view_chat: Открыть
         no_chats: Чатов пока нет
+        bookings_count:
+          one: "%{count} заявка"
+          few: "%{count} заявки"
+          many: "%{count} заявок"
+          other: "%{count} заявок"
     bookings:
       index:
         title: Заявки
