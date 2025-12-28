@@ -20,6 +20,7 @@ class DashboardStatsService
     :bookings_today,
     :active_chats,
     :messages_today,
+    :avg_messages_per_chat,
     :chart_data,
     :recent_chats,
     :funnel_data,
@@ -52,6 +53,7 @@ class DashboardStatsService
       bookings_today: bookings.where(created_at: today_range).count,
       active_chats: active_chats_count,
       messages_today: messages_today_count,
+      avg_messages_per_chat: calculate_avg_messages_per_chat,
       chart_data: build_chart_data,
       recent_chats: fetch_recent_chats,
       funnel_data: build_funnel_data,
@@ -92,6 +94,20 @@ class DashboardStatsService
            .where(chats: { tenant_id: tenant.id })
            .where(created_at: today_range)
            .count
+  end
+
+  # Рассчитывает среднее количество сообщений на диалог
+  #
+  # @return [Float] среднее количество сообщений, округленное до 1 знака
+  def calculate_avg_messages_per_chat
+    messages_per_chat = tenant.chats
+                              .joins(:messages)
+                              .group('chats.id')
+                              .count('messages.id')
+
+    return 0.0 if messages_per_chat.empty?
+
+    (messages_per_chat.values.sum.to_f / messages_per_chat.size).round(1)
   end
 
   def build_chart_data

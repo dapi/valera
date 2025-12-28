@@ -37,6 +37,16 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
         span.text-2xl 📨
       .text-3xl.font-bold.text-gray-800.mt-2 = @stats.messages_today
 
+  / Вторая строка KPI карточек
+  .grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-4.gap-6.mt-6
+    / Avg messages per chat card
+    .bg-white.rounded-lg.shadow.p-6
+      .flex.items-center.justify-between
+        .text-sm.font-medium.text-gray-500 Среднее сообщений в диалоге
+        span.text-2xl 💬
+      .text-3xl.font-bold.text-gray-800.mt-2 = @stats.avg_messages_per_chat
+      .text-sm.text-gray-500.mt-1 сообщений на чат
+
   / График активности и Воронка конверсии
   .grid.grid-cols-1.lg:grid-cols-3.gap-6.mt-8
     / График активности (занимает 2 колонки)
