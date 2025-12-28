@@ -15,3 +15,9 @@ viewer_on_tenant_two:
   tenant: two
   user: viewer_user
   role: 0
+
+# Viewer membership for tenant one (for testing)
+viewer_on_tenant_one:
+  tenant: one
+  user: viewer_user_one
+  role: 0

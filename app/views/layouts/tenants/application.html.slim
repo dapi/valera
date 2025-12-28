@@ -26,9 +26,8 @@ html
         = link_to tenant_bookings_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_bookings_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
           span.ml-3 Заявки
 
-        - if current_user_can_manage_members?
-          = link_to tenant_members_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_members_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
-            span.ml-3 Команда
+        = link_to tenant_members_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(tenant_members_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"
+          span.ml-3 Команда
 
         - if current_user_is_admin?
           = link_to edit_tenant_settings_path, class: "flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 #{current_page?(edit_tenant_settings_path) ? 'bg-gray-100 border-r-4 border-blue-500' : ''}"

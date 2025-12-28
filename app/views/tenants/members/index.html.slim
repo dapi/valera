@@ -1,18 +1,19 @@
 h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
 
-/ Invite buttons
-.mb-6.flex.gap-4
-  = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
-    = f.hidden_field :role, value: 'viewer'
-    = f.submit t('.invite_viewer'), class: 'bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded cursor-pointer'
+/ Invite buttons (only for admins)
+- if current_user_can_manage_members?
+  .mb-6.flex.gap-4
+    = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
+      = f.hidden_field :role, value: 'viewer'
+      = f.submit t('.invite_viewer'), class: 'bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded cursor-pointer'
 
-  = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
-    = f.hidden_field :role, value: 'operator'
-    = f.submit t('.invite_operator'), class: 'bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded cursor-pointer'
+    = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
+      = f.hidden_field :role, value: 'operator'
+      = f.submit t('.invite_operator'), class: 'bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded cursor-pointer'
 
-  = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
-    = f.hidden_field :role, value: 'admin'
-    = f.submit t('.invite_admin'), class: 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded cursor-pointer'
+    = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
+      = f.hidden_field :role, value: 'admin'
+      = f.submit t('.invite_admin'), class: 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded cursor-pointer'
 
 / Members table
 .bg-white.rounded-lg.shadow.overflow-hidden
@@ -54,8 +55,12 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
           td.px-6.py-4.whitespace-nowrap
             .text-sm.text-gray-500 = membership.user.email || '—'
           td.px-6.py-4.whitespace-nowrap
-            = form_with url: tenant_member_path(membership), method: :patch, class: "inline" do |f|
-              = f.select :role, options_for_select(TenantMembership.roles.keys.map { |r| [t(".roles.#{r}"), r] }, membership.role), {}, class: "text-xs border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500", onchange: "this.form.submit()"
+            - if current_user_can_manage_members?
+              = form_with url: tenant_member_path(membership), method: :patch, class: "inline" do |f|
+                = f.select :role, options_for_select(TenantMembership.roles.keys.map { |r| [t(".roles.#{r}"), r] }, membership.role), {}, class: "text-xs border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500", onchange: "this.form.submit()"
+            - else
+              span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-gray-100.text-gray-800
+                = t(".roles.#{membership.role}")
           td.px-6.py-4.whitespace-nowrap
             - if membership.user.telegram_linked?
               span.text-green-600 = t('.telegram_linked')
@@ -67,18 +72,61 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
             - else
               | —
           td.px-6.py-4.whitespace-nowrap.text-right.text-sm.font-medium
-            = button_to t('.remove'), tenant_member_path(membership), method: :delete, data: { confirm: t('.remove_confirm', name: membership.user.name) }, class: 'text-red-600 hover:text-red-900'
+            - if current_user_can_manage_members?
+              = button_to t('.remove'), tenant_member_path(membership), method: :delete, data: { confirm: t('.remove_confirm', name: membership.user.name) }, class: 'text-red-600 hover:text-red-900'
+            - else
+              span.text-gray-400 —
 
-/ Role description
+/ Role permissions matrix
 .mt-6.bg-gray-50.rounded-lg.p-4
-  h3.font-semibold.text-gray-700.mb-2 = t('.roles_description')
-  ul.text-sm.text-gray-600.space-y-1
-    li
-      span.font-medium = "#{t('.roles.viewer')}:"
-      = " #{t('.role_descriptions.viewer')}"
-    li
-      span.font-medium = "#{t('.roles.operator')}:"
-      = " #{t('.role_descriptions.operator')}"
-    li
-      span.font-medium = "#{t('.roles.admin')}:"
-      = " #{t('.role_descriptions.admin')}"
+  h3.font-semibold.text-gray-700.mb-4 = t('.roles_matrix_title')
+  .overflow-x-auto
+    table.min-w-full.text-sm
+      thead
+        tr.border-b.border-gray-200
+          th.text-left.py-2.px-3.font-medium.text-gray-600 = t('.matrix.capability')
+          th.text-center.py-2.px-3.font-medium.text-yellow-700 = t('.roles.owner')
+          th.text-center.py-2.px-3.font-medium.text-green-700 = t('.roles.admin')
+          th.text-center.py-2.px-3.font-medium.text-blue-700 = t('.roles.operator')
+          th.text-center.py-2.px-3.font-medium.text-gray-700 = t('.roles.viewer')
+      tbody
+        tr.border-b.border-gray-100
+          td.py-2.px-3.text-gray-600 = t('.matrix.view_chats')
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+        tr.border-b.border-gray-100
+          td.py-2.px-3.text-gray-600 = t('.matrix.respond_to_clients')
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-gray-400 —
+        tr.border-b.border-gray-100
+          td.py-2.px-3.text-gray-600 = t('.matrix.tenant_settings')
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-gray-400 —
+          td.text-center.py-2.px-3
+            span.text-gray-400 —
+        tr
+          td.py-2.px-3.text-gray-600 = t('.matrix.manage_team')
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-green-600 ✓
+          td.text-center.py-2.px-3
+            span.text-gray-400 —
+          td.text-center.py-2.px-3
+            span.text-gray-400 —
