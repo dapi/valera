@@ -1,62 +1,63 @@
 / Header with title and export button
 .flex.justify-between.items-center.mb-6
   h1.text-2xl.font-bold.text-gray-800 = t('.title')
-  = button_to t('.export_csv'), tenant_clients_export_path, method: :post, class: "bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+  = button_to t('.export_csv'), tenant_export_path, method: :post, class: "bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
 
 / Search form
 .mb-6
-  = form_with url: tenant_clients_path, method: :get, class: "flex gap-4" do |f|
+  = form_with url: tenant_clients_path, method: :get, class: "flex gap-4", data: { turbo_frame: "clients_table", turbo_action: "advance", controller: "search" } do |f|
     .flex-1
-      = f.text_field :q, value: params[:q], placeholder: t('.search_placeholder'), class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      = f.text_field :q, value: params[:q], placeholder: t('.search_placeholder'), class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500", data: { action: "input->search#search" }
     = f.submit t('.search_button'), class: "bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer"
     - if params[:q].present?
-      = link_to t('.clear_search'), tenant_clients_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+      = link_to t('.clear_search'), tenant_clients_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg", data: { turbo_frame: "clients_table", turbo_action: "advance" }
 
-/ Clients table
-.bg-white.rounded-lg.shadow.overflow-hidden
-  - if @clients.any?
-    table.min-w-full.divide-y.divide-gray-200
-      thead.bg-gray-50
-        tr
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = sortable_column('name', t('.headers.name'))
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = sortable_column('phone', t('.headers.phone'))
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.telegram')
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = sortable_column('created_at', t('.headers.registered'), default_direction: :desc)
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.vehicles')
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.bookings')
-          th.px-6.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.actions')
+/ Clients table with Turbo Frame
+= turbo_frame_tag "clients_table" do
+  .bg-white.rounded-lg.shadow.overflow-hidden
+    - if @clients.any?
+      table.min-w-full.divide-y.divide-gray-200
+        thead.bg-gray-50
+          tr
+            th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = sortable_column('name', t('.headers.name'))
+            th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = sortable_column('phone', t('.headers.phone'))
+            th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.telegram')
+            th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = sortable_column('created_at', t('.headers.registered'), default_direction: :desc)
+            th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.vehicles')
+            th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.bookings')
+            th.px-6.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.actions')
 
-      tbody.bg-white.divide-y.divide-gray-200
-        - @clients.each do |client|
-          tr.hover:bg-gray-50
-            td.px-6.py-4.whitespace-nowrap
-              .text-sm.font-medium.text-gray-900 = client.display_name
-            td.px-6.py-4.whitespace-nowrap
-              .text-sm.text-gray-500 = client.phone.presence || '—'
-            td.px-6.py-4.whitespace-nowrap
-              - if client.telegram_user_username.present?
-                a.text-sm.text-blue-600.hover:text-blue-800 href="https://t.me/#{client.telegram_user_username}" target="_blank"
-                  = "@#{client.telegram_user_username}"
-              - else
-                span.text-sm.text-gray-400 = t('.no_username')
-            td.px-6.py-4.whitespace-nowrap
-              .text-sm.text-gray-500 = l(client.created_at, format: :short)
-            td.px-6.py-4.whitespace-nowrap
-              span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-gray-100.text-gray-800
-                = client.vehicles.size
-            td.px-6.py-4.whitespace-nowrap
-              span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-blue-100.text-blue-800
-                = client.bookings.size
-            td.px-6.py-4.whitespace-nowrap.text-right.text-sm.font-medium
-              = link_to t('.view'), tenant_client_path(client), class: "text-blue-600 hover:text-blue-900"
-  - else
-    .p-8.text-center.text-gray-500
-      - if params[:q].present?
-        p = t('.no_results')
-      - else
-        p = t('.empty')
+        tbody.bg-white.divide-y.divide-gray-200
+          - @clients.each do |client|
+            tr.hover:bg-gray-50
+              td.px-6.py-4.whitespace-nowrap
+                .text-sm.font-medium.text-gray-900 = client.display_name
+              td.px-6.py-4.whitespace-nowrap
+                .text-sm.text-gray-500 = client.phone.presence || '—'
+              td.px-6.py-4.whitespace-nowrap
+                - if client.telegram_user_username.present?
+                  a.text-sm.text-blue-600.hover:text-blue-800 href="https://t.me/#{client.telegram_user_username}" target="_blank"
+                    = "@#{client.telegram_user_username}"
+                - else
+                  span.text-sm.text-gray-400 = t('.no_username')
+              td.px-6.py-4.whitespace-nowrap
+                .text-sm.text-gray-500 = l(client.created_at, format: :short)
+              td.px-6.py-4.whitespace-nowrap
+                span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-gray-100.text-gray-800
+                  = client.vehicles.size
+              td.px-6.py-4.whitespace-nowrap
+                span.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full.bg-blue-100.text-blue-800
+                  = client.bookings.size
+              td.px-6.py-4.whitespace-nowrap.text-right.text-sm.font-medium
+                = link_to t('.view'), tenant_client_path(client), class: "text-blue-600 hover:text-blue-900"
+    - else
+      .p-8.text-center.text-gray-500
+        - if params[:q].present?
+          p = t('.no_results')
+        - else
+          p = t('.empty')
 
-/ Pagination
-- if @clients.total_pages > 1
-  .px-6.py-4.border-t.border-gray-200
-    = paginate @clients
+  / Pagination inside Turbo Frame
+  - if @clients.total_pages > 1
+    .px-6.py-4.border-t.border-gray-200
+      = paginate @clients
