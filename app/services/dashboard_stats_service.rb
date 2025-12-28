@@ -22,6 +22,7 @@ class DashboardStatsService
     :messages_today,
     :chart_data,
     :recent_chats,
+    :funnel_data,
     keyword_init: true
   )
 
@@ -51,7 +52,8 @@ class DashboardStatsService
       active_chats: active_chats_count,
       messages_today: messages_today_count,
       chart_data: build_chart_data,
-      recent_chats: fetch_recent_chats
+      recent_chats: fetch_recent_chats,
+      funnel_data: build_funnel_data
     )
   end
 
@@ -125,5 +127,17 @@ class DashboardStatsService
           .order('messages.created_at DESC')
           .distinct
           .limit(3)
+  end
+
+  def build_funnel_data
+    chats_count = tenant.chats.count
+    bookings_count = bookings.count
+    conversion_rate = chats_count.positive? ? (bookings_count.to_f / chats_count * 100).round(1) : 0.0
+
+    {
+      chats_count: chats_count,
+      bookings_count: bookings_count,
+      conversion_rate: conversion_rate
+    }
   end
 end
