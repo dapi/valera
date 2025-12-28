@@ -28,6 +28,7 @@ class DashboardStatsService
     :funnel_data,
     :funnel_trend,
     :llm_costs,
+    :hourly_distribution,
     keyword_init: true
   )
 
@@ -64,7 +65,8 @@ class DashboardStatsService
       recent_chats: fetch_recent_chats,
       funnel_data: build_funnel_data,
       funnel_trend: build_funnel_trend,
-      llm_costs: build_llm_costs
+      llm_costs: build_llm_costs,
+      hourly_distribution: build_hourly_distribution
     )
   end
 
@@ -246,5 +248,32 @@ class DashboardStatsService
         values: by_day.map { |d| d.total_cost.round(4) }
       }
     }
+  end
+
+  # Рассчитывает распределение пользовательских сообщений по часам суток
+  #
+  # Учитывает только сообщения от пользователей (role: 'user') за выбранный период.
+  # Возвращает массив из 24 элементов, по одному на каждый час суток.
+  #
+  # При ошибках БД возвращает пустой массив часов, чтобы не блокировать загрузку dashboard.
+  #
+  # @return [Array<Hash>] массив из 24 хэшей { hour: 0..23, count: Integer }
+  def build_hourly_distribution
+    chart_period = effective_chart_period
+    period_range = chart_period.days.ago.beginning_of_day..Time.current
+
+    raw_data = Message.joins(:chat)
+                      .where(chats: { tenant_id: tenant.id })
+                      .where(role: 'user')
+                      .where(created_at: period_range)
+                      .group(Arel.sql('EXTRACT(HOUR FROM messages.created_at)::integer'))
+                      .count
+                      .transform_keys(&:to_i)
+
+    # Заполняем все 24 часа, даже если нет данных
+    (0..23).map { |hour| { hour: hour, count: raw_data[hour] || 0 } }
+  rescue ActiveRecord::StatementInvalid => e
+    log_error(e, { method: 'build_hourly_distribution', tenant_id: tenant.id, period: period })
+    (0..23).map { |hour| { hour: hour, count: 0 } }
   end
 end
