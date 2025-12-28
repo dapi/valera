@@ -349,16 +349,17 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_kind_of Array, result.funnel_trend
   end
 
-  test 'funnel_trend contains week data with required keys' do
+  test 'funnel_trend contains WeekData structs with required attributes' do
     result = DashboardStatsService.new(@tenant, period: 30).call
 
     if result.funnel_trend.any?
       week = result.funnel_trend.first
-      assert_includes week.keys, :week_start
-      assert_includes week.keys, :week_end
-      assert_includes week.keys, :chats
-      assert_includes week.keys, :bookings
-      assert_includes week.keys, :conversion
+      assert_kind_of DashboardStatsService::WeekData, week
+      assert_respond_to week, :week_start
+      assert_respond_to week, :week_end
+      assert_respond_to week, :chats_count
+      assert_respond_to week, :bookings_count
+      assert_respond_to week, :conversion_rate
     end
   end
 
@@ -367,8 +368,8 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
 
     if result.funnel_trend.any?
       week = result.funnel_trend.first
-      assert_kind_of Date, week[:week_start]
-      assert_kind_of Date, week[:week_end]
+      assert_kind_of Date, week.week_start
+      assert_kind_of Date, week.week_end
     end
   end
 
@@ -376,11 +377,11 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     result = DashboardStatsService.new(@tenant, period: 7).call
 
     result.funnel_trend.each do |week|
-      if week[:chats].positive?
-        expected = (week[:bookings].to_f / week[:chats] * 100).round(1)
-        assert_equal expected, week[:conversion]
+      if week.chats_count.positive?
+        expected = (week.bookings_count.to_f / week.chats_count * 100).round(1)
+        assert_equal expected, week.conversion_rate
       else
-        assert_equal 0.0, week[:conversion]
+        assert_equal 0.0, week.conversion_rate
       end
     end
   end
@@ -396,7 +397,7 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     result = DashboardStatsService.new(@tenant, period: 30).call
 
     if result.funnel_trend.size > 1
-      dates = result.funnel_trend.map { |w| w[:week_start] }
+      dates = result.funnel_trend.map(&:week_start)
       assert_equal dates, dates.sort
     end
   end
@@ -580,5 +581,61 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
       assert_equal 0, week_data.bookings_count
       assert_equal 0.0, week_data.conversion_rate
     end
+  end
+
+  test 'funnel_trend isolates data by tenant' do
+    # Tenant 1 с 1 чатом и 1 букингом
+    user1 = User.create!(name: 'Trend Iso 1', email: 'trend_iso1@test.com', password: 'password123')
+    tenant1 = Tenant.create!(name: 'Trend Iso Tenant 1', bot_token: '111111111:TRENDiso1', bot_username: 'trend_iso_bot1', owner: user1)
+    tg_user1 = TelegramUser.create!(username: 'trend_iso_user1', first_name: 'TrendIso1')
+    client1 = tenant1.clients.create!(telegram_user: tg_user1, name: 'Trend Iso Client 1')
+    chat1 = tenant1.chats.create!(client: client1)
+    tenant1.bookings.create!(chat: chat1, client: client1)
+
+    # Tenant 2 с 1 чатом и 5 букингами
+    user2 = User.create!(name: 'Trend Iso 2', email: 'trend_iso2@test.com', password: 'password123')
+    tenant2 = Tenant.create!(name: 'Trend Iso Tenant 2', bot_token: '222222222:TRENDiso2', bot_username: 'trend_iso_bot2', owner: user2)
+    tg_user2 = TelegramUser.create!(username: 'trend_iso_user2', first_name: 'TrendIso2')
+    client2 = tenant2.clients.create!(telegram_user: tg_user2, name: 'Trend Iso Client 2')
+    chat2 = tenant2.chats.create!(client: client2)
+    5.times { tenant2.bookings.create!(chat: chat2, client: client2) }
+
+    result1 = DashboardStatsService.new(tenant1).call
+    result2 = DashboardStatsService.new(tenant2).call
+
+    current_week1 = result1.funnel_trend.last
+    current_week2 = result2.funnel_trend.last
+
+    # Tenant 1 видит только свои данные (1 чат, 1 букинг)
+    assert_equal 1, current_week1.chats_count
+    assert_equal 1, current_week1.bookings_count
+
+    # Tenant 2 видит только свои данные (1 чат, 5 букингов)
+    assert_equal 1, current_week2.chats_count
+    assert_equal 5, current_week2.bookings_count
+  end
+
+  test 'funnel_trend groups records from same week correctly' do
+    # Создаём изолированный тенант
+    user = User.create!(name: 'Week Group Owner', email: 'week_group@test.com', password: 'password123')
+    tenant = Tenant.create!(name: 'Week Group Tenant', bot_token: '333333333:WEEKGROUP', bot_username: 'week_group_bot', owner: user)
+    tg_user = TelegramUser.create!(username: 'week_group_user', first_name: 'WeekGroup')
+    client = tenant.clients.create!(telegram_user: tg_user, name: 'Week Group Client')
+
+    # Создаем чаты в начале и конце текущей недели
+    week_start = Date.current.beginning_of_week.to_time + 1.hour
+    week_end = Date.current.end_of_week.to_time - 1.hour
+
+    chat1 = tenant.chats.create!(client: client, created_at: week_start)
+    chat2 = tenant.chats.create!(client: client, created_at: week_end)
+    tenant.bookings.create!(chat: chat1, client: client, created_at: week_start)
+
+    result = DashboardStatsService.new(tenant).call
+    current_week = result.funnel_trend.last
+
+    # Оба чата должны быть в одной неделе
+    assert_equal 2, current_week.chats_count
+    assert_equal 1, current_week.bookings_count
+    assert_equal 50.0, current_week.conversion_rate
   end
 end
