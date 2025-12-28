@@ -44,5 +44,29 @@ module Admin
     # def records_per_page
     #   params[:per_page] || 20
     # end
+
+    # Apply COLLECTION_FILTERS from dashboard if defined.
+    # Filters are applied via URL parameters matching filter names.
+    # Example: ?provider=openai&family=gpt
+    def scoped_resource
+      apply_collection_filters(super)
+    end
+
+    def apply_collection_filters(resources)
+      filters = dashboard_class.const_get(:COLLECTION_FILTERS) rescue nil
+      return resources unless filters.present?
+
+      filters.each do |filter_name, filter_proc|
+        filter_value = params[filter_name]
+        next if filter_value.blank?
+
+        resources = filter_proc.call(resources, filter_value)
+      end
+      resources
+    end
+
+    def dashboard_class
+      "#{resource_name.to_s.camelize}Dashboard".constantize
+    end
   end
 end
