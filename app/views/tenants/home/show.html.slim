@@ -37,18 +37,48 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
         span.text-2xl 📨
       .text-3xl.font-bold.text-gray-800.mt-2 = @stats.messages_today
 
-  / График активности
-  .mt-8.bg-white.rounded-lg.shadow.p-6 data-controller="chart"
-    .flex.items-center.justify-between.mb-4
-      h2.text-lg.font-semibold.text-gray-800 📈 Активность
-      .flex.gap-2
-        = link_to "7 дней", tenant_root_path(period: 7), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 7 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
-        = link_to "30 дней", tenant_root_path(period: 30), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 30 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
-        = link_to "90 дней", tenant_root_path(period: 90), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 90 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
-        = link_to "Всё время", tenant_root_path(period: "all"), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period.nil? ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+  / График активности и Воронка конверсии
+  .grid.grid-cols-1.lg:grid-cols-3.gap-6.mt-8
+    / График активности (занимает 2 колонки)
+    .lg:col-span-2.bg-white.rounded-lg.shadow.p-6 data-controller="chart"
+      .flex.items-center.justify-between.mb-4
+        h2.text-lg.font-semibold.text-gray-800 📈 Активность
+        .flex.gap-2
+          = link_to "7 дней", tenant_root_path(period: 7), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 7 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+          = link_to "30 дней", tenant_root_path(period: 30), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 30 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+          = link_to "90 дней", tenant_root_path(period: 90), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 90 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+          = link_to "Всё время", tenant_root_path(period: "all"), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period.nil? ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
 
-    .h-64
-      canvas data-chart-target="canvas" data-chart-labels=@stats.chart_data[:labels].to_json data-chart-values=@stats.chart_data[:values].to_json
+      .h-64
+        canvas data-chart-target="canvas" data-chart-labels=@stats.chart_data[:labels].to_json data-chart-values=@stats.chart_data[:values].to_json
+
+    / Воронка конверсии
+    .bg-white.rounded-lg.shadow.p-6
+      h2.text-lg.font-semibold.text-gray-800.mb-4 📊 Воронка конверсии
+
+      .space-y-4
+        / Диалоги
+        div
+          .flex.items-center.justify-between.mb-1
+            span.text-sm.font-medium.text-gray-600 Диалоги
+            span.text-lg.font-bold.text-gray-800 = @stats.funnel_data[:chats_count]
+          .w-full.bg-gray-200.rounded-full.h-3
+            .bg-blue-500.h-3.rounded-full style="width: 100%"
+
+        / Заявки
+        div
+          .flex.items-center.justify-between.mb-1
+            span.text-sm.font-medium.text-gray-600 Заявки
+            span.text-lg.font-bold.text-gray-800 = @stats.funnel_data[:bookings_count]
+          - bar_width = [@stats.funnel_data[:conversion_rate].round, 100].min
+          .w-full.bg-gray-200.rounded-full.h-3
+            .bg-green-500.h-3.rounded-full style="width: #{bar_width}%"
+
+        / Конверсия
+        .pt-4.border-t.border-gray-200
+          .flex.items-center.justify-between
+            span.text-sm.font-medium.text-gray-600 Конверсия
+            span.text-2xl.font-bold.text-green-600 #{@stats.funnel_data[:conversion_rate]}%
 
   / Последние диалоги
   .mt-8.bg-white.rounded-lg.shadow.p-6
