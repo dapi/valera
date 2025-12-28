@@ -21,30 +21,98 @@ require 'yaml'
 # Генератор демо-диалогов через LLM
 class DemoDialogGenerator
   # Профили клиентов с настройками
+  # weight - доля от общего количества при автораспределении
+  # booking_rate - вероятность записи на сервис
+  # messages - диапазон количества пар сообщений
   PROFILES = {
+    # === Базовые профили (основная сегментация) ===
     active_client: {
-      weight: 20,          # 20% от общего количества
-      booking_rate: 0.9,   # 90% шанс записи
-      messages: 10..20,    # количество пар сообщений
+      weight: 10, booking_rate: 0.9, messages: 10..20,
       description: 'Постоянный клиент, доверяет сервису'
     },
     one_time_client: {
-      weight: 50,
-      booking_rate: 0.5,
-      messages: 5..12,
+      weight: 15, booking_rate: 0.5, messages: 5..12,
       description: 'Первое обращение, ищет решение проблемы'
     },
     just_asking: {
-      weight: 20,
-      booking_rate: 0.0,
-      messages: 3..6,
+      weight: 8, booking_rate: 0.0, messages: 3..6,
       description: 'Интересуется ценами, не готов к действиям'
     },
     urgent_client: {
-      weight: 10,
-      booking_rate: 0.85,
-      messages: 6..10,
+      weight: 5, booking_rate: 0.85, messages: 6..10,
       description: 'Аварийная ситуация, нужна срочная помощь'
+    },
+
+    # === Профили по характеру ===
+    suspicious_client: {
+      weight: 5, booking_rate: 0.4, messages: 8..15,
+      description: 'Недоверчивый, боится обмана'
+    },
+    budget_client: {
+      weight: 8, booking_rate: 0.3, messages: 6..12,
+      description: 'Экономный, ищет минимальную цену'
+    },
+    vip_client: {
+      weight: 3, booking_rate: 0.95, messages: 5..10,
+      description: 'VIP, цена не важна, важно качество'
+    },
+    perfectionist_client: {
+      weight: 3, booking_rate: 0.65, messages: 8..15,
+      description: 'Перфекционист, требует идеального результата'
+    },
+
+    # === Профили по уровню знаний ===
+    tech_savvy_client: {
+      weight: 5, booking_rate: 0.7, messages: 6..12,
+      description: 'Технически грамотный, знает термины'
+    },
+    newbie_driver: {
+      weight: 6, booking_rate: 0.75, messages: 6..12,
+      description: 'Новичок, первая машина, ничего не понимает'
+    },
+
+    # === Профили по возрасту/стилю ===
+    elderly_client: {
+      weight: 4, booking_rate: 0.6, messages: 8..15,
+      description: 'Пожилой, медленно общается, переспрашивает'
+    },
+    young_driver: {
+      weight: 5, booking_rate: 0.55, messages: 4..8,
+      description: 'Молодой, сленг, быстрое общение'
+    },
+    busy_businessman: {
+      weight: 4, booking_rate: 0.8, messages: 4..8,
+      description: 'Занятой бизнесмен, ценит время'
+    },
+    emotional_female_client: {
+      weight: 4, booking_rate: 0.7, messages: 6..12,
+      description: 'Эмоциональная, нуждается в поддержке'
+    },
+
+    # === Профили по ситуации ===
+    referred_client: {
+      weight: 5, booking_rate: 0.85, messages: 5..10,
+      description: 'Пришёл по рекомендации друга'
+    },
+    disappointed_client: {
+      weight: 4, booking_rate: 0.55, messages: 7..14,
+      description: 'Разочарован другим сервисом'
+    },
+    insurance_client: {
+      weight: 4, booking_rate: 0.9, messages: 6..12,
+      description: 'Страховой случай ОСАГО/КАСКО'
+    },
+    pre_sale_client: {
+      weight: 3, booking_rate: 0.7, messages: 5..10,
+      description: 'Готовит машину к продаже'
+    },
+    post_purchase_client: {
+      weight: 3, booking_rate: 0.95, messages: 5..10,
+      description: 'Купил б/у, хочет проверить'
+    },
+    corporate_client: {
+      weight: 2, booking_rate: 0.8, messages: 6..12,
+      description: 'Корпоративный, автопарк компании'
     }
   }.freeze
 
