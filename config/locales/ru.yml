@@ -401,6 +401,7 @@ ru:
         search_placeholder: Поиск по имени или телефону...
         search_button: Найти
         clear_search: Сбросить
+        export_csv: Экспорт CSV
         headers:
           name: Имя
           phone: Телефон
@@ -442,6 +443,7 @@ ru:
         date_to: По
         filter_button: Применить
         clear_filter: Сбросить
+        export_csv: Экспорт CSV
         headers:
           number: Номер
           client: Клиент

@@ -1,4 +1,7 @@
-h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
+/ Header with title and export button
+.flex.justify-between.items-center.mb-6
+  h1.text-2xl.font-bold.text-gray-800 = t('.title')
+  = button_to t('.export_csv'), tenant_clients_export_path, method: :post, class: "bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
 
 / Search form
 .mb-6

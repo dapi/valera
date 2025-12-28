@@ -21,6 +21,9 @@ gem 'tailwindcss-rails'
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'jbuilder'
 
+# CSV support (required from Ruby 3.4+)
+gem 'csv'
+
 # Данный репоизтоий используется только из-за поддержки Rails 8.1.
 # Реальный оригиниальный источник с документацией - https://github.com/telegram-bot-rb/telegram-bot
 gem 'telegram-bot', github: 'mprokopov/telegram-bot'
