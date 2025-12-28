@@ -13,10 +13,12 @@
     all_resources = Administrate::Namespace.new(namespace).resources_with_index_route
     priority_resources = %w[leads tenants]
     tenant_resources = %w[clients chats vehicles bookings tenant_memberships tenant_invites]
+    superuser_resources = %w[models]
 
     # Order: priority first, then platform, then tenant data
+    # Superuser resources are shown separately in System section
     priority = all_resources.select { |r| priority_resources.include?(r.to_s) }
-    platform_resources = all_resources.reject { |r| (tenant_resources + priority_resources).include?(r.to_s) }
+    platform_resources = all_resources.reject { |r| (tenant_resources + priority_resources + superuser_resources).include?(r.to_s) }
     tenant_data_resources = all_resources.select { |r| tenant_resources.include?(r.to_s) }
   %>
 
@@ -61,6 +63,9 @@
   <div class="navigation__divider"></div>
   <div class="navigation__section-title">System</div>
   <%= link_to "Jobs", GoodJob::Engine.routes.url_helpers.root_path, class: "navigation__link" %>
+  <% if current_admin_user&.superuser? %>
+    <%= link_to "Models", admin_models_path, class: "navigation__link navigation__link--#{controller_name == 'models' ? 'active' : 'inactive'}" %>
+  <% end %>
 
   <div class="navigation__divider"></div>
   <div class="navigation__external-links">
