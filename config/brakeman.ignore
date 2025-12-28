@@ -1,10 +1,10 @@
 {
   "ignored_warnings": [
     {
-      "fingerprint": "713c413be63edd287ab2d1ebf540dbfe5431c82f93fa1f5dd5d92984c8f15a05",
-      "note": "Role is an enum field, validated by the model. Only :viewer, :operator, :admin are accepted. False positive."
+      "fingerprint": "ac42ce868243ca41b5d7122756942135f929fa3ac0a54b5549f89a989e782402",
+      "note": "Admin controller - admin must set tenant_id and role for invite. Role is validated by model enum. False positive."
     }
   ],
-  "updated": "2025-12-27 12:10:00 +0300",
+  "updated": "2025-12-28 12:25:00 +0300",
   "brakeman_version": "7.1.2"
 }
