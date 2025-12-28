@@ -87,12 +87,15 @@ class Booking < ApplicationRecord
   # Устанавливает first_booking_at при создании первой заявки,
   # и всегда обновляет last_booking_at.
   #
+  # Использует атомарный SQL UPDATE с COALESCE для предотвращения
+  # race condition при одновременном создании нескольких заявок.
+  #
   # @return [void]
   # @api private
   def update_chat_booking_timestamps
-    chat.update_columns(
-      first_booking_at: chat.first_booking_at || created_at,
-      last_booking_at: created_at
-    )
+    Chat.where(id: chat_id).update_all([
+      'first_booking_at = COALESCE(first_booking_at, ?), last_booking_at = ?',
+      created_at, created_at
+    ])
   end
 end

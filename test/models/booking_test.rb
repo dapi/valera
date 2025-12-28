@@ -107,6 +107,26 @@ class BookingTest < ActiveSupport::TestCase
     assert_equal initial_count + 1, chat.reload.bookings_count
   end
 
+  test 'decrements chat bookings_count on destroy' do
+    chat = chats(:one)
+    # Сбрасываем состояние и синхронизируем counter_cache
+    chat.bookings.destroy_all
+    Chat.reset_counters(chat.id, :bookings)
+    assert_equal 0, chat.reload.bookings_count
+
+    booking = Booking.create!(
+      tenant: chat.tenant,
+      client: chat.client,
+      chat: chat,
+      meta: { customer_name: 'To Delete' }
+    )
+    assert_equal 1, chat.reload.bookings_count
+
+    booking.destroy
+
+    assert_equal 0, chat.reload.bookings_count
+  end
+
   test 'sets first_booking_at on first booking' do
     chat = chats(:one)
     chat.update_columns(first_booking_at: nil, last_booking_at: nil, bookings_count: 0)

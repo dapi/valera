@@ -87,6 +87,15 @@ en:
         bookings_count:
           one: "%{count} booking"
           other: "%{count} bookings"
+      chats_list:
+        chat_default_title: "Chat #%{id}"
+        messages_count:
+          one: "%{count} message"
+          other: "%{count} messages"
+        bookings_count:
+          one: "%{count} booking"
+          other: "%{count} bookings"
+        view_chat: View
     chats:
       chat_header:
         bookings_count:
