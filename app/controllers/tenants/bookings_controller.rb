@@ -6,7 +6,13 @@ module Tenants
   # Показывает список заявок с пагинацией и фильтрацией по дате,
   # а также детальную информацию о заявке.
   class BookingsController < ApplicationController
+    include ErrorLogger
     PER_PAGE = 20
+    PERIOD_FILTERS = {
+      'today' => -> { Date.current.beginning_of_day },
+      'week' => -> { 1.week.ago.beginning_of_day },
+      'month' => -> { 1.month.ago.beginning_of_day }
+    }.freeze
 
     # GET /bookings
     def index
@@ -26,25 +32,35 @@ module Tenants
     private
 
     def apply_date_filter
-      apply_date_from_filter
-      apply_date_to_filter
+      apply_period_filter
+      apply_custom_date_range
     end
 
-    def apply_date_from_filter
-      return unless params[:date_from].present?
+    def apply_period_filter
+      return unless PERIOD_FILTERS[params[:period]]
 
-      date = Date.parse(params[:date_from])
-      @bookings = @bookings.where('bookings.created_at >= ?', date.beginning_of_day)
-    rescue Date::Error
-      flash.now[:alert] = t('tenants.bookings.index.invalid_date_format')
+      start_date = PERIOD_FILTERS[params[:period]].call
+      @bookings = @bookings.where('bookings.created_at >= ?', start_date)
     end
 
-    def apply_date_to_filter
-      return unless params[:date_to].present?
+    def apply_custom_date_range
+      apply_date_boundary(:date_from, :>=, :beginning_of_day)
+      apply_date_boundary(:date_to, :<=, :end_of_day)
+    end
 
-      date = Date.parse(params[:date_to])
-      @bookings = @bookings.where('bookings.created_at <= ?', date.end_of_day)
-    rescue Date::Error
+    def apply_date_boundary(param, operator, time_method)
+      return unless params[param].present?
+
+      date = Date.parse(params[param])
+      boundary = date.send(time_method)
+      @bookings = @bookings.where("bookings.created_at #{operator} ?", boundary)
+    rescue Date::Error => e
+      log_error(e, {
+        controller: 'Tenants::BookingsController',
+        action: 'apply_date_boundary',
+        param: param,
+        value: params[param]
+      })
       flash.now[:alert] = t('tenants.bookings.index.invalid_date_format')
     end
   end

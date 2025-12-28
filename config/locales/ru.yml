@@ -436,9 +436,23 @@ ru:
           actions: Действия
         no_bookings: Заявок пока нет
         view_booking: Открыть
+        chats_title: Чаты
+        chat_default_title: "Чат #%{id}"
+        messages_count:
+          one: "%{count} сообщение"
+          few: "%{count} сообщения"
+          many: "%{count} сообщений"
+          other: "%{count} сообщений"
+        view_chat: Открыть
+        no_chats: Чатов пока нет
     bookings:
       index:
         title: Заявки
+        period:
+          all: Все
+          today: Сегодня
+          week: Неделя
+          month: Месяц
         date_from: С
         date_to: По
         filter_button: Применить
@@ -465,6 +479,7 @@ ru:
         no_vehicle: Автомобиль не указан
         details_title: Описание
         context_title: Контекст
+        meta_title: Meta данные
         related_chat: Связанный чат
         messages_count:
           one: "%{count} сообщение"

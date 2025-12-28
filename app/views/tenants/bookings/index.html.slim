@@ -3,6 +3,13 @@
   h1.text-2xl.font-bold.text-gray-800 = t('.title')
   = button_to t('.export_csv'), tenant_bookings_export_path(date_from: params[:date_from], date_to: params[:date_to]), method: :post, class: "bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
 
+/ Quick period filters
+.flex.gap-2.mb-4
+  = render 'period_filter_button', period: nil, title: t('.period.all')
+  = render 'period_filter_button', period: 'today', title: t('.period.today')
+  = render 'period_filter_button', period: 'week', title: t('.period.week')
+  = render 'period_filter_button', period: 'month', title: t('.period.month')
+
 / Date filter form
 .mb-6.bg-white.rounded-lg.shadow.p-4
   = form_with url: tenant_bookings_path, method: :get, class: "flex flex-wrap gap-4 items-end" do |f|
@@ -56,10 +63,8 @@
               = link_to t('.view'), tenant_booking_path(booking), class: "text-blue-600 hover:text-blue-900"
   - else
     .p-8.text-center.text-gray-500
-      - if params[:date_from].present? || params[:date_to].present?
-        p = t('.no_results')
-      - else
-        p = t('.empty')
+      - message_key = (params[:date_from].present? || params[:date_to].present? || params[:period].present?) ? '.no_results' : '.empty'
+      p = t(message_key)
 
 / Pagination
 - if @bookings.total_pages > 1

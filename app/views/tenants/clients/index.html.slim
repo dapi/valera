@@ -18,10 +18,10 @@
     table.min-w-full.divide-y.divide-gray-200
       thead.bg-gray-50
         tr
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.name')
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.phone')
+          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = sortable_column('name', t('.headers.name'))
+          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = sortable_column('phone', t('.headers.phone'))
           th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.telegram')
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.registered')
+          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = sortable_column('created_at', t('.headers.registered'), default_direction: :desc)
           th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.vehicles')
           th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.bookings')
           th.px-6.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.headers.actions')

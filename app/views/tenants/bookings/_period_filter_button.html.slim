@@ -1,0 +1,5 @@
+- is_active = period.nil? ? (params[:period].blank? && params[:date_from].blank? && params[:date_to].blank?) : (params[:period] == period)
+- active_class = is_active ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+- path = period ? tenant_bookings_path(period: period) : tenant_bookings_path
+
+= link_to title, path, class: "px-3 py-1 rounded-full text-sm #{active_class}"

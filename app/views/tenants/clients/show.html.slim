@@ -45,44 +45,26 @@
     h2.text-lg.font-semibold.text-gray-800 = t('.vehicles_title')
 
   - if @client.vehicles.any?
-    table.min-w-full.divide-y.divide-gray-200
-      thead.bg-gray-50
-        tr
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.vehicle_headers.brand')
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.vehicle_headers.model')
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.vehicle_headers.year')
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.vehicle_headers.plate_number')
-      tbody.bg-white.divide-y.divide-gray-200
-        - @client.vehicles.each do |vehicle|
-          tr
-            td.px-6.py-4.whitespace-nowrap.text-sm.font-medium.text-gray-900 = vehicle.brand.presence || '—'
-            td.px-6.py-4.whitespace-nowrap.text-sm.text-gray-500 = vehicle.model.presence || '—'
-            td.px-6.py-4.whitespace-nowrap.text-sm.text-gray-500 = vehicle.year.presence || '—'
-            td.px-6.py-4.whitespace-nowrap.text-sm.text-gray-500 = vehicle.plate_number.presence || '—'
+    = render 'vehicles_table', vehicles: @client.vehicles
   - else
     .p-6.text-center.text-gray-500 = t('.no_vehicles')
 
 / Bookings section
-.bg-white.rounded-lg.shadow.overflow-hidden
+.bg-white.rounded-lg.shadow.overflow-hidden.mb-6
   .px-6.py-4.border-b.border-gray-200
     h2.text-lg.font-semibold.text-gray-800 = t('.bookings_title')
 
   - if @client.bookings.any?
-    table.min-w-full.divide-y.divide-gray-200
-      thead.bg-gray-50
-        tr
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.booking_headers.number')
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.booking_headers.date')
-          th.px-6.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.booking_headers.details')
-          th.px-6.py-3.text-right.text-xs.font-medium.text-gray-500.uppercase.tracking-wider = t('.booking_headers.actions')
-      tbody.bg-white.divide-y.divide-gray-200
-        - @client.bookings.sort_by(&:created_at).reverse.each do |booking|
-          tr.hover:bg-gray-50
-            td.px-6.py-4.whitespace-nowrap
-              span.font-mono.text-sm.font-medium.text-gray-900 = booking.public_number
-            td.px-6.py-4.whitespace-nowrap.text-sm.text-gray-500 = l(booking.created_at, format: :short)
-            td.px-6.py-4.text-sm.text-gray-500 = truncate(booking.details, length: 60) if booking.details.present?
-            td.px-6.py-4.whitespace-nowrap.text-right.text-sm.font-medium
-              = link_to t('.view_booking'), tenant_booking_path(booking), class: "text-blue-600 hover:text-blue-900"
+    = render 'bookings_table', bookings: @client.bookings
   - else
     .p-6.text-center.text-gray-500 = t('.no_bookings')
+
+/ Chats section
+.bg-white.rounded-lg.shadow.overflow-hidden
+  .px-6.py-4.border-b.border-gray-200
+    h2.text-lg.font-semibold.text-gray-800 = t('.chats_title')
+
+  - if @client.chats.any?
+    = render 'chats_list', chats: @client.chats
+  - else
+    .p-6.text-center.text-gray-500 = t('.no_chats')
