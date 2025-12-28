@@ -98,16 +98,16 @@ class DashboardStatsService
 
   # Рассчитывает среднее количество сообщений на диалог
   #
+  # Использует два COUNT запроса вместо загрузки данных в память,
+  # что оптимально для тенантов с большим количеством чатов.
+  #
   # @return [Float] среднее количество сообщений, округленное до 1 знака
   def calculate_avg_messages_per_chat
-    messages_per_chat = tenant.chats
-                              .joins(:messages)
-                              .group('chats.id')
-                              .count('messages.id')
+    chats_with_messages_count = tenant.chats.joins(:messages).distinct.count
+    return 0.0 if chats_with_messages_count.zero?
 
-    return 0.0 if messages_per_chat.empty?
-
-    (messages_per_chat.values.sum.to_f / messages_per_chat.size).round(1)
+    total_messages = Message.joins(:chat).where(chats: { tenant_id: tenant.id }).count
+    (total_messages.to_f / chats_with_messages_count).round(1)
   end
 
   def build_chart_data
