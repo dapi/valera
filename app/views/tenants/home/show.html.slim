@@ -88,6 +88,36 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
             span.text-sm.font-medium.text-gray-600 Конверсия
             span.text-2xl.font-bold.text-green-600 #{@stats.funnel_data[:conversion_rate]}%
 
+      / Тренд конверсии по неделям
+      - if @stats.funnel_trend.present? && @stats.funnel_trend.size > 1
+        .mt-6.pt-4.border-t.border-gray-200
+          h3.text-sm.font-medium.text-gray-500.mb-3 Тренд по неделям
+          .overflow-x-auto
+            table.w-full.text-sm
+              thead
+                tr.text-left.text-gray-500.border-b
+                  th.py-2.pr-2 Неделя
+                  th.py-2.px-2.text-right Диалоги
+                  th.py-2.px-2.text-right Заявки
+                  th.py-2.pl-2.text-right Конверсия
+              tbody
+                - prev_conversion = nil
+                - @stats.funnel_trend.each do |week|
+                  tr.border-b.border-gray-100
+                    td.py-2.pr-2.text-gray-600
+                      = "#{week[:week_start].strftime('%d.%m')} - #{week[:week_end].strftime('%d.%m')}"
+                    td.py-2.px-2.text-right.text-gray-800 = week[:chats]
+                    td.py-2.px-2.text-right.text-gray-800 = week[:bookings]
+                    td.py-2.pl-2.text-right
+                      span.font-medium class=(week[:conversion] > 0 ? 'text-green-600' : 'text-gray-400')
+                        = "#{week[:conversion]}%"
+                      - if prev_conversion.present?
+                        - if week[:conversion] > prev_conversion
+                          span.ml-1.text-green-500 ↑
+                        - elsif week[:conversion] < prev_conversion
+                          span.ml-1.text-red-500 ↓
+                      - prev_conversion = week[:conversion]
+
   / Расходы на AI
   .mt-8.bg-white.rounded-lg.shadow.p-6
     h2.text-lg.font-semibold.text-gray-800.mb-4 💰 Расходы на AI

@@ -28,6 +28,7 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_respond_to result, :chart_data
     assert_respond_to result, :recent_chats
     assert_respond_to result, :funnel_data
+    assert_respond_to result, :funnel_trend
   end
 
   test 'counts total clients for tenant' do
@@ -338,6 +339,66 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
 
     assert_equal 0, result.funnel_data[:chats_count]
     assert_equal 0.0, result.funnel_data[:conversion_rate]
+  end
+
+  # === funnel_trend ===
+
+  test 'funnel_trend returns array' do
+    result = DashboardStatsService.new(@tenant).call
+
+    assert_kind_of Array, result.funnel_trend
+  end
+
+  test 'funnel_trend contains week data with required keys' do
+    result = DashboardStatsService.new(@tenant, period: 30).call
+
+    if result.funnel_trend.any?
+      week = result.funnel_trend.first
+      assert_includes week.keys, :week_start
+      assert_includes week.keys, :week_end
+      assert_includes week.keys, :chats
+      assert_includes week.keys, :bookings
+      assert_includes week.keys, :conversion
+    end
+  end
+
+  test 'funnel_trend week dates are Date objects' do
+    result = DashboardStatsService.new(@tenant, period: 30).call
+
+    if result.funnel_trend.any?
+      week = result.funnel_trend.first
+      assert_kind_of Date, week[:week_start]
+      assert_kind_of Date, week[:week_end]
+    end
+  end
+
+  test 'funnel_trend calculates conversion correctly' do
+    result = DashboardStatsService.new(@tenant, period: 7).call
+
+    result.funnel_trend.each do |week|
+      if week[:chats].positive?
+        expected = (week[:bookings].to_f / week[:chats] * 100).round(1)
+        assert_equal expected, week[:conversion]
+      else
+        assert_equal 0.0, week[:conversion]
+      end
+    end
+  end
+
+  test 'funnel_trend returns more weeks for longer period' do
+    result_7 = DashboardStatsService.new(@tenant, period: 7).call
+    result_30 = DashboardStatsService.new(@tenant, period: 30).call
+
+    assert_operator result_30.funnel_trend.size, :>=, result_7.funnel_trend.size
+  end
+
+  test 'funnel_trend weeks are ordered chronologically' do
+    result = DashboardStatsService.new(@tenant, period: 30).call
+
+    if result.funnel_trend.size > 1
+      dates = result.funnel_trend.map { |w| w[:week_start] }
+      assert_equal dates, dates.sort
+    end
   end
 
   # === llm_costs ===
