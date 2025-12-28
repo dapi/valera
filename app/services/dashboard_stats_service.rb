@@ -23,6 +23,7 @@ class DashboardStatsService
     :chart_data,
     :recent_chats,
     :funnel_data,
+    :funnel_trend,
     :llm_costs,
     keyword_init: true
   )
@@ -55,6 +56,7 @@ class DashboardStatsService
       chart_data: build_chart_data,
       recent_chats: fetch_recent_chats,
       funnel_data: build_funnel_data,
+      funnel_trend: build_funnel_trend,
       llm_costs: build_llm_costs
     )
   end
@@ -141,6 +143,42 @@ class DashboardStatsService
       bookings_count: bookings_count,
       conversion_rate: conversion_rate
     }
+  end
+
+  def build_funnel_trend
+    weeks = period_weeks
+    return [] if weeks.empty?
+
+    weeks.map do |week_start, week_end|
+      chats_count = tenant.chats.where(created_at: week_start..week_end).count
+      bookings_count = tenant.bookings.where(created_at: week_start..week_end).count
+      conversion = chats_count.positive? ? (bookings_count.to_f / chats_count * 100).round(1) : 0.0
+
+      {
+        week_start: week_start.to_date,
+        week_end: week_end.to_date,
+        chats: chats_count,
+        bookings: bookings_count,
+        conversion: conversion
+      }
+    end
+  end
+
+  def period_weeks
+    chart_period = effective_chart_period
+    end_date = Date.current.end_of_week
+    start_date = (chart_period.days.ago.to_date).beginning_of_week
+
+    weeks = []
+    current_week_start = start_date
+
+    while current_week_start <= end_date
+      week_end = [ current_week_start.end_of_week, Date.current ].min
+      weeks << [ current_week_start.beginning_of_day, week_end.end_of_day ]
+      current_week_start += 1.week
+    end
+
+    weeks
   end
 
   def build_llm_costs
