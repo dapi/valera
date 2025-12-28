@@ -14,8 +14,10 @@ class ClassifyChatTopicJobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'skips when chat does not exist' do
-    # Should not raise, just return
+  test 'skips when chat does not exist and logs warning' do
+    # Should not raise, just return and log
+    Rails.logger.expects(:warn).with(includes('Chat not found: 999999'))
+
     assert_nothing_raised do
       ClassifyChatTopicJob.perform_now(999_999)
     end
@@ -55,5 +57,21 @@ class ClassifyChatTopicJobTest < ActiveSupport::TestCase
     assert_enqueued_with(job: ClassifyChatTopicJob, args: [@chat.id]) do
       ClassifyChatTopicJob.perform_later(@chat.id)
     end
+  end
+
+  test 'has concurrency control configured' do
+    # Проверяем что GoodJob concurrency control настроен
+    concurrency_config = ClassifyChatTopicJob.good_job_concurrency_config
+
+    assert_equal 1, concurrency_config[:perform_limit]
+    assert_equal 1, concurrency_config[:enqueue_limit]
+    assert concurrency_config[:key].is_a?(Proc), 'Concurrency key should be a Proc'
+  end
+
+  test 'concurrency key includes chat_id' do
+    job = ClassifyChatTopicJob.new(@chat.id)
+    key = job.good_job_concurrency_key
+
+    assert_equal "classify_chat_topic_#{@chat.id}", key
   end
 end

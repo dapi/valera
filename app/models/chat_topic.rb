@@ -14,13 +14,20 @@
 # @see ChatTopicClassifier
 # @see Chat#chat_topic
 class ChatTopic < ApplicationRecord
+  # Ключ fallback топика для неклассифицированных чатов
+  FALLBACK_KEY = 'other'
+
   belongs_to :tenant, optional: true
   has_many :chats, dependent: :nullify
 
+  # Ключ нельзя менять после создания - это сломает LLM классификацию
+  attr_readonly :key
+
   validates :key, presence: true,
+                  length: { maximum: 50 },
                   format: { with: /\A[a-z][a-z0-9_]*\z/, message: 'только латинские буквы, цифры и подчёркивания' }
   validates :key, uniqueness: { scope: :tenant_id }
-  validates :label, presence: true
+  validates :label, presence: true, length: { maximum: 100 }
 
   scope :active, -> { where(active: true) }
   scope :global, -> { where(tenant_id: nil) }
@@ -36,13 +43,19 @@ class ChatTopic < ApplicationRecord
     tenant_topics.exists? ? tenant_topics : active.global
   end
 
-  # Находит или создаёт топик "other" для fallback
+  # Находит топик "other" для fallback при неудачной классификации
   #
   # @param tenant [Tenant, nil] тенант
-  # @return [ChatTopic]
+  # @return [ChatTopic, nil] топик или nil если не найден
   def self.fallback_topic(tenant = nil)
     scope = tenant ? where(tenant: tenant) : global
-    scope.find_by(key: 'other') || global.find_by(key: 'other')
+    result = scope.find_by(key: FALLBACK_KEY) || global.find_by(key: FALLBACK_KEY)
+
+    if result.nil?
+      Rails.logger.error "[ChatTopic] CRITICAL: Fallback topic '#{FALLBACK_KEY}' not found! Check seeds/migrations."
+    end
+
+    result
   end
 
   def to_s

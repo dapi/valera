@@ -178,4 +178,61 @@ class ChatTopicTest < ActiveSupport::TestCase
 
     assert topic.active
   end
+
+  # === Constants ===
+
+  test 'FALLBACK_KEY is defined' do
+    assert_equal 'other', ChatTopic::FALLBACK_KEY
+  end
+
+  # === Key Immutability ===
+
+  test 'key cannot be changed after creation' do
+    topic = ChatTopic.create!(key: 'immutable_key', label: 'Test')
+
+    # attr_readonly бросает исключение при попытке изменить key
+    assert_raises(ActiveRecord::ReadonlyAttributeError) do
+      topic.key = 'new_key'
+      topic.save!
+    end
+
+    # Ключ остается неизменным
+    assert_equal 'immutable_key', topic.reload.key
+  end
+
+  # === Length Validations ===
+
+  test 'key must not exceed 50 characters' do
+    topic = ChatTopic.new(key: 'a' * 51, label: 'Test')
+
+    refute topic.valid?
+    assert topic.errors[:key].any?
+  end
+
+  test 'label must not exceed 100 characters' do
+    topic = ChatTopic.new(key: 'test', label: 'a' * 101)
+
+    refute topic.valid?
+    assert topic.errors[:label].any?
+  end
+
+  # === Instance Methods ===
+
+  test 'to_s returns label' do
+    topic = ChatTopic.new(key: 'test', label: 'Test Label')
+
+    assert_equal 'Test Label', topic.to_s
+  end
+
+  test 'global? returns true for global topic' do
+    topic = ChatTopic.new(key: 'test', label: 'Test')
+
+    assert topic.global?
+  end
+
+  test 'global? returns false for tenant topic' do
+    topic = ChatTopic.new(key: 'test', label: 'Test', tenant: @tenant)
+
+    refute topic.global?
+  end
 end
