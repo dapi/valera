@@ -143,4 +143,30 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     assert_equal tenant_one.clients.count, result_one.clients_total
     assert_equal tenant_two.clients.count, result_two.clients_total
   end
+
+  test 'accepts 90 days period' do
+    result = DashboardStatsService.new(@tenant, period: 90).call
+
+    assert_equal 91, result.chart_data[:labels].size
+    assert_equal 91, result.chart_data[:values].size
+  end
+
+  test 'accepts nil period for all time' do
+    result = DashboardStatsService.new(@tenant, period: nil).call
+
+    assert_kind_of Hash, result.chart_data
+    assert_operator result.chart_data[:labels].size, :>=, 1
+  end
+
+  test 'all_time? returns true when period is nil' do
+    service = DashboardStatsService.new(@tenant, period: nil)
+
+    assert service.all_time?
+  end
+
+  test 'all_time? returns false when period is set' do
+    service = DashboardStatsService.new(@tenant, period: 7)
+
+    refute service.all_time?
+  end
 end

@@ -10,6 +10,12 @@ Rails.logger.info '[Seeds] Starting database seeding...'
 owner = User.find_or_create_by!(email: 'tenant@super-valera.ru') do |user|
   user.name = 'Администратор Super Valera'
 end
+
+# В development устанавливаем пароль для удобства тестирования
+if Rails.env.development? && owner.password_digest.blank?
+  owner.update!(password: 'password')
+  Rails.logger.info "[Seeds] Owner password set to 'password'"
+end
 Rails.logger.info "[Seeds] Owner user: #{owner.email} (id: #{owner.id})"
 
 # В multi-tenant режиме tenants создаются через UI/API с реальным bot_token
@@ -22,6 +28,26 @@ bot_token = ENV.fetch('TELEGRAM_BOT_TOKEN', nil)
 if bot_token.present?
   tenant = Tenant.create_with(name: 'Кузник', owner: owner).find_or_create_by!(bot_token: bot_token)
   Rails.logger.info "[Seeds] Tenant created: #{tenant.name} (key: #{tenant.key}, bot: @#{tenant.bot_username})"
+elsif Rails.env.development? || Rails.env.test?
+  # В development/test создаём tenant с фейковым токеном (без обращения к Telegram API)
+  fake_token = "123456789:fake_dev_token_#{SecureRandom.hex(8)}"
+  tenant = Tenant.find_by(key: 'dev') || Tenant.new(
+    name: 'Dev Автосервис',
+    key: 'dev',
+    owner: owner,
+    bot_token: fake_token,
+    bot_username: 'dev_valera_bot'
+  )
+
+  if tenant.new_record?
+    # Пропускаем fetch_bot_username callback для фейкового токена
+    tenant.class.skip_callback(:validation, :before, :fetch_bot_username, raise: false)
+    tenant.save!
+    tenant.class.set_callback(:validation, :before, :fetch_bot_username, if: :should_fetch_bot_username?)
+    Rails.logger.info "[Seeds] Dev tenant created: #{tenant.name} (key: #{tenant.key}, bot: @#{tenant.bot_username})"
+  else
+    Rails.logger.info "[Seeds] Dev tenant exists: #{tenant.name} (key: #{tenant.key})"
+  end
 else
   tenant = Tenant.first
   Rails.logger.info '[Seeds] TELEGRAM_BOT_TOKEN not set, using existing tenant' if tenant
@@ -141,14 +167,14 @@ if tenant && Rails.env.development?
 
   Rails.logger.info "[Seeds] Created #{conversations.size} demo conversations"
 
-  # Создаём bookings (через insert_all для обхода callbacks)
+  # Создаём bookings
   booking_data = [
     { details: 'Плановое ТО для Toyota Camry', created_ago: 2.hours },
     { details: 'Диагностика двигателя BMW X5', created_ago: 1.day },
     { details: 'Замена тормозных колодок Hyundai Solaris', created_ago: 3.days }
   ]
 
-  bookings_to_insert = []
+  bookings_created = 0
   booking_data.each_with_index do |data, index|
     client = clients[index % clients.size]
     chat = client.chats.first || Chat.create!(tenant: tenant, client: client)
@@ -156,19 +182,17 @@ if tenant && Rails.env.development?
     existing = Booking.exists?(tenant: tenant, client: client, details: data[:details])
     next if existing
 
-    bookings_to_insert << {
-      tenant_id: tenant.id,
-      client_id: client.id,
-      chat_id: chat.id,
-      details: data[:details],
-      created_at: Time.current - data[:created_ago],
-      updated_at: Time.current
-    }
+    booking = Booking.create!(
+      tenant: tenant,
+      client: client,
+      chat: chat,
+      details: data[:details]
+    )
+    booking.update_column(:created_at, Time.current - data[:created_ago])
+    bookings_created += 1
   end
 
-  Booking.insert_all(bookings_to_insert) if bookings_to_insert.any?
-
-  Rails.logger.info "[Seeds] Created #{bookings_to_insert.size} demo bookings"
+  Rails.logger.info "[Seeds] Created #{bookings_created} demo bookings"
 
   # Создаём дополнительные сообщения для графика активности (за последние 7-30 дней)
   (1..30).each do |days_ago|
