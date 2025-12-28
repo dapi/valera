@@ -19,7 +19,7 @@ module Admin
 
       if resource.save
         redirect_to(
-          [:admin, resource],
+          [ :admin, resource ],
           notice: translate_with_resource('create.success')
         )
       else
@@ -34,7 +34,7 @@ module Admin
       requested_resource.cancel!
 
       redirect_to(
-        [:admin, :tenant_invites],
+        [ :admin, :tenant_invites ],
         notice: t('admin.tenant_invites.destroy.success', default: 'Приглашение отменено')
       )
     end

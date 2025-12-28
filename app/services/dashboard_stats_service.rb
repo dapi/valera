@@ -12,6 +12,8 @@
 #
 # @see Tenants::HomeController
 class DashboardStatsService
+  include ErrorLogger
+
   Result = Struct.new(
     :clients_total,
     :clients_today,
@@ -20,6 +22,7 @@ class DashboardStatsService
     :bookings_today,
     :active_chats,
     :messages_today,
+    :avg_messages_per_dialog,
     :chart_data,
     :recent_chats,
     :funnel_data,
@@ -56,6 +59,7 @@ class DashboardStatsService
       bookings_today: bookings.where(created_at: today_range).count,
       active_chats: active_chats_count,
       messages_today: messages_today_count,
+      avg_messages_per_dialog: calculate_avg_messages_per_dialog,
       chart_data: build_chart_data,
       recent_chats: fetch_recent_chats,
       funnel_data: build_funnel_data,
@@ -97,6 +101,25 @@ class DashboardStatsService
            .where(chats: { tenant_id: tenant.id })
            .where(created_at: today_range)
            .count
+  end
+
+  # Рассчитывает среднее количество сообщений в диалоге (за всё время)
+  #
+  # Использует два COUNT запроса вместо загрузки данных в память,
+  # что оптимально для тенантов с большим количеством чатов.
+  #
+  # При ошибках БД возвращает 0.0, чтобы не блокировать загрузку dashboard.
+  #
+  # @return [Float] среднее количество сообщений, округленное до 1 знака
+  def calculate_avg_messages_per_dialog
+    chats_with_messages_count = tenant.chats.joins(:messages).distinct.count
+    return 0.0 if chats_with_messages_count.zero?
+
+    total_messages = Message.joins(:chat).where(chats: { tenant_id: tenant.id }).count
+    (total_messages.to_f / chats_with_messages_count).round(1)
+  rescue ActiveRecord::StatementInvalid => e
+    log_error(e, { method: 'calculate_avg_messages_per_dialog', tenant_id: tenant.id })
+    0.0
   end
 
   def build_chart_data

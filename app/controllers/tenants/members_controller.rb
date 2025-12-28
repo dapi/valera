@@ -7,7 +7,7 @@ module Tenants
   # Owner и admin могут приглашать новых сотрудников,
   # управлять существующими членами команды и изменять их роли.
   class MembersController < ApplicationController
-    before_action :require_admin!, except: [:index]
+    before_action :require_admin!, except: [ :index ]
     before_action :set_membership, only: %i[update destroy]
 
     # GET /members
