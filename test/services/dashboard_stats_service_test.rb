@@ -622,9 +622,10 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     tg_user = TelegramUser.create!(username: 'week_group_user', first_name: 'WeekGroup')
     client = tenant.clients.create!(telegram_user: tg_user, name: 'Week Group Client')
 
-    # Создаем чаты в начале и конце текущей недели
-    week_start = Date.current.beginning_of_week.to_time + 1.hour
-    week_end = Date.current.end_of_week.to_time - 1.hour
+    # Создаем чаты в начале и конце текущей недели (UTC для корректной группировки)
+    # Используем середину дней чтобы избежать проблем с timezone при DATE_TRUNC
+    week_start = Time.current.beginning_of_week + 1.day + 12.hours  # Вторник полдень
+    week_end = Time.current.end_of_week - 1.day + 12.hours  # Суббота полдень
 
     chat1 = tenant.chats.create!(client: client, created_at: week_start)
     chat2 = tenant.chats.create!(client: client, created_at: week_end)

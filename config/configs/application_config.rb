@@ -189,13 +189,15 @@ class ApplicationConfig < Anyway::Config
 
   # Вычисляет tld_length для корректной работы с поддоменами
   #
-  # Формула: dots + 1, чтобы весь host считался доменом, а subdomain добавлялся сверху.
-  # Для 'lvh.me' -> 2 (domain = 'lvh.me', subdomain 'dev' даст 'dev.lvh.me')
-  # Для '3010.brandymint.ru' -> 3 (domain = '3010.brandymint.ru', subdomain 'dev' даст 'dev.3010.brandymint.ru')
-  # Для 'localhost' -> 1 (default)
+  # tld_length определяет сколько сегментов справа считаются TLD (top-level domain).
+  # Формула: количество точек в host (минимум 1).
+  #
+  # Для 'lvh.me' (1 точка) -> 1 ('me' = TLD, 'lvh' = domain, subdomain 'dev' даст 'dev.lvh.me')
+  # Для '3010.brandymint.ru' (2 точки) -> 2 ('brandymint.ru' = TLD+domain, subdomain 'dev' даст 'dev.3010.brandymint.ru')
+  # Для 'localhost' (0 точек) -> 1 (default)
   def tld_length
     dots = host.to_s.count('.')
-    dots.positive? ? dots + 1 : 1
+    [dots, 1].max
   end
 
   # Возвращает ID платформенного бота (первая часть токена)
