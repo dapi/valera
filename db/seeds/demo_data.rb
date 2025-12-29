@@ -2,18 +2,18 @@
 
 # Demo data seeder for dashboard testing
 #
-# Creates realistic demo data based on customer profiles:
-# - 30 dialogs distributed across 4 profiles
-# - ~14 bookings (~47% conversion rate)
-# - Data spread over 30 days
+# Creates realistic demo data from two sources:
+# - db/seeds/demo_dialogs.yml (manual dialogs, 29 dialogs)
+# - db/seeds/generated_dialogs/*.yml (LLM-generated, 100+ dialogs)
 #
 # Usage: Called from db/seeds.rb in development environment
 #
 # @see docs/product/customer-profiles.md for profile definitions
-# @see db/seeds/demo_dialogs.yml for dialog content
+# @see db/seeds/README.md for LLM generator documentation
 
 class DemoDataSeeder
   DIALOGS_FILE = Rails.root.join('db/seeds/demo_dialogs.yml')
+  GENERATED_DIALOGS_DIR = Rails.root.join('db/seeds/generated_dialogs')
 
   def initialize(tenant)
     @tenant = tenant
@@ -46,13 +46,106 @@ class DemoDataSeeder
   private
 
   def load_dialogs
+    dialogs = []
+
+    # Load manual dialogs from demo_dialogs.yml
+    dialogs += load_manual_dialogs
+
+    # Load LLM-generated dialogs from generated_dialogs/*.yml
+    dialogs += load_generated_dialogs
+
+    Rails.logger.info "[DemoData] Loaded #{dialogs.size} dialogs (manual + generated)"
+    dialogs
+  end
+
+  def load_manual_dialogs
     return [] unless File.exist?(DIALOGS_FILE)
 
     data = YAML.load_file(DIALOGS_FILE, permitted_classes: [Symbol])
-    data['dialogs'] || []
+    (data['dialogs'] || []).map { |d| normalize_dialog(d, source: :manual) }
   rescue StandardError => e
-    Rails.logger.error "[DemoData] Error loading YAML: #{e.message}"
+    Rails.logger.error "[DemoData] Error loading manual dialogs: #{e.message}"
     []
+  end
+
+  def load_generated_dialogs
+    return [] unless Dir.exist?(GENERATED_DIALOGS_DIR)
+
+    dialogs = []
+    Dir.glob(GENERATED_DIALOGS_DIR.join('*.yml')).each do |file|
+      next if File.basename(file) == '.gitkeep'
+
+      data = YAML.load_file(file, permitted_classes: [Symbol, Time, DateTime])
+      file_dialogs = data[:dialogs] || data['dialogs'] || []
+      dialogs += file_dialogs.map { |d| normalize_dialog(d, source: :generated) }
+    rescue StandardError => e
+      Rails.logger.error "[DemoData] Error loading #{file}: #{e.message}"
+    end
+
+    Rails.logger.info "[DemoData] Loaded #{dialogs.size} generated dialogs from #{GENERATED_DIALOGS_DIR}"
+    dialogs
+  end
+
+  # Normalize dialog format from different sources to unified structure
+  def normalize_dialog(dialog, source:)
+    if source == :generated
+      normalize_generated_dialog(dialog)
+    else
+      normalize_manual_dialog(dialog)
+    end
+  end
+
+  def normalize_manual_dialog(dialog)
+    # Manual dialogs already have correct format, just ensure string keys
+    dialog.deep_stringify_keys
+  end
+
+  def normalize_generated_dialog(dialog)
+    # Generated dialogs have symbol keys and different structure
+    profile = dialog[:profile]&.to_s || 'one_time_client'
+    messages = (dialog[:messages] || []).map do |msg|
+      {
+        'role' => msg[:role]&.to_s,
+        'content' => msg[:content]&.to_s
+      }
+    end
+
+    # Generate client name from profile
+    client_name = generate_client_name_from_profile(profile)
+
+    {
+      'profile' => profile,
+      'client' => {
+        'first_name' => client_name[:first],
+        'last_name' => client_name[:last],
+        'username' => "gen_#{dialog[:id]&.to_s&.first(8) || SecureRandom.hex(4)}"
+      },
+      'messages' => messages,
+      'has_booking' => dialog[:booking_expected] == true,
+      'booking_details' => "Заявка от #{profile.humanize}",
+      'created_days_ago' => rand(1..30)
+    }
+  end
+
+  # Generate realistic Russian names based on profile
+  def generate_client_name_from_profile(profile)
+    first_names = {
+      male: %w[Александр Дмитрий Максим Артём Иван Михаил Даниил Кирилл Андрей Егор],
+      female: %w[Анна Мария Елена Ольга Наталья Екатерина Татьяна Светлана Ирина Юлия]
+    }
+    last_names = %w[Иванов Петров Сидоров Козлов Новиков Морозов Волков Соколов Лебедев Попов]
+
+    # Some profiles suggest gender
+    gender = case profile
+             when 'emotional_female_client' then :female
+             when 'busy_businessman', 'tech_savvy_client' then :male
+             else %i[male female].sample
+             end
+
+    {
+      first: first_names[gender].sample,
+      last: last_names.sample + (gender == :female ? 'а' : '')
+    }
   end
 
   def process_dialog(dialog_data, index)
