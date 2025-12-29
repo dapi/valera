@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_28_190730) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_29_172012) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -114,6 +114,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_190730) do
     t.datetime "first_booking_at"
     t.datetime "last_booking_at"
     t.datetime "last_message_at"
+    t.boolean "manager_active", default: false, null: false
+    t.datetime "manager_active_at"
+    t.datetime "manager_active_until"
+    t.bigint "manager_user_id"
     t.bigint "model_id"
     t.bigint "tenant_id", null: false
     t.datetime "topic_classified_at"
@@ -124,6 +128,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_190730) do
     t.index ["client_id"], name: "index_chats_on_client_id"
     t.index ["first_booking_at"], name: "index_chats_on_first_booking_at"
     t.index ["last_booking_at"], name: "index_chats_on_last_booking_at"
+    t.index ["manager_active"], name: "index_chats_on_manager_active_true", where: "(manager_active = true)"
+    t.index ["manager_user_id"], name: "index_chats_on_manager_user_id"
     t.index ["model_id"], name: "index_chats_on_model_id"
     t.index ["tenant_id", "last_message_at"], name: "index_chats_on_tenant_id_and_last_message_at"
     t.index ["tenant_id"], name: "index_chats_on_tenant_id"
@@ -256,6 +262,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_190730) do
     t.bigint "model_id"
     t.integer "output_tokens"
     t.string "role", null: false
+    t.bigint "sent_by_user_id"
     t.bigint "tool_call_id"
     t.datetime "updated_at", null: false
     t.index ["chat_id", "created_at"], name: "idx_messages_chat_created_at"
@@ -263,6 +270,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_190730) do
     t.index ["chat_id"], name: "index_messages_on_chat_id"
     t.index ["model_id"], name: "index_messages_on_model_id"
     t.index ["role"], name: "index_messages_on_role"
+    t.index ["sent_by_user_id"], name: "index_messages_on_sent_by_user_id"
     t.index ["tool_call_id"], name: "index_messages_on_tool_call_id"
   end
 
@@ -400,10 +408,12 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_190730) do
   add_foreign_key "chats", "chat_topics"
   add_foreign_key "chats", "clients"
   add_foreign_key "chats", "tenants"
+  add_foreign_key "chats", "users", column: "manager_user_id"
   add_foreign_key "clients", "telegram_users"
   add_foreign_key "clients", "tenants"
   add_foreign_key "leads", "admin_users", column: "manager_id"
   add_foreign_key "messages", "chats"
+  add_foreign_key "messages", "users", column: "sent_by_user_id"
   add_foreign_key "tenant_invites", "admin_users", column: "invited_by_admin_id"
   add_foreign_key "tenant_invites", "tenants"
   add_foreign_key "tenant_invites", "users", column: "accepted_by_id"
