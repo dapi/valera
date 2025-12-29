@@ -14,6 +14,7 @@
 class DemoDataSeeder
   DIALOGS_FILE = Rails.root.join('db/seeds/demo_dialogs.yml')
   GENERATED_DIALOGS_DIR = Rails.root.join('db/seeds/generated_dialogs')
+  MIN_CLIENTS_THRESHOLD = 10  # Skip seeding if tenant has >= this many clients
 
   def initialize(tenant)
     @tenant = tenant
@@ -24,6 +25,11 @@ class DemoDataSeeder
   def seed!
     return unless Rails.env.development?
     return unless @tenant
+
+    if @tenant.clients.count >= MIN_CLIENTS_THRESHOLD
+      Rails.logger.info "[DemoData] Skipping: tenant already has #{@tenant.clients.count} clients (threshold: #{MIN_CLIENTS_THRESHOLD})"
+      return
+    end
 
     Rails.logger.info '[DemoData] Starting demo data seeding...'
 
