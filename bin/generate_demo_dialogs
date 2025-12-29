@@ -130,7 +130,7 @@ class DemoDialogGenerator
       profile: nil,
       dry_run: false,
       output: nil,
-      model: 'gpt-4o-mini',
+      model: ApplicationConfig.llm_model,
       verbose: false
     }.merge(options)
 
@@ -506,7 +506,7 @@ OptionParser.new do |opts|
     options[:output] = f
   end
 
-  opts.on('-m', '--model MODEL', 'Модель LLM (default: gpt-4o-mini)') do |m|
+  opts.on('-m', '--model MODEL', "Модель LLM (default: #{ApplicationConfig.llm_model})") do |m|
     options[:model] = m
   end
 
