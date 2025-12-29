@@ -24,9 +24,6 @@
 class Chat < ApplicationRecord
   include ErrorLogger
 
-  # Manager takeover timeout in minutes
-  MANAGER_TAKEOVER_TIMEOUT = 30
-
   belongs_to :tenant, counter_cache: true
   belongs_to :client
   belongs_to :chat_topic, optional: true
@@ -73,7 +70,7 @@ class Chat < ApplicationRecord
   # @param user [User] пользователь, который берёт контроль
   # @param timeout_minutes [Integer] время таймаута в минутах
   # @return [Boolean] успешность операции
-  def takeover_by_manager!(user, timeout_minutes: MANAGER_TAKEOVER_TIMEOUT)
+  def takeover_by_manager!(user, timeout_minutes: ApplicationConfig.manager_takeover_timeout_minutes)
     update!(
       manager_active: true,
       manager_user: user,
@@ -86,7 +83,7 @@ class Chat < ApplicationRecord
   #
   # @param timeout_minutes [Integer] время таймаута в минутах
   # @return [Boolean] успешность операции
-  def extend_manager_timeout!(timeout_minutes: MANAGER_TAKEOVER_TIMEOUT)
+  def extend_manager_timeout!(timeout_minutes: ApplicationConfig.manager_takeover_timeout_minutes)
     return false unless manager_active?
 
     update!(manager_active_until: timeout_minutes.minutes.from_now)

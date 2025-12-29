@@ -87,7 +87,10 @@ class ApplicationConfig < Anyway::Config
     :tenant_invite_expiration_days,
 
     # Dashboard: максимальное количество сообщений для отображения в чате
-    max_chat_messages_display: 200
+    max_chat_messages_display: 200,
+
+    # Manager takeover: таймаут в минутах до автоматического возврата чата боту
+    manager_takeover_timeout_minutes: 30
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -147,6 +150,9 @@ class ApplicationConfig < Anyway::Config
 
     # Dashboard
     max_chat_messages_display: :integer,
+
+    # Manager takeover
+    manager_takeover_timeout_minutes: :integer,
 
     # Admin host
     admin_host: :string,
