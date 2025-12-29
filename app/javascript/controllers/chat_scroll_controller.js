@@ -2,10 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 
 // Auto-scrolls chat to the bottom when connected
 export default class extends Controller {
-  static targets = ["container"]
-
   connect() {
-    this.scrollToBottom()
+    // Wait for DOM to be fully rendered before scrolling
+    requestAnimationFrame(() => {
+      this.scrollToBottom()
+    })
   }
 
   scrollToBottom() {
