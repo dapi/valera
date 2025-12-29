@@ -11,8 +11,7 @@
 # Exit codes:
 #   0 - No issues found
 #   1 - Issues found
-
-require "pathname"
+#   2 - Configuration error (path not found)
 
 PATTERN = /^\s*\.[a-z][a-z0-9-]*-\[[^\]]+\]/i
 DESCRIPTION = "Slim shorthand with Tailwind arbitrary value (will break)"
@@ -20,42 +19,77 @@ SUGGESTION = 'Use `div class="..."` or inline style instead'
 
 def check_file(path)
   issues = []
-  File.readlines(path).each_with_index do |line, index|
-    if line.match?(PATTERN)
-      issues << { line: index + 1, content: line.strip }
+  begin
+    File.readlines(path, encoding: "UTF-8").each_with_index do |line, index|
+      if line.match?(PATTERN)
+        issues << { line: index + 1, content: line.strip[0, 120] }
+      end
     end
+    { success: true, issues: issues }
+  rescue Errno::EACCES => e
+    warn "\e[33mWarning: Cannot read #{path}: Permission denied\e[0m"
+    { success: false, error: "Permission denied" }
+  rescue Errno::ENOENT => e
+    warn "\e[33mWarning: File not found: #{path}\e[0m"
+    { success: false, error: "File not found" }
+  rescue Encoding::InvalidByteSequenceError, Encoding::UndefinedConversionError, ArgumentError => e
+    warn "\e[33mWarning: Encoding error in #{path}: #{e.message}\e[0m"
+    { success: false, error: e.message }
   end
-  issues
 end
 
 def main
   search_path = ARGV[0] || "app/views"
+
+  unless File.directory?(search_path)
+    warn "\e[31mError: Directory not found: #{search_path}\e[0m"
+    exit 2
+  end
+
   files = Dir.glob("#{search_path}/**/*.slim")
+
+  if files.empty?
+    warn "\e[33mWarning: No .slim files found in #{search_path}\e[0m"
+    exit 0
+  end
 
   total_issues = 0
   files_with_issues = []
+  files_skipped = []
 
   files.each do |file|
-    issues = check_file(file)
-    next if issues.empty?
+    result = check_file(file)
+
+    unless result[:success]
+      files_skipped << file
+      next
+    end
+
+    next if result[:issues].empty?
 
     files_with_issues << file
-    total_issues += issues.size
+    total_issues += result[:issues].size
 
     puts "\n\e[31m#{file}\e[0m"
-    issues.each do |issue|
+    result[:issues].each do |issue|
       puts "  Line #{issue[:line]}: #{issue[:content]}"
     end
+  end
+
+  files_checked = files.size - files_skipped.size
+
+  if files_skipped.any?
+    puts "\n\e[33mWarning: #{files_skipped.size} file(s) could not be read\e[0m"
   end
 
   if total_issues > 0
     puts "\n\e[31m#{DESCRIPTION}\e[0m"
     puts "\e[33m#{SUGGESTION}\e[0m"
     puts "\nSee: https://github.com/slim-template/slim/issues/906"
-    puts "\nFound #{total_issues} issue(s) in #{files_with_issues.size} file(s)"
+    puts "\nFound #{total_issues} issue(s) in #{files_with_issues.size} file(s) (scanned #{files_checked})"
     exit 1
   else
-    puts "\e[32mNo Slim + Tailwind arbitrary value issues found\e[0m"
+    puts "\e[32mScanned #{files_checked} file(s), no Slim + Tailwind arbitrary value issues found\e[0m"
     exit 0
   end
 end
