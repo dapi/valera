@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Workaround for tailwindcss v4 watch mode not working
+# See: https://github.com/rails/tailwindcss-rails/issues/602
+
+INPUT="app/assets/stylesheets/application.css"
+OUTPUT="app/assets/builds/application.css"
+CHECKSUM_FILE="/tmp/tailwind-checksum"
+
+# Calculate checksum of relevant files
+calculate_checksum() {
+  find app/assets/stylesheets app/views app/helpers app/javascript app/components \
+    -type f \( -name "*.css" -o -name "*.html" -o -name "*.erb" -o -name "*.slim" -o -name "*.rb" -o -name "*.js" \) \
+    -exec md5sum {} \; 2>/dev/null | sort | md5sum | cut -d' ' -f1
+}
+
+# Initial build
+echo "[tailwind-watch] Initial build..."
+bundle exec tailwindcss -i "$INPUT" -o "$OUTPUT" || echo "[tailwind-watch] Build failed with exit code $?"
+calculate_checksum > "$CHECKSUM_FILE"
+
+echo "[tailwind-watch] Watching for changes (polling every 1s)..."
+
+# Poll for changes
+while true; do
+  sleep 1
+  NEW_CHECKSUM=$(calculate_checksum)
+  OLD_CHECKSUM=$(cat "$CHECKSUM_FILE" 2>/dev/null || echo "")
+
+  if [ "$NEW_CHECKSUM" != "$OLD_CHECKSUM" ]; then
+    echo "[tailwind-watch] Changes detected, rebuilding..."
+    bundle exec tailwindcss -i "$INPUT" -o "$OUTPUT" || echo "[tailwind-watch] Build failed with exit code $?"
+    echo "$NEW_CHECKSUM" > "$CHECKSUM_FILE"
+  fi
+done
