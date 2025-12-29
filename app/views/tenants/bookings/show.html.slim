@@ -19,7 +19,7 @@
         span = @booking.client.display_name
 
 / Info cards
-.grid.grid-cols-1.md:grid-cols-2.gap-6.mb-6
+.grid.grid-cols-1.md:grid-cols-3.gap-6.mb-6
   / Client card
   .bg-white.rounded-lg.shadow.p-4
     .text-sm.font-medium.text-gray-500.mb-2 = t('.client')
@@ -51,6 +51,17 @@
     - else
       .text-gray-400 = t('.no_vehicle')
 
+  / Chat card
+  - if @booking.chat.present?
+    = link_to tenant_chat_path(@booking.chat), class: "bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
+      .text-sm.font-medium.text-gray-500.mb-2 = t('.related_chat')
+      .flex.items-center.gap-3
+        .w-10.h-10.bg-gray-200.rounded-full.flex.items-center.justify-center
+          span 💬
+        div
+          .font-semibold.text-gray-800 = t('.related_chat')
+          .text-sm.text-gray-500 = t('.messages_count', count: @booking.chat.messages.count)
+
 / Details section
 - if @booking.details.present?
   .bg-white.rounded-lg.shadow.p-6.mb-6
@@ -69,13 +80,3 @@
     h2.text-lg.font-semibold.text-gray-800.mb-3 = t('.meta_title')
     pre.bg-gray-900.text-green-400.p-4.rounded-lg.overflow-x-auto.text-sm.font-mono
       = JSON.pretty_generate(@booking.meta)
-
-/ Chat link
-- if @booking.chat.present?
-  .bg-white.rounded-lg.shadow.p-4
-    .flex.items-center.justify-between
-      .flex.items-center.gap-3
-        span.text-2xl 💬
-        div
-          .font-semibold.text-gray-800 = t('.related_chat')
-          .text-sm.text-gray-500 = t('.messages_count', count: @booking.chat.messages.count)
