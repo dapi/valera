@@ -84,7 +84,10 @@ class ApplicationConfig < Anyway::Config
     :reserved_subdomains,
 
     # Tenant invite expiration (in days)
-    :tenant_invite_expiration_days
+    :tenant_invite_expiration_days,
+
+    # Dashboard: максимальное количество сообщений для отображения в чате
+    max_chat_messages_display: 200
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -141,6 +144,9 @@ class ApplicationConfig < Anyway::Config
 
     # Tenant invites
     tenant_invite_expiration_days: :integer,
+
+    # Dashboard
+    max_chat_messages_display: :integer,
 
     # Admin host
     admin_host: :string,

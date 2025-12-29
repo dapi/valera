@@ -12,24 +12,44 @@ module Tenants
     # GET /chats?sort=created_at
     def index
       @chats = fetch_chats
-      @chat = @chats.first
+      # Reload first chat with all messages (fetch_chats only preloads last message for preview)
+      @chat = load_chat_with_messages(@chats.first&.id)
     end
 
     # GET /chats/:id
     def show
       @chats = fetch_chats
-      @chat = current_tenant.chats
-                            .includes(client: :telegram_user)
-                            .includes(:bookings)
-                            .includes(messages: :tool_calls)
-                            .find(params[:id])
+      @chat = load_chat_with_messages(params[:id])
     end
 
     private
 
+    # Загружает чат со всеми сообщениями (с лимитом для производительности)
+    def load_chat_with_messages(chat_id)
+      return nil if chat_id.blank?
+
+      chat = current_tenant.chats
+                           .with_client_details
+                           .includes(:bookings)
+                           .find(chat_id)
+
+      # Загружаем сообщения с лимитом для производительности
+      # (200 сообщений ≈ 120KB HTML, 2000 DOM nodes)
+      messages = chat.messages
+                     .includes(:tool_calls)
+                     .order(created_at: :desc)
+                     .limit(ApplicationConfig.max_chat_messages_display)
+                     .reverse
+
+      # Перезаписываем кэш ассоциации ограниченным набором сообщений
+      chat.association(:messages).target = messages
+
+      chat
+    end
+
     def fetch_chats
       chats = current_tenant.chats
-                            .includes(client: :telegram_user)
+                            .with_client_details
                             .order(sort_column => :desc)
                             .page(params[:page])
                             .per(PER_PAGE)

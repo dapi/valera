@@ -34,6 +34,10 @@ class Chat < ApplicationRecord
 
   acts_as_chat
 
+  # Scope для предзагрузки данных клиента и Telegram пользователя
+  # Используется в dashboard для отображения информации о клиенте
+  scope :with_client_details, -> { includes(client: :telegram_user) }
+
   # Устанавливает модель AI по умолчанию перед созданием
   #
   # @return [void]
