@@ -1,0 +1,810 @@
+# Demo dialogs for dashboard testing
+# Based on docs/user-scenarios/ and docs/product/customer-profiles.md
+#
+# Profiles distribution:
+# - active_client: 6 dialogs (20%), ~90% booking rate -> ~5 bookings
+# - one_time_client: 15 dialogs (50%), ~50% booking rate -> ~7 bookings
+# - just_asking: 6 dialogs (20%), 0% booking rate -> 0 bookings
+# - urgent_client: 3 dialogs (10%), ~85% booking rate -> ~2 bookings
+#
+# Total: 30 dialogs, ~14 bookings (~47% conversion)
+
+dialogs:
+  # =============================================================================
+  # ACTIVE_CLIENT - Постоянные клиенты (6 диалогов, ~5 booking)
+  # =============================================================================
+  - profile: active_client
+    client:
+      first_name: "Алексей"
+      last_name: "Петров"
+      username: "alexey_petrov"
+      phone: "+7(916)123-45-67"
+    vehicle:
+      brand: "Toyota"
+      model: "Camry"
+      year: 2020
+    created_days_ago: 2
+    has_booking: true
+    booking_details: "Плановое ТО для Toyota Camry 2020. Замена масла, фильтров, проверка ходовой."
+    messages:
+      - role: user
+        content: "Здравствуйте! Хочу записаться на плановое ТО для своей Камри"
+      - role: assistant
+        content: "Здравствуйте, Алексей! Рады вас снова видеть. Toyota Camry 2020, верно? Какой пробег сейчас?"
+      - role: user
+        content: "Да, всё верно. Пробег около 45000 км"
+      - role: assistant
+        content: "Отлично! На 45000 км рекомендую:\n- Замена масла и фильтра\n- Проверка тормозной системы\n- Диагностика ходовой\n\nСтоимость: 8500₽ с материалами. Когда удобно приехать?"
+      - role: user
+        content: "В пятницу утром можно?"
+      - role: assistant
+        content: "Записал вас на пятницу на 9:00. Адрес: ул. Автосервисная, 15.\n\nМенеджер перезвонит за час до визита для подтверждения. До встречи!"
+
+  - profile: active_client
+    client:
+      first_name: "Мария"
+      last_name: "Сидорова"
+      username: "maria_sid"
+      phone: "+7(926)234-56-78"
+    vehicle:
+      brand: "BMW"
+      model: "X3"
+      year: 2019
+    created_days_ago: 5
+    has_booking: true
+    booking_details: "Замена тормозных колодок и дисков BMW X3. Передняя ось."
+    messages:
+      - role: user
+        content: "Добрый день! При торможении появился скрип, нужно проверить тормоза"
+      - role: assistant
+        content: "Здравствуйте, Мария! Скрип при торможении обычно указывает на износ колодок. На вашем BMW X3 2019 года пробег какой?"
+      - role: user
+        content: "Около 60000 км"
+      - role: assistant
+        content: "На таком пробеге колодки действительно могут потребовать замены. Рекомендую:\n- Диагностика тормозной системы (бесплатно)\n- Замена колодок если нужно: 12000₽\n- Диски при необходимости: от 18000₽\n\nКогда сможете подъехать на осмотр?"
+      - role: user
+        content: "Завтра после обеда"
+      - role: assistant
+        content: "Записала вас на завтра в 14:00. Осмотр займет 30 минут, после чего скажем точную стоимость. До встречи!"
+
+  - profile: active_client
+    client:
+      first_name: "Дмитрий"
+      last_name: "Козлов"
+      username: "dmitry_kozlov"
+      phone: "+7(903)345-67-89"
+    vehicle:
+      brand: "Mercedes"
+      model: "E-Class"
+      year: 2018
+    created_days_ago: 8
+    has_booking: true
+    booking_details: "Полная полировка кузова и нанесение керамики Mercedes E-Class."
+    messages:
+      - role: user
+        content: "Привет! Хочу сделать полировку и керамику на Мерседес"
+      - role: assistant
+        content: "Здравствуйте, Дмитрий! Отличный выбор для Mercedes E-Class. У нас есть несколько вариантов:\n\n1. Полировка + керамика 1 слой: 25000₽\n2. Полировка + керамика 2 слоя: 35000₽\n3. Премиум (3 слоя + колесные диски): 45000₽\n\nКакой вариант рассматриваете?"
+      - role: user
+        content: "Давайте 2 слоя, машина часто на мойке"
+      - role: assistant
+        content: "Отличный выбор! 2 слоя обеспечат защиту на 2-3 года. Работа займет 2 дня. Когда хотите записаться?"
+      - role: user
+        content: "На следующей неделе в понедельник"
+      - role: assistant
+        content: "Записал на понедельник. Машину нужно будет оставить на 2 дня. Предоплата 10000₽. Ждем вас!"
+
+  - profile: active_client
+    client:
+      first_name: "Елена"
+      last_name: "Новикова"
+      username: "elena_novikova"
+      phone: "+7(915)456-78-90"
+    vehicle:
+      brand: "Audi"
+      model: "A4"
+      year: 2021
+    created_days_ago: 12
+    has_booking: true
+    booking_details: "Замена лобового стекла Audi A4 после попадания камня."
+    messages:
+      - role: user
+        content: "Здравствуйте! На трассе камень прилетел, трещина на лобовом"
+      - role: assistant
+        content: "Здравствуйте, Елена! Понимаю, неприятная ситуация. Трещина большая? Можно попробовать отремонтировать, если до 3 см."
+      - role: user
+        content: "Нет, уже сантиметров 15, от камня паутинка пошла"
+      - role: assistant
+        content: "В таком случае нужна замена. Для Audi A4 2021:\n- Оригинальное стекло: 45000₽\n- Качественный аналог: 28000₽\n\nОба варианта с гарантией. Что предпочитаете?"
+      - role: user
+        content: "Давайте аналог, если качество хорошее"
+      - role: assistant
+        content: "Конечно! Аналог от проверенного поставщика с гарантией 2 года. Замена займет 4 часа. Когда удобно?"
+      - role: user
+        content: "В среду можно?"
+      - role: assistant
+        content: "Записала на среду на 10:00. После замены рекомендую не мыть машину 48 часов для полной полимеризации клея. До встречи!"
+
+  - profile: active_client
+    client:
+      first_name: "Сергей"
+      last_name: "Морозов"
+      username: "sergey_moroz"
+      phone: "+7(925)567-89-01"
+    vehicle:
+      brand: "Lexus"
+      model: "RX"
+      year: 2020
+    created_days_ago: 15
+    has_booking: true
+    booking_details: "Детейлинг салона Lexus RX. Глубокая чистка, кондиционирование кожи."
+    messages:
+      - role: user
+        content: "Добрый день! Хочу сделать химчистку салона в Лексусе"
+      - role: assistant
+        content: "Здравствуйте, Сергей! Для Lexus RX предлагаем:\n\n1. Стандартная химчистка: 8000₽\n2. Глубокая с озонированием: 12000₽\n3. Премиум (+ кондиционер кожи): 15000₽\n\nКакой вариант интересует?"
+      - role: user
+        content: "Премиум, кожа давно не обрабатывалась"
+      - role: assistant
+        content: "Отличный выбор! Премиум-детейлинг включает:\n- Глубокую чистку всех поверхностей\n- Кондиционирование кожи\n- Озонирование\n- Обработка пластика\n\nРабота займет 1 день. Когда записать?"
+      - role: user
+        content: "В субботу"
+      - role: assistant
+        content: "Записал на субботу на 9:00. К вечеру машина будет готова. Ждем!"
+
+  - profile: active_client
+    client:
+      first_name: "Анна"
+      last_name: "Волкова"
+      username: "anna_volkova"
+      phone: "+7(916)678-90-12"
+    vehicle:
+      brand: "Volvo"
+      model: "XC60"
+      year: 2019
+    created_days_ago: 20
+    has_booking: false
+    messages:
+      - role: user
+        content: "Привет! Подскажите, сколько стоит заменить масло в Вольво?"
+      - role: assistant
+        content: "Здравствуйте, Анна! Для Volvo XC60 замена масла:\n- С нашим маслом: 6500₽\n- Со своим маслом: 2000₽ работа\n\nРекомендую качественную синтетику 0W-20. Когда планируете?"
+      - role: user
+        content: "Пока просто узнаю, скоро ТО нужно будет"
+      - role: assistant
+        content: "Понял! Когда соберетесь - напишите, запишем на удобное время. Для Volvo также рекомендую раз в год делать диагностику подвески."
+
+  # =============================================================================
+  # ONE_TIME_CLIENT - Разовые клиенты (15 диалогов, ~7 bookings)
+  # =============================================================================
+  - profile: one_time_client
+    client:
+      first_name: "Игорь"
+      last_name: "Федоров"
+      username: "igor_fed"
+      phone: "+7(903)111-22-33"
+    vehicle:
+      brand: "Hyundai"
+      model: "Solaris"
+      year: 2019
+    created_days_ago: 3
+    has_booking: true
+    booking_details: "Удаление вмятины без покраски (PDR) на двери Hyundai Solaris."
+    messages:
+      - role: user
+        content: "Здравствуйте! На парковке помяли дверь, сколько стоит ремонт?"
+      - role: assistant
+        content: "Здравствуйте! Понимаю, неприятно. Какая марка автомобиля и какой примерно размер вмятины?"
+      - role: user
+        content: "Хендай Солярис 2019, вмятина с ладонь примерно"
+      - role: assistant
+        content: "Для Hyundai Solaris вмятина с ладонь:\n- PDR (без покраски): 5000-7000₽\n- С покраской: 12000-15000₽\n\nКраска повреждена?"
+      - role: user
+        content: "Нет, просто вмятина, краска целая"
+      - role: assistant
+        content: "Отлично! Тогда PDR - идеальный вариант:\n- Без покраски - сохраняем заводское покрытие\n- Быстро - 2-3 часа\n- Экономия ~50%\n\nКогда удобно приехать на осмотр?"
+      - role: user
+        content: "Завтра в первой половине дня"
+      - role: assistant
+        content: "Записал на завтра на 10:00. После осмотра скажем точную цену. Адрес: ул. Автосервисная, 15. До встречи!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Ольга"
+      last_name: "Кузнецова"
+      username: "olga_kuz"
+      phone: "+7(926)222-33-44"
+    vehicle:
+      brand: "Kia"
+      model: "Rio"
+      year: 2020
+    created_days_ago: 4
+    has_booking: true
+    booking_details: "Устранение царапины на бампере Kia Rio. Локальная покраска."
+    messages:
+      - role: user
+        content: "Добрый день! Поцарапала бампер при парковке, можно отремонтировать?"
+      - role: assistant
+        content: "Здравствуйте! Конечно можно. Царапина глубокая? До грунта или поверхностная?"
+      - role: user
+        content: "Не очень глубокая, но заметная. Kia Rio серебристая"
+      - role: assistant
+        content: "Для Kia Rio царапина на бампере:\n- Полировка (если неглубокая): 2000-3000₽\n- Локальная покраска: 5000-7000₽\n\nМожете прислать фото? Точнее скажу что нужно."
+      - role: user
+        content: "Хорошо, сейчас пришлю"
+      - role: assistant
+        content: "Жду фото! Как получу - сразу скажу варианты и стоимость."
+      - role: user
+        content: "Вот фото царапины"
+      - role: assistant
+        content: "Спасибо! Вижу, царапина средней глубины. Рекомендую локальную покраску - 6000₽, результат будет идеальным. Полировка не уберет полностью. Записать?"
+      - role: user
+        content: "Да, давайте"
+      - role: assistant
+        content: "Отлично! Когда удобно приехать? Работа займет 1 день."
+      - role: user
+        content: "В четверг"
+      - role: assistant
+        content: "Записала на четверг. Оставите машину утром, к вечеру будет готова. До встречи!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Андрей"
+      last_name: "Смирнов"
+      username: "andrey_smirnov"
+      phone: "+7(915)333-44-55"
+    vehicle:
+      brand: "Volkswagen"
+      model: "Polo"
+      year: 2018
+    created_days_ago: 6
+    has_booking: true
+    booking_details: "Диагностика и ремонт подвески Volkswagen Polo. Замена сайлентблоков."
+    messages:
+      - role: user
+        content: "Привет! Появился стук в подвеске, что это может быть?"
+      - role: assistant
+        content: "Здравствуйте! Стук в подвеске может быть от разных причин: стойки стабилизатора, сайлентблоки, шаровые. Какая машина и с какой стороны стучит?"
+      - role: user
+        content: "Фольксваген Поло 2018, стучит спереди слева"
+      - role: assistant
+        content: "На VW Polo часто изнашиваются стойки стабилизатора и сайлентблоки. Нужна диагностика:\n- Диагностика подвески: 500₽\n- Если найдем проблему - зачтем в стоимость ремонта\n\nПримерные цены на ремонт:\n- Стойки стаба: 3000₽\n- Сайлентблоки: 5000-8000₽\n\nКогда можете приехать?"
+      - role: user
+        content: "Завтра после работы, часов в 6"
+      - role: assistant
+        content: "Записал на завтра на 18:00. Диагностика займет 30 минут. Если нужен ремонт - обсудим сразу. До встречи!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Наталья"
+      last_name: "Иванова"
+      username: "natalia_iv"
+      phone: "+7(903)444-55-66"
+    vehicle:
+      brand: "Renault"
+      model: "Duster"
+      year: 2017
+    created_days_ago: 7
+    has_booking: false
+    messages:
+      - role: user
+        content: "Сколько стоит покрасить крыло?"
+      - role: assistant
+        content: "Здравствуйте! Стоимость зависит от марки авто и объема работ. Какой у вас автомобиль?"
+      - role: user
+        content: "Рено Дастер 2017"
+      - role: assistant
+        content: "Для Renault Duster покраска крыла:\n- Без снятия: 8000-10000₽\n- Со снятием (качественнее): 10000-12000₽\n\nЕсть вмятины или только царапины?"
+      - role: user
+        content: "Царапины и небольшая вмятина"
+      - role: assistant
+        content: "Тогда рекомендую вариант со снятием:\n- Рихтовка вмятины\n- Шпаклевка\n- Покраска\n- Полировка\n\nИтого: ~12000₽. Срок 2-3 дня. Хотите записаться?"
+      - role: user
+        content: "Подумаю, спасибо за информацию"
+      - role: assistant
+        content: "Хорошо! Если будут вопросы - пишите. Цена актуальна в течение месяца."
+
+  - profile: one_time_client
+    client:
+      first_name: "Павел"
+      last_name: "Егоров"
+      username: "pavel_eg"
+      phone: "+7(926)555-66-77"
+    vehicle:
+      brand: "Skoda"
+      model: "Rapid"
+      year: 2019
+    created_days_ago: 9
+    has_booking: true
+    booking_details: "Замена масла и фильтров Skoda Rapid. Проверка уровня всех жидкостей."
+    messages:
+      - role: user
+        content: "Здравствуйте! Нужно масло поменять, сколько будет стоить?"
+      - role: assistant
+        content: "Здравствуйте! Какая у вас машина?"
+      - role: user
+        content: "Шкода Рапид 2019, 1.6"
+      - role: assistant
+        content: "Для Skoda Rapid 1.6 замена масла:\n- С нашим маслом (синтетика): 4500₽\n- Со своим маслом: 1500₽ работа\n\nВ стоимость входит: масло 4л, фильтр, работа. Когда удобно?"
+      - role: user
+        content: "А какое масло используете?"
+      - role: assistant
+        content: "Используем Castrol или Mobil 5W-30 - рекомендованные для вашего двигателя. Гарантия на масло от поставщика."
+      - role: user
+        content: "Хорошо, давайте с вашим маслом. Когда можно приехать?"
+      - role: assistant
+        content: "Отлично! Можем принять сегодня или завтра. Замена займет 30-40 минут. Какой день удобнее?"
+      - role: user
+        content: "Завтра утром"
+      - role: assistant
+        content: "Записал на завтра на 9:00. Пока меняем масло - проверим все жидкости бесплатно. До встречи!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Виктор"
+      last_name: "Соколов"
+      username: "viktor_sok"
+      phone: "+7(915)666-77-88"
+    vehicle:
+      brand: "Ford"
+      model: "Focus"
+      year: 2016
+    created_days_ago: 10
+    has_booking: false
+    messages:
+      - role: user
+        content: "Добрый день! Загорелся check engine, что делать?"
+      - role: assistant
+        content: "Здравствуйте! Check Engine может указывать на разные проблемы. Машина едет нормально? Нет рывков, дыма?"
+      - role: user
+        content: "Вроде едет нормально, Ford Focus 2016"
+      - role: assistant
+        content: "Если едет нормально - скорее всего не критично. Но диагностику сделать нужно:\n- Компьютерная диагностика: 1000₽\n- Считаем ошибки и расскажем что с ними делать\n\nМожете приехать сегодня?"
+      - role: user
+        content: "Сегодня не могу, может на неделе"
+      - role: assistant
+        content: "Хорошо! Пока можете ездить, но не откладывайте надолго. Напишите когда соберетесь - запишем."
+
+  - profile: one_time_client
+    client:
+      first_name: "Татьяна"
+      last_name: "Белова"
+      username: "tanya_bel"
+      phone: "+7(903)777-88-99"
+    vehicle:
+      brand: "Mazda"
+      model: "CX-5"
+      year: 2020
+    created_days_ago: 11
+    has_booking: true
+    booking_details: "Антикоррозийная обработка днища Mazda CX-5."
+    messages:
+      - role: user
+        content: "Здравствуйте! Хочу сделать антикор на Мазду, сколько стоит?"
+      - role: assistant
+        content: "Здравствуйте! Для Mazda CX-5 предлагаем:\n\n1. Базовый антикор (днище): 8000₽\n2. Стандарт (днище + арки): 12000₽\n3. Премиум (полный + пороги): 18000₽\n\nКакой вариант интересует?"
+      - role: user
+        content: "Стандарт подойдет. Сколько времени займет?"
+      - role: assistant
+        content: "Стандартная обработка займет 4-5 часов. Материалы импортные, гарантия 3 года. Когда хотите записаться?"
+      - role: user
+        content: "На выходных можно?"
+      - role: assistant
+        content: "Да, работаем в субботу с 9 до 18. Записать на субботу утром?"
+      - role: user
+        content: "Да, давайте на субботу"
+      - role: assistant
+        content: "Записала на субботу на 9:00. К 14:00 будет готово. До встречи!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Роман"
+      last_name: "Попов"
+      username: "roman_pop"
+      phone: "+7(926)888-99-00"
+    vehicle:
+      brand: "Nissan"
+      model: "Qashqai"
+      year: 2018
+    created_days_ago: 13
+    has_booking: false
+    messages:
+      - role: user
+        content: "Привет, какие цены на шиномонтаж?"
+      - role: assistant
+        content: "Здравствуйте! Цены на шиномонтаж:\n\nR15: 1600₽\nR16: 1800₽\nR17: 2000₽\nR18: 2400₽\nR19: 2800₽\n\nВ стоимость входит: снятие, монтаж, балансировка. Какой размер колес?"
+      - role: user
+        content: "R17, Ниссан Кашкай"
+      - role: assistant
+        content: "Для Nissan Qashqai R17: 2000₽ за 4 колеса. Если нужна замена на зимнюю резину - храним ваши колеса бесплатно до весны. Когда планируете переобуться?"
+      - role: user
+        content: "Пока смотрю цены, спасибо"
+      - role: assistant
+        content: "Хорошо! Осенью у нас бывают очереди, лучше записываться заранее. Будут вопросы - пишите!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Людмила"
+      last_name: "Титова"
+      username: "luda_tit"
+      phone: "+7(915)999-00-11"
+    vehicle:
+      brand: "Chevrolet"
+      model: "Cruze"
+      year: 2015
+    created_days_ago: 14
+    has_booking: true
+    booking_details: "Замена передних тормозных колодок Chevrolet Cruze."
+    messages:
+      - role: user
+        content: "Добрый день! Скрипят тормоза, наверное колодки пора менять"
+      - role: assistant
+        content: "Здравствуйте! Да, скрип обычно означает износ колодок. Какая машина?"
+      - role: user
+        content: "Шевроле Круз 2015"
+      - role: assistant
+        content: "Для Chevrolet Cruze замена колодок:\n- Передние: 4000-5000₽ с материалами\n- Задние: 3500-4500₽\n\nСкрипят передние или задние?"
+      - role: user
+        content: "Передние вроде"
+      - role: assistant
+        content: "Понял. Передние колодки: 4500₽ с работой. Приезжайте на диагностику - бесплатно проверим толщину колодок и дисков. Когда удобно?"
+      - role: user
+        content: "Завтра после обеда"
+      - role: assistant
+        content: "Записала на завтра на 14:00. Диагностика 15 минут, замена колодок - 1 час если нужно. До встречи!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Артем"
+      last_name: "Киселев"
+      username: "artem_kis"
+      phone: "+7(903)000-11-22"
+    vehicle:
+      brand: "Mitsubishi"
+      model: "Outlander"
+      year: 2017
+    created_days_ago: 16
+    has_booking: false
+    messages:
+      - role: user
+        content: "Сколько стоит ремонт кондиционера?"
+      - role: assistant
+        content: "Здравствуйте! Что именно с кондиционером? Не холодит, плохо холодит, шумит?"
+      - role: user
+        content: "Плохо холодит, Митсубиси Аутлендер 2017"
+      - role: assistant
+        content: "Понял. Для Mitsubishi Outlander:\n\n1. Диагностика + заправка: 3500₽\n2. Если утечка - поиск и устранение: от 5000₽\n3. Замена компрессора (если сломан): от 25000₽\n\nОбычно помогает простая заправка. Хотите записаться на диагностику?"
+      - role: user
+        content: "А сколько займет диагностика?"
+      - role: assistant
+        content: "Диагностика кондиционера: 30-40 минут. Если нужна только заправка - сделаем сразу. Если найдем утечку - обсудим ремонт."
+      - role: user
+        content: "Ладно, попозже запишусь, спасибо"
+      - role: assistant
+        content: "Хорошо! Кондиционер лучше чинить до жары. Пишите когда соберетесь!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Ксения"
+      last_name: "Лебедева"
+      username: "ksenia_leb"
+      phone: "+7(926)111-22-33"
+    vehicle:
+      brand: "Peugeot"
+      model: "308"
+      year: 2016
+    created_days_ago: 18
+    has_booking: true
+    booking_details: "Замена ремня ГРМ и роликов Peugeot 308."
+    messages:
+      - role: user
+        content: "Здравствуйте! Нужно заменить ремень ГРМ, сколько стоит?"
+      - role: assistant
+        content: "Здравствуйте! Важная процедура. Какая машина и какой пробег?"
+      - role: user
+        content: "Пежо 308 2016, пробег 95000"
+      - role: assistant
+        content: "На 95000 км замена ГРМ - правильное решение! Для Peugeot 308:\n\n- Замена ремня + ролики: 15000₽\n- Комплект с помпой (рекомендую): 20000₽\n\nРекомендую с помпой - меньше разбирать в следующий раз. Что выберете?"
+      - role: user
+        content: "Давайте с помпой, раз уж разбирать"
+      - role: assistant
+        content: "Правильное решение! Работа займет 1 день. Когда удобно привезти машину?"
+      - role: user
+        content: "В среду"
+      - role: assistant
+        content: "Записала на среду. Оставите машину утром, к вечеру будет готова. Детали закажем заранее. До встречи!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Максим"
+      last_name: "Орлов"
+      username: "max_orlov"
+      phone: "+7(915)222-33-44"
+    vehicle:
+      brand: "Honda"
+      model: "CR-V"
+      year: 2018
+    created_days_ago: 21
+    has_booking: false
+    messages:
+      - role: user
+        content: "Добрый день! Сколько стоит покрасить машину полностью?"
+      - role: assistant
+        content: "Здравствуйте! Полная покраска - серьезная работа. Какая машина и какой цвет планируете?"
+      - role: user
+        content: "Хонда СРВ 2018, хочу в тот же цвет перекрасить"
+      - role: assistant
+        content: "Для Honda CR-V полная покраска в тот же цвет:\n- Стандарт: 150000-180000₽\n- Премиум (с разборкой всего): 200000-250000₽\n\nЗачем перекрашивать если цвет тот же? Много царапин?"
+      - role: user
+        content: "Да, вся машина в мелких царапинах и сколах"
+      - role: assistant
+        content: "Понял. В таком случае можно рассмотреть альтернативу:\n- Глубокая полировка + ремонт сколов: 30000-40000₽\n- Оклейка пленкой: 80000-120000₽\n\nЧто думаете? Можем сделать осмотр и дать точные рекомендации."
+      - role: user
+        content: "Интересно, подумаю над вариантами"
+      - role: assistant
+        content: "Конечно! Приезжайте на бесплатный осмотр - посмотрим состояние и дадим точные цены на все варианты."
+
+  - profile: one_time_client
+    client:
+      first_name: "Евгения"
+      last_name: "Макарова"
+      username: "evgenia_mak"
+      phone: "+7(903)333-44-55"
+    vehicle:
+      brand: "Suzuki"
+      model: "Vitara"
+      year: 2019
+    created_days_ago: 23
+    has_booking: true
+    booking_details: "Замена салонного и воздушного фильтров Suzuki Vitara."
+    messages:
+      - role: user
+        content: "Привет! Нужно поменять фильтры - салонный и воздушный"
+      - role: assistant
+        content: "Здравствуйте! Какая машина?"
+      - role: user
+        content: "Сузуки Витара 2019"
+      - role: assistant
+        content: "Для Suzuki Vitara 2019:\n- Воздушный фильтр: 1500₽ с заменой\n- Салонный фильтр: 1200₽ с заменой\n- Комплект оба: 2500₽\n\nМожем сделать быстро, минут 20. Когда удобно?"
+      - role: user
+        content: "Сегодня можно?"
+      - role: assistant
+        content: "Да, сегодня можем! До 18:00 приезжайте без записи, сделаем сразу. Или записать на конкретное время?"
+      - role: user
+        content: "Приеду часа через два"
+      - role: assistant
+        content: "Отлично! Ждем вас. Адрес: ул. Автосервисная, 15. До встречи!"
+
+  - profile: one_time_client
+    client:
+      first_name: "Денис"
+      last_name: "Зайцев"
+      username: "denis_zaitsev"
+      phone: "+7(926)444-55-66"
+    vehicle:
+      brand: "Opel"
+      model: "Astra"
+      year: 2014
+    created_days_ago: 25
+    has_booking: false
+    messages:
+      - role: user
+        content: "Здравствуйте, сколько стоит заменить сцепление?"
+      - role: assistant
+        content: "Здравствуйте! Замена сцепления - серьезная работа. Какая машина?"
+      - role: user
+        content: "Опель Астра 2014, механика"
+      - role: assistant
+        content: "Для Opel Astra 2014 МКПП замена сцепления:\n- Комплект сцепления + работа: 25000-30000₽\n- С маховиком (если изношен): +15000₽\n\nКакие симптомы? Буксует, дергается?"
+      - role: user
+        content: "Педаль тугая стала и буксует иногда"
+      - role: assistant
+        content: "Похоже на износ диска сцепления. Нужна диагностика:\n- Посмотрим состояние\n- Скажем точную цену\n\nКогда можете приехать?"
+      - role: user
+        content: "Пока не решил, дорого выходит"
+      - role: assistant
+        content: "Понимаю. Если буксует сильно - лучше не затягивать, можно повредить маховик. Приезжайте на диагностику - она бесплатна, посмотрим реальное состояние."
+
+  # =============================================================================
+  # JUST_ASKING - "Просто спросить" (6 диалогов, 0 bookings)
+  # =============================================================================
+  - profile: just_asking
+    client:
+      first_name: "Константин"
+      last_name: "Николаев"
+      username: "kostya_nik"
+    created_days_ago: 1
+    has_booking: false
+    messages:
+      - role: user
+        content: "Сколько стоит покраска бампера?"
+      - role: assistant
+        content: "Здравствуйте! Покраска бампера: 8000-12000₽ в зависимости от марки авто и объема работ. Какая у вас машина?"
+      - role: user
+        content: "Просто интересуюсь"
+      - role: assistant
+        content: "Понял! Если будут конкретные вопросы - пишите, с удовольствием поможем!"
+
+  - profile: just_asking
+    client:
+      first_name: "Валентина"
+      last_name: "Гусева"
+      username: "valya_gus"
+    created_days_ago: 4
+    has_booking: false
+    messages:
+      - role: user
+        content: "А вы работаете в воскресенье?"
+      - role: assistant
+        content: "Здравствуйте! Да, работаем без выходных с 9:00 до 20:00. Чем можем помочь?"
+      - role: user
+        content: "Спасибо, это все"
+      - role: assistant
+        content: "Пожалуйста! Будут вопросы - пишите!"
+
+  - profile: just_asking
+    client:
+      first_name: "Станислав"
+      last_name: "Панов"
+      username: "stas_panov"
+    created_days_ago: 8
+    has_booking: false
+    messages:
+      - role: user
+        content: "Привет! А где вы находитесь?"
+      - role: assistant
+        content: "Здравствуйте! Мы находимся по адресу: ул. Автосервисная, 15.\n\nУдобный подъезд, бесплатная парковка. Планируете к нам приехать?"
+      - role: user
+        content: "Пока не знаю, может потом"
+      - role: assistant
+        content: "Хорошо! Будем рады видеть, когда решите."
+
+  - profile: just_asking
+    client:
+      first_name: "Оксана"
+      last_name: "Чернова"
+      username: "oksana_ch"
+    created_days_ago: 12
+    has_booking: false
+    messages:
+      - role: user
+        content: "Сколько стоит полировка?"
+      - role: assistant
+        content: "Здравствуйте! Полировка кузова:\n- Легкая полировка: 5000-8000₽\n- Глубокая полировка: 10000-15000₽\n- С нанесением защиты: 15000-25000₽\n\nКакая машина?"
+      - role: user
+        content: "Это дорого"
+      - role: assistant
+        content: "Цена зависит от состояния кузова. Можем сделать осмотр и предложить оптимальный вариант. Хотите записаться?"
+      - role: user
+        content: "Нет, спасибо"
+      - role: assistant
+        content: "Хорошо! Если передумаете - пишите."
+
+  - profile: just_asking
+    client:
+      first_name: "Григорий"
+      last_name: "Власов"
+      username: "grisha_vl"
+    created_days_ago: 17
+    has_booking: false
+    messages:
+      - role: user
+        content: "Делаете ли вы ремонт АКПП?"
+      - role: assistant
+        content: "Здравствуйте! Да, делаем диагностику и ремонт АКПП. Какие симптомы беспокоят?"
+      - role: user
+        content: "Пока ничего, просто на будущее спрашиваю"
+      - role: assistant
+        content: "Понял! Если появятся вопросы по коробке - обращайтесь. Диагностика АКПП: 2000₽, определим состояние точно."
+
+  - profile: just_asking
+    client:
+      first_name: "Алина"
+      last_name: "Суворова"
+      username: "alina_suv"
+    created_days_ago: 22
+    has_booking: false
+    messages:
+      - role: user
+        content: "Здравствуйте! Работаете ли вы с каско?"
+      - role: assistant
+        content: "Здравствуйте! Да, работаем со всеми страховыми компаниями:\n- РЕСО\n- Ингосстрах\n- АльфаСтрахование\n- СОГАЗ\n- И другими\n\nПроизошел страховой случай?"
+      - role: user
+        content: "Нет, просто узнаю заранее"
+      - role: assistant
+        content: "Хорошо! Если что случится - обращайтесь. Поможем с оформлением документов для страховой."
+
+  # =============================================================================
+  # URGENT_CLIENT - Срочные клиенты (3 диалога, ~2 bookings)
+  # =============================================================================
+  - profile: urgent_client
+    client:
+      first_name: "Владимир"
+      last_name: "Герасимов"
+      username: "vladimir_ger"
+      phone: "+7(915)555-66-77"
+    vehicle:
+      brand: "Toyota"
+      model: "RAV4"
+      year: 2021
+    created_days_ago: 1
+    has_booking: true
+    booking_details: "Срочный ремонт после ДТП: замена бампера и крыла Toyota RAV4."
+    messages:
+      - role: user
+        content: "Срочно! Попал в ДТП, нужен ремонт!"
+      - role: assistant
+        content: "Здравствуйте! Сочувствую! Вы в порядке? Что повреждено на машине?"
+      - role: user
+        content: "Да, я в порядке. Помяли бампер и крыло, Тойота РАВ4 2021"
+      - role: assistant
+        content: "Хорошо, что вы в порядке! Toyota RAV4 - можем принять сегодня.\n\nПредварительно:\n- Бампер: 15000-25000₽\n- Крыло: 20000-35000₽\n\nТочную цену скажем после осмотра. Можете приехать сейчас?"
+      - role: user
+        content: "Да, еду к вам!"
+      - role: assistant
+        content: "Ждем вас! Адрес: ул. Автосервисная, 15. Приедете - сразу посмотрим и составим смету.\n\nЕсли нужно для страховой - оформим все документы."
+      - role: user
+        content: "Хорошо, буду через 30 минут"
+      - role: assistant
+        content: "Принял! Предупредил мастеров. До встречи!"
+
+  - profile: urgent_client
+    client:
+      first_name: "Екатерина"
+      last_name: "Фролова"
+      username: "kate_frol"
+      phone: "+7(926)666-77-88"
+    vehicle:
+      brand: "Kia"
+      model: "Sportage"
+      year: 2020
+    created_days_ago: 5
+    has_booking: true
+    booking_details: "Срочная замена лобового стекла Kia Sportage после попадания камня."
+    messages:
+      - role: user
+        content: "Помогите! Камень разбил лобовое, трещина по всему стеклу!"
+      - role: assistant
+        content: "Здравствуйте! Понимаю, неприятная ситуация. Какая машина?"
+      - role: user
+        content: "Киа Спортейдж 2020"
+      - role: assistant
+        content: "Для Kia Sportage 2020 замена лобового:\n- Оригинал: 35000₽\n- Качественный аналог: 20000₽\n\nМожем заменить сегодня! Когда приедете?"
+      - role: user
+        content: "Сейчас могу, это срочно - ездить невозможно"
+      - role: assistant
+        content: "Приезжайте! Стекло в наличии, заменим за 3-4 часа. Адрес: ул. Автосервисная, 15. Ждем!"
+      - role: user
+        content: "Еду!"
+      - role: assistant
+        content: "Отлично! До встречи!"
+
+  - profile: urgent_client
+    client:
+      first_name: "Борис"
+      last_name: "Медведев"
+      username: "boris_med"
+      phone: "+7(903)777-88-99"
+    vehicle:
+      brand: "Volkswagen"
+      model: "Tiguan"
+      year: 2019
+    created_days_ago: 10
+    has_booking: false
+    messages:
+      - role: user
+        content: "Добрый день! Поцарапал машину об столб, можно сегодня отремонтировать?"
+      - role: assistant
+        content: "Здравствуйте! Понимаю, хочется скорее исправить. Что повреждено и какая машина?"
+      - role: user
+        content: "VW Tiguan 2019, царапина на двери и немного помял"
+      - role: assistant
+        content: "Для VW Tiguan:\n- Осмотр + расчет: бесплатно\n- Если только царапина: можем начать сегодня\n- Если нужна рихтовка: 1-2 дня\n\nМожете приехать сейчас на осмотр?"
+      - role: user
+        content: "Сегодня не успеваю, а завтра с утра?"
+      - role: assistant
+        content: "Конечно! Записываю на завтра на 9:00. Посмотрим повреждения и скажем точные сроки и стоимость. Ваш телефон для связи?"
+      - role: user
+        content: "Подожду пока, перезвоню"
+      - role: assistant
+        content: "Хорошо! Когда соберетесь - пишите или звоните. Постараемся принять как можно быстрее."
