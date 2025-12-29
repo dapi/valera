@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Lint Slim files for Tailwind arbitrary values in shorthand syntax
+#
+# Slim parser breaks `.class-[value]` syntax - it interprets `[` as attribute delimiter.
+# See: https://github.com/slim-template/slim/issues/906
+#
+# Usage: bin/lint-slim-tailwind [path]
+#
+# Exit codes:
+#   0 - No issues found
+#   1 - Issues found
+
+require "pathname"
+
+PATTERN = /^\s*\.[a-z][a-z0-9-]*-\[[^\]]+\]/i
+DESCRIPTION = "Slim shorthand with Tailwind arbitrary value (will break)"
+SUGGESTION = 'Use `div class="..."` or inline style instead'
+
+def check_file(path)
+  issues = []
+  File.readlines(path).each_with_index do |line, index|
+    if line.match?(PATTERN)
+      issues << { line: index + 1, content: line.strip }
+    end
+  end
+  issues
+end
+
+def main
+  search_path = ARGV[0] || "app/views"
+  files = Dir.glob("#{search_path}/**/*.slim")
+
+  total_issues = 0
+  files_with_issues = []
+
+  files.each do |file|
+    issues = check_file(file)
+    next if issues.empty?
+
+    files_with_issues << file
+    total_issues += issues.size
+
+    puts "\n\e[31m#{file}\e[0m"
+    issues.each do |issue|
+      puts "  Line #{issue[:line]}: #{issue[:content]}"
+    end
+  end
+
+  if total_issues > 0
+    puts "\n\e[31m#{DESCRIPTION}\e[0m"
+    puts "\e[33m#{SUGGESTION}\e[0m"
+    puts "\nSee: https://github.com/slim-template/slim/issues/906"
+    puts "\nFound #{total_issues} issue(s) in #{files_with_issues.size} file(s)"
+    exit 1
+  else
+    puts "\e[32mNo Slim + Tailwind arbitrary value issues found\e[0m"
+    exit 0
+  end
+end
+
+main
