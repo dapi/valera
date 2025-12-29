@@ -14,6 +14,7 @@
 🚨 **Testing:** Без `File.write/File.delete` и изменения ENV в тестах
 🚨 **Jobs/SolidQueue:** НЕ использовать символы `:exponentially_longer` или `:polynomially_longer` в `retry_on` — SolidQueue их не поддерживает. Используй lambda: `wait: ->(executions) { (executions**4) + 2 }`
 🚨 **Порты worktree:** ВСЕГДА проверяй занятость порта (`ss -tlnp | grep :PORT`) перед запуском сервера. Каждый порт имеет свою session cookie (`_session_PORT`), поэтому параллельные worktree не конфликтуют.
+🚨 **Demo/Production авторизация:** НИКОГДА не устанавливать/менять пароли на demo.supervalera.ru или production. Если форма предлагает "Установить пароль" — НЕ делать этого, а спросить у пользователя актуальные креды.
 
 ## 🚀 Запуск проекта в новом каталоге (worktree)
 
@@ -181,7 +182,23 @@ ADMIN_URL, а доступы бери из переменных окружеия
 # Диагностика
 
 - Логи из production смотреть через `make production-logs`
-- Запустить в rails runner на production через `production-rails-runner`
+- Запустить rails runner на production через `bin/production-rails-runner`
+
+## Production Rails Runner
+
+Скрипт `bin/production-rails-runner` для выполнения Ruby-кода на production:
+
+```bash
+# Простые команды
+bin/production-rails-runner 'User.count'
+bin/production-rails-runner 'puts Tenant.pluck(:key)'
+
+# Команды с ! и спецсимволами — через stdin (решает проблему экранирования bash)
+echo 'DemoDataSeeder.send("seed!", Tenant.find_by_key(:demo))' | bin/production-rails-runner -
+echo 'require_relative "db/seeds/demo_data"; DemoDataSeeder.send("seed!", Tenant.first)' | bin/production-rails-runner -
+```
+
+**Важно:** Для методов с `!` используй `send("method!", args)` через stdin, иначе bash экранирует `!`.
 
 ### 🚨 Critical Rules для требований
 
