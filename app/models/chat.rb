@@ -24,9 +24,13 @@
 class Chat < ApplicationRecord
   include ErrorLogger
 
+  # Manager takeover timeout in minutes
+  MANAGER_TAKEOVER_TIMEOUT = 30
+
   belongs_to :tenant, counter_cache: true
   belongs_to :client
   belongs_to :chat_topic, optional: true
+  belongs_to :manager_user, class_name: 'User', optional: true
 
   has_one :telegram_user, through: :client
 
@@ -37,6 +41,78 @@ class Chat < ApplicationRecord
   # Scope для предзагрузки данных клиента и Telegram пользователя
   # Используется в dashboard для отображения информации о клиенте
   scope :with_client_details, -> { includes(client: :telegram_user) }
+
+  # Scopes для фильтрации по режиму менеджера
+  scope :manager_controlled, -> { where(manager_active: true) }
+  scope :bot_controlled, -> { where(manager_active: false) }
+
+  # Проверяет, активен ли менеджер в чате (с учётом таймаута)
+  #
+  # @return [Boolean] true если менеджер активен и таймаут не истёк
+  def manager_mode?
+    return false unless manager_active?
+
+    # Проверяем таймаут
+    if manager_active_until.present? && manager_active_until < Time.current
+      release_to_bot!
+      return false
+    end
+
+    true
+  end
+
+  # Проверяет, управляется ли чат ботом
+  #
+  # @return [Boolean] true если чат в режиме бота
+  def bot_mode?
+    !manager_mode?
+  end
+
+  # Менеджер берёт контроль над чатом
+  #
+  # @param user [User] пользователь, который берёт контроль
+  # @param timeout_minutes [Integer] время таймаута в минутах
+  # @return [Boolean] успешность операции
+  def takeover_by_manager!(user, timeout_minutes: MANAGER_TAKEOVER_TIMEOUT)
+    update!(
+      manager_active: true,
+      manager_user: user,
+      manager_active_at: Time.current,
+      manager_active_until: timeout_minutes.minutes.from_now
+    )
+  end
+
+  # Продлевает время активности менеджера
+  #
+  # @param timeout_minutes [Integer] время таймаута в минутах
+  # @return [Boolean] успешность операции
+  def extend_manager_timeout!(timeout_minutes: MANAGER_TAKEOVER_TIMEOUT)
+    return false unless manager_active?
+
+    update!(manager_active_until: timeout_minutes.minutes.from_now)
+  end
+
+  # Возвращает чат боту
+  #
+  # @return [Boolean] успешность операции
+  def release_to_bot!
+    update!(
+      manager_active: false,
+      manager_user: nil,
+      manager_active_at: nil,
+      manager_active_until: nil
+    )
+  end
+
+  # Время до автоматического возврата боту
+  #
+  # @return [ActiveSupport::Duration, nil] оставшееся время или nil
+  def time_until_auto_release
+    return nil unless manager_active? && manager_active_until.present?
+
+    remaining = manager_active_until - Time.current
+    remaining.positive? ? remaining.seconds : nil
+  end
 
   # Устанавливает модель AI по умолчанию перед созданием
   #
