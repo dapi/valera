@@ -2,9 +2,8 @@
 
 # Demo data seeder for dashboard testing
 #
-# Creates realistic demo data from two sources:
-# - db/seeds/demo_dialogs.yml (manual dialogs, 29 dialogs)
-# - db/seeds/generated_dialogs/*.yml (LLM-generated, 100+ dialogs)
+# Creates realistic demo data from LLM-generated dialogs:
+# - db/seeds/generated_dialogs/*.yml (100+ dialogs by customer profile)
 #
 # Usage: Called from db/seeds.rb in development environment
 #
@@ -12,25 +11,15 @@
 # @see db/seeds/README.md for LLM generator documentation
 
 class DemoDataSeeder
-  DIALOGS_FILE = Rails.root.join('db/seeds/demo_dialogs.yml')
   GENERATED_DIALOGS_DIR = Rails.root.join('db/seeds/generated_dialogs')
-  MIN_CLIENTS_THRESHOLD = 10  # Skip seeding if tenant has >= this many clients
 
   def initialize(tenant)
-    @tenant = tenant
+    @tenant = tenant || raise('No tenant')
     @model = find_or_create_model
     @stats = { clients: 0, chats: 0, messages: 0, bookings: 0, vehicles: 0 }
   end
 
   def seed!
-    return unless Rails.env.development?
-    return unless @tenant
-
-    if @tenant.clients.count >= MIN_CLIENTS_THRESHOLD
-      Rails.logger.info "[DemoData] Skipping: tenant already has #{@tenant.clients.count} clients (threshold: #{MIN_CLIENTS_THRESHOLD})"
-      return
-    end
-
     Rails.logger.info '[DemoData] Starting demo data seeding...'
 
     dialogs = load_dialogs
@@ -52,26 +41,9 @@ class DemoDataSeeder
   private
 
   def load_dialogs
-    dialogs = []
-
-    # Load manual dialogs from demo_dialogs.yml
-    dialogs += load_manual_dialogs
-
-    # Load LLM-generated dialogs from generated_dialogs/*.yml
-    dialogs += load_generated_dialogs
-
-    Rails.logger.info "[DemoData] Loaded #{dialogs.size} dialogs (manual + generated)"
+    dialogs = load_generated_dialogs
+    Rails.logger.info "[DemoData] Loaded #{dialogs.size} dialogs"
     dialogs
-  end
-
-  def load_manual_dialogs
-    return [] unless File.exist?(DIALOGS_FILE)
-
-    data = YAML.load_file(DIALOGS_FILE, permitted_classes: [Symbol])
-    (data['dialogs'] || []).map { |d| normalize_dialog(d, source: :manual) }
-  rescue StandardError => e
-    Rails.logger.error "[DemoData] Error loading manual dialogs: #{e.message}"
-    []
   end
 
   def load_generated_dialogs
@@ -83,7 +55,7 @@ class DemoDataSeeder
 
       data = YAML.load_file(file, permitted_classes: [Symbol, Time, DateTime])
       file_dialogs = data[:dialogs] || data['dialogs'] || []
-      dialogs += file_dialogs.map { |d| normalize_dialog(d, source: :generated) }
+      dialogs += file_dialogs.map { |d| normalize_dialog(d) }
     rescue StandardError => e
       Rails.logger.error "[DemoData] Error loading #{file}: #{e.message}"
     end
@@ -92,22 +64,8 @@ class DemoDataSeeder
     dialogs
   end
 
-  # Normalize dialog format from different sources to unified structure
-  def normalize_dialog(dialog, source:)
-    if source == :generated
-      normalize_generated_dialog(dialog)
-    else
-      normalize_manual_dialog(dialog)
-    end
-  end
-
-  def normalize_manual_dialog(dialog)
-    # Manual dialogs already have correct format, just ensure string keys
-    dialog.deep_stringify_keys
-  end
-
-  def normalize_generated_dialog(dialog)
-    # Generated dialogs have symbol keys and different structure
+  # Normalize dialog from YAML to unified structure
+  def normalize_dialog(dialog)
     profile = dialog[:profile]&.to_s || 'one_time_client'
     messages = (dialog[:messages] || []).map do |msg|
       {
@@ -301,8 +259,6 @@ class DemoDataSeeder
   end
 
   def print_progress(current, total)
-    return unless Rails.env.development?
-
     progress = (current.to_f / total * 100).round
     print "\r[DemoData] Progress: #{current}/#{total} (#{progress}%)"
     puts if current == total
@@ -330,7 +286,6 @@ end
 module DemoHistoricalData
   # Generate additional messages spread over time for activity charts
   def self.generate!(tenant, days: 30, daily_messages: 5..15)
-    return unless Rails.env.development?
     return unless tenant
 
     model = Model.find_by(
