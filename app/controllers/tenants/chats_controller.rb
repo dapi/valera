@@ -29,7 +29,7 @@ module Tenants
       return nil if chat_id.blank?
 
       chat = current_tenant.chats
-                           .includes(client: :telegram_user)
+                           .with_client_details
                            .includes(:bookings)
                            .find(chat_id)
 
@@ -49,7 +49,7 @@ module Tenants
 
     def fetch_chats
       chats = current_tenant.chats
-                            .includes(client: :telegram_user)
+                            .with_client_details
                             .order(sort_column => :desc)
                             .page(params[:page])
                             .per(PER_PAGE)

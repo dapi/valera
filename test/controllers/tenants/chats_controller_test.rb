@@ -105,8 +105,9 @@ module Tenants
       get '/chats'
 
       assert_response :success
-      # Проверяем что показаны все сообщения чата (2 сообщения в фикстурах)
-      assert_select '.whitespace-pre-wrap', count: 2
+      # Проверяем что показаны все сообщения чата по содержимому
+      assert_match 'Hello, I need help with my car', response.body
+      assert_match 'I can help you with car maintenance', response.body
     end
 
     test 'show displays all messages for chat' do
@@ -116,9 +117,24 @@ module Tenants
       get "/chats/#{@chat.id}"
 
       assert_response :success
-      # Проверяем наличие сообщений пользователя и ассистента
-      assert_select '.bg-blue-500', count: 1  # user message
-      assert_select '.bg-white.border', count: 1  # assistant message
+      # Проверяем наличие сообщений пользователя и ассистента по содержимому
+      assert_match 'Hello, I need help with my car', response.body
+      assert_match 'I can help you with car maintenance', response.body
+    end
+
+    test 'limits messages to max_chat_messages_display config' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      # Мокаем конфигурацию с лимитом в 1 сообщение
+      ApplicationConfig.stubs(:max_chat_messages_display).returns(1)
+
+      get "/chats/#{@chat.id}"
+
+      assert_response :success
+      # При лимите 1 показывается только последнее (assistant) сообщение
+      assert_match 'I can help you with car maintenance', response.body
+      assert_no_match(/Hello, I need help with my car/, response.body)
     end
   end
 end
