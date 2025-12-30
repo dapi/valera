@@ -150,6 +150,18 @@ module Tenants
         assert_response :not_found
       end
 
+      test 'release fails for bot-controlled chat' do
+        # Chat is NOT in manager mode (default state)
+        assert_not @chat.manager_mode?
+
+        post "/chats/#{@chat.id}/manager/release"
+
+        assert_response :unprocessable_entity
+        json = JSON.parse(response.body)
+        assert_not json['success']
+        assert_equal 'Chat is not in manager mode', json['error']
+      end
+
       # === Messages Tests ===
 
       test 'create_message succeeds for manager-controlled chat' do

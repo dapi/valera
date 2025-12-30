@@ -59,14 +59,14 @@ class Manager::ReleaseServiceTest < ActiveSupport::TestCase
     assert_equal 'User is not authorized to release this chat', result.error
   end
 
-  test 'succeeds when chat is already in bot mode' do
+  test 'fails when chat is already in bot mode' do
     @chat.release_to_bot!
     @mock_bot_client.expects(:send_message).never
 
     result = Manager::ReleaseService.call(chat: @chat)
 
-    assert result.success?
-    assert @chat.reload.bot_mode?
+    assert_not result.success?
+    assert_equal 'Chat is not in manager mode', result.error
   end
 
   test 'does not notify when chat is already in bot mode' do
@@ -75,7 +75,8 @@ class Manager::ReleaseServiceTest < ActiveSupport::TestCase
 
     result = Manager::ReleaseService.call(chat: @chat, notify_client: true)
 
-    assert result.success?
+    assert_not result.success?
+    assert_equal 'Chat is not in manager mode', result.error
   end
 
   test 'handles telegram send failure gracefully' do
@@ -107,13 +108,13 @@ class Manager::ReleaseServiceTest < ActiveSupport::TestCase
     assert_nil result.notification_sent
   end
 
-  test 'returns notification_sent nil when chat already in bot mode' do
+  test 'returns error when chat already in bot mode' do
     @chat.release_to_bot!
     @mock_bot_client.expects(:send_message).never
 
     result = Manager::ReleaseService.call(chat: @chat, notify_client: true)
 
-    assert result.success?
-    assert_nil result.notification_sent
+    assert_not result.success?
+    assert_equal 'Chat is not in manager mode', result.error
   end
 end
