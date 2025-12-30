@@ -98,6 +98,16 @@ module Tenants
         assert_nil json['notification_sent']
       end
 
+      test 'takeover with unrecognized notify_client value defaults to notification' do
+        @mock_bot_client.expects(:send_message).once.returns({ 'result' => { 'message_id' => 123 } })
+
+        post "/chats/#{@chat.id}/manager/takeover", params: { notify_client: 'invalid_value' }
+
+        json = JSON.parse(response.body)
+        assert json['success']
+        assert_equal true, json['notification_sent']
+      end
+
       test 'takeover fails for already taken chat' do
         @chat.takeover_by_manager!(@owner)
 
