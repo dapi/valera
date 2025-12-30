@@ -1,0 +1,11 @@
+/ Turbo Stream response for takeover action
+/ Updates chat header, controls, and status badge
+
+= turbo_stream.replace "chat_#{@chat.id}_header" do
+  = render 'tenants/chats/chat_header', chat: @chat
+
+= turbo_stream.replace "chat_#{@chat.id}_controls" do
+  = render 'tenants/chats/chat_controls', chat: @chat
+
+= turbo_stream.replace "chat_#{@chat.id}_status" do
+  = render 'tenants/chats/status', chat: @chat

@@ -1,0 +1,9 @@
+/ Turbo Stream response for send_message action
+/ Appends new message and clears the form
+
+= turbo_stream.append "chat_messages" do
+  = render 'tenants/chats/message', message: @message
+
+/ Clear the message input field
+= turbo_stream.replace "chat_#{@chat.id}_controls" do
+  = render 'tenants/chats/chat_controls', chat: @chat

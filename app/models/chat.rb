@@ -27,12 +27,39 @@ class Chat < ApplicationRecord
   belongs_to :tenant, counter_cache: true
   belongs_to :client
   belongs_to :chat_topic, optional: true
+  belongs_to :taken_by, class_name: 'User', optional: true
 
   has_one :telegram_user, through: :client
 
   has_many :bookings, dependent: :destroy
 
   acts_as_chat
+
+  # Takeover support
+  # mode: ai_mode (по умолчанию) - бот отвечает автоматически
+  # mode: manager_mode - менеджер перехватил диалог, бот не отвечает
+  enum :mode, { ai_mode: 0, manager_mode: 1 }, default: :ai_mode
+
+  validates :taken_by, presence: true, if: :manager_mode?
+  validates :taken_at, presence: true, if: :manager_mode?
+
+  scope :in_manager_mode, -> { where(mode: :manager_mode) }
+  scope :taken_by_user, ->(user) { where(taken_by: user) }
+
+  # Возвращает оставшееся время до автоматического возврата боту
+  # @return [Float, nil] секунды до таймаута или nil если не в manager_mode
+  def takeover_time_remaining
+    return nil unless manager_mode? && taken_at
+
+    timeout_at = taken_at + ChatTakeoverService::TIMEOUT_DURATION
+    [ timeout_at - Time.current, 0 ].max
+  end
+
+  # Проверяет, истёк ли таймаут takeover
+  # @return [Boolean]
+  def takeover_expired?
+    manager_mode? && taken_at && taken_at < ChatTakeoverService::TIMEOUT_DURATION.ago
+  end
 
   # Scope для предзагрузки данных клиента и Telegram пользователя
   # Используется в dashboard для отображения информации о клиенте
