@@ -409,15 +409,21 @@ module Telegram
 
     # Отправляет broadcast о новом сообщении в dashboard
     #
+    # Broadcast не критичен - если упадёт, сообщение уже сохранено.
+    # Менеджер увидит его при обновлении страницы.
+    #
     # @return [void]
     # @api private
     def broadcast_new_message_to_dashboard
-      Turbo::StreamsChannel.broadcast_prepend_to(
+      Turbo::StreamsChannel.broadcast_append_to(
         "tenant_#{current_tenant.id}_chat_#{llm_chat.id}",
         target: 'chat-messages',
         partial: 'tenants/chats/message',
         locals: { message: llm_chat.messages.last }
       )
+    rescue Redis::BaseConnectionError, ActionView::Template::Error => e
+      Rails.logger.warn("[WebhookController] Failed to broadcast message to dashboard: #{e.message}")
+      # Не пробрасываем ошибку - broadcast не критичен, сообщение уже сохранено
     end
 
     # Определяет тип сообщения для аналитики
