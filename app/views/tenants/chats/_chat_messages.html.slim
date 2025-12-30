@@ -1,5 +1,8 @@
 / Chat messages container with max-width and auto-scroll
+/ Подписка на Turbo Streams для real-time обновлений в режиме менеджера
+= turbo_stream_from "tenant_#{chat.tenant_id}_chat_#{chat.id}"
+
 / Используем предзагруженные сообщения из контроллера (уже отсортированы)
-div.mx-auto.space-y-4 class="max-w-[800px]" data-controller="chat-scroll"
+div.mx-auto.space-y-4#chat-messages class="max-w-[800px]" data-controller="chat-scroll"
   - chat.messages.each do |message|
     = render 'message', message: message
