@@ -398,6 +398,13 @@ module Telegram
           platform: 'telegram'
         }
       )
+    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
+      AnalyticsService.track_error(e, tenant: current_tenant, context: {
+        chat_id: llm_chat&.id,
+        action: 'handle_message_in_manager_mode'
+      })
+      Rails.logger.error("[WebhookController] Failed to save message in manager mode: #{e.message}")
+      respond_with :message, text: I18n.t('telegram.errors.message_save_failed', default: 'Не удалось сохранить сообщение')
     end
 
     # Отправляет broadcast о новом сообщении в dashboard

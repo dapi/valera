@@ -30,7 +30,13 @@ class ChatTakeoverTimeoutJob < ApplicationJob
     chat = Chat.find(chat_id)
 
     # Проверяем что чат всё ещё в режиме менеджера
-    return unless chat.manager_mode?
+    unless chat.manager_mode?
+      Rails.logger.info(
+        "[ChatTakeoverTimeoutJob] Skipping: chat #{chat_id} is no longer in manager mode " \
+        "(likely manually released)"
+      )
+      return
+    end
 
     # Защита от race condition: если был новый takeover - не возвращаем
     if expected_takeover_at.present?
