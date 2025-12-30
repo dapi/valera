@@ -3,6 +3,8 @@
 require 'test_helper'
 
 class Manager::TakeoverServiceTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup do
     @chat = chats(:one)
     @user = users(:one)
@@ -104,5 +106,21 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
 
     assert result.success?
     assert_nil result.notification_sent
+  end
+
+  test 'schedules timeout job on takeover' do
+    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+
+    assert_enqueued_with(job: ChatTakeoverTimeoutJob) do
+      Manager::TakeoverService.call(chat: @chat, user: @user)
+    end
+  end
+
+  test 'tracks analytics event on takeover' do
+    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+
+    assert_enqueued_with(job: AnalyticsJob) do
+      Manager::TakeoverService.call(chat: @chat, user: @user)
+    end
   end
 end
