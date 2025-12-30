@@ -75,7 +75,13 @@ Rails.application.routes.draw do
           resource :export, only: :create, module: :bookings, as: :bookings_export
         end
       end
-      resources :chats, only: %i[index show]
+      resources :chats, only: %i[index show] do
+        member do
+          post :takeover
+          post :release
+          post :send_message
+        end
+      end
       resources :members, only: %i[index create update destroy] do
         collection do
           get :invite
