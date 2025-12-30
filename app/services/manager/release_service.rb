@@ -72,9 +72,10 @@ module Manager
 
     def validate!
       raise ArgumentError, 'Chat is required' if chat.nil?
+      raise ArgumentError, 'Chat is not in manager mode' unless chat.manager_mode?
 
       # Если передан user, проверяем что это активный менеджер или админ
-      return unless user.present? && chat.manager_mode?
+      return unless user.present?
       return if user_can_release?
 
       raise ArgumentError, 'User is not authorized to release this chat'

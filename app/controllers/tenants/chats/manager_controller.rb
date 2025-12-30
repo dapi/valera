@@ -137,12 +137,13 @@ module Tenants
       end
 
       # Парсит параметр notify_client как boolean
-      # По умолчанию true, если параметр не передан или nil
+      # По умолчанию true, если параметр не передан, nil, или нераспознанное значение
       def notify_client_param
         value = params[:notify_client]
         return true if value.nil?
 
-        ActiveModel::Type::Boolean.new.cast(value)
+        result = ActiveModel::Type::Boolean.new.cast(value)
+        result.nil? ? true : result
       end
 
       def message_params
