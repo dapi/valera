@@ -26,6 +26,9 @@ class AnalyticsService
     BOOKING_CREATED = Analytics::EventConstants.event_name(:booking_created)
     SUGGESTION_ACCEPTED = Analytics::EventConstants.event_name(:suggestion_accepted)
     RESPONSE_TIME = Analytics::EventConstants.event_name(:response_time)
+    MESSAGE_RECEIVED_IN_MANAGER_MODE = Analytics::EventConstants.event_name(:message_received_in_manager_mode)
+    CHAT_TAKEOVER_STARTED = Analytics::EventConstants.event_name(:chat_takeover_started)
+    CHAT_TAKEOVER_ENDED = Analytics::EventConstants.event_name(:chat_takeover_ended)
     ERROR_OCCURRED = Analytics::EventConstants.event_name(:error_occurred)
   end
 

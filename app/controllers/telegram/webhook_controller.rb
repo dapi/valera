@@ -50,6 +50,12 @@ module Telegram
 
       chat_id = message.dig('chat', 'id')
 
+      # Если чат находится в режиме менеджера - не вызываем AI
+      if llm_chat.manager_mode?
+        handle_message_in_manager_mode(message)
+        return
+      end
+
       # Track dialog start for first message of the day
       if first_message_today?(chat_id)
         AnalyticsService.track(
@@ -357,6 +363,54 @@ module Telegram
       Rails.logger.warn { "[WebhookController] Tenant #{current_tenant.key} has no admin_chat_id configured" }
       respond_with :message, text: I18n.t('telegram.bot_not_configured')
       false
+    end
+
+    # Обрабатывает сообщение клиента когда чат в режиме менеджера
+    #
+    # Сохраняет сообщение в истории и уведомляет менеджера через dashboard.
+    # AI не вызывается - менеджер отвечает напрямую.
+    #
+    # @param message [Hash] данные сообщения от Telegram
+    # @return [void]
+    # @api private
+    def handle_message_in_manager_mode(message)
+      text = message['text']
+
+      # Сохраняем сообщение клиента в историю чата
+      llm_chat.messages.create!(
+        role: :user,
+        content: text
+      )
+
+      # Обновляем время последнего сообщения
+      llm_chat.update!(last_message_at: Time.current)
+
+      # Уведомляем dashboard о новом сообщении через Turbo Streams
+      broadcast_new_message_to_dashboard
+
+      # Трекаем событие для аналитики
+      AnalyticsService.track(
+        AnalyticsService::Events::MESSAGE_RECEIVED_IN_MANAGER_MODE,
+        tenant: current_tenant,
+        chat_id: llm_chat.id,
+        properties: {
+          manager_user_id: llm_chat.manager_user_id,
+          platform: 'telegram'
+        }
+      )
+    end
+
+    # Отправляет broadcast о новом сообщении в dashboard
+    #
+    # @return [void]
+    # @api private
+    def broadcast_new_message_to_dashboard
+      Turbo::StreamsChannel.broadcast_prepend_to(
+        "tenant_#{current_tenant.id}_chat_#{llm_chat.id}",
+        target: 'chat-messages',
+        partial: 'tenants/chats/message',
+        locals: { message: llm_chat.messages.last }
+      )
     end
 
     # Определяет тип сообщения для аналитики

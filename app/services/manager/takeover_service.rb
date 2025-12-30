@@ -65,7 +65,9 @@ module Manager
     def call
       validate!
       takeover_chat
+      schedule_timeout_job
       notification_result = notify_client ? notify_client_about_takeover : nil
+      track_takeover_started
       build_success_result(notification_result)
     rescue ArgumentError => e
       Result.new(success?: false, error: e.message)
@@ -109,6 +111,30 @@ module Manager
         user_id: user&.id,
         timeout_minutes:
       }
+    end
+
+    # Планирует фоновую задачу для автоматического возврата чата боту
+    #
+    # @return [void]
+    def schedule_timeout_job
+      ChatTakeoverTimeoutJob
+        .set(wait: timeout_minutes.minutes)
+        .perform_later(chat.id, chat.manager_active_at)
+    end
+
+    # Отслеживает событие начала takeover
+    #
+    # @return [void]
+    def track_takeover_started
+      AnalyticsService.track(
+        AnalyticsService::Events::CHAT_TAKEOVER_STARTED,
+        tenant: chat.tenant,
+        chat_id: chat.id,
+        properties: {
+          manager_user_id: user.id,
+          timeout_minutes: timeout_minutes
+        }
+      )
     end
   end
 end
