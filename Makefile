@@ -150,4 +150,4 @@ production-logs:
 	kubectl logs -n production deployment/valera --tail=200
 
 production-rails-runner:
-	kubectl exec -n production deployment/valera -c ror -- bundle exec rails runner ${ARGS}
+	@bin/production-rails-runner $(ARGS)
