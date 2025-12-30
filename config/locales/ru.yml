@@ -512,6 +512,8 @@ ru:
         no_messages: Нет сообщений
         empty: Чатов пока нет
         unknown_client: Неизвестный клиент
+        ai_mode: Бот
+        manager_mode: Менеджер
       chat_header:
         messages_count:
           one: "%{count} сообщение"
@@ -523,8 +525,38 @@ ru:
           few: "%{count} заявки"
           many: "%{count} заявок"
           other: "%{count} заявок"
+        ai_mode: Бот отвечает
+        manager_mode: Вы общаетесь
+        time_remaining: "Осталось: %{time}"
+      takeover:
+        success: Диалог перехвачен
+        already_taken: Диалог уже перехвачен другим менеджером
+        unauthorized: Нет доступа к этому чату
+      release:
+        success: Диалог возвращён боту
+        not_taken: Диалог не был перехвачен
+        unauthorized: Только перехвативший менеджер может вернуть диалог
+      send_message:
+        empty_message: Введите текст сообщения
+        not_in_manager_mode: Сначала перехватите диалог
+        not_taken_by_user: Диалог перехвачен другим менеджером
+        rate_limit_exceeded: Превышен лимит сообщений (60/час)
       message:
         tool_result: Результат инструмента
+        manager_label: Менеджер
+        system_label: Система
+      controls:
+        takeover: Взять диалог
+        release: Вернуть боту
+        release_confirm: Вы уверены, что хотите вернуть диалог боту?
+        send: Отправить
+        placeholder: Введите сообщение...
+      chat_controls:
+        takeover: Взять диалог
+        release: Вернуть боту
+        release_confirm: Вы уверены, что хотите вернуть диалог боту?
+        send: Отправить
+        placeholder: Введите сообщение...
 
   # Manager takeover translations
   manager:

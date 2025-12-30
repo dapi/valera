@@ -45,6 +45,7 @@ html
 
     / Main content
     main.lg:ml-64.p-8
-      = render 'tenants/shared/flash'
+      #flash
+        = render 'tenants/shared/flash'
 
       = yield

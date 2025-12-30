@@ -2,37 +2,34 @@
 
 # Represents a single message within a chat conversation
 #
-# Roles:
-# - user: message from client (via Telegram)
-# - assistant: message from AI bot
-# - manager: message from human manager (via dashboard)
-# - system: system instructions
-# - tool: tool call result
+# @attr [String] role роль отправителя (user, assistant, tool, system)
+# @attr [String] content содержимое сообщения
+# @attr [Integer] sender_type тип отправителя для assistant сообщений
+# @attr [Integer] sender_id ID пользователя, если отправлено менеджером
 class Message < ApplicationRecord
   ROLES = %w[user assistant manager system tool].freeze
 
   acts_as_message touch_chat: :last_message_at
   has_many_attached :attachments
 
-  # Manager who sent the message (only for role: 'manager')
-  belongs_to :sent_by_user, class_name: 'User', optional: true
+  belongs_to :sender, class_name: 'User', optional: true
 
-  validates :role, inclusion: { in: ROLES }
-  validates :sent_by_user, presence: true, if: -> { role == 'manager' }
+  # Тип отправителя для различения AI и менеджера в истории чата
+  # ai: сообщение от AI-бота (по умолчанию)
+  # manager: сообщение от менеджера в режиме takeover
+  # client: сообщение от клиента (для аналитики)
+  # system: системное уведомление (переключение на менеджера и т.д.)
+  enum :sender_type, { ai: 0, manager: 1, client: 2, system: 3 }, default: :ai
 
-  scope :from_manager, -> { where(role: 'manager') }
-  scope :from_bot, -> { where(role: 'assistant') }
-  scope :from_client, -> { where(role: 'user') }
+  validates :sender, presence: true, if: :manager?
 
+  # Возвращает true, если сообщение отправлено менеджером
   def from_manager?
-    role == 'manager'
+    manager?
   end
 
-  def from_bot?
-    role == 'assistant'
-  end
-
-  def from_client?
-    role == 'user'
+  # Возвращает true, если сообщение является системным уведомлением
+  def system_notification?
+    system?
   end
 end

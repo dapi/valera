@@ -76,13 +76,10 @@ Rails.application.routes.draw do
         end
       end
       resources :chats, only: %i[index show] do
-        # Manager takeover API endpoints
-        scope module: :chats do
-          resource :manager, only: [], controller: :manager do
-            post :takeover
-            post :release
-            post :messages, action: :create_message
-          end
+        member do
+          post :takeover
+          post :release
+          post :send_message
         end
       end
       resources :members, only: %i[index create update destroy] do
