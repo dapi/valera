@@ -127,5 +127,20 @@ module Tenants
     # - Проверка .limit() — это unit-логика, тестировать её в integration test неправильно
     # - Rails гарантирует работу .limit(), нет смысла дублировать тестирование
     # Если нужно тестировать лимит сообщений, следует написать unit test для контроллера
+
+    test 'displays messages in chronological order using preloaded data' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get "/chats/#{@chat.id}"
+
+      assert_response :success
+
+      # Проверяем что оба сообщения отображаются в chat message bubbles
+      # User messages: bg-blue-500 (blue bubble)
+      # Assistant messages: bg-white (white bubble)
+      assert_select 'div.bg-blue-500 div.whitespace-pre-wrap', text: 'Hello, I need help with my car'
+      assert_select 'div.bg-white div.whitespace-pre-wrap', text: /I can help you with car maintenance/
+    end
   end
 end
