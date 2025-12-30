@@ -259,6 +259,81 @@ module Tenants
 
         assert_response :created
       end
+
+      # === Viewer Role Tests ===
+
+      test 'viewer can access takeover endpoint' do
+        viewer = users(:viewer_user_one)
+        viewer.update!(password: 'password123')
+
+        reset!
+        host! "#{@tenant.key}.#{ApplicationConfig.host}"
+        post '/session', params: { email: viewer.email, password: 'password123' }
+
+        @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+
+        post "/chats/#{@chat.id}/manager/takeover"
+
+        assert_response :success
+        json = JSON.parse(response.body)
+        assert json['success']
+      end
+
+      # === Release Authorization Tests ===
+
+      test 'release fails when different user tries to release' do
+        other_user = users(:two)
+        @chat.takeover_by_manager!(other_user)
+
+        # Current user (@owner) tries to release chat taken by other_user
+        post "/chats/#{@chat.id}/manager/release"
+
+        assert_response :unprocessable_entity
+        json = JSON.parse(response.body)
+        assert_not json['success']
+        assert_equal 'User is not authorized to release this chat', json['error']
+      end
+
+      # === Timeout Expiry Tests ===
+
+      test 'manager_mode returns false after timeout expiry' do
+        @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+
+        # Takeover with 1 minute timeout
+        post "/chats/#{@chat.id}/manager/takeover", params: { timeout_minutes: 1 }
+
+        assert_response :success
+        json = JSON.parse(response.body)
+        assert json['chat']['manager_active']
+
+        # Travel past expiry - manager_mode? checks timeout and auto-releases
+        travel 2.minutes do
+          @chat.reload
+          assert_not @chat.manager_mode?
+        end
+      end
+
+      # === JSON Error Response Tests ===
+
+      test 'returns JSON 404 for non-existent chat' do
+        post '/chats/999999/manager/takeover'
+
+        assert_response :not_found
+        json = JSON.parse(response.body)
+        assert_not json['success']
+        assert_equal 'Chat not found', json['error']
+      end
+
+      test 'returns JSON 400 for missing message params' do
+        @chat.takeover_by_manager!(@owner)
+
+        post "/chats/#{@chat.id}/manager/messages", params: {}
+
+        assert_response :bad_request
+        json = JSON.parse(response.body)
+        assert_not json['success']
+        assert_includes json['error'], 'message'
+      end
     end
   end
 end

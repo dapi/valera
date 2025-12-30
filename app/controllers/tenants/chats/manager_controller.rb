@@ -25,6 +25,14 @@ module Tenants
     class ManagerController < Tenants::ApplicationController
       before_action :set_chat
 
+      rescue_from ActiveRecord::RecordNotFound do |_error|
+        render json: { success: false, error: 'Chat not found' }, status: :not_found
+      end
+
+      rescue_from ActionController::ParameterMissing do |error|
+        render json: { success: false, error: error.message }, status: :bad_request
+      end
+
       # POST /chats/:chat_id/manager/takeover
       #
       # Менеджер берёт контроль над чатом.
@@ -109,11 +117,12 @@ module Tenants
       end
 
       # Парсит параметр notify_client как boolean
-      # По умолчанию true, если параметр не передан
+      # По умолчанию true, если параметр не передан или nil
       def notify_client_param
-        return true unless params.key?(:notify_client)
+        value = params[:notify_client]
+        return true if value.nil?
 
-        ActiveModel::Type::Boolean.new.cast(params[:notify_client])
+        ActiveModel::Type::Boolean.new.cast(value)
       end
 
       def message_params
