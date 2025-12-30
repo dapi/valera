@@ -23,13 +23,23 @@ module Tenants
     #
     # @since 0.38.0
     class ManagerController < Tenants::ApplicationController
+      include ErrorLogger
+
       before_action :set_chat
 
-      rescue_from ActiveRecord::RecordNotFound do |_error|
+      # Fallback для непредвиденных ошибок — возвращаем JSON вместо HTML
+      rescue_from StandardError do |error|
+        log_error(error, error_context)
+        render json: { success: false, error: 'Internal server error' }, status: :internal_server_error
+      end
+
+      rescue_from ActiveRecord::RecordNotFound do |error|
+        log_error(error, error_context)
         render json: { success: false, error: 'Chat not found' }, status: :not_found
       end
 
       rescue_from ActionController::ParameterMissing do |error|
+        log_error(error, error_context)
         render json: { success: false, error: error.message }, status: :bad_request
       end
 
@@ -145,6 +155,16 @@ module Tenants
           role: message.role,
           content: message.content,
           created_at: message.created_at
+        }
+      end
+
+      def error_context
+        {
+          controller: self.class.name,
+          action: action_name,
+          chat_id: params[:chat_id],
+          user_id: current_user&.id,
+          tenant_id: current_tenant&.id
         }
       end
     end
