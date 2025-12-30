@@ -27,8 +27,18 @@ module Tenants
 
       before_action :set_chat
 
+      # Фатальные инфраструктурные ошибки — пробрасываем наверх (согласно CLAUDE.md)
+      FATAL_ERRORS = [
+        ActiveRecord::ConnectionNotEstablished,
+        ActiveRecord::QueryCanceled
+      ].freeze
+
       # Fallback для непредвиденных ошибок — возвращаем JSON вместо HTML
+      # Фатальные DB ошибки пробрасываются для 500 + Bugsnag
       rescue_from StandardError do |error|
+        raise error if FATAL_ERRORS.any? { |klass| error.is_a?(klass) }
+        raise error if defined?(PG::ConnectionBad) && error.is_a?(PG::ConnectionBad)
+
         log_error(error, error_context)
         render json: { success: false, error: 'Internal server error' }, status: :internal_server_error
       end
