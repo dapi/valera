@@ -1,11 +1,17 @@
 - if chats.any?
   - chats.each do |chat|
     - is_active = current_chat&.id == chat.id
-    = link_to tenant_chat_path(chat), class: "block p-4 border-b border-gray-100 hover:bg-gray-50 #{is_active ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}"
+    = link_to tenant_chat_path(chat), class: "block p-4 border-b border-gray-100 hover:bg-gray-50 #{is_active ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}", id: "chat_list_item_#{chat.id}"
       .flex.items-start.gap-3
-        / Avatar
-        .w-10.h-10.rounded-full.bg-blue-500.flex.items-center.justify-center.text-white.font-medium.flex-shrink-0
-          = chat.client&.display_name&.first&.upcase || '?'
+        / Avatar with mode indicator
+        .relative.flex-shrink-0
+          .w-10.h-10.rounded-full.bg-blue-500.flex.items-center.justify-center.text-white.font-medium
+            = chat.client&.display_name&.first&.upcase || '?'
+          / Mode indicator dot
+          - if chat.manager_mode?
+            .absolute.-bottom-0.5.-right-0.5.w-3.h-3.bg-orange-500.rounded-full.border-2.border-white title=t('.manager_mode')
+          - else
+            .absolute.-bottom-0.5.-right-0.5.w-3.h-3.bg-green-500.rounded-full.border-2.border-white title=t('.ai_mode')
         / Chat info
         .flex-1.min-w-0
           .flex.items-center.justify-between
@@ -18,7 +24,11 @@
           - if (last_message = chat.messages.last)
             p.text-sm.text-gray-500.truncate
               - if last_message.role == 'assistant'
-                span.text-gray-400> Bot:
+                - if last_message.manager?
+                  span.text-orange-500>
+                    = "[#{t('.manager_mode')}]"
+                - else
+                  span.text-gray-400> Bot:
               = truncate(last_message.content.to_s, length: 40)
           - else
             p.text-sm.text-gray-400.italic = t('.no_messages')

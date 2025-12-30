@@ -1,7 +1,7 @@
 - case message.role
 - when 'user'
   / User message (right side, blue)
-  .flex.justify-end
+  .flex.justify-end id="message_#{message.id}"
     div style="max-width: 70%"
       .bg-blue-500.text-white.rounded-2xl.rounded-br-sm.px-4.py-2
         .whitespace-pre-wrap = message.content.to_s
@@ -9,23 +9,44 @@
         = l(message.created_at, format: :time)
 
 - when 'assistant'
-  / Assistant message (left side, gray)
-  .flex.justify-start
+  / Assistant message (left side)
+  / Different styles for AI, Manager, and System messages
+  .flex.justify-start id="message_#{message.id}"
     div style="max-width: 70%"
-      .bg-gray-100.rounded-2xl.rounded-bl-sm.px-4.py-2
-        .whitespace-pre-wrap.text-gray-800 = message.content.to_s
-        - if message.tool_calls.any?
-          .mt-2.pt-2.border-t.border-gray-200
-            - message.tool_calls.each do |tool_call|
-              = render 'tool_call', tool_call: tool_call
-      .text-xs.text-gray-400.mt-1
-        = l(message.created_at, format: :time)
-        - if message.model.present?
-          span.ml-2.text-gray-300 = message.model.model_id
+      - if message.manager?
+        / Manager message (orange accent)
+        .bg-orange-50.border.border-orange-200.rounded-2xl.rounded-bl-sm.px-4.py-2
+          .flex.items-center.gap-2.mb-1
+            span.text-xs.font-medium.text-orange-600 = t('.manager_label')
+            - if message.sender
+              span.text-xs.text-orange-500 = message.sender.display_name
+          .whitespace-pre-wrap.text-gray-800 = message.content.to_s
+        .text-xs.text-gray-400.mt-1
+          = l(message.created_at, format: :time)
+      - elsif message.system?
+        / System notification (centered, subtle)
+        .bg-gray-100.rounded-full.px-4.py-2.text-center
+          .text-xs.text-gray-500
+            span.font-medium = t('.system_label')
+            span.ml-1 = message.content.to_s
+        .text-center.text-xs.text-gray-400.mt-1
+          = l(message.created_at, format: :time)
+      - else
+        / AI message (default gray)
+        .bg-gray-100.rounded-2xl.rounded-bl-sm.px-4.py-2
+          .whitespace-pre-wrap.text-gray-800 = message.content.to_s
+          - if message.tool_calls.any?
+            .mt-2.pt-2.border-t.border-gray-200
+              - message.tool_calls.each do |tool_call|
+                = render 'tool_call', tool_call: tool_call
+        .text-xs.text-gray-400.mt-1
+          = l(message.created_at, format: :time)
+          - if message.model.present?
+            span.ml-2.text-gray-300 = message.model.model_id
 
 - when 'tool'
   / Tool result (system message, centered)
-  .flex.justify-center
+  .flex.justify-center id="message_#{message.id}"
     .text-xs.text-gray-400.bg-gray-100.rounded-full.px-3.py-1
       = t('.tool_result')
 

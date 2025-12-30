@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_29_172012) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_30_165009) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -118,6 +118,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_29_172012) do
     t.datetime "manager_active_at"
     t.datetime "manager_active_until"
     t.bigint "manager_user_id"
+    t.integer "mode", default: 0, null: false
     t.bigint "model_id"
     t.bigint "tenant_id", null: false
     t.datetime "topic_classified_at"
@@ -132,6 +133,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_29_172012) do
     t.index ["manager_user_id"], name: "index_chats_on_manager_user_id"
     t.index ["model_id"], name: "index_chats_on_model_id"
     t.index ["tenant_id", "last_message_at"], name: "index_chats_on_tenant_id_and_last_message_at"
+    t.index ["tenant_id", "mode"], name: "index_chats_on_tenant_id_and_mode"
     t.index ["tenant_id"], name: "index_chats_on_tenant_id"
     t.index ["topic_classified_at"], name: "index_chats_on_topic_classified_at"
   end

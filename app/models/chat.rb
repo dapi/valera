@@ -35,6 +35,16 @@ class Chat < ApplicationRecord
 
   acts_as_chat
 
+  # Takeover support
+  # mode: ai_mode (по умолчанию) - бот отвечает автоматически
+  # mode: manager_mode - менеджер перехватил диалог, бот не отвечает
+  enum :mode, { ai_mode: 0, manager_mode: 1 }, default: :ai_mode
+
+  validates :manager_user, presence: true, if: :manager_mode?
+
+  scope :in_manager_mode, -> { where(mode: :manager_mode) }
+  scope :taken_by_user, ->(user) { where(manager_user: user) }
+
   # Scope для предзагрузки данных клиента и Telegram пользователя
   # Используется в dashboard для отображения информации о клиенте
   scope :with_client_details, -> { includes(client: :telegram_user) }
@@ -43,11 +53,26 @@ class Chat < ApplicationRecord
   scope :manager_controlled, -> { where(manager_active: true) }
   scope :bot_controlled, -> { where(manager_active: false) }
 
+  # Возвращает оставшееся время до автоматического возврата боту
+  # @return [Float, nil] секунды до таймаута или nil если не в manager_mode
+  def takeover_time_remaining
+    return nil unless manager_mode? && manager_active_at
+
+    timeout_at = manager_active_at + ApplicationConfig.manager_takeover_timeout_minutes.minutes
+    [ timeout_at - Time.current, 0 ].max
+  end
+
+  # Проверяет, истёк ли таймаут takeover
+  # @return [Boolean]
+  def takeover_expired?
+    manager_mode? && manager_active_at && manager_active_at < ApplicationConfig.manager_takeover_timeout_minutes.minutes.ago
+  end
+
   # Проверяет, активен ли менеджер в чате (с учётом таймаута)
   #
   # @return [Boolean] true если менеджер активен и таймаут не истёк
-  def manager_mode?
-    return false unless manager_active?
+  def manager_active?
+    return false unless manager_mode?
 
     # Проверяем таймаут
     if manager_active_until.present? && manager_active_until < Time.current
@@ -62,7 +87,7 @@ class Chat < ApplicationRecord
   #
   # @return [Boolean] true если чат в режиме бота
   def bot_mode?
-    !manager_mode?
+    ai_mode?
   end
 
   # Менеджер берёт контроль над чатом
@@ -72,7 +97,7 @@ class Chat < ApplicationRecord
   # @return [Boolean] успешность операции
   def takeover_by_manager!(user, timeout_minutes: ApplicationConfig.manager_takeover_timeout_minutes)
     update!(
-      manager_active: true,
+      mode: :manager_mode,
       manager_user: user,
       manager_active_at: Time.current,
       manager_active_until: timeout_minutes.minutes.from_now
@@ -84,7 +109,7 @@ class Chat < ApplicationRecord
   # @param timeout_minutes [Integer] время таймаута в минутах
   # @return [Boolean] успешность операции
   def extend_manager_timeout!(timeout_minutes: ApplicationConfig.manager_takeover_timeout_minutes)
-    return false unless manager_active?
+    return false unless manager_mode?
 
     update!(manager_active_until: timeout_minutes.minutes.from_now)
   end
@@ -94,7 +119,7 @@ class Chat < ApplicationRecord
   # @return [Boolean] успешность операции
   def release_to_bot!
     update!(
-      manager_active: false,
+      mode: :ai_mode,
       manager_user: nil,
       manager_active_at: nil,
       manager_active_until: nil
@@ -105,7 +130,7 @@ class Chat < ApplicationRecord
   #
   # @return [ActiveSupport::Duration, nil] оставшееся время или nil
   def time_until_auto_release
-    return nil unless manager_active? && manager_active_until.present?
+    return nil unless manager_mode? && manager_active_until.present?
 
     remaining = manager_active_until - Time.current
     remaining.positive? ? remaining.seconds : nil
