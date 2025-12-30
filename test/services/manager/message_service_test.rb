@@ -1,0 +1,121 @@
+# frozen_string_literal: true
+
+require 'test_helper'
+
+class Manager::MessageServiceTest < ActiveSupport::TestCase
+  setup do
+    @chat = chats(:one)
+    @user = users(:one)
+    @mock_bot_client = mock('bot_client')
+    @chat.tenant.stubs(:bot_client).returns(@mock_bot_client)
+
+    # Put chat in manager mode
+    @chat.takeover_by_manager!(@user)
+  end
+
+  test 'sends message successfully' do
+    @mock_bot_client.expects(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+
+    result = Manager::MessageService.call(
+      chat: @chat,
+      user: @user,
+      content: 'Hello from manager!'
+    )
+
+    assert result.success?
+    assert result.message.persisted?
+    assert_equal 'manager', result.message.role
+    assert_equal 'Hello from manager!', result.message.content
+    assert_equal @user, result.message.sent_by_user
+    assert result.telegram_sent
+  end
+
+  test 'extends timeout after sending message' do
+    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    original_until = @chat.manager_active_until
+
+    travel 5.minutes
+
+    Manager::MessageService.call(
+      chat: @chat,
+      user: @user,
+      content: 'Hello!'
+    )
+
+    assert @chat.reload.manager_active_until > original_until
+
+    travel_back
+  end
+
+  test 'does not extend timeout when extend_timeout is false' do
+    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    original_until = @chat.manager_active_until
+
+    travel 5.minutes
+
+    Manager::MessageService.call(
+      chat: @chat,
+      user: @user,
+      content: 'Hello!',
+      extend_timeout: false
+    )
+
+    assert_equal original_until, @chat.reload.manager_active_until
+
+    travel_back
+  end
+
+  test 'returns error when chat is nil' do
+    result = Manager::MessageService.call(chat: nil, user: @user, content: 'Hello!')
+
+    assert_not result.success?
+    assert_equal 'Chat is required', result.error
+  end
+
+  test 'returns error when user is nil' do
+    result = Manager::MessageService.call(chat: @chat, user: nil, content: 'Hello!')
+
+    assert_not result.success?
+    assert_equal 'User is required', result.error
+  end
+
+  test 'returns error when content is blank' do
+    result = Manager::MessageService.call(chat: @chat, user: @user, content: '')
+
+    assert_not result.success?
+    assert_equal 'Content is required', result.error
+  end
+
+  test 'returns error when chat is not in manager mode' do
+    @chat.release_to_bot!
+
+    result = Manager::MessageService.call(chat: @chat, user: @user, content: 'Hello!')
+
+    assert_not result.success?
+    assert_equal 'Chat is not in manager mode', result.error
+  end
+
+  test 'returns error when user is not the active manager' do
+    other_user = users(:two)
+
+    result = Manager::MessageService.call(chat: @chat, user: other_user, content: 'Hello!')
+
+    assert_not result.success?
+    assert_equal 'User is not the active manager', result.error
+  end
+
+  test 'message is saved even if telegram fails' do
+    @mock_bot_client.expects(:send_message).raises(Faraday::Error.new('Network error'))
+
+    result = Manager::MessageService.call(
+      chat: @chat,
+      user: @user,
+      content: 'Hello!'
+    )
+
+    # Message should be saved, but telegram_sent should be false
+    assert result.success?
+    assert result.message.persisted?
+    assert_not result.telegram_sent
+  end
+end

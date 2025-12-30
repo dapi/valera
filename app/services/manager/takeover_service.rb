@@ -1,0 +1,114 @@
+# frozen_string_literal: true
+
+module Manager
+  # Сервис для перехвата чата менеджером
+  #
+  # Переводит чат в режим менеджера и опционально уведомляет клиента
+  # о том, что его переключили на живого оператора.
+  #
+  # @example Перехват чата
+  #   result = Manager::TakeoverService.call(chat: chat, user: current_user)
+  #   if result.success?
+  #     puts "Чат перехвачен до #{result.active_until}"
+  #   end
+  #
+  # @author AI Assistant
+  # @since 0.38.0
+  class TakeoverService
+    include ErrorLogger
+
+    # Ошибки которые мы обрабатываем gracefully
+    HANDLED_ERRORS = [
+      ActiveRecord::RecordInvalid,
+      ActiveRecord::RecordNotSaved
+    ].freeze
+
+    # @return [Chat] чат для перехвата
+    attr_reader :chat
+
+    # @return [User] менеджер, который берёт чат
+    attr_reader :user
+
+    # @return [Integer] таймаут в минутах
+    attr_reader :timeout_minutes
+
+    # @return [Boolean] отправлять ли уведомление клиенту
+    attr_reader :notify_client
+
+    Result = Struct.new(:success?, :chat, :active_until, :notification_sent, :error, keyword_init: true)
+
+    # Фабричный метод для создания и выполнения сервиса
+    #
+    # @param chat [Chat] чат для перехвата
+    # @param user [User] менеджер
+    # @param timeout_minutes [Integer] таймаут (по умолчанию из конфига)
+    # @param notify_client [Boolean] уведомлять ли клиента
+    # @return [Result] результат операции
+    def self.call(chat:, user:, timeout_minutes: nil, notify_client: true)
+      new(chat:, user:, timeout_minutes:, notify_client:).call
+    end
+
+    # @param chat [Chat] чат для перехвата
+    # @param user [User] менеджер
+    # @param timeout_minutes [Integer] таймаут
+    # @param notify_client [Boolean] уведомлять ли клиента
+    def initialize(chat:, user:, timeout_minutes: nil, notify_client: true)
+      @chat = chat
+      @user = user
+      @timeout_minutes = timeout_minutes || ApplicationConfig.manager_takeover_timeout_minutes
+      @notify_client = notify_client
+    end
+
+    # Выполняет перехват чата
+    #
+    # @return [Result] результат с данными о перехвате
+    def call
+      validate!
+      takeover_chat
+      notification_result = notify_client ? notify_client_about_takeover : nil
+      build_success_result(notification_result)
+    rescue ArgumentError => e
+      Result.new(success?: false, error: e.message)
+    rescue *HANDLED_ERRORS => e
+      log_error(e, safe_context)
+      Result.new(success?: false, error: e.message)
+    end
+
+    private
+
+    def validate!
+      raise ArgumentError, 'Chat is required' if chat.nil?
+      raise ArgumentError, 'User is required' if user.nil?
+      raise ArgumentError, 'Chat is already in manager mode' if chat.manager_mode?
+    end
+
+    def takeover_chat
+      chat.takeover_by_manager!(user, timeout_minutes:)
+    end
+
+    def notify_client_about_takeover
+      TelegramMessageSender.call(
+        chat:,
+        text: I18n.t('manager.takeover.client_notification')
+      )
+    end
+
+    def build_success_result(notification_result)
+      Result.new(
+        success?: true,
+        chat: chat.reload,
+        active_until: chat.manager_active_until,
+        notification_sent: notification_result&.success?
+      )
+    end
+
+    def safe_context
+      {
+        service: self.class.name,
+        chat_id: chat&.id,
+        user_id: user&.id,
+        timeout_minutes:
+      }
+    end
+  end
+end
