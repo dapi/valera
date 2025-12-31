@@ -149,7 +149,7 @@ module Manager
           duration_minutes: duration_minutes
         }
       )
-    rescue => e
+    rescue StandardError => e
       log_error(e, safe_context.merge(event: 'track_manual_release'))
       # Не пробрасываем - аналитика не критична для release
     end
