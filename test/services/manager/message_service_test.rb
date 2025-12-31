@@ -104,8 +104,10 @@ class Manager::MessageServiceTest < ActiveSupport::TestCase
     assert_equal 'User is not the active manager', result.error
   end
 
-  test 'message is saved even if telegram fails' do
+  test 'message is NOT saved if telegram fails' do
     @mock_bot_client.expects(:send_message).raises(Faraday::Error.new('Network error'))
+
+    initial_message_count = @chat.messages.count
 
     result = Manager::MessageService.call(
       chat: @chat,
@@ -113,9 +115,10 @@ class Manager::MessageServiceTest < ActiveSupport::TestCase
       content: 'Hello!'
     )
 
-    # Message should be saved, but telegram_sent should be false
-    assert result.success?
-    assert result.message.persisted?
-    assert_not result.telegram_sent
+    # Message should NOT be saved if Telegram delivery fails
+    # This ensures the manager sees only messages that were actually delivered
+    assert_not result.success?
+    assert_includes result.error, I18n.t('manager.message.telegram_delivery_failed')
+    assert_equal initial_message_count, @chat.messages.reload.count
   end
 end

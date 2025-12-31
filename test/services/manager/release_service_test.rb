@@ -20,8 +20,8 @@ class Manager::ReleaseServiceTest < ActiveSupport::TestCase
 
     assert result.success?
     assert @chat.reload.bot_mode?
-    assert_nil @chat.manager_user
-    assert_nil @chat.manager_active_at
+    assert_nil @chat.taken_by
+    assert_nil @chat.taken_at
     assert_nil @chat.manager_active_until
   end
 

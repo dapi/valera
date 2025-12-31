@@ -6,8 +6,12 @@
 # Проверяет, что чат всё ещё в режиме менеджера и таймаут действительно истёк,
 # затем возвращает управление боту.
 #
-# @example Планирование задачи при takeover
-#   ChatTakeoverTimeoutJob.set(wait: 30.minutes).perform_later(chat.id)
+# @note Эта задача автоматически планируется в Manager::TakeoverService.
+#   Не вызывайте её напрямую - используйте TakeoverService для перехвата чата.
+#
+# @example Перехват чата через TakeoverService (автоматически планирует timeout job)
+#   result = Manager::TakeoverService.call(chat: chat, user: current_user)
+#   # ChatTakeoverTimeoutJob автоматически запланирован на manager_active_until
 #
 # @see Manager::TakeoverService для логики перехвата
 # @see Manager::ReleaseService для логики возврата
@@ -16,10 +20,17 @@
 class ChatTakeoverTimeoutJob < ApplicationJob
   include ErrorLogger
 
+  # Ошибка при неуспешном release - позволяет SolidQueue сделать retry
+  class ReleaseFailedError < StandardError; end
+
   queue_as :default
 
   # Не ретрить если чат не найден - это ожидаемое поведение
   discard_on ActiveRecord::RecordNotFound
+
+  # Retry при ошибке release - чат не должен застревать в manager_mode
+  # SolidQueue не поддерживает символы, используем lambda (согласно CLAUDE.md)
+  retry_on ReleaseFailedError, wait: ->(executions) { (executions**2) + 2 }, attempts: 5
 
   # Выполняет автоматический возврат чата боту
   #
@@ -33,14 +44,14 @@ class ChatTakeoverTimeoutJob < ApplicationJob
     unless chat.manager_mode?
       Rails.logger.info(
         "[ChatTakeoverTimeoutJob] Skipping: chat #{chat_id} is no longer in manager mode " \
-        "(likely manually released)"
+        '(likely manually released)'
       )
       return
     end
 
     # Защита от race condition: если был новый takeover - не возвращаем
     if expected_takeover_at.present?
-      actual_takeover_at = chat.manager_active_at
+      actual_takeover_at = chat.taken_at
       if actual_takeover_at.present? && actual_takeover_at > expected_takeover_at
         Rails.logger.info(
           "[ChatTakeoverTimeoutJob] Skipping: chat #{chat_id} has newer takeover " \
@@ -78,7 +89,12 @@ class ChatTakeoverTimeoutJob < ApplicationJob
   #
   # @param chat [Chat] чат для возврата
   # @return [void]
+  # @raise [ReleaseFailedError] если release не удался (для retry через SolidQueue)
   def release_chat_to_bot(chat)
+    # Сохраняем данные ДО release, так как после release они будут nil
+    taken_by_id = chat.taken_by_id
+    taken_at = chat.taken_at
+
     result = Manager::ReleaseService.call(
       chat: chat,
       notify_client: true
@@ -86,27 +102,33 @@ class ChatTakeoverTimeoutJob < ApplicationJob
 
     if result.success?
       Rails.logger.info("[ChatTakeoverTimeoutJob] Chat #{chat.id} released to bot by timeout")
-      track_timeout_release(chat)
+      track_timeout_release(chat, taken_by_id:, taken_at:)
     else
-      Rails.logger.warn(
-        "[ChatTakeoverTimeoutJob] Failed to release chat #{chat.id}: #{result.error}"
+      # Критичная ошибка - чат застрянет в manager_mode без retry
+      # Выбрасываем исключение чтобы SolidQueue сделал retry
+      log_error(
+        ReleaseFailedError.new("Failed to release chat #{chat.id}: #{result.error}"),
+        { chat_id: chat.id, result_error: result.error, taken_by_id: taken_by_id }
       )
+      raise ReleaseFailedError, "Failed to release chat #{chat.id}: #{result.error}"
     end
   end
 
   # Отслеживает событие возврата чата по таймауту
   #
   # @param chat [Chat] возвращённый чат
+  # @param taken_by_id [Integer] ID менеджера (сохранён до release)
+  # @param taken_at [Time] время takeover (сохранено до release)
   # @return [void]
-  def track_timeout_release(chat)
-    duration_minutes = calculate_takeover_duration(chat)
+  def track_timeout_release(chat, taken_by_id:, taken_at:)
+    duration_minutes = calculate_takeover_duration(taken_at)
 
     AnalyticsService.track(
       AnalyticsService::Events::CHAT_TAKEOVER_ENDED,
       tenant: chat.tenant,
       chat_id: chat.id,
       properties: {
-        manager_user_id: chat.manager_user_id,
+        taken_by_id: taken_by_id,
         reason: 'timeout',
         duration_minutes: duration_minutes
       }
@@ -115,11 +137,11 @@ class ChatTakeoverTimeoutJob < ApplicationJob
 
   # Рассчитывает продолжительность takeover в минутах
   #
-  # @param chat [Chat] чат
+  # @param taken_at [Time] время начала takeover
   # @return [Integer] продолжительность в минутах
-  def calculate_takeover_duration(chat)
-    return 0 unless chat.manager_active_at.present?
+  def calculate_takeover_duration(taken_at)
+    return 0 unless taken_at.present?
 
-    ((Time.current - chat.manager_active_at) / 60).round
+    ((Time.current - taken_at) / 60).round
   end
 end

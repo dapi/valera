@@ -76,21 +76,21 @@ module Analytics
       name: 'message_received_in_manager_mode',
       description: 'Получено сообщение от клиента когда чат управляется менеджером',
       category: 'manager',
-      properties: [ :manager_user_id, :platform ]
+      properties: [ :taken_by_id, :platform ]
     }.freeze
 
     CHAT_TAKEOVER_STARTED = {
       name: 'chat_takeover_started',
       description: 'Менеджер перехватил чат у бота',
       category: 'manager',
-      properties: [ :manager_user_id, :timeout_minutes ]
+      properties: [ :taken_by_id, :timeout_minutes ]
     }.freeze
 
     CHAT_TAKEOVER_ENDED = {
       name: 'chat_takeover_ended',
       description: 'Чат возвращён боту',
       category: 'manager',
-      properties: [ :manager_user_id, :reason, :duration_minutes ]
+      properties: [ :taken_by_id, :reason, :duration_minutes ]
     }.freeze
 
     # События ошибок

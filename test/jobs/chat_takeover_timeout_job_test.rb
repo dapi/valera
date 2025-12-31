@@ -24,14 +24,14 @@ class ChatTakeoverTimeoutJobTest < ActiveSupport::TestCase
     end
 
     assert_not @chat.reload.manager_mode?
-    assert_nil @chat.manager_user
+    assert_nil @chat.taken_by
   end
 
   test 'does not release chat if timeout not yet expired' do
     ChatTakeoverTimeoutJob.perform_now(@chat.id)
 
     assert @chat.reload.manager_mode?
-    assert_equal @user, @chat.manager_user
+    assert_equal @user, @chat.taken_by
   end
 
   test 'does not release chat if not in manager mode' do
@@ -43,14 +43,16 @@ class ChatTakeoverTimeoutJobTest < ActiveSupport::TestCase
   end
 
   test 'skips if chat was taken over again after job was scheduled' do
-    original_takeover_at = @chat.manager_active_at
+    original_takeover_at = @chat.taken_at
 
     # Simulate new takeover (e.g., manager extended timeout)
     travel_to(5.minutes.from_now) do
+      # Release first, then takeover again
+      @chat.release_to_bot!
       @chat.takeover_by_manager!(@user, timeout_minutes: 30)
     end
 
-    new_takeover_at = @chat.reload.manager_active_at
+    new_takeover_at = @chat.reload.taken_at
 
     # Job was scheduled with original takeover time, but chat has new takeover
     travel_to(35.minutes.from_now) do
@@ -71,7 +73,7 @@ class ChatTakeoverTimeoutJobTest < ActiveSupport::TestCase
     Tenant.any_instance.stubs(:bot_client).returns(@mock_bot_client)
     @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
-    # Сохраняем manager_user_id для проверки
+    # Проверяем что чат в режиме менеджера до истечения таймаута
     assert @chat.manager_active?
 
     travel_to(31.minutes.from_now) do
@@ -87,14 +89,35 @@ class ChatTakeoverTimeoutJobTest < ActiveSupport::TestCase
     Tenant.any_instance.stubs(:bot_client).returns(@mock_bot_client)
     @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
-    # Для этого теста отключаем автоматический release в manager_mode?
-    # путём установки manager_active = false напрямую после проверки
-    Chat.any_instance.stubs(:manager_mode?).returns(true)
-
+    # Проверяем что при успешном release трекается аналитика
+    # (не нужно мокать manager_mode? - это ломает валидацию при release)
     travel_to(31.minutes.from_now) do
       assert_enqueued_with(job: AnalyticsJob) do
         ChatTakeoverTimeoutJob.perform_now(@chat.id)
       end
     end
+  end
+
+  test 'retries job when release service fails' do
+    # Проверяем что при неуспешном release job будет retry
+    # (ApplicationJob retry_on StandardError перехватывает исключение)
+    failed_result = Manager::ReleaseService::Result.new("success?": false, error: 'Test error')
+    Manager::ReleaseService.stubs(:call).returns(failed_result)
+
+    travel_to(31.minutes.from_now) do
+      # Job должен быть запланирован на retry через SolidQueue
+      assert_enqueued_with(job: ChatTakeoverTimeoutJob) do
+        ChatTakeoverTimeoutJob.perform_now(@chat.id)
+      end
+
+      # Чат должен остаться в режиме менеджера (release не удался)
+      assert @chat.reload.manager_mode?
+    end
+  end
+
+  test 'defines ReleaseFailedError for retry mechanism' do
+    # Проверяем что класс ReleaseFailedError определён для механизма retry
+    assert_kind_of Class, ChatTakeoverTimeoutJob::ReleaseFailedError
+    assert ChatTakeoverTimeoutJob::ReleaseFailedError < StandardError
   end
 end

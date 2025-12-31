@@ -19,7 +19,7 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
 
     assert result.success?
     assert @chat.reload.manager_mode?
-    assert_equal @user, @chat.manager_user
+    assert_equal @user, @chat.taken_by
     assert_not_nil result.active_until
   end
 
@@ -122,5 +122,22 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
     assert_enqueued_with(job: AnalyticsJob) do
       Manager::TakeoverService.call(chat: @chat, user: @user)
     end
+  end
+
+  test 'prevents concurrent takeover by second manager' do
+    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    other_user = users(:two)
+
+    # Первый менеджер успешно перехватывает чат
+    first_result = Manager::TakeoverService.call(chat: @chat, user: @user)
+    assert first_result.success?
+
+    # Второй менеджер не может перехватить уже занятый чат
+    second_result = Manager::TakeoverService.call(chat: @chat.reload, user: other_user)
+    assert_not second_result.success?
+    assert_equal 'Chat is already in manager mode', second_result.error
+
+    # Чат остаётся за первым менеджером
+    assert_equal @user, @chat.reload.taken_by
   end
 end

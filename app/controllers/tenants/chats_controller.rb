@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module Tenants
-  # Контроллер для просмотра и управления чатами tenant'а
+  # Контроллер для просмотра чатов tenant'а
   #
   # Показывает список чатов с пагинацией и сортировкой,
-  # историю переписки выбранного чата, а также позволяет
-  # менеджерам перехватывать диалоги и отправлять сообщения.
+  # историю переписки выбранного чата.
+  #
+  # Для управления режимом менеджера (takeover/release/messages)
+  # используется Tenants::Chats::ManagerController.
   class ChatsController < ApplicationController
-    include ErrorLogger
-
     PER_PAGE = 20
 
     # GET /chats
@@ -23,59 +23,6 @@ module Tenants
     def show
       @chats = fetch_chats
       @chat = load_chat_with_messages(params[:id])
-    end
-
-    # POST /chats/:id/takeover
-    # Перехват диалога менеджером
-    def takeover
-      @chat = find_chat
-      ChatTakeoverService.new(@chat).takeover!(current_user)
-
-      respond_to do |format|
-        format.turbo_stream
-        format.html { redirect_to tenant_chat_path(@chat), notice: t('.success') }
-      end
-    rescue ChatTakeoverService::AlreadyTakenError => e
-      respond_with_error(t('.already_taken'))
-    rescue ChatTakeoverService::UnauthorizedError => e
-      respond_with_error(t('.unauthorized'))
-    end
-
-    # POST /chats/:id/release
-    # Возврат диалога боту
-    def release
-      @chat = find_chat
-      ChatTakeoverService.new(@chat).release!(user: current_user)
-
-      respond_to do |format|
-        format.turbo_stream
-        format.html { redirect_to tenant_chat_path(@chat), notice: t('.success') }
-      end
-    rescue ChatTakeoverService::NotTakenError => e
-      respond_with_error(t('.not_taken'))
-    rescue ChatTakeoverService::UnauthorizedError => e
-      respond_with_error(t('.unauthorized'))
-    end
-
-    # POST /chats/:id/send_message
-    # Отправка сообщения менеджером
-    def send_message
-      @chat = find_chat
-
-      return respond_with_error(t('.empty_message')) if params[:text].blank?
-
-      @message = ManagerMessageService.new(@chat).send!(current_user, params[:text])
-
-      respond_to do |format|
-        format.turbo_stream
-        format.html { redirect_to tenant_chat_path(@chat) }
-      end
-    rescue ManagerMessageService::NotInManagerModeError => e
-      respond_with_error(t('.not_in_manager_mode'))
-    rescue ManagerMessageService::NotTakenByUserError => e
-      respond_with_error(t('.not_taken_by_user'))
-    rescue ManagerMessageService::RateLimitExceededError => e
-      respond_with_error(t('.rate_limit_exceeded'))
     end
 
     private
@@ -136,28 +83,6 @@ module Tenants
 
     def sort_column
       %w[last_message_at created_at].include?(params[:sort]) ? params[:sort] : 'last_message_at'
-    end
-
-    # Находит чат для takeover/release/send_message actions
-    def find_chat
-      current_tenant.chats
-                    .with_client_details
-                    .includes(messages: :tool_calls)
-                    .find(params[:id])
-    end
-
-    # Отвечает с ошибкой
-    def respond_with_error(message)
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            'flash',
-            partial: 'tenants/shared/flash',
-            locals: { message: message, type: :error }
-          )
-        end
-        format.html { redirect_to tenant_chat_path(@chat), alert: message }
-      end
     end
   end
 end
