@@ -12,7 +12,6 @@ module Manager
   #     puts "Чат перехвачен до #{result.active_until}"
   #   end
   #
-  # @author AI Assistant
   # @since 0.38.0
   class TakeoverService
     include ErrorLogger

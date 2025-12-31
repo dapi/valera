@@ -12,7 +12,6 @@ module Manager
   #     puts "Сообщение отправлено: #{result.telegram_message_id}"
   #   end
   #
-  # @author AI Assistant
   # @since 0.38.0
   class TelegramMessageSender
     include ErrorLogger
