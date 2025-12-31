@@ -252,14 +252,6 @@ class Chat < ApplicationRecord
     )
 
     Rails.logger.info "Booking creator tool executed successfully: #{result[:booking_id]}"
-  rescue StandardError => e
-    log_error(e, {
-                tool: 'booking_creator',
-                tool_call_id: tool_call.id,
-                telegram_user_id: telegram_user&.id,
-                chat_id: id,
-                parameters: parameters
-              })
   end
 
   # Находит ID записи tool call в базе данных по API ID

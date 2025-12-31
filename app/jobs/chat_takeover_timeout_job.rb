@@ -133,9 +133,6 @@ class ChatTakeoverTimeoutJob < ApplicationJob
         duration_minutes: duration_minutes
       }
     )
-  rescue StandardError => e
-    log_error(e, { chat_id: chat.id, event: 'track_timeout_release' })
-    # Не пробрасываем - аналитика не критична для timeout release
   end
 
   # Рассчитывает продолжительность takeover в минутах
