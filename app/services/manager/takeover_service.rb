@@ -61,15 +61,19 @@ module Manager
 
     # Выполняет перехват чата
     #
-    # Операции takeover и schedule_timeout_job выполняются в транзакции,
-    # чтобы гарантировать атомарность: либо чат перехвачен И job запланирован,
-    # либо ничего не изменилось.
+    # Операции takeover и schedule_timeout_job выполняются в транзакции
+    # с pessimistic locking (with_lock), чтобы гарантировать:
+    # 1. Атомарность: либо чат перехвачен И job запланирован, либо ничего не изменилось
+    # 2. Защиту от race condition: два менеджера не могут одновременно перехватить чат
     #
     # @return [Result] результат с данными о перехвате
     def call
-      validate!
+      # Валидация nil-аргументов до with_lock
+      raise ArgumentError, 'Chat is required' if chat.nil?
+      raise ArgumentError, 'User is required' if user.nil?
 
-      ActiveRecord::Base.transaction do
+      chat.with_lock do
+        validate_chat_state!
         takeover_chat
         schedule_timeout_job
       end
@@ -89,9 +93,8 @@ module Manager
 
     private
 
-    def validate!
-      raise ArgumentError, 'Chat is required' if chat.nil?
-      raise ArgumentError, 'User is required' if user.nil?
+    # Валидация состояния чата (вызывается внутри with_lock)
+    def validate_chat_state!
       raise ArgumentError, 'Chat is already in manager mode' if chat.manager_mode?
     end
 
