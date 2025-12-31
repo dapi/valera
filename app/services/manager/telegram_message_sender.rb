@@ -47,9 +47,10 @@ module Manager
     # @param chat [Chat] чат для отправки
     # @param text [String] текст сообщения
     # @param parse_mode [String] режим парсинга
+    # @raise [RuntimeError] если chat или text не переданы
     def initialize(chat:, text:, parse_mode: 'HTML')
-      @chat = chat
-      @text = text
+      @chat = chat || raise('No chat')
+      @text = text.presence || raise('No text')
       @parse_mode = parse_mode
     end
 
@@ -57,23 +58,13 @@ module Manager
     #
     # @return [Result] результат с telegram_message_id или ошибкой
     def call
-      validate!
       send_message
-    rescue ArgumentError => e
-      Rails.logger.warn("[#{self.class.name}] Validation failed: #{e.message}")
-      Result.new(success?: false, error: e.message)
     rescue *TELEGRAM_ERRORS => e
       log_error(e, safe_context)
       Result.new(success?: false, error: e.message)
     end
 
     private
-
-    def validate!
-      raise ArgumentError, 'Chat is required' if chat.nil?
-      raise ArgumentError, 'Text is required' if text.blank?
-      raise ArgumentError, 'Chat has no telegram_user' if telegram_chat_id.blank?
-    end
 
     def send_message
       response = bot_client.send_message(
@@ -99,9 +90,9 @@ module Manager
     def safe_context
       {
         service: self.class.name,
-        chat_id: chat&.id,
-        tenant_id: chat&.tenant_id,
-        telegram_chat_id: chat&.client&.telegram_user_id
+        chat_id: chat.id,
+        tenant_id: chat.tenant_id,
+        telegram_chat_id: chat.client&.telegram_user_id
       }
     end
   end

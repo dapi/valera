@@ -67,25 +67,25 @@ class Manager::MessageServiceTest < ActiveSupport::TestCase
     travel_back
   end
 
-  test 'returns error when chat is nil' do
-    result = Manager::MessageService.call(chat: nil, user: @user, content: 'Hello!')
-
-    assert_not result.success?
-    assert_equal 'Chat is required', result.error
+  test 'raises error when chat is nil' do
+    error = assert_raises(RuntimeError) do
+      Manager::MessageService.call(chat: nil, user: @user, content: 'Hello!')
+    end
+    assert_equal 'No chat', error.message
   end
 
-  test 'returns error when user is nil' do
-    result = Manager::MessageService.call(chat: @chat, user: nil, content: 'Hello!')
-
-    assert_not result.success?
-    assert_equal 'User is required', result.error
+  test 'raises error when user is nil' do
+    error = assert_raises(RuntimeError) do
+      Manager::MessageService.call(chat: @chat, user: nil, content: 'Hello!')
+    end
+    assert_equal 'No user', error.message
   end
 
-  test 'returns error when content is blank' do
-    result = Manager::MessageService.call(chat: @chat, user: @user, content: '')
-
-    assert_not result.success?
-    assert_equal 'Content is required', result.error
+  test 'raises error when content is blank' do
+    error = assert_raises(RuntimeError) do
+      Manager::MessageService.call(chat: @chat, user: @user, content: '')
+    end
+    assert_equal 'No content', error.message
   end
 
   test 'returns error when content is too long' do

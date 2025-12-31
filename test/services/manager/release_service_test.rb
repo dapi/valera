@@ -45,11 +45,11 @@ class Manager::ReleaseServiceTest < ActiveSupport::TestCase
     assert @chat.reload.bot_mode?
   end
 
-  test 'returns error when chat is nil' do
-    result = Manager::ReleaseService.call(chat: nil)
-
-    assert_not result.success?
-    assert_equal 'Chat is required', result.error
+  test 'raises error when chat is nil' do
+    error = assert_raises(RuntimeError) do
+      Manager::ReleaseService.call(chat: nil)
+    end
+    assert_equal 'No chat', error.message
   end
 
   test 'returns error when user is not the active manager' do

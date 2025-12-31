@@ -62,10 +62,11 @@ module Manager
     # @param user [User] менеджер
     # @param content [String] текст сообщения
     # @param extend_timeout [Boolean] продлевать ли таймаут менеджера
+    # @raise [RuntimeError] если chat, user или content не переданы
     def initialize(chat:, user:, content:, extend_timeout: true)
-      @chat = chat
-      @user = user
-      @content = content
+      @chat = chat || raise('No chat')
+      @user = user || raise('No user')
+      @content = content.presence || raise('No content')
       @extend_timeout = extend_timeout
     end
 
@@ -80,7 +81,7 @@ module Manager
     #
     # @return [Result] результат с сообщением и статусом отправки
     def call
-      validate!
+      validate_state!
 
       # Сначала отправляем в Telegram - если не доставили, не сохраняем
       telegram_result = send_to_telegram
@@ -107,10 +108,7 @@ module Manager
 
     private
 
-    def validate!
-      raise ValidationError, 'Chat is required' if chat.nil?
-      raise ValidationError, 'User is required' if user.nil?
-      raise ValidationError, 'Content is required' if content.blank?
+    def validate_state!
       raise ValidationError, 'Content is too long' if content.length > MAX_MESSAGE_LENGTH
       raise ValidationError, 'Chat is not in manager mode' unless chat.manager_mode?
       raise ValidationError, 'Manager session has expired' unless chat.manager_active?
@@ -148,9 +146,9 @@ module Manager
     def safe_context
       {
         service: self.class.name,
-        chat_id: chat&.id,
-        user_id: user&.id,
-        content_length: content&.length
+        chat_id: chat.id,
+        user_id: user.id,
+        content_length: content.length
       }
     end
 

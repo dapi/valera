@@ -54,9 +54,10 @@ module Manager
     # @param user [User] менеджер
     # @param timeout_minutes [Integer] таймаут
     # @param notify_client [Boolean] уведомлять ли клиента
+    # @raise [RuntimeError] если chat или user не переданы
     def initialize(chat:, user:, timeout_minutes: nil, notify_client: true)
-      @chat = chat
-      @user = user
+      @chat = chat || raise('No chat')
+      @user = user || raise('No user')
       @timeout_minutes = timeout_minutes || ApplicationConfig.manager_takeover_timeout_minutes
       @notify_client = notify_client
     end
@@ -70,10 +71,6 @@ module Manager
     #
     # @return [Result] результат с данными о перехвате
     def call
-      # Валидация nil-аргументов до with_lock
-      raise ValidationError, 'Chat is required' if chat.nil?
-      raise ValidationError, 'User is required' if user.nil?
-
       chat.with_lock do
         validate_chat_state!
         takeover_chat
@@ -132,8 +129,8 @@ module Manager
     def safe_context
       {
         service: self.class.name,
-        chat_id: chat&.id,
-        user_id: user&.id,
+        chat_id: chat.id,
+        user_id: user.id,
         timeout_minutes:
       }
     end

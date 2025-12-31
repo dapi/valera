@@ -23,27 +23,29 @@ class Manager::TelegramMessageSenderTest < ActiveSupport::TestCase
     assert_nil result.error
   end
 
-  test 'returns error when chat is nil' do
-    result = Manager::TelegramMessageSender.call(chat: nil, text: 'Hello!')
-
-    assert_not result.success?
-    assert_equal 'Chat is required', result.error
+  test 'raises error when chat is nil' do
+    error = assert_raises(RuntimeError) do
+      Manager::TelegramMessageSender.call(chat: nil, text: 'Hello!')
+    end
+    assert_equal 'No chat', error.message
   end
 
-  test 'returns error when text is blank' do
-    result = Manager::TelegramMessageSender.call(chat: @chat, text: '')
-
-    assert_not result.success?
-    assert_equal 'Text is required', result.error
+  test 'raises error when text is blank' do
+    error = assert_raises(RuntimeError) do
+      Manager::TelegramMessageSender.call(chat: @chat, text: '')
+    end
+    assert_equal 'No text', error.message
   end
 
   test 'returns error when chat has no telegram_user' do
     @chat.client.stubs(:telegram_user_id).returns(nil)
+    # Telegram API rejects messages to nil chat_id
+    @mock_bot_client.expects(:send_message).raises(Telegram::Bot::Error.new('Bad Request: chat not found'))
 
     result = Manager::TelegramMessageSender.call(chat: @chat, text: 'Hello!')
 
     assert_not result.success?
-    assert_equal 'Chat has no telegram_user', result.error
+    assert_equal 'Bad Request: chat not found', result.error
   end
 
   test 'uses custom parse_mode' do
