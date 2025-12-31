@@ -90,7 +90,14 @@ Rails.application.configure do
   config.active_job.queue_adapter = :good_job
   config.good_job.execution_mode = :async
 
-  # Allow subdomains for admin panel testing (configured via ALLOWED_HOSTS env var)
+  # Allow hosts for subdomain routing
+  # 1. If HOST is set, automatically allow the host and all subdomains
+  # 2. Additional hosts can be added via ALLOWED_HOSTS env var
+  if ApplicationConfig.host.present?
+    # Allow exact host and all subdomains using Rails dot-prefix convention
+    # ".3012.brandymint.ru" matches both "3012.brandymint.ru" and "*.3012.brandymint.ru"
+    config.hosts << ".#{ApplicationConfig.host}"
+  end
   ApplicationConfig.allowed_hosts.each { |host| config.hosts << host }
 
   # Web console permissions for local network access
