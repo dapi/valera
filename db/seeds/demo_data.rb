@@ -53,7 +53,7 @@ class DemoDataSeeder
     Dir.glob(GENERATED_DIALOGS_DIR.join('*.yml')).each do |file|
       next if File.basename(file) == '.gitkeep'
 
-      data = YAML.load_file(file, permitted_classes: [Symbol, Time, DateTime])
+      data = YAML.load_file(file, permitted_classes: [ Symbol, Time, DateTime ])
       file_dialogs = data[:dialogs] || data['dialogs'] || []
       dialogs += file_dialogs.map { |d| normalize_dialog(d) }
     rescue StandardError => e
@@ -101,10 +101,10 @@ class DemoDataSeeder
 
     # Some profiles suggest gender
     gender = case profile
-             when 'emotional_female_client' then :female
-             when 'busy_businessman', 'tech_savvy_client' then :male
-             else %i[male female].sample
-             end
+    when 'emotional_female_client' then :female
+    when 'busy_businessman', 'tech_savvy_client' then :male
+    else %i[male female].sample
+    end
 
     {
       first: first_names[gender].sample,
@@ -165,7 +165,7 @@ class DemoDataSeeder
   def build_client_name(client_data, telegram_user)
     first = client_data['first_name'] || telegram_user.first_name
     last = client_data['last_name'] || telegram_user.last_name
-    [first, last].compact.join(' ').presence
+    [ first, last ].compact.join(' ').presence
   end
 
   def create_vehicle(client, vehicle_data)

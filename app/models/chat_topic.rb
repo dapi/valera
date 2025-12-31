@@ -31,7 +31,7 @@ class ChatTopic < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :global, -> { where(tenant_id: nil) }
-  scope :for_tenant, ->(tenant) { where(tenant_id: [nil, tenant.id]) }
+  scope :for_tenant, ->(tenant) { where(tenant_id: [ nil, tenant.id ]) }
 
   # Возвращает топики для использования в классификаторе
   # Приоритет: топики тенанта, если есть, иначе глобальные
