@@ -60,7 +60,7 @@ module Tenants
         result = Manager::TakeoverService.call(
           chat: @chat,
           user: current_user,
-          timeout_minutes: params[:timeout_minutes]&.to_i,
+          timeout_minutes: params[:timeout_minutes].presence&.to_i,
           notify_client: notify_client_param
         )
 

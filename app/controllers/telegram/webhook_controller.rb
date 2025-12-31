@@ -459,7 +459,7 @@ module Telegram
         locals: { message: llm_chat.messages.last }
       )
     rescue Redis::BaseConnectionError, ActionView::Template::Error => e
-      Rails.logger.warn("[WebhookController] Failed to broadcast message to dashboard: #{e.message}")
+      log_error(e, { method: 'broadcast_new_message_to_dashboard', chat_id: llm_chat.id, tenant_id: current_tenant.id })
       # Не пробрасываем ошибку - broadcast не критичен, сообщение уже сохранено
     end
 

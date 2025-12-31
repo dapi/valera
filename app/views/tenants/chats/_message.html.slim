@@ -8,22 +8,24 @@
       .text-right.text-xs.text-gray-400.mt-1
         = l(message.created_at, format: :time)
 
-- when 'assistant'
-  / Assistant message (left side)
-  / Different styles for AI, Manager, and System messages
+- when 'manager'
+  / Manager message (left side, orange accent)
   .flex.justify-start id="message_#{message.id}"
     div style="max-width: 70%"
-      - if message.from_manager?
-        / Manager message (orange accent)
-        .bg-orange-50.border.border-orange-200.rounded-2xl.rounded-bl-sm.px-4.py-2
-          .flex.items-center.gap-2.mb-1
-            span.text-xs.font-medium.text-orange-600 = t('.manager_label')
-            - if message.sent_by_user
-              span.text-xs.text-orange-500 = message.sent_by_user.display_name
-          .whitespace-pre-wrap.text-gray-800 = message.content.to_s
-        .text-xs.text-gray-400.mt-1
-          = l(message.created_at, format: :time)
-      - elsif message.role == 'system'
+      .bg-orange-50.border.border-orange-200.rounded-2xl.rounded-bl-sm.px-4.py-2
+        .flex.items-center.gap-2.mb-1
+          span.text-xs.font-medium.text-orange-600 = t('.manager_label')
+          - if message.sent_by_user
+            span.text-xs.text-orange-500 = message.sent_by_user.display_name
+        .whitespace-pre-wrap.text-gray-800 = message.content.to_s
+      .text-xs.text-gray-400.mt-1
+        = l(message.created_at, format: :time)
+
+- when 'assistant'
+  / Assistant message (left side)
+  .flex.justify-start id="message_#{message.id}"
+    div style="max-width: 70%"
+      - if message.role == 'system'
         / System notification (centered, subtle)
         .bg-gray-100.rounded-full.px-4.py-2.text-center
           .text-xs.text-gray-500
