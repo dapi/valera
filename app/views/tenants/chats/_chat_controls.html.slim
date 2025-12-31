@@ -12,8 +12,8 @@
     / Manager mode - показываем форму и кнопку "Вернуть"
     .space-y-3
       / Форма отправки сообщения
-      = form_with url: messages_tenant_chat_manager_path(chat), method: :post, class: "flex gap-2", data: { turbo_stream: true, controller: "chat-message-form" } do |f|
-        = f.text_field :text, placeholder: t('.placeholder'), class: "flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent", required: true, autofocus: true, data: { action: "keydown.enter->chat-message-form#submit" }
+      = form_with url: messages_tenant_chat_manager_path(chat), method: :post, scope: :message, class: "flex gap-2", data: { turbo_stream: true, controller: "chat-message-form" } do |f|
+        = f.text_field :content, placeholder: t('.placeholder'), class: "flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent", required: true, autofocus: true, data: { action: "keydown.enter->chat-message-form#submit" }
         = f.submit t('.send'), class: "px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors cursor-pointer"
 
       / Кнопка "Вернуть боту"
