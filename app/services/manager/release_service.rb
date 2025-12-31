@@ -49,8 +49,9 @@ module Manager
     # @param chat [Chat] чат для возврата
     # @param user [User, nil] менеджер
     # @param notify_client [Boolean] уведомлять ли клиента
+    # @raise [RuntimeError] если chat не передан
     def initialize(chat:, user: nil, notify_client: true)
-      @chat = chat
+      @chat = chat || raise('No chat')
       @user = user
       @notify_client = notify_client
     end
@@ -59,7 +60,7 @@ module Manager
     #
     # @return [Result] результат операции
     def call
-      validate!
+      validate_state!
 
       # Сохраняем данные ДО release, так как после release они будут nil
       taken_by_id = chat.taken_by_id
@@ -79,8 +80,7 @@ module Manager
 
     private
 
-    def validate!
-      raise ValidationError, 'Chat is required' if chat.nil?
+    def validate_state!
       raise ValidationError, 'Chat is not in manager mode' unless chat.manager_mode?
 
       # Если передан user, проверяем что это активный менеджер или админ
@@ -127,7 +127,7 @@ module Manager
     def safe_context
       {
         service: self.class.name,
-        chat_id: chat&.id,
+        chat_id: chat.id,
         user_id: user&.id
       }
     end

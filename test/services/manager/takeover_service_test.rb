@@ -55,18 +55,18 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test 'returns error when chat is nil' do
-    result = Manager::TakeoverService.call(chat: nil, user: @user)
-
-    assert_not result.success?
-    assert_equal 'Chat is required', result.error
+  test 'raises error when chat is nil' do
+    error = assert_raises(RuntimeError) do
+      Manager::TakeoverService.call(chat: nil, user: @user)
+    end
+    assert_equal 'No chat', error.message
   end
 
-  test 'returns error when user is nil' do
-    result = Manager::TakeoverService.call(chat: @chat, user: nil)
-
-    assert_not result.success?
-    assert_equal 'User is required', result.error
+  test 'raises error when user is nil' do
+    error = assert_raises(RuntimeError) do
+      Manager::TakeoverService.call(chat: @chat, user: nil)
+    end
+    assert_equal 'No user', error.message
   end
 
   test 'returns error when chat is already in manager mode' do

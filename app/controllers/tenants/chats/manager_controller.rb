@@ -85,10 +85,16 @@ module Tenants
       # @param content [String] текст сообщения (обязательный)
       # @return [JSON] статус операции и данные сообщения
       def create_message
+        content = message_params[:content]
+
+        if content.blank?
+          return render json: { success: false, error: 'Content is required' }, status: :unprocessable_entity
+        end
+
         result = Manager::MessageService.call(
           chat: @chat,
           user: current_user,
-          content: message_params[:content]
+          content:
         )
 
         if result.success?
