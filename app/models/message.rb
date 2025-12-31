@@ -48,8 +48,8 @@ class Message < ApplicationRecord
   end
 
   def broadcast_to_dashboard
-    Turbo::StreamsChannel.broadcast_append_to(
-      "tenant_#{chat.tenant_id}_chat_#{chat_id}",
+    broadcast_append_to(
+      chat,
       target: 'chat-messages',
       partial: 'tenants/chats/message',
       locals: { message: self }
