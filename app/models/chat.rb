@@ -44,6 +44,7 @@ class Chat < ApplicationRecord
   validates :taken_at, presence: true, if: :manager_mode?
 
   scope :in_manager_mode, -> { where(mode: :manager_mode) }
+  scope :in_ai_mode, -> { where(mode: :ai_mode) }
   scope :taken_by_user, ->(user) { where(taken_by: user) }
 
   # Scope для предзагрузки данных клиента и Telegram пользователя
@@ -51,7 +52,10 @@ class Chat < ApplicationRecord
   scope :with_client_details, -> { includes(client: :telegram_user) }
 
   # Возвращает оставшееся время до автоматического возврата боту
-  # @return [Float, nil] секунды до таймаута или nil если не в manager_mode
+  #
+  # Использует `taken_at` + `TIMEOUT_DURATION` для расчёта
+  #
+  # @return [Numeric, nil] секунды до таймаута или nil если не в manager_mode
   def takeover_time_remaining
     return nil unless manager_mode? && taken_at
 

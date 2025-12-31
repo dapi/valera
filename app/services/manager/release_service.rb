@@ -83,15 +83,24 @@ module Manager
 
     def user_can_release?
       # Активный менеджер может вернуть свой чат
-      chat.manager_user_id == user.id
+      chat.taken_by_id == user.id
       # TODO: добавить проверку админских прав когда будет система ролей
     end
 
     def notify_client_about_release
-      TelegramMessageSender.call(
+      result = TelegramMessageSender.call(
         chat:,
         text: I18n.t('manager.release.client_notification')
       )
+
+      unless result.success?
+        log_error(
+          StandardError.new("Failed to notify client about release: #{result.error}"),
+          safe_context.merge(notification_error: result.error)
+        )
+      end
+
+      result
     end
 
     def release_chat

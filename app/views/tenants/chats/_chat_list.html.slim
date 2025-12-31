@@ -23,12 +23,11 @@
             span.text-xs.text-gray-400 = chat_time_ago(chat.last_message_at || chat.created_at)
           - if (last_message = chat.messages.last)
             p.text-sm.text-gray-500.truncate
-              - if last_message.role == 'assistant'
-                - if last_message.manager?
-                  span.text-orange-500>
-                    = "[#{t('.manager_mode')}]"
-                - else
-                  span.text-gray-400> Bot:
+              - if last_message.from_manager?
+                span.text-orange-500>
+                  = "[#{t('.manager_mode')}]"
+              - elsif last_message.from_bot?
+                span.text-gray-400> Bot:
               = truncate(last_message.content.to_s, length: 40)
           - else
             p.text-sm.text-gray-400.italic = t('.no_messages')

@@ -3,7 +3,7 @@
 .p-4.border-t.border-gray-200.bg-white id="chat_#{chat.id}_controls"
   - if chat.ai_mode?
     / AI mode - показываем кнопку "Взять диалог"
-    = button_to takeover_tenant_chat_path(chat), method: :post, class: "w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors", data: { turbo_stream: true }
+    = button_to takeover_tenant_chat_manager_path(chat), method: :post, class: "w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors", data: { turbo_stream: true }
       svg.w-5.h-5 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
       span = t('.takeover')
@@ -12,12 +12,12 @@
     / Manager mode - показываем форму и кнопку "Вернуть"
     .space-y-3
       / Форма отправки сообщения
-      = form_with url: send_message_tenant_chat_path(chat), method: :post, class: "flex gap-2", data: { turbo_stream: true, controller: "chat-message-form" } do |f|
+      = form_with url: messages_tenant_chat_manager_path(chat), method: :post, class: "flex gap-2", data: { turbo_stream: true, controller: "chat-message-form" } do |f|
         = f.text_field :text, placeholder: t('.placeholder'), class: "flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent", required: true, autofocus: true, data: { action: "keydown.enter->chat-message-form#submit" }
         = f.submit t('.send'), class: "px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors cursor-pointer"
 
       / Кнопка "Вернуть боту"
-      = button_to release_tenant_chat_path(chat), method: :post, class: "w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors", data: { turbo_stream: true, turbo_confirm: t('.release_confirm') }
+      = button_to release_tenant_chat_manager_path(chat), method: :post, class: "w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors", data: { turbo_stream: true, turbo_confirm: t('.release_confirm') }
         svg.w-5.h-5 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
           path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
         span = t('.release')

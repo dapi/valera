@@ -72,7 +72,7 @@ module Tenants
         assert_includes json.keys, 'chat'
         assert_includes json['chat'].keys, 'id'
         assert_includes json['chat'].keys, 'manager_active'
-        assert_includes json['chat'].keys, 'manager_user_id'
+        assert_includes json['chat'].keys, 'taken_by_id'
       end
 
       test 'takeover with custom timeout_minutes' do
@@ -318,7 +318,7 @@ module Tenants
 
       # === Timeout Expiry Tests ===
 
-      test 'manager_mode returns false after timeout expiry' do
+      test 'manager_active returns false after timeout expiry' do
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
         # Takeover with 1 minute timeout
@@ -328,10 +328,14 @@ module Tenants
         json = JSON.parse(response.body)
         assert json['chat']['manager_active']
 
-        # Travel past expiry - manager_mode? checks timeout and auto-releases
+        # Travel past expiry - manager_active? checks timeout but doesn't auto-release
+        # (auto-release happens via ChatTakeoverTimeoutJob)
         travel 2.minutes do
           @chat.reload
-          assert_not @chat.manager_mode?
+          # mode stays manager_mode until explicitly released
+          assert @chat.manager_mode?
+          # but manager_active? returns false when timeout expired
+          assert_not @chat.manager_active?
         end
       end
 

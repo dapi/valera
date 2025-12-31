@@ -69,4 +69,10 @@ class ChatTakeoverTimeoutJobTest < ActiveSupport::TestCase
 
     ChatTakeoverTimeoutJob.perform_now(@chat.id, taken_at.to_i)
   end
+
+  test 'defines ReleaseFailedError for retry mechanism' do
+    # Проверяем что класс ReleaseFailedError определён для механизма retry
+    assert_kind_of Class, ChatTakeoverTimeoutJob::ReleaseFailedError
+    assert ChatTakeoverTimeoutJob::ReleaseFailedError < StandardError
+  end
 end

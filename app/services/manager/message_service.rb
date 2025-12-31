@@ -65,11 +65,29 @@ module Manager
 
     # Выполняет отправку сообщения
     #
+    # Порядок операций важен для предсказуемости:
+    # 1. Сначала отправляем в Telegram
+    # 2. Только после успешной отправки сохраняем в БД
+    #
+    # Это гарантирует, что если менеджер видит сообщение в dashboard,
+    # то клиент точно его получил в Telegram.
+    #
     # @return [Result] результат с сообщением и статусом отправки
     def call
       validate!
-      message = create_message
+
+      # Сначала отправляем в Telegram - если не доставили, не сохраняем
       telegram_result = send_to_telegram
+      unless telegram_result.success?
+        log_error(
+          StandardError.new("Telegram delivery failed: #{telegram_result.error}"),
+          safe_context.merge(telegram_error: telegram_result.error)
+        )
+        return Result.new(success?: false, error: I18n.t('manager.message.telegram_delivery_failed'))
+      end
+
+      # Только после успешной отправки в Telegram сохраняем в БД
+      message = create_message
       extend_manager_timeout if extend_timeout
       build_success_result(message, telegram_result)
     rescue ArgumentError => e
@@ -90,7 +108,7 @@ module Manager
     end
 
     def user_is_active_manager?
-      chat.manager_user_id == user.id
+      chat.taken_by_id == user.id
     end
 
     def create_message

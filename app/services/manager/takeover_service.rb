@@ -61,11 +61,21 @@ module Manager
 
     # Выполняет перехват чата
     #
+    # Операции takeover и schedule_timeout_job выполняются в транзакции,
+    # чтобы гарантировать атомарность: либо чат перехвачен И job запланирован,
+    # либо ничего не изменилось.
+    #
     # @return [Result] результат с данными о перехвате
     def call
       validate!
-      takeover_chat
-      schedule_timeout_job
+
+      ActiveRecord::Base.transaction do
+        takeover_chat
+        schedule_timeout_job
+      end
+
+      # Уведомление и аналитика выполняются вне транзакции,
+      # так как их неудача не должна откатывать takeover
       notification_result = notify_client ? notify_client_about_takeover : nil
       track_takeover_started
       build_success_result(notification_result)
@@ -89,10 +99,19 @@ module Manager
     end
 
     def notify_client_about_takeover
-      TelegramMessageSender.call(
+      result = TelegramMessageSender.call(
         chat:,
         text: I18n.t('manager.takeover.client_notification')
       )
+
+      unless result.success?
+        log_error(
+          StandardError.new("Failed to notify client about takeover: #{result.error}"),
+          safe_context.merge(notification_error: result.error)
+        )
+      end
+
+      result
     end
 
     def build_success_result(notification_result)
@@ -119,7 +138,7 @@ module Manager
     def schedule_timeout_job
       ChatTakeoverTimeoutJob
         .set(wait: timeout_minutes.minutes)
-        .perform_later(chat.id, chat.manager_active_at)
+        .perform_later(chat.id, chat.taken_at)
     end
 
     # Отслеживает событие начала takeover
@@ -131,7 +150,7 @@ module Manager
         tenant: chat.tenant,
         chat_id: chat.id,
         properties: {
-          manager_user_id: user.id,
+          taken_by_id: user.id,
           timeout_minutes: timeout_minutes
         }
       )

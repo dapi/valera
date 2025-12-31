@@ -14,6 +14,9 @@
 class ChatTakeoverTimeoutJob < ApplicationJob
   include ErrorLogger
 
+  # Ошибка при неуспешном release - позволяет SolidQueue сделать retry
+  class ReleaseFailedError < StandardError; end
+
   queue_as :default
 
   # Retry с экспоненциальной задержкой для временных ошибок

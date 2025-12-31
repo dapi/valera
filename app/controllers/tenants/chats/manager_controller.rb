@@ -27,30 +27,26 @@ module Tenants
 
       before_action :set_chat
 
-      # Фатальные инфраструктурные ошибки — пробрасываем наверх (согласно CLAUDE.md)
-      FATAL_ERRORS = [
-        ActiveRecord::ConnectionNotEstablished,
-        ActiveRecord::QueryCanceled
-      ].freeze
-
-      # Fallback для непредвиденных ошибок — возвращаем JSON вместо HTML
-      # Фатальные DB ошибки пробрасываются для 500 + Bugsnag
-      rescue_from StandardError do |error|
-        raise error if FATAL_ERRORS.any? { |klass| error.is_a?(klass) }
-        raise error if defined?(PG::ConnectionBad) && error.is_a?(PG::ConnectionBad)
-
-        log_error(error, error_context)
-        render json: { success: false, error: 'Internal server error' }, status: :internal_server_error
-      end
+      # Перехватываем только ожидаемые ошибки бизнес-логики
+      # Неожиданные ошибки (TypeError, NoMethodError, NameError) пробрасываются
+      # наверх для стандартной обработки Rails (500 + Bugsnag)
+      #
+      # Согласно CLAUDE.md: фатальные DB ошибки НЕ перехватываем
+      # (ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad, ActiveRecord::QueryCanceled)
 
       rescue_from ActiveRecord::RecordNotFound do |error|
         log_error(error, error_context)
-        render json: { success: false, error: 'Chat not found' }, status: :not_found
+        render json: { success: false, error: 'Chat not found', chat_id: params[:chat_id] }, status: :not_found
       end
 
       rescue_from ActionController::ParameterMissing do |error|
         log_error(error, error_context)
         render json: { success: false, error: error.message }, status: :bad_request
+      end
+
+      rescue_from ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved do |error|
+        log_error(error, error_context)
+        render json: { success: false, error: error.message }, status: :unprocessable_entity
       end
 
       # POST /chats/:chat_id/manager/takeover
@@ -154,9 +150,9 @@ module Tenants
         {
           id: chat.id,
           manager_active: chat.manager_active?,
-          manager_user_id: chat.manager_user_id,
-          manager_active_at: chat.manager_active_at,
-          manager_active_until: chat.manager_active_until
+          taken_by_id: chat.taken_by_id,
+          taken_at: chat.taken_at,
+          active_until: chat.manager_active_until
         }
       end
 

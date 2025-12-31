@@ -394,7 +394,7 @@ module Telegram
         tenant: current_tenant,
         chat_id: llm_chat.id,
         properties: {
-          manager_user_id: llm_chat.manager_user_id,
+          taken_by_id: llm_chat.taken_by_id,
           platform: 'telegram'
         }
       )
