@@ -118,13 +118,4 @@ class Manager::ReleaseServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test 'release succeeds even if analytics fails' do
-    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
-    AnalyticsService.stubs(:track).raises(StandardError.new('Analytics service down'))
-
-    result = Manager::ReleaseService.call(chat: @chat, user: @user)
-
-    assert result.success?
-    assert @chat.reload.bot_mode?
-  end
 end

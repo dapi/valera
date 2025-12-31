@@ -8,6 +8,7 @@
 # @attr [Integer] sender_id ID пользователя, если отправлено менеджером
 class Message < ApplicationRecord
   ROLES = %w[user assistant manager system tool].freeze
+  BROADCASTABLE_ROLES = %w[user assistant manager].freeze
 
   acts_as_message touch_chat: :last_message_at
   has_many_attached :attachments
@@ -23,6 +24,13 @@ class Message < ApplicationRecord
 
   validates :sender, presence: true, if: :manager?
 
+  # Broadcast new messages to dashboard for real-time updates
+  after_create_commit :broadcast_to_dashboard, if: :broadcastable?
+
+  scope :from_manager, -> { where(role: 'manager') }
+  scope :from_bot, -> { where(role: 'assistant') }
+  scope :from_client, -> { where(role: 'user') }
+
   # Возвращает true, если сообщение отправлено менеджером
   def from_manager?
     manager?
@@ -31,5 +39,20 @@ class Message < ApplicationRecord
   # Возвращает true, если сообщение является системным уведомлением
   def system_notification?
     system?
+  end
+
+  private
+
+  def broadcastable?
+    BROADCASTABLE_ROLES.include?(role)
+  end
+
+  def broadcast_to_dashboard
+    Turbo::StreamsChannel.broadcast_append_to(
+      "tenant_#{chat.tenant_id}_chat_#{chat_id}",
+      target: 'chat-messages',
+      partial: 'tenants/chats/message',
+      locals: { message: self }
+    )
   end
 end

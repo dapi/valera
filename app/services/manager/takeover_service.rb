@@ -161,9 +161,6 @@ module Manager
           timeout_minutes: timeout_minutes
         }
       )
-    rescue StandardError => e
-      log_error(e, safe_context.merge(event: 'track_takeover_started'))
-      # Не пробрасываем - аналитика не критична для takeover
     end
   end
 end
