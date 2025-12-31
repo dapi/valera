@@ -38,10 +38,11 @@ module Tenants
 
       # Загружаем сообщения с лимитом для производительности
       # (200 сообщений ≈ 120KB HTML, 2000 DOM nodes)
-      # Используем id как tiebreaker при одинаковом created_at
+      # Используем reorder чтобы переопределить default scope из acts_as_chat
+      # (acts_as_chat добавляет order(created_at: :asc), который иначе объединяется с нашим order)
       messages = chat.messages
                      .includes(:tool_calls)
-                     .order(created_at: :desc, id: :desc)
+                     .reorder(created_at: :desc, id: :desc)
                      .limit(ApplicationConfig.max_chat_messages_display)
                      .reverse
 
