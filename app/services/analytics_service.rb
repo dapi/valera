@@ -56,13 +56,6 @@ class AnalyticsService
         session_id: generate_session_id(chat_id),
         tenant_id: tenant.id
       )
-    rescue => e
-      # Never break main functionality due to analytics errors
-      log_error(e, {
-        event_name: event_name,
-        chat_id: chat_id,
-        properties: properties
-      })
     end
 
     # Трекинг времени ответа AI
