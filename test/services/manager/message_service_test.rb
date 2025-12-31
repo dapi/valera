@@ -3,6 +3,8 @@
 require 'test_helper'
 
 class Manager::MessageServiceTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup do
     @chat = chats(:one)
     @user = users(:one)
@@ -86,6 +88,24 @@ class Manager::MessageServiceTest < ActiveSupport::TestCase
     assert_equal 'Content is required', result.error
   end
 
+  test 'returns error when content is too long' do
+    long_content = 'a' * 4097
+
+    result = Manager::MessageService.call(chat: @chat, user: @user, content: long_content)
+
+    assert_not result.success?
+    assert_equal 'Content is too long', result.error
+  end
+
+  test 'accepts content at max length' do
+    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    max_content = 'a' * 4096
+
+    result = Manager::MessageService.call(chat: @chat, user: @user, content: max_content)
+
+    assert result.success?
+  end
+
   test 'returns error when chat is not in manager mode' do
     @chat.release_to_bot!
 
@@ -120,5 +140,31 @@ class Manager::MessageServiceTest < ActiveSupport::TestCase
     assert_not result.success?
     assert_includes result.error, I18n.t('manager.message.telegram_delivery_failed')
     assert_equal initial_message_count, @chat.messages.reload.count
+  end
+
+  test 'tracks analytics event on message sent' do
+    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+
+    assert_enqueued_with(job: AnalyticsJob) do
+      Manager::MessageService.call(
+        chat: @chat,
+        user: @user,
+        content: 'Hello from manager!'
+      )
+    end
+  end
+
+  test 'message succeeds even if analytics fails' do
+    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    AnalyticsService.stubs(:track).raises(StandardError.new('Analytics service down'))
+
+    result = Manager::MessageService.call(
+      chat: @chat,
+      user: @user,
+      content: 'Hello!'
+    )
+
+    assert result.success?
+    assert result.message.persisted?
   end
 end

@@ -27,6 +27,9 @@ module Manager
       ActiveRecord::RecordNotSaved
     ].freeze
 
+    # Максимальная длина сообщения в Telegram
+    MAX_MESSAGE_LENGTH = 4096
+
     # @return [Chat] чат для отправки
     attr_reader :chat
 
@@ -89,6 +92,7 @@ module Manager
       # Только после успешной отправки в Telegram сохраняем в БД
       message = create_message
       extend_manager_timeout if extend_timeout
+      track_message_sent
       build_success_result(message, telegram_result)
     rescue ArgumentError => e
       Rails.logger.warn("[#{self.class.name}] Validation failed: #{e.message}")
@@ -104,6 +108,7 @@ module Manager
       raise ArgumentError, 'Chat is required' if chat.nil?
       raise ArgumentError, 'User is required' if user.nil?
       raise ArgumentError, 'Content is required' if content.blank?
+      raise ArgumentError, 'Content is too long' if content.length > MAX_MESSAGE_LENGTH
       raise ArgumentError, 'Chat is not in manager mode' unless chat.manager_mode?
       raise ArgumentError, 'User is not the active manager' unless user_is_active_manager?
     end
@@ -143,6 +148,24 @@ module Manager
         user_id: user&.id,
         content_length: content&.length
       }
+    end
+
+    # Отслеживает событие отправки сообщения менеджером
+    #
+    # @return [void]
+    def track_message_sent
+      AnalyticsService.track(
+        AnalyticsService::Events::MANAGER_MESSAGE_SENT,
+        tenant: chat.tenant,
+        chat_id: chat.id,
+        properties: {
+          manager_id: user.id,
+          message_length: content.length
+        }
+      )
+    rescue => e
+      log_error(e, safe_context.merge(event: 'track_message_sent'))
+      # Не пробрасываем - аналитика не критична для отправки сообщения
     end
   end
 end

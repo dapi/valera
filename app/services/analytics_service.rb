@@ -29,6 +29,7 @@ class AnalyticsService
     MESSAGE_RECEIVED_IN_MANAGER_MODE = Analytics::EventConstants.event_name(:message_received_in_manager_mode)
     CHAT_TAKEOVER_STARTED = Analytics::EventConstants.event_name(:chat_takeover_started)
     CHAT_TAKEOVER_ENDED = Analytics::EventConstants.event_name(:chat_takeover_ended)
+    MANAGER_MESSAGE_SENT = Analytics::EventConstants.event_name(:manager_message_sent)
     ERROR_OCCURRED = Analytics::EventConstants.event_name(:error_occurred)
   end
 

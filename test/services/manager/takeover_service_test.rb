@@ -8,12 +8,11 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
   setup do
     @chat = chats(:one)
     @user = users(:one)
-    @mock_bot_client = mock('bot_client')
-    @chat.tenant.stubs(:bot_client).returns(@mock_bot_client)
+    @success_result = Manager::TelegramMessageSender::Result.new(success?: true, telegram_message_id: 123)
   end
 
   test 'takes over chat successfully with notification' do
-    @mock_bot_client.expects(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    Manager::TelegramMessageSender.stubs(:call).returns(@success_result)
 
     result = Manager::TakeoverService.call(chat: @chat, user: @user)
 
@@ -24,7 +23,7 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
   end
 
   test 'takes over chat without notification' do
-    @mock_bot_client.expects(:send_message).never
+    Manager::TelegramMessageSender.expects(:call).never
 
     result = Manager::TakeoverService.call(chat: @chat, user: @user, notify_client: false)
 
@@ -33,18 +32,19 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
   end
 
   test 'uses custom timeout' do
-    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    Manager::TelegramMessageSender.stubs(:call).returns(@success_result)
+    custom_timeout = 60 # Отличается от дефолта (30 минут)
 
     freeze_time do
-      result = Manager::TakeoverService.call(chat: @chat, user: @user, timeout_minutes: 60)
+      result = Manager::TakeoverService.call(chat: @chat, user: @user, timeout_minutes: custom_timeout)
 
       assert result.success?
-      assert_equal 60.minutes.from_now, @chat.reload.manager_active_until
+      assert_equal custom_timeout.minutes.from_now, @chat.reload.manager_active_until
     end
   end
 
   test 'uses default timeout from config' do
-    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    Manager::TelegramMessageSender.stubs(:call).returns(@success_result)
 
     freeze_time do
       result = Manager::TakeoverService.call(chat: @chat, user: @user)
@@ -79,10 +79,10 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
   end
 
   test 'handles telegram send failure gracefully' do
-    @mock_bot_client.expects(:send_message).raises(Faraday::Error.new('Network error'))
+    failure_result = Manager::TelegramMessageSender::Result.new(success?: false, error: 'Network error')
+    Manager::TelegramMessageSender.stubs(:call).returns(failure_result)
 
     # Takeover should still succeed even if notification fails
-    # because we catch telegram errors in TelegramMessageSender
     result = Manager::TakeoverService.call(chat: @chat, user: @user)
 
     assert result.success?
@@ -91,7 +91,7 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
   end
 
   test 'returns notification_sent true when notification succeeds' do
-    @mock_bot_client.expects(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    Manager::TelegramMessageSender.stubs(:call).returns(@success_result)
 
     result = Manager::TakeoverService.call(chat: @chat, user: @user)
 
@@ -100,7 +100,7 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
   end
 
   test 'returns notification_sent nil when notifications disabled' do
-    @mock_bot_client.expects(:send_message).never
+    Manager::TelegramMessageSender.expects(:call).never
 
     result = Manager::TakeoverService.call(chat: @chat, user: @user, notify_client: false)
 
@@ -109,7 +109,7 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
   end
 
   test 'schedules timeout job on takeover' do
-    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    Manager::TelegramMessageSender.stubs(:call).returns(@success_result)
 
     assert_enqueued_with(job: ChatTakeoverTimeoutJob) do
       Manager::TakeoverService.call(chat: @chat, user: @user)
@@ -117,7 +117,7 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
   end
 
   test 'tracks analytics event on takeover' do
-    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    Manager::TelegramMessageSender.stubs(:call).returns(@success_result)
 
     assert_enqueued_with(job: AnalyticsJob) do
       Manager::TakeoverService.call(chat: @chat, user: @user)
@@ -125,7 +125,7 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
   end
 
   test 'prevents concurrent takeover by second manager' do
-    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
+    Manager::TelegramMessageSender.stubs(:call).returns(@success_result)
     other_user = users(:two)
 
     # Первый менеджер успешно перехватывает чат
@@ -139,5 +139,15 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
 
     # Чат остаётся за первым менеджером
     assert_equal @user, @chat.reload.taken_by
+  end
+
+  test 'takeover succeeds even if analytics fails' do
+    Manager::TelegramMessageSender.stubs(:call).returns(@success_result)
+    AnalyticsService.stubs(:track).raises(StandardError.new('Analytics service down'))
+
+    result = Manager::TakeoverService.call(chat: @chat, user: @user)
+
+    assert result.success?
+    assert @chat.reload.manager_mode?
   end
 end

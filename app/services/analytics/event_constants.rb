@@ -93,6 +93,13 @@ module Analytics
       properties: [ :taken_by_id, :released_by_id, :reason, :duration_minutes ]
     }.freeze
 
+    MANAGER_MESSAGE_SENT = {
+      name: 'manager_message_sent',
+      description: 'Менеджер отправил сообщение клиенту',
+      category: 'manager',
+      properties: [ :manager_id, :message_length ]
+    }.freeze
+
     # События ошибок
     ERROR_OCCURRED = {
       name: 'error_occurred',
@@ -115,6 +122,7 @@ module Analytics
       message_received_in_manager_mode: MESSAGE_RECEIVED_IN_MANAGER_MODE,
       chat_takeover_started: CHAT_TAKEOVER_STARTED,
       chat_takeover_ended: CHAT_TAKEOVER_ENDED,
+      manager_message_sent: MANAGER_MESSAGE_SENT,
       error_occurred: ERROR_OCCURRED
     }.freeze
 
