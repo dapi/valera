@@ -94,7 +94,7 @@ class Chat < ApplicationRecord
   #
   # @param user [User] пользователь, который берёт контроль
   # @param timeout_minutes [Integer] время таймаута в минутах
-  # @return [Chat] обновленный чат
+  # @return [true] при успешном обновлении
   # @raise [ActiveRecord::RecordInvalid] при ошибке валидации
   def takeover_by_manager!(user, timeout_minutes: ApplicationConfig.manager_takeover_timeout_minutes)
     update!(
@@ -118,7 +118,7 @@ class Chat < ApplicationRecord
 
   # Возвращает чат боту
   #
-  # @return [Chat] обновленный чат
+  # @return [true] при успешном обновлении
   # @raise [ActiveRecord::RecordInvalid] при ошибке валидации
   def release_to_bot!
     update!(

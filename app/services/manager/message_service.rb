@@ -27,8 +27,12 @@ module Manager
       ActiveRecord::RecordNotSaved
     ].freeze
 
-    # Максимальная длина сообщения в Telegram
+    # Максимальная длина сообщения в Telegram API (не конфигурируется)
+    # @see https://core.telegram.org/method/messages.sendMessage
     MAX_MESSAGE_LENGTH = 4096
+
+    # Ошибка валидации входных параметров сервиса
+    class ValidationError < StandardError; end
 
     # @return [Chat] чат для отправки
     attr_reader :chat
@@ -94,7 +98,7 @@ module Manager
       extend_manager_timeout if extend_timeout
       track_message_sent
       build_success_result(message, telegram_result)
-    rescue ArgumentError => e
+    rescue ValidationError => e
       Rails.logger.warn("[#{self.class.name}] Validation failed: #{e.message}")
       Result.new(success?: false, error: e.message)
     rescue *HANDLED_ERRORS => e
@@ -105,12 +109,13 @@ module Manager
     private
 
     def validate!
-      raise ArgumentError, 'Chat is required' if chat.nil?
-      raise ArgumentError, 'User is required' if user.nil?
-      raise ArgumentError, 'Content is required' if content.blank?
-      raise ArgumentError, 'Content is too long' if content.length > MAX_MESSAGE_LENGTH
-      raise ArgumentError, 'Chat is not in manager mode' unless chat.manager_mode?
-      raise ArgumentError, 'User is not the active manager' unless user_is_active_manager?
+      raise ValidationError, 'Chat is required' if chat.nil?
+      raise ValidationError, 'User is required' if user.nil?
+      raise ValidationError, 'Content is required' if content.blank?
+      raise ValidationError, 'Content is too long' if content.length > MAX_MESSAGE_LENGTH
+      raise ValidationError, 'Chat is not in manager mode' unless chat.manager_mode?
+      raise ValidationError, 'Manager session has expired' unless chat.manager_active?
+      raise ValidationError, 'User is not the active manager' unless user_is_active_manager?
     end
 
     def user_is_active_manager?

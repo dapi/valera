@@ -23,6 +23,9 @@ module Manager
       ActiveRecord::RecordNotSaved
     ].freeze
 
+    # Ошибка валидации входных параметров сервиса
+    class ValidationError < StandardError; end
+
     # @return [Chat] чат для возврата
     attr_reader :chat
 
@@ -67,7 +70,7 @@ module Manager
       release_chat
       track_manual_release(taken_by_id:, taken_at:)
       build_success_result(notification_result)
-    rescue ArgumentError => e
+    rescue ValidationError => e
       Rails.logger.warn("[#{self.class.name}] Validation failed: #{e.message}")
       Result.new(success?: false, error: e.message)
     rescue *HANDLED_ERRORS => e
@@ -78,14 +81,14 @@ module Manager
     private
 
     def validate!
-      raise ArgumentError, 'Chat is required' if chat.nil?
-      raise ArgumentError, 'Chat is not in manager mode' unless chat.manager_mode?
+      raise ValidationError, 'Chat is required' if chat.nil?
+      raise ValidationError, 'Chat is not in manager mode' unless chat.manager_mode?
 
       # Если передан user, проверяем что это активный менеджер или админ
       return unless user.present?
       return if user_can_release?
 
-      raise ArgumentError, 'User is not authorized to release this chat'
+      raise ValidationError, 'User is not authorized to release this chat'
     end
 
     def user_can_release?
