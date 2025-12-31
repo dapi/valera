@@ -90,7 +90,7 @@ module Analytics
       name: 'chat_takeover_ended',
       description: 'Чат возвращён боту',
       category: 'manager',
-      properties: [ :taken_by_id, :reason, :duration_minutes ]
+      properties: [ :taken_by_id, :released_by_id, :reason, :duration_minutes ]
     }.freeze
 
     # События ошибок
