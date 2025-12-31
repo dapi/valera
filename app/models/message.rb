@@ -8,7 +8,6 @@
 # @attr [Integer] sender_id ID пользователя, если отправлено менеджером
 class Message < ApplicationRecord
   ROLES = %w[user assistant manager system tool].freeze
-  BROADCASTABLE_ROLES = %w[user assistant manager].freeze
 
   acts_as_message touch_chat: :last_message_at
   has_many_attached :attachments
@@ -25,7 +24,7 @@ class Message < ApplicationRecord
   validates :sender, presence: true, if: :manager?
 
   # Broadcast new messages to dashboard for real-time updates
-  after_create_commit :broadcast_to_dashboard, if: :broadcastable?
+  after_create_commit :broadcast_to_dashboard
 
   scope :from_manager, -> { where(role: 'manager') }
   scope :from_bot, -> { where(role: 'assistant') }
@@ -42,10 +41,6 @@ class Message < ApplicationRecord
   end
 
   private
-
-  def broadcastable?
-    BROADCASTABLE_ROLES.include?(role)
-  end
 
   def broadcast_to_dashboard
     broadcast_append_to(
