@@ -61,6 +61,7 @@ module Manager
       validate!
       send_message
     rescue ArgumentError => e
+      Rails.logger.warn("[#{self.class.name}] Validation failed: #{e.message}")
       Result.new(success?: false, error: e.message)
     rescue *TELEGRAM_ERRORS => e
       log_error(e, safe_context)

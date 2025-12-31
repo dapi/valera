@@ -23,6 +23,9 @@ module Manager
       ActiveRecord::RecordNotSaved
     ].freeze
 
+    # Ошибка валидации входных параметров сервиса
+    class ValidationError < StandardError; end
+
     # @return [Chat] чат для перехвата
     attr_reader :chat
 
@@ -69,8 +72,8 @@ module Manager
     # @return [Result] результат с данными о перехвате
     def call
       # Валидация nil-аргументов до with_lock
-      raise ArgumentError, 'Chat is required' if chat.nil?
-      raise ArgumentError, 'User is required' if user.nil?
+      raise ValidationError, 'Chat is required' if chat.nil?
+      raise ValidationError, 'User is required' if user.nil?
 
       chat.with_lock do
         validate_chat_state!
@@ -83,7 +86,7 @@ module Manager
       notification_result = notify_client ? notify_client_about_takeover : nil
       track_takeover_started
       build_success_result(notification_result)
-    rescue ArgumentError => e
+    rescue ValidationError => e
       Rails.logger.warn("[#{self.class.name}] Validation failed: #{e.message}")
       Result.new(success?: false, error: e.message)
     rescue *HANDLED_ERRORS => e
@@ -95,7 +98,7 @@ module Manager
 
     # Валидация состояния чата (вызывается внутри with_lock)
     def validate_chat_state!
-      raise ArgumentError, 'Chat is already in manager mode' if chat.manager_mode?
+      raise ValidationError, 'Chat is already in manager mode' if chat.manager_mode?
     end
 
     def takeover_chat

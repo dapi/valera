@@ -115,6 +115,16 @@ class Manager::MessageServiceTest < ActiveSupport::TestCase
     assert_equal 'Chat is not in manager mode', result.error
   end
 
+  test 'returns error when manager session has expired' do
+    # Set manager_active_until to past time
+    @chat.update!(manager_active_until: 1.minute.ago)
+
+    result = Manager::MessageService.call(chat: @chat, user: @user, content: 'Hello!')
+
+    assert_not result.success?
+    assert_equal 'Manager session has expired', result.error
+  end
+
   test 'returns error when user is not the active manager' do
     other_user = users(:two)
 
