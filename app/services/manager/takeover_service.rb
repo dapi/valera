@@ -80,6 +80,7 @@ module Manager
       track_takeover_started
       build_success_result(notification_result)
     rescue ArgumentError => e
+      Rails.logger.warn("[#{self.class.name}] Validation failed: #{e.message}")
       Result.new(success?: false, error: e.message)
     rescue *HANDLED_ERRORS => e
       log_error(e, safe_context)
