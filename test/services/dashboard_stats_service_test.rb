@@ -656,28 +656,31 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
   end
 
   test 'hourly_distribution groups messages by hour in local timezone' do
-    # Создаём изолированный тенант
-    user = User.create!(name: 'Hourly Group', email: 'hourly_group@test.com', password: 'password123')
-    tenant = Tenant.create!(name: 'Hourly Group Tenant', bot_token: '666666666:HOURLYGROUP', bot_username: 'hourly_group_bot', owner: user)
-    tg_user = TelegramUser.create!(username: 'hourly_group_user', first_name: 'HourlyGroup')
-    client = tenant.clients.create!(telegram_user: tg_user, name: 'Hourly Group Client')
-    chat = tenant.chats.create!(client: client)
+    # Фиксируем timezone для предсказуемости в CI
+    Time.use_zone('Europe/Moscow') do
+      # Создаём изолированный тенант
+      user = User.create!(name: 'Hourly Group', email: 'hourly_group@test.com', password: 'password123')
+      tenant = Tenant.create!(name: 'Hourly Group Tenant', bot_token: '666666666:HOURLYGROUP', bot_username: 'hourly_group_bot', owner: user)
+      tg_user = TelegramUser.create!(username: 'hourly_group_user', first_name: 'HourlyGroup')
+      client = tenant.clients.create!(telegram_user: tg_user, name: 'Hourly Group Client')
+      chat = tenant.chats.create!(client: client)
 
-    # Создаём сообщения в локальном времени (Time.zone)
-    # Сервис группирует по локальному часу, а не UTC
-    today_10am_local = Time.zone.now.beginning_of_day + 10.hours + 30.minutes
-    today_2pm_local = Time.zone.now.beginning_of_day + 14.hours + 15.minutes
+      # Используем ВЧЕРАШНИЙ день, чтобы все времена были гарантированно в прошлом
+      # (иначе 14:15 сегодня может быть в будущем и отфильтроваться)
+      yesterday_10am_local = Time.zone.now.yesterday.beginning_of_day + 10.hours + 30.minutes
+      yesterday_2pm_local = Time.zone.now.yesterday.beginning_of_day + 14.hours + 15.minutes
 
-    2.times { chat.messages.create!(role: 'user', content: 'Morning message', created_at: today_10am_local) }
-    3.times { chat.messages.create!(role: 'user', content: 'Afternoon message', created_at: today_2pm_local) }
+      2.times { chat.messages.create!(role: 'user', content: 'Morning message', created_at: yesterday_10am_local) }
+      3.times { chat.messages.create!(role: 'user', content: 'Afternoon message', created_at: yesterday_2pm_local) }
 
-    result = DashboardStatsService.new(tenant).call
+      result = DashboardStatsService.new(tenant).call
 
-    hour_10_count = result.hourly_distribution.find { |h| h[:hour] == 10 }[:count]
-    hour_14_count = result.hourly_distribution.find { |h| h[:hour] == 14 }[:count]
+      hour_10_count = result.hourly_distribution.find { |h| h[:hour] == 10 }[:count]
+      hour_14_count = result.hourly_distribution.find { |h| h[:hour] == 14 }[:count]
 
-    assert_equal 2, hour_10_count
-    assert_equal 3, hour_14_count
+      assert_equal 2, hour_10_count
+      assert_equal 3, hour_14_count
+    end
   end
 
   test 'hourly_distribution isolates data by tenant' do
