@@ -12,7 +12,6 @@ module Manager
   #     puts "Чат возвращён боту"
   #   end
   #
-  # @author AI Assistant
   # @since 0.38.0
   class ReleaseService
     include ErrorLogger

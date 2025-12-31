@@ -16,7 +16,6 @@ module Manager
   #     puts "Сообщение #{result.message.id} отправлено"
   #   end
   #
-  # @author AI Assistant
   # @since 0.38.0
   class MessageService
     include ErrorLogger
@@ -27,8 +26,8 @@ module Manager
       ActiveRecord::RecordNotSaved
     ].freeze
 
-    # Максимальная длина сообщения в Telegram API (не конфигурируется)
-    # @see https://core.telegram.org/method/messages.sendMessage
+    # Максимальная длина сообщения в Telegram Bot API (не конфигурируется)
+    # @see https://core.telegram.org/bots/api#sendmessage
     MAX_MESSAGE_LENGTH = 4096
 
     # Ошибка валидации входных параметров сервиса
