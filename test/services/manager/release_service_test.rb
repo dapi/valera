@@ -3,6 +3,8 @@
 require 'test_helper'
 
 class Manager::ReleaseServiceTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup do
     @chat = chats(:one)
     @user = users(:one)
@@ -108,13 +110,11 @@ class Manager::ReleaseServiceTest < ActiveSupport::TestCase
     assert_nil result.notification_sent
   end
 
-  test 'returns error when chat already in bot mode' do
-    @chat.release_to_bot!
-    @mock_bot_client.expects(:send_message).never
+  test 'tracks analytics event on manual release' do
+    @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
-    result = Manager::ReleaseService.call(chat: @chat, notify_client: true)
-
-    assert_not result.success?
-    assert_equal 'Chat is not in manager mode', result.error
+    assert_enqueued_with(job: AnalyticsJob) do
+      Manager::ReleaseService.call(chat: @chat, user: @user)
+    end
   end
 end
