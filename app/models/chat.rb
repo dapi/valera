@@ -35,6 +35,10 @@ class Chat < ApplicationRecord
 
   acts_as_chat
 
+  # Broadcast page refresh when chat changes (mode, takeover status, etc.)
+  # Uses Turbo 8 morphing for smooth updates
+  broadcasts_refreshes
+
   # Takeover support
   # mode: ai_mode (по умолчанию) - бот отвечает автоматически
   # mode: manager_mode - менеджер перехватил диалог, бот не отвечает

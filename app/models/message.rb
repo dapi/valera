@@ -20,8 +20,9 @@ class Message < ApplicationRecord
   validates :role, inclusion: { in: ROLES }
   validates :sent_by_user, presence: true, if: -> { role == 'manager' }
 
-  # Broadcast new messages to dashboard for real-time updates
-  after_create_commit :broadcast_to_dashboard
+  # Broadcast page refresh to dashboard for real-time updates
+  # Uses Turbo 8 morphing for smooth updates
+  broadcasts_refreshes_to :chat
 
   scope :from_manager, -> { where(role: 'manager') }
   scope :from_bot, -> { where(role: 'assistant') }
@@ -37,16 +38,5 @@ class Message < ApplicationRecord
 
   def from_client?
     role == 'user'
-  end
-
-  private
-
-  def broadcast_to_dashboard
-    broadcast_append_to(
-      chat,
-      target: 'chat-messages',
-      partial: 'tenants/chats/message',
-      locals: { message: self }
-    )
   end
 end
