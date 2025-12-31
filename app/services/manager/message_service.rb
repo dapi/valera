@@ -168,9 +168,6 @@ module Manager
           message_length: content.length
         }
       )
-    rescue StandardError => e
-      log_error(e, safe_context.merge(event: 'track_message_sent'))
-      # Не пробрасываем - аналитика не критична для отправки сообщения
     end
   end
 end

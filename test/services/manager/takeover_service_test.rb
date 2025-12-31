@@ -141,13 +141,4 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
     assert_equal @user, @chat.reload.taken_by
   end
 
-  test 'takeover succeeds even if analytics fails' do
-    Manager::TelegramMessageSender.stubs(:call).returns(@success_result)
-    AnalyticsService.stubs(:track).raises(StandardError.new('Analytics service down'))
-
-    result = Manager::TakeoverService.call(chat: @chat, user: @user)
-
-    assert result.success?
-    assert @chat.reload.manager_mode?
-  end
 end

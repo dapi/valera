@@ -374,38 +374,19 @@ module Telegram
     # @return [void]
     # @api private
     def handle_message_in_manager_mode(message)
-      # Извлекаем текст сообщения, учитывая разные типы контента
       text = extract_message_content(message)
 
       # Сохраняем сообщение клиента в историю чата
-      llm_chat.messages.create!(
-        role: :user,
-        content: text
-      )
+      # last_message_at обновляется автоматически через acts_as_message touch_chat:
+      # Broadcast в dashboard происходит через after_create_commit в модели Message
+      llm_chat.messages.create!(role: 'user', content: text)
 
-      # Обновляем время последнего сообщения
-      llm_chat.update!(last_message_at: Time.current)
-
-      # Уведомляем dashboard о новом сообщении через Turbo Streams
-      broadcast_new_message_to_dashboard
-
-      # Трекаем событие для аналитики
       AnalyticsService.track(
         AnalyticsService::Events::MESSAGE_RECEIVED_IN_MANAGER_MODE,
         tenant: current_tenant,
         chat_id: llm_chat.id,
-        properties: {
-          taken_by_id: llm_chat.taken_by_id,
-          platform: 'telegram'
-        }
+        properties: { taken_by_id: llm_chat.taken_by_id, platform: 'telegram' }
       )
-    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
-      AnalyticsService.track_error(e, tenant: current_tenant, context: {
-        chat_id: llm_chat&.id,
-        action: 'handle_message_in_manager_mode'
-      })
-      Rails.logger.error("[WebhookController] Failed to save message in manager mode: #{e.message}")
-      respond_with :message, text: I18n.t('telegram.errors.message_save_failed', default: 'Не удалось сохранить сообщение')
     end
 
     # Извлекает текстовое содержимое из Telegram сообщения
@@ -421,9 +402,7 @@ module Telegram
       return message['text'] if message['text'].present?
       return message['caption'] if message['caption'].present?
 
-      # Определяем тип медиа-контента
-      media_type = detect_media_type(message)
-      media_type ? "[#{media_type}]" : '[Сообщение без текста]'
+      "[#{detect_media_type(message)}]"
     end
 
     # Определяет тип медиа-контента в сообщении
@@ -441,26 +420,8 @@ module Telegram
       when message['sticker'] then 'Стикер'
       when message['location'] then 'Геолокация'
       when message['contact'] then 'Контакт'
+      else 'Неизвестный тип'
       end
-    end
-
-    # Отправляет broadcast о новом сообщении в dashboard
-    #
-    # Broadcast не критичен - если упадёт, сообщение уже сохранено.
-    # Менеджер увидит его при обновлении страницы.
-    #
-    # @return [void]
-    # @api private
-    def broadcast_new_message_to_dashboard
-      Turbo::StreamsChannel.broadcast_append_to(
-        "tenant_#{current_tenant.id}_chat_#{llm_chat.id}",
-        target: 'chat-messages',
-        partial: 'tenants/chats/message',
-        locals: { message: llm_chat.messages.last }
-      )
-    rescue Redis::BaseConnectionError, ActionView::Template::Error => e
-      log_error(e, { method: 'broadcast_new_message_to_dashboard', chat_id: llm_chat.id, tenant_id: current_tenant.id })
-      # Не пробрасываем ошибку - broadcast не критичен, сообщение уже сохранено
     end
 
     # Определяет тип сообщения для аналитики
