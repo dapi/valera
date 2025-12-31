@@ -20,8 +20,9 @@ services:
       REDIS_URL: redis://redis:6379/0
       HISTFILE: /app/log/.bash_history
       EDITOR: vim
-      # Server port (default 3000)
+      # Server port and host (for URL generation and allowed hosts)
       PORT: ${PORT:-3000}
+      HOST: ${HOST:-lvh.me}
       # Telegram Platform Bot (from host environment)
       PLATFORM_BOT_TOKEN: ${PLATFORM_BOT_TOKEN}
       PLATFORM_BOT_USERNAME: ${PLATFORM_BOT_USERNAME}
