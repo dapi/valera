@@ -91,6 +91,7 @@ module Manager
       extend_manager_timeout if extend_timeout
       build_success_result(message, telegram_result)
     rescue ArgumentError => e
+      Rails.logger.warn("[#{self.class.name}] Validation failed: #{e.message}")
       Result.new(success?: false, error: e.message)
     rescue *HANDLED_ERRORS => e
       log_error(e, safe_context)

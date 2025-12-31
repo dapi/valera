@@ -374,7 +374,8 @@ module Telegram
     # @return [void]
     # @api private
     def handle_message_in_manager_mode(message)
-      text = message['text']
+      # Извлекаем текст сообщения, учитывая разные типы контента
+      text = extract_message_content(message)
 
       # Сохраняем сообщение клиента в историю чата
       llm_chat.messages.create!(
@@ -405,6 +406,42 @@ module Telegram
       })
       Rails.logger.error("[WebhookController] Failed to save message in manager mode: #{e.message}")
       respond_with :message, text: I18n.t('telegram.errors.message_save_failed', default: 'Не удалось сохранить сообщение')
+    end
+
+    # Извлекает текстовое содержимое из Telegram сообщения
+    #
+    # Обрабатывает разные типы контента: текст, фото, документы, голос и т.д.
+    # Для нетекстовых сообщений возвращает описание типа контента.
+    #
+    # @param message [Hash] данные сообщения от Telegram
+    # @return [String] текст сообщения или описание типа контента
+    # @api private
+    def extract_message_content(message)
+      # Приоритет: text > caption > тип медиа
+      return message['text'] if message['text'].present?
+      return message['caption'] if message['caption'].present?
+
+      # Определяем тип медиа-контента
+      media_type = detect_media_type(message)
+      media_type ? "[#{media_type}]" : '[Сообщение без текста]'
+    end
+
+    # Определяет тип медиа-контента в сообщении
+    #
+    # @param message [Hash] данные сообщения от Telegram
+    # @return [String, nil] название типа медиа или nil
+    # @api private
+    def detect_media_type(message)
+      case
+      when message['photo'] then 'Фото'
+      when message['document'] then 'Документ'
+      when message['video'] then 'Видео'
+      when message['voice'] then 'Голосовое сообщение'
+      when message['audio'] then 'Аудио'
+      when message['sticker'] then 'Стикер'
+      when message['location'] then 'Геолокация'
+      when message['contact'] then 'Контакт'
+      end
     end
 
     # Отправляет broadcast о новом сообщении в dashboard

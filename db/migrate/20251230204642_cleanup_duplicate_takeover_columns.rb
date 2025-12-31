@@ -26,15 +26,15 @@ class CleanupDuplicateTakeoverColumns < ActiveRecord::Migration[8.1]
     # Удаление старых колонок из chats
     remove_foreign_key :chats, column: :manager_user_id, if_exists: true
     remove_index :chats, :manager_active, name: 'index_chats_on_manager_active_true', if_exists: true
-    remove_column :chats, :manager_user_id
-    remove_column :chats, :manager_active_at
-    remove_column :chats, :manager_active
+    remove_column :chats, :manager_user_id, if_exists: true
+    remove_column :chats, :manager_active_at, if_exists: true
+    remove_column :chats, :manager_active, if_exists: true
 
     # Удаление неиспользуемых колонок из messages
     remove_foreign_key :messages, column: :sender_id, if_exists: true
-    remove_index :messages, [:chat_id, :sender_type], if_exists: true
-    remove_column :messages, :sender_id
-    remove_column :messages, :sender_type
+    remove_index :messages, [ :chat_id, :sender_type ], if_exists: true
+    remove_column :messages, :sender_id, if_exists: true
+    remove_column :messages, :sender_type, if_exists: true
   end
 
   def down
@@ -49,7 +49,7 @@ class CleanupDuplicateTakeoverColumns < ActiveRecord::Migration[8.1]
     add_column :messages, :sender_id, :bigint
     add_column :messages, :sender_type, :integer, default: 0, null: false
     add_foreign_key :messages, :users, column: :sender_id
-    add_index :messages, [:chat_id, :sender_type]
+    add_index :messages, [ :chat_id, :sender_type ]
 
     # Перенос данных обратно
     execute <<-SQL.squish
