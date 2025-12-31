@@ -108,7 +108,8 @@ class Chat < ApplicationRecord
   # Продлевает время активности менеджера
   #
   # @param timeout_minutes [Integer] время таймаута в минутах
-  # @return [Chat, false] обновленный чат или false если не в manager_mode
+  # @return [true, false] true при успехе или false если не в manager_mode
+  # @raise [ActiveRecord::RecordInvalid] при ошибке валидации
   def extend_manager_timeout!(timeout_minutes: ApplicationConfig.manager_takeover_timeout_minutes)
     return false unless manager_mode?
 
