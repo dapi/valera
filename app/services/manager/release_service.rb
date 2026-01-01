@@ -15,6 +15,7 @@ module Manager
   # @since 0.38.0
   class ReleaseService
     include ErrorLogger
+    include TakeoverDurationCalculator
 
     # Ошибки которые мы обрабатываем gracefully
     HANDLED_ERRORS = [
@@ -153,14 +154,5 @@ module Manager
       )
     end
 
-    # Рассчитывает продолжительность takeover в минутах
-    #
-    # @param taken_at [Time] время начала takeover
-    # @return [Integer] продолжительность в минутах
-    def calculate_takeover_duration(taken_at)
-      return 0 unless taken_at.present?
-
-      ((Time.current - taken_at) / 60).round
-    end
   end
 end

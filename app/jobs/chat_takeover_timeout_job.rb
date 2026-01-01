@@ -13,6 +13,7 @@
 # @since 0.1.0
 class ChatTakeoverTimeoutJob < ApplicationJob
   include ErrorLogger
+  include TakeoverDurationCalculator
 
   # Ошибка при неуспешном release - позволяет SolidQueue сделать retry
   class ReleaseFailedError < StandardError; end
