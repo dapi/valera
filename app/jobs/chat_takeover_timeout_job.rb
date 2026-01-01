@@ -135,5 +135,4 @@ class ChatTakeoverTimeoutJob < ApplicationJob
       }
     )
   end
-
 end
