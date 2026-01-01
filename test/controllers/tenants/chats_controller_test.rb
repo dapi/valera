@@ -143,6 +143,33 @@ module Tenants
       assert_select 'div.bg-white div.whitespace-pre-wrap', text: /I can help you with car maintenance/
     end
 
+    # === Infinite Scroll Tests ===
+
+    test 'returns chat list items for AJAX infinite scroll request' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/chats', params: { page: 1, chat_list_only: 'true' }
+
+      assert_response :success
+      # Should render only chat list items partial, not full page
+      assert_no_match '<html', response.body
+      assert_no_match 'h1', response.body
+      # Should contain chat link
+      assert_select 'a[id^=chat_list_item_]'
+    end
+
+    test 'chat_list_only returns items without layout' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/chats', params: { chat_list_only: 'true' }
+
+      assert_response :success
+      # Should not include page title (h1) as it's partial-only
+      assert_select 'h1', count: 0
+    end
+
     # === Manager Takeover/Release/Messages Tests ===
     # Эти тесты теперь находятся в tenants/chats/manager_controller_test.rb
     # так как функционал перехвата чата вынесен в отдельный ManagerController
