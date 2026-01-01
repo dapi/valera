@@ -140,5 +140,4 @@ class Manager::TakeoverServiceTest < ActiveSupport::TestCase
     # Чат остаётся за первым менеджером
     assert_equal @user, @chat.reload.taken_by
   end
-
 end

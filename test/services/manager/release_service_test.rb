@@ -117,5 +117,4 @@ class Manager::ReleaseServiceTest < ActiveSupport::TestCase
       Manager::ReleaseService.call(chat: @chat, user: @user)
     end
   end
-
 end

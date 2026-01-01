@@ -89,6 +89,9 @@ class ApplicationConfig < Anyway::Config
     # Dashboard: максимальное количество сообщений для отображения в чате
     max_chat_messages_display: 200,
 
+    # Manager takeover: включить возможность менеджеру вступать в диалог
+    manager_takeover_enabled: true,
+
     # Manager takeover: таймаут в минутах до автоматического возврата чата боту
     manager_takeover_timeout_minutes: 30
   )
@@ -152,6 +155,7 @@ class ApplicationConfig < Anyway::Config
     max_chat_messages_display: :integer,
 
     # Manager takeover
+    manager_takeover_enabled: :boolean,
     manager_takeover_timeout_minutes: :integer,
 
     # Admin host

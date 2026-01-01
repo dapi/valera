@@ -163,5 +163,4 @@ class Manager::MessageServiceTest < ActiveSupport::TestCase
       )
     end
   end
-
 end
