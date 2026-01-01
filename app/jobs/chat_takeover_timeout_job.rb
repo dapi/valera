@@ -19,6 +19,7 @@
 # @since 0.38.0
 class ChatTakeoverTimeoutJob < ApplicationJob
   include ErrorLogger
+  include TakeoverDurationCalculator
 
   # Ошибка при неуспешном release - позволяет SolidQueue сделать retry
   class ReleaseFailedError < StandardError; end
@@ -135,13 +136,4 @@ class ChatTakeoverTimeoutJob < ApplicationJob
     )
   end
 
-  # Рассчитывает продолжительность takeover в минутах
-  #
-  # @param taken_at [Time] время начала takeover
-  # @return [Integer] продолжительность в минутах
-  def calculate_takeover_duration(taken_at)
-    return 0 unless taken_at.present?
-
-    ((Time.current - taken_at) / 60).round
-  end
 end
