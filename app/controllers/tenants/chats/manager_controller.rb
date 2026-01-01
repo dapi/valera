@@ -25,6 +25,7 @@ module Tenants
     class ManagerController < Tenants::ApplicationController
       include ErrorLogger
 
+      before_action :ensure_manager_takeover_enabled
       before_action :set_chat
 
       # Перехватываем только ожидаемые ошибки бизнес-логики
@@ -179,6 +180,13 @@ module Tenants
           user_id: current_user&.id,
           tenant_id: current_tenant&.id
         }
+      end
+
+      # Проверяет что функция manager takeover включена в конфигурации
+      def ensure_manager_takeover_enabled
+        return if ApplicationConfig.manager_takeover_enabled
+
+        render json: { success: false, error: 'Manager takeover is disabled' }, status: :not_found
       end
     end
   end

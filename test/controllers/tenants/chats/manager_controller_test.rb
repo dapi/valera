@@ -360,6 +360,44 @@ module Tenants
         assert_not json['success']
         assert_includes json['error'], 'message'
       end
+
+      # === Feature Toggle Tests ===
+
+      test 'returns 404 when manager_takeover_enabled is false' do
+        ApplicationConfig.stubs(:manager_takeover_enabled).returns(false)
+
+        post "/chats/#{@chat.id}/manager/takeover"
+
+        assert_response :not_found
+        json = JSON.parse(response.body)
+        assert_not json['success']
+        assert_equal 'Manager takeover is disabled', json['error']
+      end
+
+      test 'release returns 404 when manager_takeover_enabled is false' do
+        @chat.takeover_by_manager!(@owner)
+        ApplicationConfig.stubs(:manager_takeover_enabled).returns(false)
+
+        post "/chats/#{@chat.id}/manager/release"
+
+        assert_response :not_found
+        json = JSON.parse(response.body)
+        assert_not json['success']
+        assert_equal 'Manager takeover is disabled', json['error']
+      end
+
+      test 'create_message returns 404 when manager_takeover_enabled is false' do
+        @chat.takeover_by_manager!(@owner)
+        ApplicationConfig.stubs(:manager_takeover_enabled).returns(false)
+
+        post "/chats/#{@chat.id}/manager/messages",
+             params: { message: { content: 'Hello!' } }
+
+        assert_response :not_found
+        json = JSON.parse(response.body)
+        assert_not json['success']
+        assert_equal 'Manager takeover is disabled', json['error']
+      end
     end
   end
 end
