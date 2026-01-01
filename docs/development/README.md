@@ -51,7 +51,8 @@ bin/dev
 1. [../CLAUDE.md](../CLAUDE.md) - инструкции и архитектура
 2. [Product Constitution](../product/constitution.md) - требования к продукту
 3. [FLOW.md](../FLOW.md) - процесс разработки
-4. [Глоссарий](../domain/glossary.md) - терминология проекта
+4. [Hotwire Guide](hotwire-guide.md) - Turbo + Stimulus руководство
+5. [Глоссарий](../domain/glossary.md) - терминология проекта
 
 ---
 
