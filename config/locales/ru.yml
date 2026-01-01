@@ -557,6 +557,13 @@ ru:
         release_confirm: Вы уверены, что хотите вернуть диалог боту?
         send: Отправить
         placeholder: Введите сообщение...
+      manager:
+        create_message:
+          content_required: Введите текст сообщения
+        set_chat:
+          chat_not_found: Чат не найден
+        ensure_manager_takeover_enabled:
+          feature_disabled: Функция перехвата диалога отключена
 
   # Manager takeover translations
   manager:

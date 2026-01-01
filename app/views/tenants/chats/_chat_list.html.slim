@@ -1,7 +1,7 @@
 - if chats.any?
   - chats.each do |chat|
     - is_active = current_chat&.id == chat.id
-    = link_to tenant_chat_path(chat), class: "block p-4 border-b border-gray-100 hover:bg-gray-50 #{is_active ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}", id: "chat_list_item_#{chat.id}"
+    = link_to tenant_chat_path(chat), class: "block p-4 border-b border-gray-100 hover:bg-gray-50 #{is_active ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}", id: "chat_list_item_#{chat.id}", data: { turbo_action: "advance" }
       .flex.items-start.gap-3
         / Avatar with mode indicator
         .relative.flex-shrink-0
