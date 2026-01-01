@@ -43,7 +43,7 @@ PORT=3013 dip rails s  # или dip dev для полного стека
 
 **URLs (замени PORT на выбранный порт):**
 - **Admin панель:** `http://admin.lvh.me:PORT/login`
-- **Tenant Dashboard:** `http://dev.lvh.me:PORT/`
+- **Tenant Dashboard:** `http://demo.lvh.me:PORT/`
 
 **Креды для dev окружения:**
 | Роль | Email | Пароль |
