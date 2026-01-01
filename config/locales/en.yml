@@ -104,6 +104,7 @@ en:
         sort_created: created date
         select_chat: Select a chat to view
         load_more: Load more
+        load_more_error: Failed to load. Click to retry
       chat_list:
         no_messages: No messages
         empty: No chats yet

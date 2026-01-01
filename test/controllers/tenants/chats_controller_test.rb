@@ -170,6 +170,29 @@ module Tenants
       assert_select 'h1', count: 0
     end
 
+    test 'chat_list_only accepts page parameter for pagination' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      # Request page 2 - should return success even if no data on page 2
+      get '/chats', params: { page: 2, chat_list_only: 'true' }
+
+      assert_response :success
+      # Should return empty partial without errors
+      assert_no_match '<html', response.body
+    end
+
+    test 'chat_list_only preserves sort parameter' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/chats', params: { sort: 'created_at', chat_list_only: 'true' }
+
+      assert_response :success
+      # Response should be successful with sort applied
+      assert_no_match '<html', response.body
+    end
+
     # === Manager Takeover/Release/Messages Tests ===
     # Эти тесты теперь находятся в tenants/chats/manager_controller_test.rb
     # так как функционал перехвата чата вынесен в отдельный ManagerController

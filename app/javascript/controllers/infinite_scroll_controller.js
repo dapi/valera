@@ -4,7 +4,7 @@ import { Controller } from "@hotwired/stimulus"
  * Infinite scroll controller for chat list sidebar
  *
  * Handles loading more chats when user clicks "Load more" button
- * or scrolls to the bottom of the list.
+ * or when the trigger element approaches the viewport (preloads 100px early).
  *
  * Usage:
  *   data-controller="infinite-scroll"
@@ -16,14 +16,16 @@ import { Controller } from "@hotwired/stimulus"
  *   - trigger: container with load more button (will be replaced)
  *   - button: the load more button
  *   - spinner: loading spinner (hidden by default)
+ *   - error: error message container (hidden by default)
  */
 export default class extends Controller {
-  static targets = ["trigger", "button", "spinner"]
+  static targets = ["trigger", "button", "spinner", "error"]
   static values = {
     url: String,
     page: Number,
     totalPages: Number,
-    loading: { type: Boolean, default: false }
+    loading: { type: Boolean, default: false },
+    errorText: { type: String, default: "Ошибка загрузки. Повторить?" }
   }
 
   connect() {
@@ -63,6 +65,7 @@ export default class extends Controller {
 
     this.loadingValue = true
     this.showSpinner()
+    this.hideError()
 
     const nextPage = this.pageValue + 1
     const url = new URL(this.urlValue, window.location.origin)
@@ -79,9 +82,16 @@ export default class extends Controller {
       const response = await fetch(url, {
         headers: {
           "Accept": "text/html",
-          "X-Requested-With": "XMLHttpRequest"
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content
         }
       })
+
+      // Handle authentication errors - redirect to login
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = "/session/new"
+        return
+      }
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
@@ -95,7 +105,7 @@ export default class extends Controller {
       }
     } catch (error) {
       console.error("Failed to load more chats:", error)
-      this.hideSpinner()
+      this.showError()
     } finally {
       this.loadingValue = false
     }
@@ -135,5 +145,27 @@ export default class extends Controller {
   hideSpinner() {
     if (this.hasButtonTarget) this.buttonTarget.classList.remove("hidden")
     if (this.hasSpinnerTarget) this.spinnerTarget.classList.add("hidden")
+  }
+
+  showError() {
+    this.hideSpinner()
+    if (this.hasErrorTarget) {
+      this.errorTarget.classList.remove("hidden")
+    } else if (this.hasButtonTarget) {
+      // Fallback: change button text to error state
+      this.buttonTarget.textContent = this.errorTextValue
+      this.buttonTarget.classList.add("text-red-600")
+      this.buttonTarget.classList.remove("text-blue-600", "hidden")
+    }
+  }
+
+  hideError() {
+    if (this.hasErrorTarget) {
+      this.errorTarget.classList.add("hidden")
+    }
+    if (this.hasButtonTarget) {
+      this.buttonTarget.classList.remove("text-red-600")
+      this.buttonTarget.classList.add("text-blue-600")
+    }
   }
 }

@@ -9,7 +9,6 @@ module Tenants
   # Для управления режимом менеджера (takeover/release/messages)
   # используется Tenants::Chats::ManagerController.
   class ChatsController < ApplicationController
-    PER_PAGE = 20
 
     # GET /chats
     # GET /chats?sort=created_at
@@ -65,7 +64,7 @@ module Tenants
                             .with_client_details
                             .order(sort_column => :desc)
                             .page(params[:page])
-                            .per(PER_PAGE)
+                            .per(ApplicationConfig.chats_per_page)
 
       # Preload last message for each chat (optimized single query)
       preload_last_messages(chats)

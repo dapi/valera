@@ -509,6 +509,7 @@ ru:
         sort_created: по дате создания
         select_chat: Выберите чат для просмотра
         load_more: Загрузить ещё
+        load_more_error: Ошибка загрузки. Нажмите, чтобы повторить
       chat_list:
         no_messages: Нет сообщений
         empty: Чатов пока нет

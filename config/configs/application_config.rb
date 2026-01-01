@@ -89,6 +89,9 @@ class ApplicationConfig < Anyway::Config
     # Dashboard: максимальное количество сообщений для отображения в чате
     max_chat_messages_display: 200,
 
+    # Dashboard: количество чатов на странице (для infinite scroll)
+    chats_per_page: 20,
+
     # Manager takeover: включить возможность менеджеру вступать в диалог
     manager_takeover_enabled: true,
 
@@ -153,6 +156,7 @@ class ApplicationConfig < Anyway::Config
 
     # Dashboard
     max_chat_messages_display: :integer,
+    chats_per_page: :integer,
 
     # Manager takeover
     manager_takeover_enabled: :boolean,
