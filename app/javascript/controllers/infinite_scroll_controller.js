@@ -70,7 +70,6 @@ export default class extends Controller {
     const nextPage = this.pageValue + 1
     const url = new URL(this.urlValue, window.location.origin)
     url.searchParams.set("page", nextPage)
-    url.searchParams.set("chat_list_only", "true")
 
     // Preserve current sort parameter
     const currentSort = new URLSearchParams(window.location.search).get("sort")

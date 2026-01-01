@@ -12,12 +12,12 @@ module Tenants
 
     # GET /chats
     # GET /chats?sort=created_at
-    # GET /chats?page=2&chat_list_only=true (AJAX for infinite scroll)
+    # XHR GET /chats?page=2 (AJAX for infinite scroll)
     def index
       @chats = fetch_chats
 
       # AJAX request for infinite scroll - return only chat list items
-      if params[:chat_list_only]
+      if request.xhr?
         render partial: 'chat_list_items', locals: { chats: @chats, current_chat: nil }
         return
       end
