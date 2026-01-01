@@ -18,7 +18,7 @@
 🚨 **Configurable Values:** Все настраиваемые значения (таймауты, лимиты, пороги) СРАЗУ выноси в `ApplicationConfig` (`config/configs/application_config.rb`), а не хардкодь как константы в моделях. Это позволяет менять значения через ENV без пересборки.
 🚨 **Demo/Production авторизация:** НИКОГДА не устанавливать/менять пароли на demo.supervalera.ru или production. Если форма предлагает "Установить пароль" — НЕ делать этого, а спросить у пользователя актуальные креды.
 🚨 **Slim + Tailwind arbitrary values:** НЕ использовать shorthand-синтаксис `.class-[value]` в Slim — парсер обрезает класс на `[`. Вместо `.max-w-[70%]` используй `div class="max-w-[70%]"` или inline style `div style="max-width: 70%"`. См. [issue #165](https://github.com/dapi/valera/issues/165).
-🚨 **Turbo Streams:** Для real-time обновлений используй `broadcasts_refreshes` / `broadcasts_refreshes_to` с Turbo 8 morphing. Изучи [Turbo::Broadcastable](https://github.com/hotwired/turbo-rails/blob/main/app/models/concerns/turbo/broadcastable.rb) для понимания доступных опций (`broadcasts_to`, `broadcast_append_to`, etc.).
+🚨 **Turbo Streams:** Для real-time обновлений используй `broadcasts_refreshes` / `broadcasts_refreshes_to` с Turbo 8 morphing. См. @docs/development/hotwire-guide.md для полного руководства по Turbo/Stimulus.
 🚨 **Service Objects валидация:** Обязательные аргументы валидируй в `initialize` через `|| raise`: `@chat = chat || raise('No chat')`. НЕ ловить эти ошибки — это ошибки программиста. Бизнес-валидации (проверки состояния) делай в отдельном методе `validate_state!` с кастомным `ValidationError`.
 🚨 **Programming Errors:** НЕ ловить `ArgumentError`, `TypeError`, `NameError`, `NoMethodError` — это ошибки программиста, они должны падать и попадать в Bugsnag. Ловить только ожидаемые runtime-ошибки (сетевые, API, валидация данных).
 🚨 **Analytics:** НЕ оборачивать `AnalyticsService.track` в rescue. Аналитика использует background job (SolidQueue) — если job не встал в очередь, это инфраструктурная ошибка, которая должна падать.
@@ -95,7 +95,7 @@ bin/rails screenshots:dashboard
 
 ## 📋 Ссылки
 
-**Process:** @docs/FLOW.md | **Development:** @docs/development/README.md | **Error Handling:** @docs/patterns/error-handling.md | **Architecture:** @docs/architecture/decisions.md | **Gems:** @docs/gems/README.md
+**Process:** @docs/FLOW.md | **Development:** @docs/development/README.md | **Hotwire:** @docs/development/hotwire-guide.md | **Error Handling:** @docs/patterns/error-handling.md | **Architecture:** @docs/architecture/decisions.md | **Gems:** @docs/gems/README.md
 
 ## 🎯 Работа с требованиями (Critical для AI-агентов)
 
