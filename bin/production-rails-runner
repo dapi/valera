@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# Run Rails runner command on production Kubernetes deployment
+#
+# Usage:
+#   bin/production-rails-runner 'User.count'
+#   bin/production-rails-runner 'puts Tenant.pluck(:key)'
+#   echo 'User.first' | bin/production-rails-runner -
+#
+# For commands with special characters (!, etc.), use stdin:
+#   echo 'DemoDataSeeder.send("seed!", Tenant.first)' | bin/production-rails-runner -
+#
+
+set -euo pipefail
+
+NAMESPACE="${PRODUCTION_NAMESPACE:-production}"
+DEPLOYMENT="${PRODUCTION_DEPLOYMENT:-valera}"
+CONTAINER="${PRODUCTION_CONTAINER:-ror}"
+
+if [[ $# -eq 0 ]]; then
+  echo "Usage: bin/production-rails-runner '<ruby_code>'"
+  echo "       echo '<ruby_code>' | bin/production-rails-runner -"
+  echo ""
+  echo "Examples:"
+  echo "  bin/production-rails-runner 'User.count'"
+  echo "  bin/production-rails-runner 'puts Tenant.pluck(:key)'"
+  echo "  echo 'Model.send(\"method!\", arg)' | bin/production-rails-runner -"
+  exit 1
+fi
+
+if [[ "$1" == "-" ]]; then
+  # Read from stdin
+  kubectl exec -i -n "$NAMESPACE" "deployment/$DEPLOYMENT" -c "$CONTAINER" -- \
+    bundle exec rails runner -
+else
+  # Pass argument directly
+  kubectl exec -n "$NAMESPACE" "deployment/$DEPLOYMENT" -c "$CONTAINER" -- \
+    bundle exec rails runner "$1"
+fi

@@ -80,11 +80,14 @@ class ApplicationConfig < Anyway::Config
     # Telegram Auth settings
     :telegram_auth_expiration,
 
-    # Reserved subdomains that cannot be used as tenant keys
-    :reserved_subdomains,
-
     # Tenant invite expiration (in days)
-    :tenant_invite_expiration_days
+    :tenant_invite_expiration_days,
+
+    # Dashboard: максимальное количество сообщений для отображения в чате
+    max_chat_messages_display: 200,
+
+    # Reserved subdomains that cannot be used as tenant keys
+    reserved_subdomains: %w[admin www api]
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -141,6 +144,9 @@ class ApplicationConfig < Anyway::Config
 
     # Tenant invites
     tenant_invite_expiration_days: :integer,
+
+    # Dashboard
+    max_chat_messages_display: :integer,
 
     # Admin host
     admin_host: :string,

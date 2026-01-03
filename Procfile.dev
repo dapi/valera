@@ -1,4 +1,4 @@
 web: bin/rails server
-css: bin/rails tailwindcss:watch
+css: bin/tailwind-watch
 bot: bin/rake telegram:bot:poller
 jobs: bin/rails good_job:start

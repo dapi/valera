@@ -1,4 +1,4 @@
-/ Chat messages
-.space-y-4
-  - chat.messages.each do |message|
+/ Chat messages container with max-width and auto-scroll
+div.mx-auto.space-y-4 class="max-w-[800px]" data-controller="chat-scroll"
+  - chat.messages.order(:created_at).each do |message|
     = render 'message', message: message

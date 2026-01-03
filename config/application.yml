@@ -63,6 +63,7 @@ default: &default
   reserved_subdomains:
     - www
     - admin
+    - api
     - public
     - assets
 

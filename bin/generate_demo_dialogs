@@ -1,0 +1,525 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Генерирует реалистичные диалоги через общение двух LLM моделей.
+#
+# Модель-клиент получает профиль поведения (active_client, just_asking, etc.)
+# Модель-ассистент использует системный промпт автосервиса.
+# Они обмениваются сообщениями, результат сохраняется в YAML.
+#
+# Usage:
+#   bin/generate_demo_dialogs --count 100
+#   bin/generate_demo_dialogs --profile active_client --count 10
+#   bin/generate_demo_dialogs --dry-run  # Показать план без генерации
+#   bin/generate_demo_dialogs --output dialogs.yml
+#   bin/generate_demo_dialogs --model gpt-4o-mini
+
+require_relative '../config/environment'
+require 'optparse'
+require 'yaml'
+
+# Генератор демо-диалогов через LLM
+class DemoDialogGenerator
+  # Профили клиентов с настройками
+  # weight - доля от общего количества при автораспределении
+  # booking_rate - вероятность записи на сервис
+  # messages - диапазон количества пар сообщений
+  PROFILES = {
+    # === Базовые профили (основная сегментация) ===
+    active_client: {
+      weight: 10, booking_rate: 0.9, messages: 10..20,
+      description: 'Постоянный клиент, доверяет сервису'
+    },
+    one_time_client: {
+      weight: 15, booking_rate: 0.5, messages: 5..12,
+      description: 'Первое обращение, ищет решение проблемы'
+    },
+    just_asking: {
+      weight: 8, booking_rate: 0.0, messages: 3..6,
+      description: 'Интересуется ценами, не готов к действиям'
+    },
+    urgent_client: {
+      weight: 5, booking_rate: 0.85, messages: 6..10,
+      description: 'Аварийная ситуация, нужна срочная помощь'
+    },
+
+    # === Профили по характеру ===
+    suspicious_client: {
+      weight: 5, booking_rate: 0.4, messages: 8..15,
+      description: 'Недоверчивый, боится обмана'
+    },
+    budget_client: {
+      weight: 8, booking_rate: 0.3, messages: 6..12,
+      description: 'Экономный, ищет минимальную цену'
+    },
+    vip_client: {
+      weight: 3, booking_rate: 0.95, messages: 5..10,
+      description: 'VIP, цена не важна, важно качество'
+    },
+    perfectionist_client: {
+      weight: 3, booking_rate: 0.65, messages: 8..15,
+      description: 'Перфекционист, требует идеального результата'
+    },
+
+    # === Профили по уровню знаний ===
+    tech_savvy_client: {
+      weight: 5, booking_rate: 0.7, messages: 6..12,
+      description: 'Технически грамотный, знает термины'
+    },
+    newbie_driver: {
+      weight: 6, booking_rate: 0.75, messages: 6..12,
+      description: 'Новичок, первая машина, ничего не понимает'
+    },
+
+    # === Профили по возрасту/стилю ===
+    elderly_client: {
+      weight: 4, booking_rate: 0.6, messages: 8..15,
+      description: 'Пожилой, медленно общается, переспрашивает'
+    },
+    young_driver: {
+      weight: 5, booking_rate: 0.55, messages: 4..8,
+      description: 'Молодой, сленг, быстрое общение'
+    },
+    busy_businessman: {
+      weight: 4, booking_rate: 0.8, messages: 4..8,
+      description: 'Занятой бизнесмен, ценит время'
+    },
+    emotional_female_client: {
+      weight: 4, booking_rate: 0.7, messages: 6..12,
+      description: 'Эмоциональная, нуждается в поддержке'
+    },
+
+    # === Профили по ситуации ===
+    referred_client: {
+      weight: 5, booking_rate: 0.85, messages: 5..10,
+      description: 'Пришёл по рекомендации друга'
+    },
+    disappointed_client: {
+      weight: 4, booking_rate: 0.55, messages: 7..14,
+      description: 'Разочарован другим сервисом'
+    },
+    insurance_client: {
+      weight: 4, booking_rate: 0.9, messages: 6..12,
+      description: 'Страховой случай ОСАГО/КАСКО'
+    },
+    pre_sale_client: {
+      weight: 3, booking_rate: 0.7, messages: 5..10,
+      description: 'Готовит машину к продаже'
+    },
+    post_purchase_client: {
+      weight: 3, booking_rate: 0.95, messages: 5..10,
+      description: 'Купил б/у, хочет проверить'
+    },
+    corporate_client: {
+      weight: 2, booking_rate: 0.8, messages: 6..12,
+      description: 'Корпоративный, автопарк компании'
+    }
+  }.freeze
+
+  # Директория с профилями клиентов
+  PROFILES_DIR = Rails.root.join('db/seeds/client_profiles')
+
+  # Директория для сохранения результатов
+  OUTPUT_DIR = Rails.root.join('db/seeds/generated_dialogs')
+
+  attr_reader :options, :stats
+
+  def initialize(options = {})
+    @options = {
+      count: 100,
+      profile: nil,
+      dry_run: false,
+      output: nil,
+      model: ApplicationConfig.llm_model,
+      verbose: false
+    }.merge(options)
+
+    @stats = {
+      generated: 0,
+      failed: 0,
+      by_profile: Hash.new(0),
+      total_messages: 0,
+      start_time: nil,
+      end_time: nil
+    }
+  end
+
+  # Основной метод генерации
+  def generate
+    plan = build_plan
+    show_plan(plan)
+
+    return if options[:dry_run]
+
+    puts "\n" + '=' * 60
+    puts 'Начинаю генерацию диалогов...'
+    puts '=' * 60
+
+    @stats[:start_time] = Time.current
+    dialogs = execute_plan(plan)
+    @stats[:end_time] = Time.current
+
+    if dialogs.any?
+      save_dialogs(dialogs)
+    else
+      puts "\nНет сгенерированных диалогов для сохранения."
+    end
+    show_stats
+  end
+
+  private
+
+  # Строит план генерации на основе профилей
+  def build_plan(count = options[:count])
+    if options[:profile]
+      # Генерируем только для конкретного профиля
+      profile = options[:profile].to_sym
+      raise ArgumentError, "Unknown profile: #{profile}" unless PROFILES.key?(profile)
+
+      [ { profile: profile, count: count } ]
+    else
+      # Распределяем по весам профилей
+      PROFILES.map do |profile, config|
+        profile_count = (count * config[:weight] / 100.0).round
+        { profile: profile, count: profile_count } if profile_count > 0
+      end.compact
+    end
+  end
+
+  # Показывает план генерации
+  def show_plan(plan)
+    total = plan.sum { |p| p[:count] }
+
+    puts "\n" + '=' * 60
+    puts 'ПЛАН ГЕНЕРАЦИИ ДИАЛОГОВ'
+    puts '=' * 60
+    puts "\nМодель: #{options[:model]}"
+    puts "Всего диалогов: #{total}"
+    puts "\nРаспределение по профилям:"
+    puts '-' * 40
+
+    plan.each do |item|
+      profile = item[:profile]
+      config = PROFILES[profile]
+      puts format(
+        '  %-20s %3d диалогов (booking_rate: %d%%, messages: %s)',
+        profile,
+        item[:count],
+        (config[:booking_rate] * 100).to_i,
+        config[:messages]
+      )
+    end
+
+    puts '-' * 40
+
+    # Оценка стоимости
+    estimated_messages = plan.sum do |item|
+      config = PROFILES[item[:profile]]
+      avg_messages = (config[:messages].min + config[:messages].max) / 2.0
+      item[:count] * avg_messages * 2 # x2 для user + assistant
+    end
+
+    estimated_api_calls = estimated_messages
+    estimated_cost_min = estimated_api_calls * 0.00015 # ~$0.15 per 1K tokens
+    estimated_cost_max = estimated_api_calls * 0.0006  # ~$0.60 per 1K tokens
+
+    puts "\nОценка:"
+    puts "  Примерно сообщений: ~#{estimated_messages.to_i}"
+    puts "  API вызовов: ~#{estimated_api_calls.to_i}"
+    puts "  Примерная стоимость: $#{estimated_cost_min.round(2)}-$#{estimated_cost_max.round(2)}"
+    puts "  Примерное время: #{(total * 0.5).ceil}-#{(total * 1.0).ceil} минут"
+
+    if options[:dry_run]
+      puts "\n[DRY RUN] Генерация не выполняется"
+    end
+  end
+
+  # Выполняет план генерации
+  def execute_plan(plan)
+    dialogs = []
+
+    plan.each do |item|
+      profile = item[:profile]
+      count = item[:count]
+
+      puts "\nГенерирую #{count} диалогов для профиля '#{profile}'..."
+
+      count.times do |i|
+        print "  [#{i + 1}/#{count}] "
+
+        begin
+          dialog = simulate_dialog(profile)
+          dialogs << dialog
+          @stats[:generated] += 1
+          @stats[:by_profile][profile] += 1
+          @stats[:total_messages] += dialog[:messages].size
+
+          puts "OK (#{dialog[:messages].size} сообщений)"
+        rescue StandardError => e
+          @stats[:failed] += 1
+          puts "FAILED: #{e.message}"
+          Rails.logger.error("Dialog generation failed: #{e.message}\n#{e.backtrace.first(5).join("\n")}")
+        end
+      end
+    end
+
+    dialogs
+  end
+
+  # Симулирует диалог между клиентом и ассистентом
+  def simulate_dialog(profile)
+    client_prompt = load_client_prompt(profile)
+    assistant_prompt = load_assistant_prompt
+
+    config = PROFILES[profile]
+    message_count = rand(config[:messages])
+
+    messages = []
+    conversation_context = []
+
+    message_count.times do |i|
+      # Клиент отправляет сообщение
+      user_msg = generate_client_message(client_prompt, conversation_context, i)
+      messages << { role: 'user', content: user_msg, timestamp: Time.current.iso8601 }
+      conversation_context << { role: 'user', content: user_msg }
+
+      # Ассистент отвечает
+      assistant_msg = generate_assistant_message(assistant_prompt, conversation_context)
+      messages << { role: 'assistant', content: assistant_msg, timestamp: Time.current.iso8601 }
+      conversation_context << { role: 'assistant', content: assistant_msg }
+
+      # Небольшая пауза для rate limiting
+      sleep(0.1) if i < message_count - 1
+    end
+
+    {
+      id: SecureRandom.uuid,
+      profile: profile.to_s,
+      generated_at: Time.current.iso8601,
+      message_count: messages.size,
+      booking_expected: rand < config[:booking_rate],
+      messages: messages
+    }
+  end
+
+  # Генерирует сообщение клиента
+  def generate_client_message(client_prompt, context, turn_number)
+    system_prompt = build_client_system_prompt(client_prompt, turn_number)
+
+    chat = RubyLLM.chat(model: options[:model])
+    chat.add_message(role: 'system', content: system_prompt)
+
+    # Добавляем контекст разговора
+    context.each do |msg|
+      # Инвертируем роли: для клиента его сообщения - это assistant, а ответы бота - user
+      role = msg[:role] == 'user' ? 'assistant' : 'user'
+      chat.add_message(role: role, content: msg[:content])
+    end
+
+    response = chat.complete
+    response.content.strip
+  end
+
+  # Генерирует ответ ассистента
+  def generate_assistant_message(assistant_prompt, context)
+    chat = RubyLLM.chat(model: options[:model])
+    chat.add_message(role: 'system', content: assistant_prompt)
+
+    # Добавляем контекст разговора
+    context.each do |msg|
+      chat.add_message(role: msg[:role], content: msg[:content])
+    end
+
+    response = chat.complete
+    response.content.strip
+  end
+
+  # Строит системный промпт для модели-клиента
+  def build_client_system_prompt(profile_prompt, turn_number)
+    intro = if turn_number == 0
+              'Напиши ПЕРВОЕ сообщение в диалоге с автосервисом. Начни разговор.'
+    else
+              'Продолжи диалог. Отвечай на последнее сообщение ассистента.'
+    end
+
+    <<~PROMPT
+      #{profile_prompt}
+
+      ## Инструкции
+
+      #{intro}
+
+      **ВАЖНО:**
+      - Пиши ТОЛЬКО сообщение клиента, без пояснений
+      - Не используй кавычки вокруг сообщения
+      - Отвечай кратко и естественно, как в мессенджере
+      - Следуй характеристикам своего профиля
+      - Отвечай на РУССКОМ языке
+    PROMPT
+  end
+
+  # Загружает промпт профиля клиента
+  def load_client_prompt(profile)
+    path = PROFILES_DIR.join("#{profile}.md")
+    raise "Profile not found: #{path}" unless File.exist?(path)
+
+    File.read(path)
+  end
+
+  # Загружает системный промпт ассистента
+  def load_assistant_prompt
+    # Используем дефолтный системный промпт
+    path = Rails.root.join('data/system-prompt.md')
+    raise "System prompt not found: #{path}" unless File.exist?(path)
+
+    prompt = File.read(path)
+
+    # Подставляем плейсхолдеры с демо-данными
+    prompt
+      .gsub(/\{\{\s*COMPANY_INFO\s*\}\}/, demo_company_info)
+      .gsub(/\{\{\s*PRICE_LIST\s*\}\}/, demo_price_list)
+      .gsub(/\{\{\s*CURRENT_TIME\s*\}\}/, Time.current.strftime('%d.%m.%Y %H:%M (MSK)'))
+  end
+
+  # Демо-информация о компании
+  def demo_company_info
+    <<~INFO
+      Автосервис "Кузник"
+      Адрес: г. Москва, ул. Автосервисная, 15
+      Телефон: +7 (495) 123-45-67
+      Email: info@kuznik.ru
+      Время работы: Пн-Сб 9:00-20:00, Вс - выходной
+    INFO
+  end
+
+  # Демо прайс-лист
+  def demo_price_list
+    <<~CSV
+      Услуга,1 класс,2 класс,3 класс
+      Диагностика подвески,800,1000,1500
+      Замена масла,1500,2000,3000
+      Замена тормозных колодок,2500,3500,5000
+      Покраска бампера,8000,10000,15000
+      Покраска крыла,10000,12000,18000
+      Полировка кузова,5000,7000,10000
+      Ремонт вмятин PDR,3000,4000,6000
+      Замена лобового стекла,8000,12000,20000
+      ТО плановое,5000,7000,10000
+      Диагностика двигателя,1500,2000,3000
+    CSV
+  end
+
+  # Сохраняет диалоги в YAML файл
+  def save_dialogs(dialogs)
+    FileUtils.mkdir_p(OUTPUT_DIR)
+
+    filename = options[:output] || "dialogs_#{Time.current.strftime('%Y%m%d_%H%M%S')}.yml"
+    filepath = OUTPUT_DIR.join(filename)
+
+    data = {
+      metadata: {
+        generated_at: Time.current.iso8601,
+        model: options[:model],
+        total_dialogs: dialogs.size,
+        profiles: @stats[:by_profile].transform_keys(&:to_s)
+      },
+      dialogs: dialogs
+    }
+
+    File.write(filepath, data.to_yaml)
+    puts "\nДиалоги сохранены в: #{filepath}"
+
+    # Валидация
+    validate_yaml(filepath)
+  end
+
+  # Валидирует YAML файл
+  def validate_yaml(filepath)
+    data = YAML.load_file(filepath, permitted_classes: [ Time, Date, DateTime, Symbol ])
+
+    errors = []
+
+    # Проверяем структуру
+    errors << 'Missing metadata' unless data['metadata']
+    errors << 'Missing dialogs' unless data['dialogs']
+
+    # Проверяем диалоги
+    data['dialogs']&.each_with_index do |dialog, i|
+      errors << "Dialog #{i}: missing id" unless dialog['id']
+      errors << "Dialog #{i}: missing messages" unless dialog['messages']
+      errors << "Dialog #{i}: empty messages" if dialog['messages']&.empty?
+
+      dialog['messages']&.each_with_index do |msg, j|
+        errors << "Dialog #{i}, message #{j}: missing role" unless msg['role']
+        errors << "Dialog #{i}, message #{j}: missing content" unless msg['content']
+        errors << "Dialog #{i}, message #{j}: invalid role '#{msg['role']}'" unless %w[user assistant].include?(msg['role'])
+      end
+    end
+
+    if errors.any?
+      puts "\nВалидация YAML: ОШИБКИ"
+      errors.each { |e| puts "  - #{e}" }
+    else
+      puts 'Валидация YAML: OK'
+    end
+  end
+
+  # Показывает статистику
+  def show_stats
+    duration = @stats[:end_time] - @stats[:start_time]
+
+    puts "\n" + '=' * 60
+    puts 'РЕЗУЛЬТАТЫ ГЕНЕРАЦИИ'
+    puts '=' * 60
+    puts "Успешно сгенерировано: #{@stats[:generated]}"
+    puts "Ошибок: #{@stats[:failed]}"
+    puts "Всего сообщений: #{@stats[:total_messages]}"
+    puts "Время выполнения: #{duration.round(1)} сек"
+
+    puts "\nПо профилям:"
+    @stats[:by_profile].each do |profile, count|
+      puts "  #{profile}: #{count}"
+    end
+    puts '=' * 60
+  end
+end
+
+# Парсинг аргументов командной строки
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: bin/generate_demo_dialogs [options]'
+
+  opts.on('-c', '--count COUNT', Integer, 'Количество диалогов для генерации (default: 100)') do |c|
+    options[:count] = c
+  end
+
+  opts.on('-p', '--profile PROFILE', 'Генерировать только для конкретного профиля') do |p|
+    options[:profile] = p
+  end
+
+  opts.on('-d', '--dry-run', 'Показать план без генерации') do
+    options[:dry_run] = true
+  end
+
+  opts.on('-o', '--output FILE', 'Имя выходного файла (default: dialogs_TIMESTAMP.yml)') do |f|
+    options[:output] = f
+  end
+
+  opts.on('-m', '--model MODEL', "Модель LLM (default: #{ApplicationConfig.llm_model})") do |m|
+    options[:model] = m
+  end
+
+  opts.on('-v', '--verbose', 'Подробный вывод') do
+    options[:verbose] = true
+  end
+
+  opts.on('-h', '--help', 'Показать справку') do
+    puts opts
+    exit
+  end
+end.parse!
+
+# Запуск генератора
+generator = DemoDialogGenerator.new(options)
+generator.generate

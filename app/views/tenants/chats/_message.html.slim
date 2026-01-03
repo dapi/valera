@@ -2,7 +2,7 @@
 - when 'user'
   / User message (right side, blue)
   .flex.justify-end
-    .max-w-[70%]
+    div style="max-width: 70%"
       .bg-blue-500.text-white.rounded-2xl.rounded-br-sm.px-4.py-2
         .whitespace-pre-wrap = message.content.to_s
       .text-right.text-xs.text-gray-400.mt-1
@@ -11,11 +11,11 @@
 - when 'assistant'
   / Assistant message (left side, gray)
   .flex.justify-start
-    .max-w-[70%]
-      .bg-white.border.border-gray-200.rounded-2xl.rounded-bl-sm.px-4.py-2.shadow-sm
+    div style="max-width: 70%"
+      .bg-gray-100.rounded-2xl.rounded-bl-sm.px-4.py-2
         .whitespace-pre-wrap.text-gray-800 = message.content.to_s
         - if message.tool_calls.any?
-          .mt-2.pt-2.border-t.border-gray-100
+          .mt-2.pt-2.border-t.border-gray-200
             - message.tool_calls.each do |tool_call|
               = render 'tool_call', tool_call: tool_call
       .text-xs.text-gray-400.mt-1
