@@ -26,7 +26,7 @@ module Tenants
         reset!
         host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
-        post "/chats/#{@chat.id}/manager/takeover"
+        post "/chats/#{@chat.id}/manager/takeover", as: :turbo_stream
 
         assert_redirected_to '/session/new'
       end
@@ -35,7 +35,7 @@ module Tenants
         reset!
         host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
-        post "/chats/#{@chat.id}/manager/release"
+        post "/chats/#{@chat.id}/manager/release", as: :turbo_stream
 
         assert_redirected_to '/session/new'
       end
@@ -44,7 +44,9 @@ module Tenants
         reset!
         host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
-        post "/chats/#{@chat.id}/manager/messages", params: { message: { content: 'test' } }
+        post "/chats/#{@chat.id}/manager/messages",
+             params: { message: { content: 'test' } },
+             as: :turbo_stream
 
         assert_redirected_to '/session/new'
       end
@@ -54,75 +56,77 @@ module Tenants
       test 'takeover succeeds with valid chat' do
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
-        post "/chats/#{@chat.id}/manager/takeover"
+        post "/chats/#{@chat.id}/manager/takeover", as: :turbo_stream
 
         assert_response :success
-        json = JSON.parse(response.body)
-        assert json['success']
-        assert json['chat']['manager_active']
-        assert_not_nil json['active_until']
+        assert_turbo_stream_response
+        assert_turbo_stream_replaces("chat_#{@chat.id}_controls")
+        assert_turbo_stream_replaces("chat_#{@chat.id}_header")
+
+        @chat.reload
+        assert @chat.manager_active?
       end
 
-      test 'takeover returns json with chat data' do
+      test 'takeover updates chat UI elements via turbo stream' do
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
-        post "/chats/#{@chat.id}/manager/takeover"
+        post "/chats/#{@chat.id}/manager/takeover", as: :turbo_stream
 
-        json = JSON.parse(response.body)
-        assert_includes json.keys, 'chat'
-        assert_includes json['chat'].keys, 'id'
-        assert_includes json['chat'].keys, 'manager_active'
-        assert_includes json['chat'].keys, 'taken_by_id'
+        assert_turbo_stream_replaces("chat_#{@chat.id}_header")
+        assert_turbo_stream_replaces("chat_#{@chat.id}_controls")
+        assert_turbo_stream_replaces("chat_#{@chat.id}_status")
       end
 
       test 'takeover with custom timeout_minutes' do
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
         freeze_time do
-          post "/chats/#{@chat.id}/manager/takeover", params: { timeout_minutes: 60 }
+          post "/chats/#{@chat.id}/manager/takeover",
+               params: { timeout_minutes: 60 },
+               as: :turbo_stream
 
-          json = JSON.parse(response.body)
-          assert json['success']
-          expected_time = 60.minutes.from_now.as_json
-          assert_equal expected_time, json['active_until']
+          assert_response :success
+          @chat.reload
+          assert_equal 60.minutes.from_now.to_i, @chat.manager_active_until.to_i
         end
       end
 
       test 'takeover without notification' do
         @mock_bot_client.expects(:send_message).never
 
-        post "/chats/#{@chat.id}/manager/takeover", params: { notify_client: false }
+        post "/chats/#{@chat.id}/manager/takeover",
+             params: { notify_client: false },
+             as: :turbo_stream
 
-        json = JSON.parse(response.body)
-        assert json['success']
-        assert_nil json['notification_sent']
+        assert_response :success
+        @chat.reload
+        assert @chat.manager_active?
       end
 
       test 'takeover with unrecognized notify_client value defaults to notification' do
         @mock_bot_client.expects(:send_message).once.returns({ 'result' => { 'message_id' => 123 } })
 
-        post "/chats/#{@chat.id}/manager/takeover", params: { notify_client: 'invalid_value' }
+        post "/chats/#{@chat.id}/manager/takeover",
+             params: { notify_client: 'invalid_value' },
+             as: :turbo_stream
 
-        json = JSON.parse(response.body)
-        assert json['success']
-        assert_equal true, json['notification_sent']
+        assert_response :success
       end
 
       test 'takeover fails for already taken chat' do
         @chat.takeover_by_manager!(@owner)
 
-        post "/chats/#{@chat.id}/manager/takeover"
+        post "/chats/#{@chat.id}/manager/takeover", as: :turbo_stream
 
         assert_response :unprocessable_entity
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'Chat is already in manager mode', json['error']
+        assert_turbo_stream_response
+        assert_turbo_stream_updates('flash')
       end
 
       test 'takeover returns 404 for chat from another tenant' do
         other_chat = chats(:two)
 
-        post "/chats/#{other_chat.id}/manager/takeover"
+        post "/chats/#{other_chat.id}/manager/takeover", as: :turbo_stream
 
         assert_response :not_found
       end
@@ -133,29 +137,32 @@ module Tenants
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
         @chat.takeover_by_manager!(@owner)
 
-        post "/chats/#{@chat.id}/manager/release"
+        post "/chats/#{@chat.id}/manager/release", as: :turbo_stream
 
         assert_response :success
-        json = JSON.parse(response.body)
-        assert json['success']
-        assert_not json['chat']['manager_active']
+        assert_turbo_stream_response
+
+        @chat.reload
+        assert_not @chat.manager_active?
       end
 
       test 'release without notification' do
         @chat.takeover_by_manager!(@owner)
         @mock_bot_client.expects(:send_message).never
 
-        post "/chats/#{@chat.id}/manager/release", params: { notify_client: false }
+        post "/chats/#{@chat.id}/manager/release",
+             params: { notify_client: false },
+             as: :turbo_stream
 
-        json = JSON.parse(response.body)
-        assert json['success']
-        assert_nil json['notification_sent']
+        assert_response :success
+        @chat.reload
+        assert_not @chat.manager_active?
       end
 
       test 'release returns 404 for chat from another tenant' do
         other_chat = chats(:two)
 
-        post "/chats/#{other_chat.id}/manager/release"
+        post "/chats/#{other_chat.id}/manager/release", as: :turbo_stream
 
         assert_response :not_found
       end
@@ -164,12 +171,10 @@ module Tenants
         # Chat is NOT in manager mode (default state)
         assert_not @chat.manager_mode?
 
-        post "/chats/#{@chat.id}/manager/release"
+        post "/chats/#{@chat.id}/manager/release", as: :turbo_stream
 
         assert_response :unprocessable_entity
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'Chat is not in manager mode', json['error']
+        assert_turbo_stream_updates('flash')
       end
 
       # === Messages Tests ===
@@ -178,50 +183,50 @@ module Tenants
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
         @chat.takeover_by_manager!(@owner)
 
-        post "/chats/#{@chat.id}/manager/messages",
-             params: { message: { content: 'Hello from manager!' } }
+        assert_difference -> { @chat.messages.count }, 1 do
+          post "/chats/#{@chat.id}/manager/messages",
+               params: { message: { content: 'Hello from manager!' } },
+               as: :turbo_stream
+        end
 
-        assert_response :created
-        json = JSON.parse(response.body)
-        assert json['success']
-        assert_equal 'Hello from manager!', json['message']['content']
-        assert_equal 'manager', json['message']['role']
+        assert_response :success
+        assert_turbo_stream_response
+
+        message = @chat.messages.last
+        assert_equal 'Hello from manager!', message.content
+        assert_equal 'manager', message.role
       end
 
-      test 'create_message returns message data' do
+      test 'create_message appends message and replaces controls' do
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
         @chat.takeover_by_manager!(@owner)
 
         post "/chats/#{@chat.id}/manager/messages",
-             params: { message: { content: 'Test message' } }
+             params: { message: { content: 'Test message' } },
+             as: :turbo_stream
 
-        json = JSON.parse(response.body)
-        assert_includes json['message'].keys, 'id'
-        assert_includes json['message'].keys, 'role'
-        assert_includes json['message'].keys, 'content'
-        assert_includes json['message'].keys, 'created_at'
+        assert_turbo_stream_appends('chat_messages')
+        assert_turbo_stream_replaces("chat_#{@chat.id}_controls")
       end
 
       test 'create_message fails without content' do
         @chat.takeover_by_manager!(@owner)
 
         post "/chats/#{@chat.id}/manager/messages",
-             params: { message: { content: '' } }
+             params: { message: { content: '' } },
+             as: :turbo_stream
 
         assert_response :unprocessable_entity
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'Content is required', json['error']
+        assert_turbo_stream_updates('flash')
       end
 
       test 'create_message fails for bot-controlled chat' do
         post "/chats/#{@chat.id}/manager/messages",
-             params: { message: { content: 'Hello!' } }
+             params: { message: { content: 'Hello!' } },
+             as: :turbo_stream
 
         assert_response :unprocessable_entity
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'Chat is not in manager mode', json['error']
+        assert_turbo_stream_updates('flash')
       end
 
       test 'create_message fails for non-active manager' do
@@ -229,19 +234,19 @@ module Tenants
         @chat.takeover_by_manager!(other_user)
 
         post "/chats/#{@chat.id}/manager/messages",
-             params: { message: { content: 'Hello!' } }
+             params: { message: { content: 'Hello!' } },
+             as: :turbo_stream
 
         assert_response :unprocessable_entity
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'User is not the active manager', json['error']
+        assert_turbo_stream_updates('flash')
       end
 
       test 'create_message returns 404 for chat from another tenant' do
         other_chat = chats(:two)
 
         post "/chats/#{other_chat.id}/manager/messages",
-             params: { message: { content: 'Hello!' } }
+             params: { message: { content: 'Hello!' } },
+             as: :turbo_stream
 
         assert_response :not_found
       end
@@ -258,11 +263,11 @@ module Tenants
 
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
-        post "/chats/#{@chat.id}/manager/takeover"
+        post "/chats/#{@chat.id}/manager/takeover", as: :turbo_stream
 
         assert_response :success
-        json = JSON.parse(response.body)
-        assert json['success']
+        @chat.reload
+        assert @chat.manager_active?
       end
 
       test 'tenant member can send messages as manager' do
@@ -277,9 +282,10 @@ module Tenants
         @chat.takeover_by_manager!(member)
 
         post "/chats/#{@chat.id}/manager/messages",
-             params: { message: { content: 'Message from member' } }
+             params: { message: { content: 'Message from member' } },
+             as: :turbo_stream
 
-        assert_response :created
+        assert_response :success
       end
 
       # === Viewer Role Tests ===
@@ -294,11 +300,11 @@ module Tenants
 
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
-        post "/chats/#{@chat.id}/manager/takeover"
+        post "/chats/#{@chat.id}/manager/takeover", as: :turbo_stream
 
         assert_response :success
-        json = JSON.parse(response.body)
-        assert json['success']
+        @chat.reload
+        assert @chat.manager_active?
       end
 
       # === Release Authorization Tests ===
@@ -308,12 +314,10 @@ module Tenants
         @chat.takeover_by_manager!(other_user)
 
         # Current user (@owner) tries to release chat taken by other_user
-        post "/chats/#{@chat.id}/manager/release"
+        post "/chats/#{@chat.id}/manager/release", as: :turbo_stream
 
         assert_response :unprocessable_entity
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'User is not authorized to release this chat', json['error']
+        assert_turbo_stream_updates('flash')
       end
 
       # === Timeout Expiry Tests ===
@@ -322,11 +326,13 @@ module Tenants
         @mock_bot_client.stubs(:send_message).returns({ 'result' => { 'message_id' => 123 } })
 
         # Takeover with 1 minute timeout
-        post "/chats/#{@chat.id}/manager/takeover", params: { timeout_minutes: 1 }
+        post "/chats/#{@chat.id}/manager/takeover",
+             params: { timeout_minutes: 1 },
+             as: :turbo_stream
 
         assert_response :success
-        json = JSON.parse(response.body)
-        assert json['chat']['manager_active']
+        @chat.reload
+        assert @chat.manager_active?
 
         # Travel past expiry - manager_active? checks timeout but doesn't auto-release
         # (auto-release happens via ChatTakeoverTimeoutJob)
@@ -339,26 +345,21 @@ module Tenants
         end
       end
 
-      # === JSON Error Response Tests ===
+      # === Error Response Tests ===
 
-      test 'returns JSON 404 for non-existent chat' do
-        post '/chats/999999/manager/takeover'
+      test 'returns turbo stream error for non-existent chat' do
+        post '/chats/999999/manager/takeover', as: :turbo_stream
 
         assert_response :not_found
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'Chat not found', json['error']
+        assert_turbo_stream_updates('flash')
       end
 
-      test 'returns JSON 400 for missing message params' do
+      test 'returns 400 for missing message params' do
         @chat.takeover_by_manager!(@owner)
 
-        post "/chats/#{@chat.id}/manager/messages", params: {}
+        post "/chats/#{@chat.id}/manager/messages", params: {}, as: :turbo_stream
 
         assert_response :bad_request
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_includes json['error'], 'message'
       end
 
       # === Feature Toggle Tests ===
@@ -366,24 +367,20 @@ module Tenants
       test 'returns 404 when manager_takeover_enabled is false' do
         ApplicationConfig.stubs(:manager_takeover_enabled).returns(false)
 
-        post "/chats/#{@chat.id}/manager/takeover"
+        post "/chats/#{@chat.id}/manager/takeover", as: :turbo_stream
 
         assert_response :not_found
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'Manager takeover is disabled', json['error']
+        assert_turbo_stream_updates('flash')
       end
 
       test 'release returns 404 when manager_takeover_enabled is false' do
         @chat.takeover_by_manager!(@owner)
         ApplicationConfig.stubs(:manager_takeover_enabled).returns(false)
 
-        post "/chats/#{@chat.id}/manager/release"
+        post "/chats/#{@chat.id}/manager/release", as: :turbo_stream
 
         assert_response :not_found
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'Manager takeover is disabled', json['error']
+        assert_turbo_stream_updates('flash')
       end
 
       test 'create_message returns 404 when manager_takeover_enabled is false' do
@@ -391,12 +388,33 @@ module Tenants
         ApplicationConfig.stubs(:manager_takeover_enabled).returns(false)
 
         post "/chats/#{@chat.id}/manager/messages",
-             params: { message: { content: 'Hello!' } }
+             params: { message: { content: 'Hello!' } },
+             as: :turbo_stream
 
         assert_response :not_found
-        json = JSON.parse(response.body)
-        assert_not json['success']
-        assert_equal 'Manager takeover is disabled', json['error']
+        assert_turbo_stream_updates('flash')
+      end
+
+      private
+
+      # Helper to assert response is turbo stream
+      def assert_turbo_stream_response
+        assert_match %r{text/vnd\.turbo-stream\.html}, response.content_type
+      end
+
+      # Helper to assert turbo stream replace action for target
+      def assert_turbo_stream_replaces(target)
+        assert_match %r{<turbo-stream[^>]*action="replace"[^>]*target="#{target}"}, response.body
+      end
+
+      # Helper to assert turbo stream update action for target
+      def assert_turbo_stream_updates(target)
+        assert_match %r{<turbo-stream[^>]*action="update"[^>]*target="#{target}"}, response.body
+      end
+
+      # Helper to assert turbo stream append action for target
+      def assert_turbo_stream_appends(target)
+        assert_match %r{<turbo-stream[^>]*action="append"[^>]*target="#{target}"}, response.body
       end
     end
   end
