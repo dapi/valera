@@ -35,6 +35,13 @@ services:
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
       # Bugsnag
       BUGSNAG_API_KEY: ${BUGSNAG_API_KEY}
+      # Admin and demo user credentials (for seeds)
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-password}
+      TENANT_DEMO_USER_EMAIL: ${TENANT_DEMO_USER_EMAIL:-tenant@super-valera.ru}
+      TENANT_DEMO_USER_PASSWORD: ${TENANT_DEMO_USER_PASSWORD:-password}
+      # Web console permissions
+      WEB_CONSOLE_PERMISSIONS: ${WEB_CONSOLE_PERMISSIONS}
     depends_on:
       postgres:
         condition: service_healthy
