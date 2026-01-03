@@ -1,0 +1,31 @@
+/ Tenant Not Found page
+/ Shown when user visits a subdomain that doesn't have an associated tenant
+
+section.min-h-screen.flex.items-center.justify-center.bg-gradient-to-br.from-gray-100.to-gray-200.px-4
+  .max-w-lg.mx-auto.text-center
+    .text-6xl.mb-6
+      | 🔍
+
+    h1.text-3xl.md:text-4xl.font-bold.text-gray-800.mb-4
+      | Аккаунт не найден
+
+    p.text-lg.text-gray-600.mb-2
+      | По адресу
+      span.font-semibold.text-gray-800<
+        = " #{@subdomain}.#{ApplicationConfig.host}"
+      |  аккаунт не зарегистрирован.
+
+    p.text-gray-500.mb-8
+      | Возможно, вы ошиблись в адресе или аккаунт ещё не создан.
+
+    .flex.flex-col.sm:flex-row.gap-4.justify-center
+      = link_to root_url(subdomain: false), class: "inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200" do
+        | На главную
+
+      = link_to login_url(subdomain: false), class: "inline-block border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-bold py-3 px-6 rounded-lg transition duration-200" do
+        | Войти
+
+    p.mt-8.text-sm.text-gray-400
+      | Если у вас есть аккаунт, проверьте правильность адреса.
+      br
+      | Для создания нового аккаунта перейдите на главную страницу.
