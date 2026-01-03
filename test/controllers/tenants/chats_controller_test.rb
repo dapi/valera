@@ -127,7 +127,10 @@ module Tenants
       post '/session', params: { email: @owner.email, password: 'password123' }
 
       # Мокаем конфигурацию с лимитом в 1 сообщение
-      ApplicationConfig.stubs(:max_chat_messages_display).returns(1)
+      # Сбрасываем кэш singleton и создаём новый с мокнутым значением
+      ApplicationConfig.instance_variable_set(:@instance, nil)
+      mock_config = ApplicationConfig.send(:instance)
+      mock_config.stubs(:max_chat_messages_display).returns(1)
 
       get "/chats/#{@chat.id}"
 

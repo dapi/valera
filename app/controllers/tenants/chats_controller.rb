@@ -35,11 +35,12 @@ module Tenants
 
       # Загружаем сообщения с лимитом для производительности
       # (200 сообщений ≈ 120KB HTML, 2000 DOM nodes)
-      messages = chat.messages
-                     .includes(:tool_calls)
-                     .order(created_at: :desc)
-                     .limit(ApplicationConfig.max_chat_messages_display)
-                     .reverse
+      # Используем Message.where вместо chat.messages чтобы избежать кэширования ассоциации
+      messages = Message.where(chat_id: chat.id)
+                        .includes(:tool_calls)
+                        .order(created_at: :desc)
+                        .limit(ApplicationConfig.max_chat_messages_display)
+                        .reverse
 
       # Перезаписываем кэш ассоциации ограниченным набором сообщений
       chat.association(:messages).target = messages
