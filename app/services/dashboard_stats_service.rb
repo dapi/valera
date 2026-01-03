@@ -166,6 +166,7 @@ class DashboardStatsService
           .limit(3)
   end
 
+  # Общая конверсия за всё время (не зависит от выбранного периода)
   def build_funnel_data
     chats_count = tenant.chats.count
     bookings_count = bookings.count
