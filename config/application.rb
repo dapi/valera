@@ -44,7 +44,6 @@ module Valera
     Anyway.loaders.delete :env if Rails.env.test?
 
     # Configure TLD length for subdomain routing
-    # For '3010.brandymint.ru' -> tld_length=2 -> subdomain 'admin' (not 'admin.3010')
     config.action_dispatch.tld_length = ApplicationConfig.tld_length
 
     # Session cookie shared across all subdomains
