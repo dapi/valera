@@ -93,6 +93,9 @@ Rails.application.configure do
   # Allow subdomains for admin panel testing (configured via ALLOWED_HOSTS env var)
   ApplicationConfig.allowed_hosts.each { |host| config.hosts << host }
 
+  # Allow host from ApplicationConfig.host (e.g., 3002.brandymint.com)
+  config.hosts << ".#{ApplicationConfig.host}" if ApplicationConfig.host.present?
+
   # Web console permissions for local network access
   # Configured via WEB_CONSOLE_PERMISSIONS in config/application.yml
   if ApplicationConfig.web_console_permissions.any?

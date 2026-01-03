@@ -42,7 +42,7 @@ Rails.application.routes.draw do
   end
 
   # Tenant dashboard and webhook (subdomain-based routing)
-  # Accessible at {tenant_key}.lvh.me (dev) or {tenant_key}.example.com (prod)
+  # Accessible at {tenant_key}.lvh.me (demo) or {tenant_key}.example.com (prod)
   constraints Constraints::TenantSubdomainConstraint.new do
     # Telegram webhook endpoint for this tenant
     post 'telegram/webhook',

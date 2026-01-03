@@ -198,7 +198,7 @@ class ApplicationConfig < Anyway::Config
   # tld_length определяет сколько сегментов справа считаются TLD (top-level domain).
   # Формула: количество точек в host (минимум 1).
   #
-  # Для 'lvh.me' (1 точка) -> 1 ('me' = TLD, 'lvh' = domain, subdomain 'dev' даст 'dev.lvh.me')
+  # Для 'lvh.me' (1 точка) -> 1 ('me' = TLD, 'lvh' = domain, subdomain 'demo' даст 'demo.lvh.me')
   # Для '3010.brandymint.ru' (2 точки) -> 2 ('brandymint.ru' = TLD+domain, subdomain 'dev' даст 'dev.3010.brandymint.ru')
   # Для 'localhost' (0 точек) -> 1 (default)
   def tld_length

@@ -2,6 +2,8 @@ version: '8.0'
 
 environment:
   RAILS_ENV: development
+  HOST: ${HOST:-lvh.me}
+  PORT: ${PORT:-3000}
 
 compose:
   files:
