@@ -179,8 +179,8 @@ ADMIN_URL, а доступы бери из переменных окружеия
 
 # Окружения
 
-- **Production:** `admin.supervalera.ru` — боевой сервер
-- **Development:** `admin.3010.brandymint.ru` — development сервер (SSL self-signed, нужно принять сертификат)
+- **Production:** `supervalera.ru` — боевой сервер
+- **Development:** $_URL, — development сервер (SSL self-signed, нужно принять сертификат)
 
 # Диагностика
 
