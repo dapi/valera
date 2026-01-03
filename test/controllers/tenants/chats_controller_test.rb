@@ -143,6 +143,56 @@ module Tenants
       assert_select 'div.bg-white div.whitespace-pre-wrap', text: /I can help you with car maintenance/
     end
 
+    # === Infinite Scroll Tests (XHR) ===
+
+    test 'XHR request returns chat list items for infinite scroll' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/chats', params: { page: 1 }, headers: { 'X-Requested-With' => 'XMLHttpRequest' }
+
+      assert_response :success
+      # Should render only chat list items partial, not full page
+      assert_no_match '<html', response.body
+      assert_no_match 'h1', response.body
+      # Should contain chat link
+      assert_select 'a[id^=chat_list_item_]'
+    end
+
+    test 'XHR request returns items without layout' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/chats', headers: { 'X-Requested-With' => 'XMLHttpRequest' }
+
+      assert_response :success
+      # Should not include page title (h1) as it's partial-only
+      assert_select 'h1', count: 0
+    end
+
+    test 'XHR request accepts page parameter for pagination' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      # Request page 2 - should return success even if no data on page 2
+      get '/chats', params: { page: 2 }, headers: { 'X-Requested-With' => 'XMLHttpRequest' }
+
+      assert_response :success
+      # Should return empty partial without errors
+      assert_no_match '<html', response.body
+    end
+
+    test 'XHR request preserves sort parameter' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/session', params: { email: @owner.email, password: 'password123' }
+
+      get '/chats', params: { sort: 'created_at' }, headers: { 'X-Requested-With' => 'XMLHttpRequest' }
+
+      assert_response :success
+      # Response should be successful with sort applied
+      assert_no_match '<html', response.body
+    end
+
     # === Manager Takeover/Release/Messages Tests ===
     # Эти тесты теперь находятся в tenants/chats/manager_controller_test.rb
     # так как функционал перехвата чата вынесен в отдельный ManagerController

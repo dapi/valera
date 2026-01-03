@@ -46,7 +46,9 @@ html
         .text-xs.text-gray-400.mt-2 = AppVersion
 
     / Main content
-    main.lg:ml-64.p-8
+    / Chats page uses compact padding for edge-to-edge layout
+    - main_padding = controller_name == 'chats' ? 'p-4' : 'p-8'
+    main.lg:ml-64 class=main_padding
       #flash
         = render 'tenants/shared/flash'
 

@@ -89,6 +89,9 @@ class ApplicationConfig < Anyway::Config
     # Reserved subdomains that cannot be used as tenant keys
     reserved_subdomains: %w[admin www api],
 
+    # Dashboard: количество чатов на странице (для infinite scroll)
+    chats_per_page: 20,
+
     # Manager takeover: включить возможность менеджеру вступать в диалог
     manager_takeover_enabled: true,
 
@@ -153,6 +156,7 @@ class ApplicationConfig < Anyway::Config
 
     # Dashboard
     max_chat_messages_display: :integer,
+    chats_per_page: :integer,
 
     # Manager takeover
     manager_takeover_enabled: :boolean,
