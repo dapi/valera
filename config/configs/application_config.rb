@@ -159,7 +159,11 @@ class ApplicationConfig < Anyway::Config
     requisites_url: :string,
     commercial_proposal_url: :string,
     contract_url: :string,
-    project_folder_url: :string
+    project_folder_url: :string,
+
+    # Arrays (comma-separated in ENV)
+    allowed_hosts: { type: :string, array: true },
+    web_console_permissions: { type: :string, array: true }
   )
 
   # System prompt
