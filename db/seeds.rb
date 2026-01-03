@@ -9,7 +9,9 @@ Rails.logger.info '[Seeds] Starting database seeding...'
 require_relative 'seeds/chat_topics'
 
 # Создаём владельца для demo tenant
-owner = User.create_with(name: 'Администратор Super Valera', password: 'password').find_or_create_by!(email: 'tenant@super-valera.ru')
+owner = User.
+  create_with(name: 'Администратор Super Valera', password: ENV.fetch('TENANT_DEMO_USER_PASSWORD', 'password')).
+  find_or_create_by!(email: ENV.fetch('TENANT_DEMO_USER_EMAIL', 'tenant@super-valera.ru'))
 Rails.logger.info "[Seeds] Owner: #{owner.email} (id: #{owner.id})"
 
 # =============================================================================
@@ -29,10 +31,10 @@ Rails.logger.info "[Seeds] Demo tenant: #{demo_tenant.name} (key: #{demo_tenant.
 # IMPORTANT: Change password in production!
 admin = AdminUser.create_with(
   name: 'Главный Администратор',
-  password: 'password',
-  password_confirmation: 'password',
+  password: ENV.fetch('ADMIN_PASSWORD', 'password'),
+  password_confirmation: ENV.fetch('ADMIN_PASSWORD', 'password'),
   role: :superuser
-).find_or_create_by!(email: 'admin@example.com')
+).find_or_create_by!(email: ENV.fetch('ADMIN_EMAIL', 'admin@example.com'))
 Rails.logger.info "[Seeds] AdminUser: #{admin.email} (#{admin.role})"
 
 # =============================================================================

@@ -42,10 +42,11 @@ direnv exec . dip rails s  # или direnv exec . dip dev для полного 
 - **Tenant Dashboard:** `http://demo.$URL/` (demo tenant из seeds)
 
 **Креды для dev окружения:**
+
 | Роль | Email | Пароль |
 |------|-------|--------|
-| Admin (superuser) | `admin@example.com` | `password` |
-| Tenant Owner | `tenant@super-valera.ru` | `password` |
+| Admin (superuser) | из env var ADMIN_EMAIL или`admin@example.com` | из env var ADMIN_PASSWORD или `password` |
+| Tenant Owner | из env var TENANT_DEMO_USER_EMAIL или `tenant@super-valera.ru` | из env var TENANT_DEMO_USER_PASSWORD или`password` |
 
 **Отдельные команды (всегда через `direnv exec .`):**
 - `direnv exec . dip rails s` — только Rails server
