@@ -273,6 +273,12 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     # У разных тенантов разные данные
     assert_equal tenant_one.clients.count, result_one.clients_total
     assert_equal tenant_two.clients.count, result_two.clients_total
+
+    # funnel_data также изолирован по tenant
+    assert_equal tenant_one.chats.count, result_one.funnel_data[:chats_count]
+    assert_equal tenant_one.bookings.count, result_one.funnel_data[:bookings_count]
+    assert_equal tenant_two.chats.count, result_two.funnel_data[:chats_count]
+    assert_equal tenant_two.bookings.count, result_two.funnel_data[:bookings_count]
   end
 
   test 'accepts 90 days period' do
