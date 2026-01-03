@@ -52,7 +52,8 @@ class TenantChatsChannel < Turbo::StreamsChannel
 
     record = gid.find
     record.is_a?(Chat) ? record : nil
-  rescue ActiveRecord::RecordNotFound
+  rescue ActiveRecord::RecordNotFound, ArgumentError, URI::InvalidURIError => e
+    Rails.logger.warn "[TenantChatsChannel] Failed to parse stream name: #{e.class} - #{e.message}"
     nil
   end
 end

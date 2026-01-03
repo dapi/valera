@@ -51,27 +51,89 @@ class Chat < ApplicationRecord
   scope :in_ai_mode, -> { where(mode: :ai_mode) }
   scope :taken_by_user, ->(user) { where(taken_by: user) }
 
+  # Alias for ai_mode? for backward compatibility
+  alias_method :bot_mode?, :ai_mode?
+
+  # Возвращает true если менеджер активен и timeout не истёк
+  # @return [Boolean] true если в manager_mode и timeout не истёк
+  def manager_active?
+    manager_mode? && !takeover_expired?
+  end
+
   # Scope для предзагрузки данных клиента и Telegram пользователя
   # Используется в dashboard для отображения информации о клиенте
   scope :with_client_details, -> { includes(client: :telegram_user) }
 
   # Возвращает оставшееся время до автоматического возврата боту
   #
-  # Использует `taken_at` + `TIMEOUT_DURATION` для расчёта
+  # Использует колонку `manager_active_until` для расчёта
   #
   # @return [Numeric, nil] секунды до таймаута или nil если не в manager_mode
   def takeover_time_remaining
-    return nil unless manager_mode? && taken_at
+    return nil unless manager_mode? && manager_active_until
 
-    timeout_at = taken_at + ChatTakeoverService::TIMEOUT_DURATION
-    [ timeout_at - Time.current, 0 ].max
+    [ manager_active_until - Time.current, 0 ].max
   end
 
   # Проверяет, истёк ли таймаут takeover
   # @return [Boolean]
   def takeover_expired?
-    manager_mode? && taken_at && taken_at < ChatTakeoverService::TIMEOUT_DURATION.ago
+    manager_mode? && manager_active_until && manager_active_until < Time.current
   end
+
+  # Переключает чат в режим менеджера
+  #
+  # @param user [User] менеджер, берущий чат
+  # @param timeout_minutes [Integer] таймаут в минутах (по умолчанию из конфига)
+  # @return [Chat] self после обновления
+  # @raise [ActiveRecord::RecordInvalid] при ошибке валидации
+  def takeover_by_manager!(user, timeout_minutes: nil)
+    timeout = (timeout_minutes || ApplicationConfig.manager_takeover_timeout_minutes).minutes
+    update!(
+      mode: :manager_mode,
+      taken_by: user,
+      taken_at: Time.current,
+      manager_active_until: Time.current + timeout
+    )
+  end
+
+  # Возвращает чат в режим AI-бота
+  #
+  # @return [Chat] self после обновления
+  # @raise [ActiveRecord::RecordInvalid] при ошибке валидации
+  def release_to_bot!
+    update!(
+      mode: :ai_mode,
+      taken_by: nil,
+      taken_at: nil,
+      manager_active_until: nil
+    )
+  end
+
+  # Продлевает таймаут менеджера
+  #
+  # @param timeout_minutes [Integer] новый таймаут в минутах
+  # @return [Boolean] true при успехе, false если не в manager_mode
+  # @raise [ActiveRecord::RecordInvalid] при ошибке валидации
+  def extend_manager_timeout!(timeout_minutes: nil)
+    return false unless manager_mode?
+
+    timeout = (timeout_minutes || ApplicationConfig.manager_takeover_timeout_minutes).minutes
+    update!(
+      taken_at: Time.current,
+      manager_active_until: Time.current + timeout
+    )
+    true
+  end
+
+  # Alias для takeover_time_remaining
+  alias_method :time_until_auto_release, :takeover_time_remaining
+
+  # Возвращает время до автоматического возврата боту
+  # Используется колонка manager_active_until, которая устанавливается при takeover
+  #
+  # @return [Time, nil] время окончания режима менеджера
+  # @note Колонка manager_active_until устанавливается в takeover_by_manager!
 
   # Устанавливает модель AI по умолчанию перед созданием
   #

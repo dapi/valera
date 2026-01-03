@@ -13,6 +13,7 @@ class Message < ApplicationRecord
   has_many_attached :attachments
 
   belongs_to :sender, class_name: 'User', optional: true
+  belongs_to :sent_by_user, class_name: 'User', optional: true
 
   # Тип отправителя для различения AI и менеджера в истории чата
   # ai: сообщение от AI-бота (по умолчанию)
@@ -21,7 +22,8 @@ class Message < ApplicationRecord
   # system: системное уведомление (переключение на менеджера и т.д.)
   enum :sender_type, { ai: 0, manager: 1, client: 2, system: 3 }, default: :ai
 
-  validates :sender, presence: true, if: :manager?
+  validates :role, inclusion: { in: ROLES }
+  validates :sent_by_user, presence: true, if: -> { role == 'manager' }
 
   # Broadcast page refresh to dashboard for real-time updates
   # Uses Turbo 8 morphing for smooth updates
@@ -33,11 +35,21 @@ class Message < ApplicationRecord
 
   # Возвращает true, если сообщение отправлено менеджером
   def from_manager?
-    manager?
+    role == 'manager'
   end
 
   # Возвращает true, если сообщение является системным уведомлением
   def system_notification?
     system?
+  end
+
+  # Возвращает true, если сообщение отправлено ботом (AI)
+  def from_bot?
+    role == 'assistant' && ai?
+  end
+
+  # Возвращает true, если сообщение отправлено клиентом
+  def from_client?
+    role == 'user'
   end
 end

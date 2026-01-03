@@ -98,23 +98,17 @@ module Manager
     end
 
     def notify_client_about_release
-      result = TelegramMessageSender.call(
+      # TelegramMessageSender уже логирует ошибки Telegram API
+      TelegramMessageSender.call(
         chat:,
         text: I18n.t('manager.release.client_notification')
       )
-
-      unless result.success?
-        log_error(
-          StandardError.new("Failed to notify client about release: #{result.error}"),
-          safe_context.merge(notification_error: result.error)
-        )
-      end
-
-      result
     end
 
     def release_chat
-      chat.release_to_bot!
+      chat.with_lock do
+        chat.release_to_bot!
+      end
     end
 
     def build_success_result(notification_result)

@@ -3,8 +3,8 @@
 module Manager
   # Сервис для перехвата чата менеджером
   #
-  # Переводит чат в режим менеджера и опционально уведомляет клиента
-  # о том, что его переключили на живого оператора.
+  # Делегирует основную логику ChatTakeoverService,
+  # добавляя структурированный Result-объект.
   #
   # @example Перехват чата
   #   result = Manager::TakeoverService.call(chat: chat, user: current_user)
@@ -12,6 +12,7 @@ module Manager
   #     puts "Чат перехвачен до #{result.active_until}"
   #   end
   #
+  # @see ChatTakeoverService для core логики takeover/release
   # @since 0.38.0
   class TakeoverService
     include ErrorLogger
@@ -19,11 +20,10 @@ module Manager
     # Ошибки которые мы обрабатываем gracefully
     HANDLED_ERRORS = [
       ActiveRecord::RecordInvalid,
-      ActiveRecord::RecordNotSaved
+      ActiveRecord::RecordNotSaved,
+      ChatTakeoverService::AlreadyTakenError,
+      ChatTakeoverService::ValidationError
     ].freeze
-
-    # Ошибка валидации входных параметров сервиса
-    class ValidationError < StandardError; end
 
     # @return [Chat] чат для перехвата
     attr_reader :chat
@@ -31,11 +31,11 @@ module Manager
     # @return [User] менеджер, который берёт чат
     attr_reader :user
 
-    # @return [Integer] таймаут в минутах
-    attr_reader :timeout_minutes
-
     # @return [Boolean] отправлять ли уведомление клиенту
     attr_reader :notify_client
+
+    # @return [Integer, nil] кастомный таймаут в минутах
+    attr_reader :timeout_minutes
 
     Result = Struct.new(:success?, :chat, :active_until, :notification_sent, :error, keyword_init: true)
 
@@ -43,7 +43,7 @@ module Manager
     #
     # @param chat [Chat] чат для перехвата
     # @param user [User] менеджер
-    # @param timeout_minutes [Integer] таймаут (по умолчанию из конфига)
+    # @param timeout_minutes [Integer, nil] кастомный таймаут в минутах
     # @param notify_client [Boolean] уведомлять ли клиента
     # @return [Result] результат операции
     def self.call(chat:, user:, timeout_minutes: nil, notify_client: true)
@@ -52,110 +52,40 @@ module Manager
 
     # @param chat [Chat] чат для перехвата
     # @param user [User] менеджер
-    # @param timeout_minutes [Integer] таймаут
+    # @param timeout_minutes [Integer, nil] кастомный таймаут в минутах
     # @param notify_client [Boolean] уведомлять ли клиента
     # @raise [RuntimeError] если chat или user не переданы
     def initialize(chat:, user:, timeout_minutes: nil, notify_client: true)
       @chat = chat || raise('No chat')
       @user = user || raise('No user')
-      @timeout_minutes = timeout_minutes || ApplicationConfig.manager_takeover_timeout_minutes
+      @timeout_minutes = timeout_minutes
       @notify_client = notify_client
     end
 
-    # Выполняет перехват чата
-    #
-    # Операции takeover и schedule_timeout_job выполняются в транзакции
-    # с pessimistic locking (with_lock), чтобы гарантировать:
-    # 1. Атомарность: либо чат перехвачен И job запланирован, либо ничего не изменилось
-    # 2. Защиту от race condition: два менеджера не могут одновременно перехватить чат
+    # Выполняет перехват чата через ChatTakeoverService
     #
     # @return [Result] результат с данными о перехвате
     def call
-      chat.with_lock do
-        validate_chat_state!
-        takeover_chat
-        schedule_timeout_job
-      end
+      takeover_result = ChatTakeoverService.new(chat).takeover!(
+        user,
+        timeout_minutes: timeout_minutes,
+        notify_client: notify_client
+      )
 
-      # Уведомление и аналитика выполняются вне транзакции,
-      # так как их неудача не должна откатывать takeover
-      notification_result = notify_client ? notify_client_about_takeover : nil
-      track_takeover_started
-      build_success_result(notification_result)
-    rescue ValidationError => e
-      Rails.logger.warn("[#{self.class.name}] Validation failed: #{e.message}")
-      Result.new(success?: false, error: e.message)
+      build_success_result(takeover_result)
     rescue *HANDLED_ERRORS => e
-      log_error(e, safe_context)
+      Rails.logger.warn("[#{self.class.name}] Takeover failed: #{e.message}")
       Result.new(success?: false, error: e.message)
     end
 
     private
 
-    # Валидация состояния чата (вызывается внутри with_lock)
-    def validate_chat_state!
-      raise ValidationError, 'Chat is already in manager mode' if chat.manager_mode?
-    end
-
-    def takeover_chat
-      chat.takeover_by_manager!(user, timeout_minutes:)
-    end
-
-    def notify_client_about_takeover
-      result = TelegramMessageSender.call(
-        chat:,
-        text: I18n.t('manager.takeover.client_notification')
-      )
-
-      unless result.success?
-        log_error(
-          StandardError.new("Failed to notify client about takeover: #{result.error}"),
-          safe_context.merge(notification_error: result.error)
-        )
-      end
-
-      result
-    end
-
-    def build_success_result(notification_result)
+    def build_success_result(takeover_result)
       Result.new(
         success?: true,
         chat: chat.reload,
         active_until: chat.manager_active_until,
-        notification_sent: notification_result&.success?
-      )
-    end
-
-    def safe_context
-      {
-        service: self.class.name,
-        chat_id: chat.id,
-        user_id: user.id,
-        timeout_minutes:
-      }
-    end
-
-    # Планирует фоновую задачу для автоматического возврата чата боту
-    #
-    # @return [void]
-    def schedule_timeout_job
-      ChatTakeoverTimeoutJob
-        .set(wait: timeout_minutes.minutes)
-        .perform_later(chat.id, chat.taken_at)
-    end
-
-    # Отслеживает событие начала takeover
-    #
-    # @return [void]
-    def track_takeover_started
-      AnalyticsService.track(
-        AnalyticsService::Events::CHAT_TAKEOVER_STARTED,
-        tenant: chat.tenant,
-        chat_id: chat.id,
-        properties: {
-          taken_by_id: user.id,
-          timeout_minutes: timeout_minutes
-        }
+        notification_sent: takeover_result.notification_sent
       )
     end
   end

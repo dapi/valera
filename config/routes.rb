@@ -76,10 +76,12 @@ Rails.application.routes.draw do
         end
       end
       resources :chats, only: %i[index show] do
-        member do
+        # Manager takeover/release/messages routes
+        # Uses Tenants::Chats::ManagerController
+        resource :manager, only: [], module: :chats, controller: :manager do
           post :takeover
           post :release
-          post :send_message
+          post 'messages', action: :create_message, as: :messages
         end
       end
       resources :members, only: %i[index create update destroy] do
