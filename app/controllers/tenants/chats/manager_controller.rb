@@ -2,13 +2,9 @@
 
 module Tenants
   module Chats
-    # REST API контроллер для управления режимом менеджера в чате
+    # Контроллер для управления режимом менеджера в чате
     #
-    # Предоставляет endpoints для:
-    # - Перехвата чата менеджером (takeover)
-    # - Отправки сообщений от менеджера
-    # - Возврата чата боту (release)
-    #
+    # Использует Turbo Streams для обновления UI без перезагрузки страницы.
     # Все endpoints требуют авторизации (owner или member tenant'а).
     #
     # @example Перехват чата
@@ -28,35 +24,11 @@ module Tenants
       before_action :ensure_manager_takeover_enabled
       before_action :set_chat
 
-      # Перехватываем только ожидаемые ошибки бизнес-логики
-      # Неожиданные ошибки (TypeError, NoMethodError, NameError) пробрасываются
-      # наверх для стандартной обработки Rails (500 + Bugsnag)
-      #
-      # Согласно CLAUDE.md: фатальные DB ошибки НЕ перехватываем
-      # (ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad, ActiveRecord::QueryCanceled)
-
-      rescue_from ActiveRecord::RecordNotFound do |error|
-        log_error(error, error_context)
-        render json: { success: false, error: 'Chat not found', chat_id: params[:chat_id] }, status: :not_found
-      end
-
-      rescue_from ActionController::ParameterMissing do |error|
-        log_error(error, error_context)
-        render json: { success: false, error: error.message }, status: :bad_request
-      end
-
-      rescue_from ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved do |error|
-        log_error(error, error_context)
-        render json: { success: false, error: error.message }, status: :unprocessable_entity
-      end
-
       # POST /chats/:chat_id/manager/takeover
       #
       # Менеджер берёт контроль над чатом.
       # После takeover бот перестаёт отвечать, все сообщения
       # от клиента будут видны только в dashboard.
-      #
-      # @return [JSON] статус операции и данные чата
       def takeover
         result = Manager::TakeoverService.call(
           chat: @chat,
@@ -66,14 +38,10 @@ module Tenants
         )
 
         if result.success?
-          render json: {
-            success: true,
-            chat: chat_json(result.chat),
-            active_until: result.active_until,
-            notification_sent: result.notification_sent
-          }
+          @chat.reload
+          # renders takeover.turbo_stream.slim
         else
-          render json: { success: false, error: result.error }, status: :unprocessable_entity
+          render_turbo_stream_error(result.error)
         end
       end
 
@@ -84,12 +52,11 @@ module Tenants
       # текущий пользователь был активным менеджером.
       #
       # @param content [String] текст сообщения (обязательный)
-      # @return [JSON] статус операции и данные сообщения
       def create_message
         content = message_params[:content]
 
         if content.blank?
-          return render json: { success: false, error: 'Content is required' }, status: :unprocessable_entity
+          return render_turbo_stream_error(t('.content_required'))
         end
 
         result = Manager::MessageService.call(
@@ -99,13 +66,10 @@ module Tenants
         )
 
         if result.success?
-          render json: {
-            success: true,
-            message: message_json(result.message),
-            telegram_sent: result.telegram_sent
-          }, status: :created
+          @message = result.message
+          # renders create_message.turbo_stream.slim
         else
-          render json: { success: false, error: result.error }, status: :unprocessable_entity
+          render_turbo_stream_error(result.error)
         end
       end
 
@@ -113,8 +77,6 @@ module Tenants
       #
       # Возвращает чат боту. После release бот снова
       # начинает отвечать на сообщения клиента.
-      #
-      # @return [JSON] статус операции
       def release
         result = Manager::ReleaseService.call(
           chat: @chat,
@@ -123,13 +85,10 @@ module Tenants
         )
 
         if result.success?
-          render json: {
-            success: true,
-            chat: chat_json(result.chat),
-            notification_sent: result.notification_sent
-          }
+          @chat.reload
+          # renders release.turbo_stream.slim
         else
-          render json: { success: false, error: result.error }, status: :unprocessable_entity
+          render_turbo_stream_error(result.error)
         end
       end
 
@@ -137,6 +96,9 @@ module Tenants
 
       def set_chat
         @chat = current_tenant.chats.find(params[:chat_id])
+      rescue ActiveRecord::RecordNotFound => e
+        log_error(e, error_context)
+        render_turbo_stream_error(t('.chat_not_found'), status: :not_found)
       end
 
       # Парсит параметр notify_client как boolean
@@ -153,25 +115,6 @@ module Tenants
         params.require(:message).permit(:content)
       end
 
-      def chat_json(chat)
-        {
-          id: chat.id,
-          manager_active: chat.manager_active?,
-          taken_by_id: chat.taken_by_id,
-          taken_at: chat.taken_at,
-          active_until: chat.manager_active_until
-        }
-      end
-
-      def message_json(message)
-        {
-          id: message.id,
-          role: message.role,
-          content: message.content,
-          created_at: message.created_at
-        }
-      end
-
       def error_context
         {
           controller: self.class.name,
@@ -186,7 +129,16 @@ module Tenants
       def ensure_manager_takeover_enabled
         return if ApplicationConfig.manager_takeover_enabled
 
-        render json: { success: false, error: 'Manager takeover is disabled' }, status: :not_found
+        render_turbo_stream_error(t('.feature_disabled'), status: :not_found)
+      end
+
+      # Рендерит ошибку через Turbo Stream в flash контейнер
+      def render_turbo_stream_error(message, status: :unprocessable_entity)
+        render turbo_stream: turbo_stream.update(
+          'flash',
+          partial: 'tenants/shared/flash',
+          locals: { message:, type: :error }
+        ), status:
       end
     end
   end
