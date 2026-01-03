@@ -97,6 +97,20 @@ en:
           other: "%{count} bookings"
         view_chat: View
     chats:
+      layout:
+        title: Chats
+        sort_by: Sort by
+        sort_last_message: last message
+        sort_created: created date
+        select_chat: Select a chat to view
+        load_more: Load more
+        load_more_error: Failed to load. Click to retry
+      chat_list:
+        no_messages: No messages
+        empty: No chats yet
+        unknown_client: Unknown client
+        ai_mode: Bot
+        manager_mode: Manager
       chat_header:
         bookings_count:
           one: "%{count} booking"
