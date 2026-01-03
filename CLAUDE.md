@@ -34,12 +34,12 @@ direnv exec . dip rails s  # или direnv exec . dip dev для полного 
 
 **ВАЖНО для AI-агентов:**
 - Все команды `dip` запускать через `direnv exec .` для прокидывания переменных окружения
-- Для URL использовать значение `$HOST` из окружения: `direnv exec . bash -c 'echo $HOST'`
-- НЕ выдумывать домены (lvh.me, localhost) — использовать только `$HOST`
+- Для URL использовать значение `$URL` из окружения: `direnv exec . bash -c 'echo $URL'`
+- НЕ выдумывать домены (lvh.me, localhost) — использовать только `$URL`
 
 **URLs:**
-- **Admin панель:** `http://admin.$HOST/login`
-- **Tenant Dashboard:** `http://demo.$HOST/` (demo tenant из seeds)
+- **Admin панель:** `http://admin.$URL/login`
+- **Tenant Dashboard:** `http://demo.$URL/` (demo tenant из seeds)
 
 **Креды для dev окружения:**
 | Роль | Email | Пароль |

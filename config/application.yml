@@ -70,17 +70,13 @@ default: &default
 development:
   <<: *default
   # Базовый домен для subdomain routing (без субдомена!)
-  # Переопределяется через HOST env var (например HOST=brandymint.ru)
+  # Переопределяется через HOST env var
   host: 'lvh.me'
   protocol: 'http'
   allowed_hosts:
     - '.lvh.me'
     - 'lvh.me'
     - 'localhost'
-    - '.brandymint.ru'
-    - 'brandymint.ru'
-    - '.3010.brandymint.ru'
-    - '3010.brandymint.ru'
   # Web console permissions - allow local networks
   web_console_permissions:
     - '192.168.0.0/16'
