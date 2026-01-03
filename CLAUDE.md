@@ -25,20 +25,17 @@
 # 1. Первоначальная настройка (postgres, redis, зависимости, база)
 dip provision
 
-# 2. Seed данные (создаёт тестовых пользователей)
+# 2. Seed данные (создаёт demo tenant и тестовых пользователей)
 dip rails db:seed
 
-# 3. Найти свободный порт (начиная с 3010)
-ss -tlnp | grep -E ':301[0-9]'  # занятые порты
-# Выбрать первый свободный: 3010, 3011, 3012...
-
-# 4. Запуск dev сервера с выбранным портом
-PORT=3013 dip rails s  # или dip dev для полного стека
+# 3. Запуск dev сервера
+dip rails s  # или dip dev для полного стека
 ```
 
-**URLs (замени PORT на выбранный порт):**
-- **Admin панель:** `http://admin.lvh.me:PORT/login`
-- **Tenant Dashboard:** `http://dev.lvh.me:PORT/`
+**URLs:**
+- **Admin панель:** `http://admin.$HOST/login`
+- **Tenant Dashboard:** `http://demo.$HOST/` (demo tenant из seeds)
+- Если `$HOST` не установлен, используй `lvh.me:$PORT` (например `admin.lvh.me:3000`)
 
 **Креды для dev окружения:**
 | Роль | Email | Пароль |
@@ -75,7 +72,7 @@ npm install
 npx playwright install chromium
 
 # Запуск сервера (в отдельном терминале)
-HOST=lvh.me bin/rails server
+bin/rails server
 
 # Генерация скриншотов (7 дней + 30 дней)
 bin/rails screenshots:dashboard
