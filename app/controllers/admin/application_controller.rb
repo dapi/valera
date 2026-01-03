@@ -4,6 +4,8 @@
 # Authentication is handled via session-based login.
 module Admin
   class ApplicationController < Administrate::ApplicationController
+    include ErrorLogger
+
     before_action :authenticate_admin!
 
     helper_method :current_admin_user, :impersonating?, :original_admin_user
@@ -66,9 +68,19 @@ module Admin
     end
 
     def safe_apply_filter(resources, filter_name, filter_proc, filter_value)
-      filter_proc.call(resources, filter_value)
+      # Support both 1-arg filters (boolean flags) and 2-arg filters (value-based)
+      if filter_proc.arity == 1
+        filter_proc.call(resources)
+      else
+        filter_proc.call(resources, filter_value)
+      end
     rescue ActiveRecord::StatementInvalid => e
-      Rails.logger.error "[Admin::Filters] Filter '#{filter_name}' failed: #{e.message}"
+      log_error(e, {
+        action: 'apply_collection_filter',
+        filter_name: filter_name,
+        filter_value: filter_value.to_s.truncate(100),
+        resource_class: resources.klass.name
+      })
       resources
     end
 
