@@ -2,8 +2,8 @@
 # Workaround for tailwindcss v4 watch mode not working
 # See: https://github.com/rails/tailwindcss-rails/issues/602
 
-INPUT="app/assets/stylesheets/application.css"
-OUTPUT="app/assets/builds/application.css"
+INPUT="app/assets/tailwind/application.css"
+OUTPUT="app/assets/builds/tailwind.css"
 CHECKSUM_FILE="/tmp/tailwind-checksum"
 
 # Calculate checksum of relevant files
