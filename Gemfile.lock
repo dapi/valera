@@ -317,7 +317,8 @@ GEM
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
-    minitest (5.27.0)
+    minitest (6.0.1)
+      prism (~> 1.5)
     minitest-stub_any_instance (1.0.3)
     mocha (3.0.1)
       ruby2_keywords (>= 0.0.5)
@@ -605,7 +606,7 @@ DEPENDENCIES
   jbuilder
   kaminari (~> 1.2)
   kramdown (~> 2.5)
-  minitest (< 6.0)
+  minitest (< 7.0)
   minitest-stub_any_instance
   mocha
   nanoid (~> 2.0)
