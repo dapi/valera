@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/crmne/ruby_llm.git
-  revision: 1e315ab4b3f3a150c443dc9a17f504756c2aad6f
+  revision: bf218bd9bf0e7e35f0649b2803f618b07628e6d9
   specs:
-    ruby_llm (1.9.1)
+    ruby_llm (1.9.2)
       base64
       event_stream_parser (~> 1)
       faraday (>= 1.10.0)
@@ -211,14 +211,14 @@ GEM
       logger
     faraday-follow_redirects (0.4.0)
       faraday (>= 1, < 3)
-    faraday-multipart (1.1.1)
+    faraday-multipart (1.2.0)
       multipart-post (~> 2.0)
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
     faraday-net_http_persistent (2.3.1)
       faraday (~> 2.5)
       net-http-persistent (>= 4.0.4, < 5)
-    faraday-retry (2.3.2)
+    faraday-retry (2.4.0)
       faraday (~> 2.0)
     fast-mcp (1.6.0)
       addressable (~> 2.8)
