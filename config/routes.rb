@@ -75,7 +75,15 @@ Rails.application.routes.draw do
           resource :export, only: :create, module: :bookings, as: :bookings_export
         end
       end
-      resources :chats, only: %i[index show]
+      resources :chats, only: %i[index show] do
+        # Manager takeover/release/messages routes
+        # Uses Tenants::Chats::ManagerController
+        resource :manager, only: [], module: :chats, controller: :manager do
+          post :takeover
+          post :release
+          post 'messages', action: :create_message, as: :messages
+        end
+      end
       resources :members, only: %i[index create update destroy] do
         collection do
           get :invite

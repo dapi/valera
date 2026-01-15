@@ -27,7 +27,7 @@ class ClassifyInactiveChatsJobTest < ActiveSupport::TestCase
     # Настроим чат как неактивный (25 часов назад, при дефолте 24ч)
     @chat.update!(last_message_at: 25.hours.ago, chat_topic_id: nil)
 
-    assert_enqueued_with(job: ClassifyChatTopicJob, args: [@chat.id]) do
+    assert_enqueued_with(job: ClassifyChatTopicJob, args: [ @chat.id ]) do
       ClassifyInactiveChatsJob.perform_now
     end
   end

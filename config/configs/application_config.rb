@@ -87,7 +87,16 @@ class ApplicationConfig < Anyway::Config
     max_chat_messages_display: 200,
 
     # Reserved subdomains that cannot be used as tenant keys
-    reserved_subdomains: %w[admin www api]
+    reserved_subdomains: %w[admin www api],
+
+    # Dashboard: количество чатов на странице (для infinite scroll)
+    chats_per_page: 20,
+
+    # Manager takeover: включить возможность менеджеру вступать в диалог
+    manager_takeover_enabled: true,
+
+    # Manager takeover: таймаут в минутах до автоматического возврата чата боту
+    manager_takeover_timeout_minutes: 30
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -147,6 +156,11 @@ class ApplicationConfig < Anyway::Config
 
     # Dashboard
     max_chat_messages_display: :integer,
+    chats_per_page: :integer,
+
+    # Manager takeover
+    manager_takeover_enabled: :boolean,
+    manager_takeover_timeout_minutes: :integer,
 
     # Admin host
     admin_host: :string,

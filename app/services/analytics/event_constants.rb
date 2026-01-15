@@ -71,6 +71,35 @@ module Analytics
       properties: [ :duration_ms, :model_used, :timestamp ]
     }.freeze
 
+    # События менеджера
+    MESSAGE_RECEIVED_IN_MANAGER_MODE = {
+      name: 'message_received_in_manager_mode',
+      description: 'Получено сообщение от клиента когда чат управляется менеджером',
+      category: 'manager',
+      properties: [ :taken_by_id, :platform ]
+    }.freeze
+
+    CHAT_TAKEOVER_STARTED = {
+      name: 'chat_takeover_started',
+      description: 'Менеджер перехватил чат у бота',
+      category: 'manager',
+      properties: [ :taken_by_id, :timeout_minutes ]
+    }.freeze
+
+    CHAT_TAKEOVER_ENDED = {
+      name: 'chat_takeover_ended',
+      description: 'Чат возвращён боту',
+      category: 'manager',
+      properties: [ :taken_by_id, :released_by_id, :reason, :duration_minutes ]
+    }.freeze
+
+    MANAGER_MESSAGE_SENT = {
+      name: 'manager_message_sent',
+      description: 'Менеджер отправил сообщение клиенту',
+      category: 'manager',
+      properties: [ :manager_id, :message_length ]
+    }.freeze
+
     # События ошибок
     ERROR_OCCURRED = {
       name: 'error_occurred',
@@ -90,6 +119,10 @@ module Analytics
       cart_confirmed: CART_CONFIRMED,
       booking_created: BOOKING_CREATED,
       response_time: RESPONSE_TIME,
+      message_received_in_manager_mode: MESSAGE_RECEIVED_IN_MANAGER_MODE,
+      chat_takeover_started: CHAT_TAKEOVER_STARTED,
+      chat_takeover_ended: CHAT_TAKEOVER_ENDED,
+      manager_message_sent: MANAGER_MESSAGE_SENT,
       error_occurred: ERROR_OCCURRED
     }.freeze
 
@@ -99,6 +132,7 @@ module Analytics
       service: 'Предложения услуг',
       conversion: 'Конверсионные события',
       performance: 'Производительность системы',
+      manager: 'События менеджера',
       error: 'Ошибки системы'
     }.freeze
 

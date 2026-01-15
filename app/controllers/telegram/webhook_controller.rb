@@ -50,6 +50,12 @@ module Telegram
 
       chat_id = message.dig('chat', 'id')
 
+      # Если чат находится в режиме менеджера - не вызываем AI
+      if llm_chat.manager_mode?
+        handle_message_in_manager_mode(message)
+        return
+      end
+
       # Track dialog start for first message of the day
       if first_message_today?(chat_id)
         AnalyticsService.track(
@@ -357,6 +363,65 @@ module Telegram
       Rails.logger.warn { "[WebhookController] Tenant #{current_tenant.key} has no admin_chat_id configured" }
       respond_with :message, text: I18n.t('telegram.bot_not_configured')
       false
+    end
+
+    # Обрабатывает сообщение клиента когда чат в режиме менеджера
+    #
+    # Сохраняет сообщение в истории и уведомляет менеджера через dashboard.
+    # AI не вызывается - менеджер отвечает напрямую.
+    #
+    # @param message [Hash] данные сообщения от Telegram
+    # @return [void]
+    # @api private
+    def handle_message_in_manager_mode(message)
+      text = extract_message_content(message)
+
+      # Сохраняем сообщение клиента в историю чата
+      # last_message_at обновляется автоматически через acts_as_message touch_chat:
+      # Broadcast в dashboard происходит через after_create_commit в модели Message
+      llm_chat.messages.create!(role: 'user', content: text)
+
+      AnalyticsService.track(
+        AnalyticsService::Events::MESSAGE_RECEIVED_IN_MANAGER_MODE,
+        tenant: current_tenant,
+        chat_id: llm_chat.id,
+        properties: { taken_by_id: llm_chat.taken_by_id, platform: 'telegram' }
+      )
+    end
+
+    # Извлекает текстовое содержимое из Telegram сообщения
+    #
+    # Обрабатывает разные типы контента: текст, фото, документы, голос и т.д.
+    # Для нетекстовых сообщений возвращает описание типа контента.
+    #
+    # @param message [Hash] данные сообщения от Telegram
+    # @return [String] текст сообщения или описание типа контента
+    # @api private
+    def extract_message_content(message)
+      # Приоритет: text > caption > тип медиа
+      return message['text'] if message['text'].present?
+      return message['caption'] if message['caption'].present?
+
+      "[#{detect_media_type(message)}]"
+    end
+
+    # Определяет тип медиа-контента в сообщении
+    #
+    # @param message [Hash] данные сообщения от Telegram
+    # @return [String, nil] название типа медиа или nil
+    # @api private
+    def detect_media_type(message)
+      case
+      when message['photo'] then 'Фото'
+      when message['document'] then 'Документ'
+      when message['video'] then 'Видео'
+      when message['voice'] then 'Голосовое сообщение'
+      when message['audio'] then 'Аудио'
+      when message['sticker'] then 'Стикер'
+      when message['location'] then 'Геолокация'
+      when message['contact'] then 'Контакт'
+      else 'Неизвестный тип'
+      end
     end
 
     # Определяет тип сообщения для аналитики

@@ -65,6 +65,12 @@ class TelegramUser < ApplicationRecord
     id
   end
 
+  # Alias для chat_id - используется в Telegram Bot API для отправки сообщений
+  #
+  # @return [Integer] ID пользователя Telegram
+  # @note В Telegram Bot API, chat_id для личных сообщений равен user_id
+  alias telegram_id id
+
   # Находит или создает пользователя по данным от Telegram
   #
   # @param data [Hash] данные пользователя от Telegram API

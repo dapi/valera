@@ -4,6 +4,8 @@ html
     title
       = "#{current_tenant&.name} | #{ApplicationConfig.app_name}"
     meta name="viewport" content="width=device-width,initial-scale=1"
+    meta name="turbo-refresh-method" content="morph"
+    meta name="turbo-refresh-scroll" content="preserve"
     = csrf_meta_tags
     = csp_meta_tag
 
@@ -44,7 +46,10 @@ html
         .text-xs.text-gray-400.mt-2 = AppVersion
 
     / Main content
-    main.lg:ml-64.p-8
-      = render 'tenants/shared/flash'
+    / Chats page uses compact padding for edge-to-edge layout
+    - main_padding = controller_name == 'chats' ? 'p-4' : 'p-8'
+    main.lg:ml-64 class=main_padding
+      #flash
+        = render 'tenants/shared/flash'
 
       = yield
