@@ -10,17 +10,34 @@
 #
 # @see ChatTakeoverService для логики takeover/release
 # @author Danil Pismenny
-# @since 0.1.0
+# @since 0.38.0
 class ChatTakeoverTimeoutJob < ApplicationJob
   include ErrorLogger
 
   queue_as :default
 
+  # Ошибки, которые имеет смысл ретраить (временные/сетевые)
+  # Согласно CLAUDE.md: НЕ ловить programming errors (ArgumentError, TypeError, etc.)
+  RETRIABLE_ERRORS = [
+    Telegram::Bot::Error,
+    Faraday::Error,
+    Timeout::Error,
+    ActiveRecord::StaleObjectError,
+    ActiveRecord::LockWaitTimeout
+  ].freeze
+
   # Retry с экспоненциальной задержкой для временных ошибок
   # SolidQueue не поддерживает символы, используем lambda
-  retry_on StandardError,
+  # Логируем в Bugsnag только после исчерпания всех попыток
+  retry_on *RETRIABLE_ERRORS,
            wait: ->(executions) { (executions**2) + 2 },
-           attempts: 3
+           attempts: 3 do |job, error|
+    job.log_error(error, context: {
+      chat_id: job.arguments[0],
+      taken_at_timestamp: job.arguments[1],
+      attempts_exhausted: true
+    })
+  end
 
   # Не ретраить при отсутствии записи
   discard_on ActiveRecord::RecordNotFound
@@ -49,8 +66,5 @@ class ChatTakeoverTimeoutJob < ApplicationJob
 
     ChatTakeoverService.new(chat).release!(timeout: true)
     Rails.logger.info "[ChatTakeoverTimeoutJob] Chat #{chat_id} released due to timeout"
-  rescue StandardError => e
-    log_error(e, context: { chat_id: chat_id, taken_at_timestamp: taken_at_timestamp })
-    raise # Re-raise для retry механизма
   end
 end

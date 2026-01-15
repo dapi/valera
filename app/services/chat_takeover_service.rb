@@ -36,7 +36,6 @@ class ChatTakeoverService
     end
   end
 
-
   # Ошибка при попытке вернуть неперехваченный чат
   class NotTakenError < StandardError
     def initialize(msg = 'Chat is not in manager mode')
@@ -126,6 +125,15 @@ class ChatTakeoverService
     message = NOTIFICATION_MESSAGES[type]
 
     result = Manager::TelegramMessageSender.call(chat:, text: message)
+
+    # TelegramMessageSender уже логирует ошибки в Bugsnag с полным контекстом.
+    # Здесь только debug для локальной отладки без дублирования в production.
+    unless result.success?
+      Rails.logger.debug(
+        "[#{self.class.name}] Notification #{type} for chat #{chat.id} failed: #{result.error}"
+      )
+    end
+
     result.success?
   end
 

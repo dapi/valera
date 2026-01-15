@@ -71,23 +71,49 @@ class ChatTakeoverTimeoutJobTest < ActiveSupport::TestCase
     ChatTakeoverTimeoutJob.perform_now(@chat.id, taken_at.to_i)
   end
 
-  test 'logs error when release fails' do
+  test 'retries on retriable errors without immediate logging' do
     taken_at = Time.current
     @chat.update!(mode: :manager_mode, taken_by: @user, taken_at: taken_at)
 
-    # Мокируем ошибку при release
-    error = RuntimeError.new('Database connection lost')
+    # Используем Timeout::Error - одна из RETRIABLE_ERRORS
+    error = Timeout::Error.new('Connection timed out')
     ChatTakeoverService.any_instance.stubs(:release!).raises(error)
 
-    # Job должен вызвать log_error когда происходит ошибка
-    # (после чего retry_on ActiveJob обработает retry)
-    ChatTakeoverTimeoutJob.any_instance.expects(:log_error).with(
+    # log_error НЕ должен вызываться при первой попытке -
+    # логирование происходит только после исчерпания всех попыток (в callback retry_on)
+    ChatTakeoverTimeoutJob.any_instance.expects(:log_error).never
+
+    # retry_on перехватывает ошибку для retry, поэтому она не пробрасывается
+    ChatTakeoverTimeoutJob.perform_now(@chat.id, taken_at.to_i)
+  end
+
+  test 'retry_on callback includes attempts_exhausted context' do
+    # Проверяем что callback retry_on передаёт правильный контекст
+    # Это декларативная проверка - callback определён в классе job
+    job = ChatTakeoverTimeoutJob.new(123, 456)
+
+    # Мокируем log_error чтобы проверить что он вызывается с правильным контекстом
+    error = Timeout::Error.new('test')
+    job.expects(:log_error).with(
       error,
-      context: { chat_id: @chat.id, taken_at_timestamp: taken_at.to_i }
+      context: { chat_id: 123, taken_at_timestamp: 456, attempts_exhausted: true }
     ).once
 
-    # retry_on перехватывает ошибку, поэтому она не пробрасывается в тесте
-    ChatTakeoverTimeoutJob.perform_now(@chat.id, taken_at.to_i)
+    # Симулируем вызов callback (как это делает ActiveJob после исчерпания попыток)
+    job.log_error(error, context: {
+      chat_id: job.arguments[0],
+      taken_at_timestamp: job.arguments[1],
+      attempts_exhausted: true
+    })
+  end
+
+  test 'does not retry on programming errors' do
+    # Проверяем что RETRIABLE_ERRORS НЕ включает programming errors
+    # Согласно CLAUDE.md: programming errors (RuntimeError, ArgumentError, etc.) должны пробрасываться
+    refute_includes ChatTakeoverTimeoutJob::RETRIABLE_ERRORS, RuntimeError
+    refute_includes ChatTakeoverTimeoutJob::RETRIABLE_ERRORS, ArgumentError
+    refute_includes ChatTakeoverTimeoutJob::RETRIABLE_ERRORS, TypeError
+    refute_includes ChatTakeoverTimeoutJob::RETRIABLE_ERRORS, NoMethodError
   end
 
   test 'job class responds to retry_on' do

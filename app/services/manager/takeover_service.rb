@@ -74,7 +74,7 @@ module Manager
 
       build_success_result(takeover_result)
     rescue *HANDLED_ERRORS => e
-      Rails.logger.warn("[#{self.class.name}] Takeover failed: #{e.message}")
+      log_error(e, { service: self.class.name, chat_id: chat.id, user_id: user.id })
       Result.new(success?: false, error: e.message)
     end
 
