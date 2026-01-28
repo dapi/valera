@@ -1,8 +1,5 @@
 class CleanupInvalidMessageRoles < ActiveRecord::Migration[8.1]
-  VALID_ROLES = %w[system user assistant tool].freeze
-
   def up
-    # Log messages with invalid roles before cleanup
     invalid_count = execute(<<~SQL).first
       SELECT COUNT(*) FROM messages
       WHERE role IS NULL OR role NOT IN ('system', 'user', 'assistant', 'tool')

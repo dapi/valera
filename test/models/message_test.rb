@@ -37,4 +37,12 @@ class MessageTest < ActiveSupport::TestCase
     assert_not message.valid?
     assert message.errors[:role].any?
   end
+
+  test 'VALID_ROLES matches RubyLLM roles' do
+    expected = RubyLLM::Message::ROLES.map(&:to_s).sort
+    actual = Message::VALID_ROLES.sort
+    assert_equal expected, actual,
+      "Message::VALID_ROLES is out of sync with RubyLLM::Message::ROLES. " \
+      "Expected: #{expected}, Got: #{actual}"
+  end
 end
