@@ -166,12 +166,35 @@ bin/rails screenshots:dashboard
 - **При изменениях:** ROADMAP-ARCHIVE.md обновляется
 
 
-# Подключение к production базе для диагностики
+# Production & Kubernetes доступ
+
+**Кластер:** fury (K8s context: `fury`)
+**Namespace:** `valera-production`
+**Deployment:** `valera`
+**Container:** `ror`
+
+## Подключение к production базе для диагностики
 
 Креды для подключения к production postgresql базы для диагностики находятся в
 переменных окружения: PRODUCTION_VALERA_DATABASE_USERNAME, PRODUCTION_VALERA_DATABASE_HOST, PRODUCTION_VALERA_DATABASE_PASSWORD, PRODUCTION_VALERA_DATABASE_NAME
 
 используй их для подключения через psql
+
+## Прямой доступ через kubectl
+
+```bash
+# Rails Console
+kubectl --context=fury -n valera-production exec -it deploy/valera -c ror -- bundle exec rails console
+
+# Rails Runner
+kubectl --context=fury -n valera-production exec deploy/valera -c ror -- bundle exec rails runner 'puts User.count'
+
+# Проверка подов
+kubectl --context=fury -n valera-production get pods
+
+# Логи
+kubectl --context=fury -n valera-production logs deploy/valera -c ror --tail=100
+```
 
 # Авторизация в SaaS для диагностики в разработке
 
