@@ -103,7 +103,7 @@ group :test do
 
   # Pin minitest to 5.x - minitest 6.0 breaks Rails 8.1 compatibility
   # See: https://github.com/minitest/minitest/issues/689
-  gem 'minitest', '< 6.0'
+  gem 'minitest', '< 7.0'
 end
 
 gem 'slim-rails', '~> 4.0'
