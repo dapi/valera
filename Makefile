@@ -15,7 +15,7 @@ export PRODUCTION_VALERA_DATABASE_NAME
 
 SEMVER_BIN=./bin/semver
 SEMVER=$(shell ${SEMVER_BIN})
-STAGE ?= valera-production
+STAGE ?= production
 # Version from latest git tag without 'v' prefix (for Docker images)
 TAG ?= $(shell git describe --tags --abbrev=0 | sed 's/^v//')
 # Registry from environment variable (required)
