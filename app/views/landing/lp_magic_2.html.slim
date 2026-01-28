@@ -426,7 +426,7 @@ section#form.py-28.lg:py-36.bg-gradient-to-br.from-blue-600.via-blue-700.to-blue
         = f.hidden_field :utm_campaign, data: { utm_target: "campaign" }
 
         / Phone input - large
-        = f.telephone_field :phone, class: "w-full px-6 py-5 text-lg border-2 border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 bg-slate-50 text-slate-900 transition-all placeholder-slate-400", placeholder: "+7 (999) 123-45-67", required: true, inputmode: "tel", autofocus: true
+        = f.telephone_field :phone, class: "w-full px-6 py-5 text-lg border-2 border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 bg-slate-50 text-slate-900 transition-all placeholder-slate-400", placeholder: "+7 (999) 123-45-67", required: true, inputmode: "tel"
 
         / Submit button
         = f.submit "Жду звонка", class: "w-full bg-blue-600 text-white font-bold py-5 rounded-2xl text-lg hover:bg-blue-700 active:bg-blue-800 transition-all cursor-pointer shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 hover:-translate-y-0.5"
