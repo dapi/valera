@@ -13,7 +13,8 @@
 
 set -euo pipefail
 
-NAMESPACE="${PRODUCTION_NAMESPACE:-production}"
+CONTEXT="${PRODUCTION_CONTEXT:-fury}"
+NAMESPACE="${PRODUCTION_NAMESPACE:-valera-production}"
 DEPLOYMENT="${PRODUCTION_DEPLOYMENT:-valera}"
 CONTAINER="${PRODUCTION_CONTAINER:-ror}"
 
@@ -30,10 +31,10 @@ fi
 
 if [[ "$1" == "-" ]]; then
   # Read from stdin
-  kubectl exec -i -n "$NAMESPACE" "deployment/$DEPLOYMENT" -c "$CONTAINER" -- \
+  kubectl --context="$CONTEXT" exec -i -n "$NAMESPACE" "deployment/$DEPLOYMENT" -c "$CONTAINER" -- \
     bundle exec rails runner -
 else
   # Pass argument directly
-  kubectl exec -n "$NAMESPACE" "deployment/$DEPLOYMENT" -c "$CONTAINER" -- \
+  kubectl --context="$CONTEXT" exec -n "$NAMESPACE" "deployment/$DEPLOYMENT" -c "$CONTAINER" -- \
     bundle exec rails runner "$1"
 fi
