@@ -1,19 +1,4 @@
 GIT
-  remote: https://github.com/crmne/ruby_llm.git
-  revision: bd2bb14df0b15d3eff0a9ab46154fa95076feabc
-  specs:
-    ruby_llm (1.11.0)
-      base64
-      event_stream_parser (~> 1)
-      faraday (>= 1.10.0)
-      faraday-multipart (>= 1)
-      faraday-net_http (>= 1)
-      faraday-retry (>= 1)
-      marcel (~> 1.0)
-      ruby_llm-schema (~> 0.2.1)
-      zeitwerk (~> 2)
-
-GIT
   remote: https://github.com/mprokopov/telegram-bot.git
   revision: b8ebc2d491016b206e5ac1c41ee71e16ec94dbee
   specs:
@@ -490,6 +475,16 @@ GEM
       ffi (~> 1.12)
       logger
     ruby2_keywords (0.0.5)
+    ruby_llm (1.11.0)
+      base64
+      event_stream_parser (~> 1)
+      faraday (>= 1.10.0)
+      faraday-multipart (>= 1)
+      faraday-net_http (>= 1)
+      faraday-retry (>= 1)
+      marcel (~> 1.0)
+      ruby_llm-schema (~> 0.2.1)
+      zeitwerk (~> 2)
     ruby_llm-schema (0.2.5)
     rubyzip (3.2.2)
     sanitize (7.0.0)
@@ -627,7 +622,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rails-omakase
   rubocop-yard
-  ruby_llm!
+  ruby_llm
   sanitize (~> 7.0)
   selenium-webdriver
   semver2 (~> 3.4)

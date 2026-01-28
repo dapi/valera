@@ -112,7 +112,7 @@ gem 'anyway_config', '~> 2.7'
 
 gem 'semver2', '~> 3.4'
 
-gem 'ruby_llm', github: 'crmne/ruby_llm'
+gem 'ruby_llm'
 
 gem 'hiredis', '~> 0.6.3'
 gem 'redis', '~> 5.4'
