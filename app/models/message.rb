@@ -2,9 +2,8 @@
 
 # Represents a single message within a chat conversation
 class Message < ApplicationRecord
-  # Valid roles for LLM messages.
-  # Mirrors RubyLLM::Message::ROLES (symbols) as strings for DB validation.
-  VALID_ROLES = %w[system user assistant tool].freeze
+  # Valid message roles: RubyLLM::Message::ROLES + app-specific roles (manager).
+  VALID_ROLES = %w[system user assistant tool manager].freeze
 
   acts_as_message touch_chat: :last_message_at
   has_many_attached :attachments
