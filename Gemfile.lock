@@ -91,7 +91,7 @@ GEM
       actionview (>= 6.0, < 9.0)
       activerecord (>= 6.0, < 9.0)
       kaminari (~> 1.2.2)
-    anyway_config (2.7.2)
+    anyway_config (2.8.0)
       ruby-next-core (~> 1.0)
     ast (2.4.3)
     async (2.34.0)
@@ -465,7 +465,7 @@ GEM
       faraday (~> 2.0)
       faraday-follow_redirects (~> 0.3)
       faraday-retry (~> 2.0)
-    ruby-next-core (1.1.2)
+    ruby-next-core (1.2.0)
     ruby-openai (8.3.0)
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
@@ -588,7 +588,7 @@ PLATFORMS
 
 DEPENDENCIES
   administrate (~> 1.0)
-  anyway_config (~> 2.7)
+  anyway_config (~> 2.8)
   bcrypt (~> 3.1.21)
   bootsnap
   brakeman
