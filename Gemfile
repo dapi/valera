@@ -108,7 +108,7 @@ end
 
 gem 'slim-rails', '~> 4.0'
 
-gem 'anyway_config', '~> 2.7'
+gem 'anyway_config', '~> 2.8'
 
 gem 'semver2', '~> 3.4'
 
