@@ -117,7 +117,7 @@ gem 'ruby_llm'
 gem 'hiredis', '~> 0.6.3'
 gem 'redis', '~> 5.4'
 
-gem 'bugsnag', '~> 6.28'
+gem 'bugsnag', '~> 6.29'
 
 gem 'request_store'
 
