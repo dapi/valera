@@ -112,6 +112,7 @@ module Telegram
       use_configured_model(llm_chat)
       llm_chat
         .with_fallbacks(*LlmFallbacks.models, on: LlmFallbacks::ERRORS)
+        .before_fallback { |fallback| LlmFallbacks.report(fallback) }
         .with_tools(BookingTool.new(chat: llm_chat))
         .with_temperature(ApplicationConfig.llm_temperature)
         .with_instructions(SystemPromptService.new(current_tenant).system_prompt)
