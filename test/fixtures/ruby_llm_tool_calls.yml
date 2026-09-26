@@ -1,3 +1,6 @@
+_fixture:
+  model_class: RubyLLM::ActiveRecord::ToolCall
+
 one:
   tool_call_id: call_abc123
   name: get_weather
@@ -5,6 +8,7 @@ one:
     location: Moscow
     units: celsius
   message_id: 1
+  message_type: Message
 
 two:
   tool_call_id: call_def456
@@ -13,3 +17,4 @@ two:
     service: oil_change
     car_model: Toyota Camry
   message_id: 2
+  message_type: Message

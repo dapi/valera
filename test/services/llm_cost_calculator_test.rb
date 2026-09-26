@@ -6,7 +6,7 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
   setup do
     @tenant = tenants(:one)
     @chat = chats(:one)
-    @model = models(:one)
+    @model = ruby_llm_models(:one)
   end
 
   test 'raises error when tenant is nil' do
@@ -34,10 +34,10 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
     @chat.messages.destroy_all
 
     # Создаём сообщения с токенами
-    @chat.messages.create!(role: 'user', content: 'Test 1', model: @model, input_tokens: 100, output_tokens: 0)
-    @chat.messages.create!(role: 'assistant', content: 'Response 1', model: @model, input_tokens: 0, output_tokens: 50)
-    @chat.messages.create!(role: 'user', content: 'Test 2', model: @model, input_tokens: 200, output_tokens: 0)
-    @chat.messages.create!(role: 'assistant', content: 'Response 2', model: @model, input_tokens: 0, output_tokens: 100)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: 100, output_tokens: 0)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: 0, output_tokens: 50)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: 200, output_tokens: 0)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: 0, output_tokens: 100)
 
     result = LlmCostCalculator.new(@tenant).calculate_totals
 
@@ -50,8 +50,8 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
     @chat.messages.destroy_all
 
     # Model one: $30/M input, $60/M output
-    @chat.messages.create!(role: 'user', content: 'Test', model: @model, input_tokens: 1_000_000, output_tokens: 0)
-    @chat.messages.create!(role: 'assistant', content: 'Response', model: @model, input_tokens: 0, output_tokens: 1_000_000)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: 1_000_000, output_tokens: 0)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: 0, output_tokens: 1_000_000)
 
     result = LlmCostCalculator.new(@tenant).calculate_totals
 
@@ -77,10 +77,10 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
     @chat.messages.destroy_all
 
     # Сообщение в периоде
-    @chat.messages.create!(role: 'user', content: 'Recent', model: @model, input_tokens: 100, output_tokens: 0)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: 100, output_tokens: 0)
 
     # Сообщение вне периода (31 день назад)
-    old_message = @chat.messages.create!(role: 'user', content: 'Old', model: @model, input_tokens: 500, output_tokens: 0)
+    old_message = create_llm_usage(chat: @chat, model: @model, input_tokens: 500, output_tokens: 0)
     old_message.update_column(:created_at, 31.days.ago)
 
     result = LlmCostCalculator.new(@tenant, period: 30).calculate_totals
@@ -92,13 +92,13 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
     @chat.messages.destroy_all
 
     # Создаём сообщения в разные даты
-    msg1 = @chat.messages.create!(role: 'user', content: 'Msg 1', model: @model, input_tokens: 100, output_tokens: 0)
+    msg1 = create_llm_usage(chat: @chat, model: @model, input_tokens: 100, output_tokens: 0)
     msg1.update_column(:created_at, 10.days.ago)
 
-    msg2 = @chat.messages.create!(role: 'user', content: 'Msg 2', model: @model, input_tokens: 200, output_tokens: 0)
+    msg2 = create_llm_usage(chat: @chat, model: @model, input_tokens: 200, output_tokens: 0)
     msg2.update_column(:created_at, 5.days.ago)
 
-    msg3 = @chat.messages.create!(role: 'user', content: 'Msg 3', model: @model, input_tokens: 300, output_tokens: 0)
+    msg3 = create_llm_usage(chat: @chat, model: @model, input_tokens: 300, output_tokens: 0)
     msg3.update_column(:created_at, 1.day.ago)
 
     result = LlmCostCalculator.new(@tenant, start_date: 7.days.ago.to_date, end_date: 2.days.ago.to_date).calculate_totals
@@ -120,11 +120,11 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
   test 'calculate_by_model groups by model' do
     @chat.messages.destroy_all
 
-    model_one = models(:one)
-    model_two = models(:two)
+    model_one = ruby_llm_models(:one)
+    model_two = ruby_llm_models(:two)
 
-    @chat.messages.create!(role: 'user', content: 'Test 1', model: model_one, input_tokens: 100, output_tokens: 50)
-    @chat.messages.create!(role: 'user', content: 'Test 2', model: model_two, input_tokens: 200, output_tokens: 100)
+    create_llm_usage(chat: @chat, model: model_one, input_tokens: 100, output_tokens: 50)
+    create_llm_usage(chat: @chat, model: model_two, input_tokens: 200, output_tokens: 100)
 
     result = LlmCostCalculator.new(@tenant).calculate_by_model
 
@@ -147,7 +147,7 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
 
   test 'calculate_by_model includes pricing info' do
     @chat.messages.destroy_all
-    @chat.messages.create!(role: 'user', content: 'Test', model: @model, input_tokens: 100, output_tokens: 50)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: 100, output_tokens: 50)
 
     result = LlmCostCalculator.new(@tenant).calculate_by_model
 
@@ -162,7 +162,7 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
     @chat.messages.destroy_all
 
     # Model one: $30/M input, $60/M output
-    @chat.messages.create!(role: 'user', content: 'Test', model: @model, input_tokens: 1000, output_tokens: 500)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: 1000, output_tokens: 500)
 
     result = LlmCostCalculator.new(@tenant).calculate_by_model
     stats = result.first
@@ -177,11 +177,11 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
   test 'calculate_by_model sorts by total_cost descending' do
     @chat.messages.destroy_all
 
-    model_cheap = models(:deepseek)  # $1/M input, $2/M output
-    model_expensive = models(:one)   # $30/M input, $60/M output
+    model_cheap = ruby_llm_models(:deepseek)  # $1/M input, $2/M output
+    model_expensive = ruby_llm_models(:one)   # $30/M input, $60/M output
 
-    @chat.messages.create!(role: 'user', content: 'Cheap', model: model_cheap, input_tokens: 1000, output_tokens: 500)
-    @chat.messages.create!(role: 'user', content: 'Expensive', model: model_expensive, input_tokens: 1000, output_tokens: 500)
+    create_llm_usage(chat: @chat, model: model_cheap, input_tokens: 1000, output_tokens: 500)
+    create_llm_usage(chat: @chat, model: model_expensive, input_tokens: 1000, output_tokens: 500)
 
     result = LlmCostCalculator.new(@tenant).calculate_by_model
 
@@ -228,10 +228,10 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
     @chat.messages.destroy_all
 
     # Создаём сообщения в разные дни
-    yesterday_msg = @chat.messages.create!(role: 'user', content: 'Yesterday', model: @model, input_tokens: 100, output_tokens: 50)
+    yesterday_msg = create_llm_usage(chat: @chat, model: @model, input_tokens: 100, output_tokens: 50)
     yesterday_msg.update_column(:created_at, 1.day.ago)
 
-    today_msg = @chat.messages.create!(role: 'user', content: 'Today', model: @model, input_tokens: 200, output_tokens: 100)
+    today_msg = create_llm_usage(chat: @chat, model: @model, input_tokens: 200, output_tokens: 100)
 
     result = LlmCostCalculator.new(@tenant, period: 7).calculate_by_day
 
@@ -249,7 +249,7 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
     @chat.messages.destroy_all
 
     # Model one: $30/M input, $60/M output
-    msg = @chat.messages.create!(role: 'user', content: 'Test', model: @model, input_tokens: 1_000_000, output_tokens: 1_000_000)
+    msg = create_llm_usage(chat: @chat, model: @model, input_tokens: 1_000_000, output_tokens: 1_000_000)
 
     result = LlmCostCalculator.new(@tenant, period: 1).calculate_by_day
     today_stats = result.find { |s| s.date == Date.current }
@@ -271,10 +271,10 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
     chat_one.messages.destroy_all
     chat_two.messages.destroy_all
 
-    model = models(:one)
+    model = ruby_llm_models(:one)
 
-    chat_one.messages.create!(role: 'user', content: 'Tenant 1', model: model, input_tokens: 100, output_tokens: 0)
-    chat_two.messages.create!(role: 'user', content: 'Tenant 2', model: model, input_tokens: 500, output_tokens: 0)
+    create_llm_usage(chat: chat_one, model: model, input_tokens: 100, output_tokens: 0)
+    create_llm_usage(chat: chat_two, model: model, input_tokens: 500, output_tokens: 0)
 
     result_one = LlmCostCalculator.new(tenant_one).calculate_totals
     result_two = LlmCostCalculator.new(tenant_two).calculate_totals
@@ -287,7 +287,7 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
 
   test 'handles messages without model_id' do
     @chat.messages.destroy_all
-    @chat.messages.create!(role: 'user', content: 'No model', model: nil, input_tokens: 100, output_tokens: 0)
+    create_llm_usage(chat: @chat, model: nil, input_tokens: 100, output_tokens: 0)
 
     result = LlmCostCalculator.new(@tenant).calculate_totals
 
@@ -296,7 +296,7 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
 
   test 'handles messages without input_tokens' do
     @chat.messages.destroy_all
-    @chat.messages.create!(role: 'user', content: 'No tokens', model: @model, input_tokens: nil, output_tokens: nil)
+    create_llm_usage(chat: @chat, model: @model, input_tokens: nil, output_tokens: nil)
 
     result = LlmCostCalculator.new(@tenant).calculate_totals
 
@@ -307,14 +307,14 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
     @chat.messages.destroy_all
 
     # Создаём модель без pricing
-    model_no_pricing = Model.create!(
+    model_no_pricing = RubyLLM::ActiveRecord::Model.create!(
       provider: 'test',
       model_id: 'test-no-pricing',
       name: 'Test No Pricing',
       pricing: {}
     )
 
-    @chat.messages.create!(role: 'user', content: 'Test', model: model_no_pricing, input_tokens: 1000, output_tokens: 500)
+    create_llm_usage(chat: @chat, model: model_no_pricing, input_tokens: 1000, output_tokens: 500)
 
     result = LlmCostCalculator.new(@tenant).calculate_by_model
     stats = result.first
@@ -327,14 +327,14 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
   test 'handles model with nil pricing' do
     @chat.messages.destroy_all
 
-    model_nil_pricing = Model.create!(
+    model_nil_pricing = RubyLLM::ActiveRecord::Model.create!(
       provider: 'test',
       model_id: 'test-nil-pricing',
       name: 'Test Nil Pricing',
       pricing: nil
     )
 
-    @chat.messages.create!(role: 'user', content: 'Test', model: model_nil_pricing, input_tokens: 1000, output_tokens: 500)
+    create_llm_usage(chat: @chat, model: model_nil_pricing, input_tokens: 1000, output_tokens: 500)
 
     result = LlmCostCalculator.new(@tenant).calculate_by_model
     stats = result.first
@@ -347,14 +347,14 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
   test 'handles model with partial pricing structure' do
     @chat.messages.destroy_all
 
-    model_partial = Model.create!(
+    model_partial = RubyLLM::ActiveRecord::Model.create!(
       provider: 'test',
       model_id: 'test-partial-pricing',
       name: 'Test Partial Pricing',
       pricing: { text_tokens: {} }
     )
 
-    @chat.messages.create!(role: 'user', content: 'Test', model: model_partial, input_tokens: 1000, output_tokens: 500)
+    create_llm_usage(chat: @chat, model: model_partial, input_tokens: 1000, output_tokens: 500)
 
     result = LlmCostCalculator.new(@tenant).calculate_by_model
     stats = result.first
@@ -366,11 +366,11 @@ class LlmCostCalculatorTest < ActiveSupport::TestCase
   test 'calculate_by_day aggregates costs from multiple models on same day' do
     @chat.messages.destroy_all
 
-    model_expensive = models(:one)   # $30/M input
-    model_cheap = models(:deepseek)  # $1/M input
+    model_expensive = ruby_llm_models(:one)   # $30/M input
+    model_cheap = ruby_llm_models(:deepseek)  # $1/M input
 
-    @chat.messages.create!(role: 'user', content: 'Expensive', model: model_expensive, input_tokens: 1_000_000, output_tokens: 0)
-    @chat.messages.create!(role: 'user', content: 'Cheap', model: model_cheap, input_tokens: 1_000_000, output_tokens: 0)
+    create_llm_usage(chat: @chat, model: model_expensive, input_tokens: 1_000_000, output_tokens: 0)
+    create_llm_usage(chat: @chat, model: model_cheap, input_tokens: 1_000_000, output_tokens: 0)
 
     result = LlmCostCalculator.new(@tenant, period: 1).calculate_by_day
     today_stats = result.find { |s| s.date == Date.current }

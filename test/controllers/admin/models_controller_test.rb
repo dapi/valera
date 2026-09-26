@@ -6,7 +6,7 @@ class Admin::ModelsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @superuser = admin_users(:superuser)
     @manager = admin_users(:manager)
-    @model = models(:one)
+    @model = ruby_llm_models(:one)
     host! "admin.#{ApplicationConfig.host}"
   end
 

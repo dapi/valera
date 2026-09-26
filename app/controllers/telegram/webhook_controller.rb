@@ -110,11 +110,11 @@ module Telegram
     # @note Tools используются AI для выполнения действий в реальном мире
     def setup_chat_tools
       llm_chat
-        .with_tool(BookingTool.new(chat: llm_chat))
+        .with_tools(BookingTool.new(chat: llm_chat))
         .with_temperature(ApplicationConfig.llm_temperature)
-        .with_instructions(SystemPromptService.new(current_tenant).system_prompt, replace: true)
-        .on_tool_call { |tool_call| handle_tool_call(tool_call) }
-        .on_tool_result { |result| handle_tool_result(result) }
+        .with_instructions(SystemPromptService.new(current_tenant).system_prompt)
+        .before_tool_call { |tool_call| handle_tool_call(tool_call) }
+        .after_tool_result { |result| handle_tool_result(result) }
     end
 
     # Обрабатывает вызов инструмента со стороны AI
@@ -148,7 +148,7 @@ module Telegram
     # контекстного ответа с использованием текущего диалога.
     #
     # @param text [String] текст сообщения пользователя
-    # @return [RubyLLM::Content] ответ от AI ассистента
+    # @return [RubyLLM::Message] ответ от AI ассистента
     # @see ruby_llm gem документация для подробностей
     def process_message(text)
       llm_chat.say(text)
@@ -159,7 +159,7 @@ module Telegram
     # Очищает Markdown форматирование от AI и отправляет ответ
     # пользователю через Telegram API с поддержкой Markdown.
     #
-    # @param ai_response [RubyLLM::Content] ответ от AI ассистента
+    # @param ai_response [RubyLLM::Message] ответ от AI ассистента
     # @return [void] отправляет сообщение пользователю
     # @see MarkdownCleaner для очистки форматирования
     def send_response_to_user(ai_response)

@@ -1,3 +1,6 @@
+_fixture:
+  model_class: Model
+
 one:
   provider: openai
   model_id: gpt-4

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_26_165046) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_26_165205) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -114,17 +114,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_165046) do
     t.datetime "first_booking_at"
     t.datetime "last_booking_at"
     t.datetime "last_message_at"
-    t.bigint "model_id"
+    t.bigint "ruby_llm_model_id"
     t.bigint "tenant_id", null: false
     t.datetime "topic_classified_at"
     t.datetime "updated_at", null: false
+    t.boolean "cancelled", default: false, null: false
     t.index ["bookings_count"], name: "index_chats_on_bookings_count"
     t.index ["chat_topic_id", "last_message_at"], name: "index_chats_on_chat_topic_id_and_last_message_at"
     t.index ["chat_topic_id"], name: "index_chats_on_chat_topic_id"
     t.index ["client_id"], name: "index_chats_on_client_id"
     t.index ["first_booking_at"], name: "index_chats_on_first_booking_at"
     t.index ["last_booking_at"], name: "index_chats_on_last_booking_at"
-    t.index ["model_id"], name: "index_chats_on_model_id"
+    t.index ["ruby_llm_model_id"], name: "index_chats_on_ruby_llm_model_id"
     t.index ["tenant_id", "last_message_at"], name: "index_chats_on_tenant_id_and_last_message_at"
     t.index ["tenant_id"], name: "index_chats_on_tenant_id"
     t.index ["topic_classified_at"], name: "index_chats_on_topic_classified_at"
@@ -264,6 +265,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_165046) do
     t.text "thinking_text"
     t.text "thinking_signature"
     t.integer "thinking_tokens"
+    t.boolean "cache_until_here", default: false, null: false
+    t.string "finish_reason"
+    t.jsonb "citations"
+    t.jsonb "server_tool_calls"
+    t.jsonb "raw_content"
+    t.jsonb "raw_reasoning"
     t.index ["chat_id", "created_at"], name: "idx_messages_chat_created_at"
     t.index ["chat_id", "role"], name: "idx_messages_chat_role"
     t.index ["chat_id"], name: "index_messages_on_chat_id"
@@ -272,7 +279,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_165046) do
     t.index ["tool_call_id"], name: "index_messages_on_tool_call_id"
   end
 
-  create_table "models", force: :cascade do |t|
+  create_table "ruby_llm_batches", force: :cascade do |t|
+    t.string "provider_batch_id", null: false
+    t.string "provider", null: false
+    t.string "status", null: false
+    t.string "raw_status"
+    t.boolean "completed", default: false, null: false
+    t.string "chat_type"
+    t.string "batch_protocol"
+    t.jsonb "chat_ids", default: []
+    t.jsonb "request_counts"
+    t.jsonb "reported_cost"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider", "provider_batch_id"], name: "index_ruby_llm_batches_on_provider_and_provider_batch_id", unique: true
+    t.index ["status"], name: "index_ruby_llm_batches_on_status"
+  end
+
+  create_table "ruby_llm_models", force: :cascade do |t|
     t.jsonb "capabilities", default: []
     t.integer "context_window"
     t.datetime "created_at", null: false
@@ -287,11 +311,67 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_165046) do
     t.jsonb "pricing", default: {}
     t.string "provider", null: false
     t.datetime "updated_at", null: false
-    t.index ["capabilities"], name: "index_models_on_capabilities", using: :gin
-    t.index ["family"], name: "index_models_on_family"
-    t.index ["modalities"], name: "index_models_on_modalities", using: :gin
-    t.index ["provider", "model_id"], name: "index_models_on_provider_and_model_id", unique: true
-    t.index ["provider"], name: "index_models_on_provider"
+    t.datetime "unlisted_at"
+    t.index ["capabilities"], name: "index_ruby_llm_models_on_capabilities", using: :gin
+    t.index ["family"], name: "index_ruby_llm_models_on_family"
+    t.index ["modalities"], name: "index_ruby_llm_models_on_modalities", using: :gin
+    t.index ["provider", "model_id"], name: "index_ruby_llm_models_on_provider_and_model_id", unique: true
+    t.index ["provider"], name: "index_ruby_llm_models_on_provider"
+  end
+
+  create_table "ruby_llm_tool_calls", force: :cascade do |t|
+    t.jsonb "arguments", default: {}
+    t.datetime "created_at", null: false
+    t.bigint "message_id", null: false
+    t.string "name", null: false
+    t.string "tool_call_id", null: false
+    t.datetime "updated_at", null: false
+    t.text "thought_signature"
+    t.string "message_type", null: false
+    t.string "result_type"
+    t.bigint "result_id"
+    t.string "approval"
+    t.boolean "remote", default: false, null: false
+    t.index ["message_type", "message_id"], name: "index_ruby_llm_tool_calls_on_message_type_and_message_id"
+    t.index ["name"], name: "index_ruby_llm_tool_calls_on_name"
+    t.index ["result_type", "result_id"], name: "index_ruby_llm_tool_calls_on_result_type_and_result_id"
+    t.index ["tool_call_id"], name: "index_ruby_llm_tool_calls_on_tool_call_id", unique: true
+  end
+
+  create_table "ruby_llm_usages", force: :cascade do |t|
+    t.string "chat_type", null: false
+    t.bigint "chat_id", null: false
+    t.string "message_type"
+    t.bigint "message_id"
+    t.string "operation", null: false
+    t.string "provider", null: false
+    t.string "model", null: false
+    t.string "status", null: false
+    t.integer "input_tokens"
+    t.integer "output_tokens"
+    t.integer "cache_read_tokens"
+    t.integer "cache_write_tokens"
+    t.integer "thinking_tokens"
+    t.decimal "input_cost", precision: 16, scale: 10
+    t.decimal "output_cost", precision: 16, scale: 10
+    t.decimal "cache_read_cost", precision: 16, scale: 10
+    t.decimal "cache_write_cost", precision: 16, scale: 10
+    t.decimal "thinking_cost", precision: 16, scale: 10
+    t.decimal "total_cost", precision: 16, scale: 10
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_type", "chat_id"], name: "index_ruby_llm_usages_on_chat_type_and_chat_id"
+    t.index ["message_type", "message_id"], name: "index_ruby_llm_usages_on_message_type_and_message_id"
+    t.index ["status"], name: "index_ruby_llm_usages_on_status"
+    t.check_constraint "operation::text = ANY (ARRAY['chat'::character varying, 'embedding'::character varying, 'moderation'::character varying, 'image'::character varying, 'speech'::character varying, 'transcription'::character varying, 'ocr'::character varying, 'rerank'::character varying]::text[])"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'succeeded'::character varying, 'failed'::character varying, 'cancelled'::character varying]::text[])"
+  end
+
+  create_table "ruby_llm_v2_backfills", id: false, force: :cascade do |t|
+    t.string "task", null: false
+    t.bigint "last_id"
+    t.boolean "completed", default: false, null: false
+    t.index ["task"], name: "index_ruby_llm_v2_backfills_on_task", unique: true
   end
 
   create_table "telegram_users", force: :cascade do |t|
@@ -362,19 +442,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_165046) do
     t.index ["owner_id"], name: "index_tenants_on_owner_id"
   end
 
-  create_table "tool_calls", force: :cascade do |t|
-    t.jsonb "arguments", default: {}
-    t.datetime "created_at", null: false
-    t.bigint "message_id", null: false
-    t.string "name", null: false
-    t.string "tool_call_id", null: false
-    t.datetime "updated_at", null: false
-    t.text "thought_signature"
-    t.index ["message_id"], name: "index_tool_calls_on_message_id"
-    t.index ["name"], name: "index_tool_calls_on_name"
-    t.index ["tool_call_id"], name: "index_tool_calls_on_tool_call_id", unique: true
-  end
-
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -406,6 +473,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_165046) do
   add_foreign_key "chat_topics", "tenants"
   add_foreign_key "chats", "chat_topics"
   add_foreign_key "chats", "clients"
+  add_foreign_key "chats", "ruby_llm_models"
   add_foreign_key "chats", "tenants"
   add_foreign_key "clients", "telegram_users"
   add_foreign_key "clients", "tenants"

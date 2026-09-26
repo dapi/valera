@@ -35,7 +35,7 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
     VCR.use_cassette cassete_name, record: :new_episodes do
       user_text = first_question
 
-      tool_calls_count = ToolCall.count
+      tool_calls_count = RubyLLM::ActiveRecord::ToolCall.count
       counts = 0
       loop do
         puts
@@ -43,7 +43,7 @@ class BookingFlowTest < ActionDispatch::IntegrationTest
         puts user_text.gsub(/^/, "\t")
         post_message user_text
         assistent_question = latest_reply_text
-        if ToolCall.count > tool_calls_count
+        if RubyLLM::ActiveRecord::ToolCall.count > tool_calls_count
           counts += 1
           break if counts > 2
         end

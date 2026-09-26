@@ -29,24 +29,24 @@ class BookingTool < RubyLLM::Tool
 
   description 'Определяет является ли сообщение клиента заявкой на услугу и отправляет ее в административный чат'
 
-  param :customer_name, desc: 'Полное имя клиента', required: false
-  param :customer_phone, desc: 'Телефон клиента в формате +7(XXX)XXX-XX-XX', required: false
-  param :car_brand, desc: 'Марка автомобиля', required: false
-  param :car_model, desc: 'Модель автомобиля', required: false
-  param :car_year, desc: 'Год выпуска автомобиля', required: false
-  param :car_class, desc: 'Класс автомаобиля', required: false
-  param :car_mileage, desc: 'Пробег автомобиля', required: false
-  param :required_services, desc: 'Перечень необходимых работ', required: false
-  param :cost_calculation, desc: 'Последний названный пользователю расчет стоимости услуг (общая стоимость услуг)',
-                           required: false
-  param :dialog_context,
-        desc: 'Контекст диалога для понимания ситуации (включает данные о клиенте, ' \
-              'дате и времени записи и об услуге которые пользователь запрашивал ' \
-              'и получал от ассистента)', required: true
-  param :details,
-        desc: 'Детали записи в формате Markdown включающие все необходимые данные ' \
-              'о пользователе, услуге, стоимости, автомобиле, последние сообщения ' \
-              'пользователя и суммаризованную переписку, номер заявки', required: true
+  parameter :customer_name, description: 'Полное имя клиента', required: false
+  parameter :customer_phone, description: 'Телефон клиента в формате +7(XXX)XXX-XX-XX', required: false
+  parameter :car_brand, description: 'Марка автомобиля', required: false
+  parameter :car_model, description: 'Модель автомобиля', required: false
+  parameter :car_year, description: 'Год выпуска автомобиля', required: false
+  parameter :car_class, description: 'Класс автомаобиля', required: false
+  parameter :car_mileage, description: 'Пробег автомобиля', required: false
+  parameter :required_services, description: 'Перечень необходимых работ', required: false
+  parameter :cost_calculation, description: 'Последний названный пользователю расчет стоимости услуг (общая стоимость услуг)',
+                               required: false
+  parameter :dialog_context,
+            description: 'Контекст диалога для понимания ситуации (включает данные о клиенте, ' \
+                         'дате и времени записи и об услуге которые пользователь запрашивал ' \
+                         'и получал от ассистента)', required: true
+  parameter :details,
+            description: 'Детали записи в формате Markdown включающие все необходимые данные ' \
+                         'о пользователе, услуге, стоимости, автомобиле, последние сообщения ' \
+                         'пользователя и суммаризованную переписку, номер заявки', required: true
 
   # Инициализирует инструмент с чатом
   #
@@ -74,7 +74,7 @@ class BookingTool < RubyLLM::Tool
   # @option meta [String] :cost_calculation расчет стоимости
   # @option meta [Hash] :dialog_context контекст диалога
   # @option meta [String] :details детали заявки в Markdown
-  # @return [RubyLLM::Content] ответ системы с номером заявки или ошибкой
+  # @return [String] ответ системы с номером заявки или ошибкой
   # @raise [StandardError] при ошибке создания заявки
   # @example Успешное создание заявки
   #   response = execute(
@@ -118,7 +118,7 @@ class BookingTool < RubyLLM::Tool
       response_text += "\n\n#{I18n.t('development_warning.booking_suffix')}"
     end
 
-    RubyLLM::Content.new(response_text)
+    response_text
   rescue StandardError => e
     log_error e
     AnalyticsService.track_error(e, tenant: @chat.tenant, context: {
@@ -126,7 +126,7 @@ class BookingTool < RubyLLM::Tool
       context: 'booking_tool_execution',
       booking_data: meta
     })
-    RubyLLM::Content.new("Ошибка при обработке заявки: #{e.message}")
+    "Ошибка при обработке заявки: #{e.message}"
   end
 
   private

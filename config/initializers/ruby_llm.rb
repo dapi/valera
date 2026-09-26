@@ -3,8 +3,6 @@
 require 'ruby_llm'
 
 RubyLLM.configure do |config|
-  config.use_new_acts_as = true
-
   # Устанавливаем таймауты и retry настройки
   config.request_timeout = 120 # AppConfig.request_timeout
   config.max_retries = 1 # AppConfig.max_retries
@@ -12,6 +10,7 @@ RubyLLM.configure do |config|
   # API ключи провайдеров (используем ApplicationConfig вместо ENV)
   config.openai_api_key = ApplicationConfig.openai_api_key
   config.anthropic_api_key = ApplicationConfig.anthropic_api_key
+  config.anthropic_api_base = ApplicationConfig.anthropic_base_url.presence
   config.gemini_api_key = ApplicationConfig.gemini_api_key
   config.deepseek_api_key = ApplicationConfig.deepseek_api_key
   config.perplexity_api_key = ApplicationConfig.perplexity_api_key
@@ -26,15 +25,4 @@ RubyLLM.configure do |config|
   config.default_model = ApplicationConfig.llm_model # 'claude-sonnet-4'           # For RubyLLM.chat
   config.default_embedding_model = ApplicationConfig.llm_model # 'text-embedding-3-large'  # For RubyLLM.embed
   config.default_image_model = ApplicationConfig.llm_model # 'dall-e-3'              # For RubyLLM.paint
-end
-
-module RubyLLM
-  module Providers
-    # Anthropic Claude API integration.
-    class Anthropic < Provider
-      def api_base
-        ApplicationConfig.anthropic_base_url.presence || 'https://api.anthropic.com'
-      end
-    end
-  end
 end

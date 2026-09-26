@@ -13,6 +13,7 @@ class ApplicationConfig < Anyway::Config
     # LLM Provider API Keys
     :openai_api_key,
     :anthropic_api_key,
+    :anthropic_base_url,
     :gemini_api_key,
     :deepseek_api_key,
     :perplexity_api_key,
