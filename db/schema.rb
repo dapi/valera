@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_26_165205) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_26_174218) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -253,18 +253,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_165205) do
     t.bigint "chat_id", null: false
     t.text "content"
     t.datetime "created_at", null: false
-    t.integer "input_tokens"
-    t.bigint "model_id"
-    t.integer "output_tokens"
     t.string "role", null: false
-    t.bigint "tool_call_id"
     t.datetime "updated_at", null: false
-    t.integer "cached_tokens"
-    t.integer "cache_creation_tokens"
-    t.jsonb "content_raw"
     t.text "thinking_text"
     t.text "thinking_signature"
-    t.integer "thinking_tokens"
     t.boolean "cache_until_here", default: false, null: false
     t.string "finish_reason"
     t.jsonb "citations"
@@ -274,9 +266,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_165205) do
     t.index ["chat_id", "created_at"], name: "idx_messages_chat_created_at"
     t.index ["chat_id", "role"], name: "idx_messages_chat_role"
     t.index ["chat_id"], name: "index_messages_on_chat_id"
-    t.index ["model_id"], name: "index_messages_on_model_id"
-    t.index ["role"], name: "index_messages_on_role"
-    t.index ["tool_call_id"], name: "index_messages_on_tool_call_id"
   end
 
   create_table "ruby_llm_batches", force: :cascade do |t|
@@ -365,13 +354,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_165205) do
     t.index ["status"], name: "index_ruby_llm_usages_on_status"
     t.check_constraint "operation::text = ANY (ARRAY['chat'::character varying, 'embedding'::character varying, 'moderation'::character varying, 'image'::character varying, 'speech'::character varying, 'transcription'::character varying, 'ocr'::character varying, 'rerank'::character varying]::text[])"
     t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'succeeded'::character varying, 'failed'::character varying, 'cancelled'::character varying]::text[])"
-  end
-
-  create_table "ruby_llm_v2_backfills", id: false, force: :cascade do |t|
-    t.string "task", null: false
-    t.bigint "last_id"
-    t.boolean "completed", default: false, null: false
-    t.index ["task"], name: "index_ruby_llm_v2_backfills_on_task", unique: true
   end
 
   create_table "telegram_users", force: :cascade do |t|
