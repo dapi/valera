@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.42.3] - 2026-09-26
+
+### Changed
+- Finish ruby_llm 2.0 upgrade with cleanup
+
 ## [0.42.2] - 2026-09-26
 
 ### Added
