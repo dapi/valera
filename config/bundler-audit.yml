@@ -1,5 +1,13 @@
 # Audit all gems listed in the Gemfile for known security problems by running bin/bundler-audit.
 # CVEs that are not relevant to the application can be enumerated on the ignore list below.
+# Every entry states why it does not apply and when it must be reviewed.
 
 ignore:
-  - CVE-THAT-DOES-NOT-APPLY
+  # ruby_llm ReDoS in RubyLLM::Utils.underscore (GHSA-42r3-x6vx-x49x, fixed in 2.0.0).
+  # Not affected: ruby_llm 1.11.0 has no Utils.underscore (the method exists only
+  # on the 2.x line: support/utils.rb, used by tool.rb and agent.rb); the advisory
+  # targets Ruby 3.1.x while valera runs Ruby 3.4; tool names are static classes.
+  # The range "< 2.0.0.rc1" is broader than the affected code. Review by 2026-12-31
+  # or drop together with the upgrade to ruby_llm 2.x.
+  - CVE-2026-67991
+  - GHSA-42r3-x6vx-x49x

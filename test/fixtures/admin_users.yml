@@ -2,6 +2,7 @@
 
 superuser:
   email: superuser@example.com
+  name: Super User
   password_digest: <%= BCrypt::Password.create('password') %>
   role: 1
 
