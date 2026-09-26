@@ -182,12 +182,15 @@ bin/rails screenshots:dashboard
 
 ## Прямой доступ через kubectl
 
-```bash
-# Rails Console
-kubectl --context=goga-office -n valera-production exec -it deploy/valera -c ror -- bundle exec rails console
+🚨 **Не запускай Rails внутри веб-контейнера** (`kubectl exec deploy/valera -- rails runner|console`).
+Второй процесс Rails не помещается в лимит памяти контейнера (278Mi): OOM убивает
+весь контейнер вместе с Puma, и supervalera.ru падает (так было 2026-09-26).
+Ruby-код на production выполняй только через `bin/production-rails-runner` — он
+поднимает одноразовый под с тем же образом и окружением и удаляет его после работы.
 
-# Rails Runner
-kubectl --context=goga-office -n valera-production exec deploy/valera -c ror -- bundle exec rails runner 'puts User.count'
+```bash
+# Rails Runner (одноразовый под)
+bin/production-rails-runner 'puts User.count'
 
 # Проверка подов
 kubectl --context=goga-office -n valera-production get pods

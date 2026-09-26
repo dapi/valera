@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Run Rails runner command on production Kubernetes deployment
+# Run Rails runner code against production in a one-off Kubernetes pod.
 #
 # Usage:
 #   bin/production-rails-runner 'User.count'
@@ -10,6 +10,12 @@
 # For commands with special characters (!, etc.), use stdin:
 #   echo 'DemoDataSeeder.send("seed!", Tenant.first)' | bin/production-rails-runner -
 #
+# The pod copies the production deployment's pod template (image, env, secrets)
+# but runs outside the web container: a second Rails process inside it would
+# exceed the web container memory limit and get the web server OOM-killed.
+# It carries its own labels, so the Service never routes traffic to it, and it
+# is always deleted on exit.
+#
 
 set -euo pipefail
 
@@ -17,6 +23,9 @@ CONTEXT="${PRODUCTION_CONTEXT:-goga-office}"
 NAMESPACE="${PRODUCTION_NAMESPACE:-valera-production}"
 DEPLOYMENT="${PRODUCTION_DEPLOYMENT:-valera}"
 CONTAINER="${PRODUCTION_CONTAINER:-ror}"
+MEMORY_REQUEST="${RUNNER_MEMORY_REQUEST:-256Mi}"
+MEMORY_LIMIT="${RUNNER_MEMORY_LIMIT:-768Mi}"
+TIMEOUT_SECONDS="${RUNNER_TIMEOUT_SECONDS:-900}"
 
 if [[ $# -eq 0 ]]; then
   echo "Usage: bin/production-rails-runner '<ruby_code>'"
@@ -30,11 +39,88 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if [[ "$1" == "-" ]]; then
-  # Read from stdin
-  kubectl --context="$CONTEXT" exec -i -n "$NAMESPACE" "deployment/$DEPLOYMENT" -c "$CONTAINER" -- \
-    bundle exec rails runner -
+  CODE="$(cat)"
 else
-  # Pass argument directly
-  kubectl --context="$CONTEXT" exec -n "$NAMESPACE" "deployment/$DEPLOYMENT" -c "$CONTAINER" -- \
-    bundle exec rails runner "$1"
+  CODE="$1"
 fi
+[[ -n "$CODE" ]] || { echo "Error: empty Ruby code" >&2; exit 1; }
+
+for command_name in kubectl jq; do
+  command -v "$command_name" >/dev/null || { echo "Error: $command_name is required" >&2; exit 1; }
+done
+
+k() { kubectl --context="$CONTEXT" -n "$NAMESPACE" "$@"; }
+
+POD="${DEPLOYMENT}-runner-$(date +%Y%m%d%H%M%S)-$RANDOM"
+cleanup() {
+  k delete pod "$POD" --ignore-not-found --wait=false >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+trap 'exit 130' INT TERM
+
+k get deployment "$DEPLOYMENT" -o json | jq \
+  --arg pod "$POD" --arg container "$CONTAINER" --arg code "$CODE" \
+  --arg memRequest "$MEMORY_REQUEST" --arg memLimit "$MEMORY_LIMIT" \
+  --argjson deadline "$TIMEOUT_SECONDS" '
+  .spec.template.spec as $spec
+  | ($spec.containers | map(select(.name == $container)) | first) as $c
+  | if $c == null then error("container \($container) not found") else . end
+  | {
+      apiVersion: "v1",
+      kind: "Pod",
+      metadata: {
+        name: $pod,
+        labels: {
+          "app.kubernetes.io/name": "valera-rails-runner",
+          "app.kubernetes.io/component": "rails-runner"
+        }
+      },
+      spec: ($spec
+        | del(.initContainers)
+        | .restartPolicy = "Never"
+        | .activeDeadlineSeconds = $deadline
+        | .containers = [
+            $c
+            | del(.livenessProbe, .readinessProbe, .startupProbe, .ports, .lifecycle)
+            | .command = ["bundle", "exec", "rails", "runner", $code]
+            | del(.args)
+            | .resources = {
+                requests: { cpu: "100m", memory: $memRequest },
+                limits: { memory: $memLimit }
+              }
+          ])
+    }' | k create -f - >/dev/null
+
+echo "Started one-off pod $POD in $CONTEXT/$NAMESPACE" >&2
+
+# Wait until the runner container has started or finished, then stream output.
+phase=""
+for _ in $(seq 1 180); do
+  phase="$(k get pod "$POD" -o jsonpath='{.status.phase}' 2>/dev/null || true)"
+  case "$phase" in
+    Running|Succeeded|Failed) break ;;
+  esac
+  sleep 2
+done
+case "$phase" in
+  Running|Succeeded|Failed) ;;
+  *)
+    echo "Error: pod $POD did not start (phase: ${phase:-unknown})" >&2
+    k describe pod "$POD" | tail -20 >&2 || true
+    exit 1
+    ;;
+esac
+
+k logs -f "$POD" -c "$CONTAINER"
+
+exit_code=""
+for _ in $(seq 1 30); do
+  exit_code="$(k get pod "$POD" -o jsonpath='{.status.containerStatuses[0].state.terminated.exitCode}' 2>/dev/null || true)"
+  [[ -n "$exit_code" ]] && break
+  sleep 2
+done
+if [[ -z "$exit_code" ]]; then
+  echo "Error: could not determine the runner exit code" >&2
+  exit 1
+fi
+exit "$exit_code"
