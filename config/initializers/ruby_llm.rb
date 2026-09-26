@@ -9,6 +9,7 @@ RubyLLM.configure do |config|
 
   # API ключи провайдеров (используем ApplicationConfig вместо ENV)
   config.openai_api_key = ApplicationConfig.openai_api_key
+  config.openai_api_base = ApplicationConfig.openai_api_base.presence
   config.anthropic_api_key = ApplicationConfig.anthropic_api_key
   config.anthropic_api_base = ApplicationConfig.anthropic_base_url.presence
   config.gemini_api_key = ApplicationConfig.gemini_api_key

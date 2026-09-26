@@ -109,12 +109,27 @@ module Telegram
     # @see BookingTool для реализации создания заявок
     # @note Tools используются AI для выполнения действий в реальном мире
     def setup_chat_tools
+      use_configured_model(llm_chat)
       llm_chat
+        .with_fallbacks(*LlmFallbacks.models, on: LlmFallbacks::ERRORS)
         .with_tools(BookingTool.new(chat: llm_chat))
         .with_temperature(ApplicationConfig.llm_temperature)
         .with_instructions(SystemPromptService.new(current_tenant).system_prompt)
         .before_tool_call { |tool_call| handle_tool_call(tool_call) }
         .after_tool_result { |result| handle_tool_result(result) }
+    end
+
+    # Переводит существующий чат на модель из конфигурации
+    #
+    # Чаты хранят модель, выбранную при создании; при смене LLM_MODEL или
+    # LLM_PROVIDER старые диалоги переключаются на текущую модель.
+    #
+    # @param chat [Chat] чат клиента
+    # @return [void]
+    def use_configured_model(chat)
+      return if chat.model_id == ApplicationConfig.llm_model && chat.provider.to_s == ApplicationConfig.llm_provider.to_s
+
+      chat.with_model(ApplicationConfig.llm_model, provider: ApplicationConfig.llm_provider, assume_model_exists: true)
     end
 
     # Обрабатывает вызов инструмента со стороны AI

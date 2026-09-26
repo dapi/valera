@@ -9,9 +9,15 @@ class ApplicationConfig < Anyway::Config
     # RubyLLM configuration
     :llm_provider,
     :llm_model,
+    # Fallback used when the primary model (e.g. a LiteLLM subscription alias)
+    # fails with a transient or authorization error.
+    :llm_fallback_provider,
+    :llm_fallback_model,
 
     # LLM Provider API Keys
     :openai_api_key,
+    # OpenAI-compatible endpoint, e.g. the private LiteLLM gateway
+    :openai_api_base,
     :anthropic_api_key,
     :anthropic_base_url,
     :gemini_api_key,
