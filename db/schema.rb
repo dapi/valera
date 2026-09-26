@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_28_190730) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_26_165046) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -258,6 +258,12 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_190730) do
     t.string "role", null: false
     t.bigint "tool_call_id"
     t.datetime "updated_at", null: false
+    t.integer "cached_tokens"
+    t.integer "cache_creation_tokens"
+    t.jsonb "content_raw"
+    t.text "thinking_text"
+    t.text "thinking_signature"
+    t.integer "thinking_tokens"
     t.index ["chat_id", "created_at"], name: "idx_messages_chat_created_at"
     t.index ["chat_id", "role"], name: "idx_messages_chat_role"
     t.index ["chat_id"], name: "index_messages_on_chat_id"
@@ -363,6 +369,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_28_190730) do
     t.string "name", null: false
     t.string "tool_call_id", null: false
     t.datetime "updated_at", null: false
+    t.text "thought_signature"
     t.index ["message_id"], name: "index_tool_calls_on_message_id"
     t.index ["name"], name: "index_tool_calls_on_name"
     t.index ["tool_call_id"], name: "index_tool_calls_on_tool_call_id", unique: true
