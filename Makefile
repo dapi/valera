@@ -119,8 +119,19 @@ deploy: guard-tag-exists ## Deploy via infra repo (branch-aware)
 	echo "  Image: $(REGISTRY)/valera:$$DEPLOY_TAG"; \
 	echo "  Stage: $(STAGE)"
 
-docker-build: ## Build Docker image with version tags (branch-aware)
-	@echo "Building Docker image..."; \
+docker-build: ## Build Docker image without publishing (branch-aware check)
+	@$(MAKE) --no-print-directory docker-buildx BUILDX_OUTPUT=
+
+build-and-push: ## Build and push Docker image to registry (branch-aware)
+	@$(MAKE) --no-print-directory docker-buildx BUILDX_OUTPUT=--push
+	@echo "Build and push completed!"
+
+# One buildx invocation builds and publishes: the machine chooses the builder
+# via BUILDX_BUILDER, so the image may never reach the local Docker store.
+docker-buildx:
+	@set -eu; \
+	test -n "$(REGISTRY)" || { echo "REGISTRY is required" >&2; exit 2; }; \
+	echo "Building Docker image..."; \
 	echo "  Branch: $(BRANCH_NAME) (sanitized: $(SANITIZED_BRANCH))"; \
 	echo "  Is main/master: $(IS_MAIN_BRANCH)"; \
 	trap 'echo ""; echo "Build interrupted"; exit 130' INT TERM; \
@@ -128,13 +139,13 @@ docker-build: ## Build Docker image with version tags (branch-aware)
 	VERSION=$$(${SEMVER_BIN}); \
 	VERSION=$${VERSION#v}; \
 	if [ "$(IS_MAIN_BRANCH)" = "true" ]; then \
-		TAGS="-t valera:dev -t valera:$$VERSION -t $(REGISTRY)/valera:latest -t $(REGISTRY)/valera:$$VERSION"; \
-		echo "  Tags (release): valera:dev, valera:$$VERSION, $(REGISTRY)/valera:latest, $(REGISTRY)/valera:$$VERSION"; \
+		TAGS="-t $(REGISTRY)/valera:latest -t $(REGISTRY)/valera:$$VERSION"; \
+		echo "  Tags (release): $(REGISTRY)/valera:latest, $(REGISTRY)/valera:$$VERSION"; \
 	else \
-		TAGS="-t valera:$$VERSION-$(SANITIZED_BRANCH) -t $(REGISTRY)/valera:$$VERSION-$(SANITIZED_BRANCH)"; \
-		echo "  Tags (feature): valera:$$VERSION-$(SANITIZED_BRANCH), $(REGISTRY)/valera:$$VERSION-$(SANITIZED_BRANCH)"; \
+		TAGS="-t $(REGISTRY)/valera:$$VERSION-$(SANITIZED_BRANCH)"; \
+		echo "  Tags (feature): $(REGISTRY)/valera:$$VERSION-$(SANITIZED_BRANCH)"; \
 	fi; \
-	docker build \
+	docker buildx build --platform linux/amd64 $(BUILDX_OUTPUT) \
 		--build-arg VERSION=$$VERSION \
 		--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 		--build-arg GIT_SHA=$(GIT_SHORT_SHA) \
@@ -142,23 +153,6 @@ docker-build: ## Build Docker image with version tags (branch-aware)
 	END=$$(date +%s); \
 	echo "Docker image built successfully"; \
 	echo "Build time: $$((END - START)) seconds"
-
-docker-push: ## Push Docker image to registry (branch-aware)
-	@trap 'echo ""; echo "Push interrupted"; exit 130' INT TERM; \
-	echo "Pushing Docker image to $(REGISTRY)..."; \
-	VERSION=$$(${SEMVER_BIN}); \
-	VERSION=$${VERSION#v}; \
-	if [ "$(IS_MAIN_BRANCH)" = "true" ]; then \
-		docker push $(REGISTRY)/valera:latest && \
-		docker push $(REGISTRY)/valera:$$VERSION; \
-		echo "Docker images pushed: $(REGISTRY)/valera:latest, $(REGISTRY)/valera:$$VERSION"; \
-	else \
-		docker push $(REGISTRY)/valera:$$VERSION-$(SANITIZED_BRANCH); \
-		echo "Docker image pushed: $(REGISTRY)/valera:$$VERSION-$(SANITIZED_BRANCH)"; \
-	fi
-
-build-and-push: docker-build docker-push ## Build and push Docker image
-	@echo "Build and push completed!"
 
 .PHONY: test
 test:
