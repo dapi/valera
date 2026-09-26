@@ -171,11 +171,13 @@ fi
 TEMP_FILE=$(mktemp)
 
 # Insert new section after [Unreleased]
-awk -v section="$CHANGELOG_SECTION" '
+# Pass the multi-line section through the environment: BSD awk (macOS) rejects
+# newlines in -v assignments.
+CHANGELOG_SECTION="$CHANGELOG_SECTION" awk '
     /^## \[Unreleased\]/ {
         print
         print ""
-        print section
+        print ENVIRON["CHANGELOG_SECTION"]
         next
     }
     { print }
