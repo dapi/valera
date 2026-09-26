@@ -168,7 +168,7 @@ bin/rails screenshots:dashboard
 
 # Production & Kubernetes доступ
 
-**Кластер:** fury (K8s context: `fury`)
+**Кластер:** goga-office (K8s context: `goga-office`; infra target `goga-infra`)
 **Namespace:** `valera-production`
 **Deployment:** `valera`
 **Container:** `ror`
@@ -184,16 +184,16 @@ bin/rails screenshots:dashboard
 
 ```bash
 # Rails Console
-kubectl --context=fury -n valera-production exec -it deploy/valera -c ror -- bundle exec rails console
+kubectl --context=goga-office -n valera-production exec -it deploy/valera -c ror -- bundle exec rails console
 
 # Rails Runner
-kubectl --context=fury -n valera-production exec deploy/valera -c ror -- bundle exec rails runner 'puts User.count'
+kubectl --context=goga-office -n valera-production exec deploy/valera -c ror -- bundle exec rails runner 'puts User.count'
 
 # Проверка подов
-kubectl --context=fury -n valera-production get pods
+kubectl --context=goga-office -n valera-production get pods
 
 # Логи
-kubectl --context=fury -n valera-production logs deploy/valera -c ror --tail=100
+kubectl --context=goga-office -n valera-production logs deploy/valera -c ror --tail=100
 ```
 
 # Авторизация в SaaS для диагностики в разработке

@@ -15,11 +15,11 @@ export PRODUCTION_VALERA_DATABASE_NAME
 
 SEMVER_BIN=./bin/semver
 SEMVER=$(shell ${SEMVER_BIN})
-STAGE ?= production
+# Production runs in goga-office (namespace valera-production) via the infra goga-infra target.
+STAGE ?= goga-infra
 # Version from latest git tag without 'v' prefix (for Docker images)
 TAG ?= $(shell git describe --tags --abbrev=0 | sed 's/^v//')
-# Registry from environment variable (required)
-REGISTRY ?= $(REGISTRY)
+REGISTRY ?= registry.brandymint.ru/dapi
 GH=gh
 SLEEP=5
 
@@ -113,7 +113,7 @@ deploy: guard-tag-exists ## Deploy via infra repo (branch-aware)
 		DEPLOY_TAG=$$VERSION-$(SANITIZED_BRANCH); \
 		echo "Deploying valera $$VERSION-$(SANITIZED_BRANCH) (feature branch $(BRANCH_NAME)) to $(STAGE)..."; \
 	fi; \
-	cd $(INFRA_DIR) && direnv exec . $(MAKE) app-deploy APP=valera STAGE=$(STAGE) TAG=$$DEPLOY_TAG; \
+	cd $(INFRA_DIR) && direnv exec . $(MAKE) app-update APP=valera STAGE=$(STAGE) TAG=$$DEPLOY_TAG; \
 	echo ""; \
 	echo "Deploy completed!"; \
 	echo "  Image: $(REGISTRY)/valera:$$DEPLOY_TAG"; \
@@ -218,7 +218,7 @@ guard-production-env:
 	@test -n "${PRODUCTION_VALERA_DATABASE_NAME}" || (echo "Error: PRODUCTION_VALERA_DATABASE_NAME is not set" && exit 1)
 
 production-logs:
-	kubectl logs -n production deployment/valera --tail=200
+	kubectl --context=goga-office -n valera-production logs deployment/valera -c ror --tail=200
 
 production-rails-runner:
 	@bin/production-rails-runner $(ARGS)
