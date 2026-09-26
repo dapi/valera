@@ -50,6 +50,8 @@ class Chat < ApplicationRecord
     if model.nil?
       self.provider = ApplicationConfig.llm_provider
       self.model = ApplicationConfig.llm_model
+      # Gateway aliases (e.g. LiteLLM subscription models) are not in the registry.
+      self.assume_model_exists = true
     end
   end
 

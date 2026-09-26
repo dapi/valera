@@ -68,7 +68,7 @@ class ChatTopicClassifier
   def call_llm(messages)
     dialog_content = messages.join("\n---\n")
 
-    llm_chat = RubyLLM.chat(model: config.model_with_fallback)
+    llm_chat = RubyLLM.chat(model: config.model_with_fallback, provider: config.provider, assume_model_exists: true)
     response = llm_chat.ask(build_prompt(dialog_content))
 
     extract_topic_key(response.content)
