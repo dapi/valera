@@ -2,8 +2,10 @@
 
 # Сервис для расчета расходов на LLM по тенанту
 #
-# Вычисляет стоимость использования LLM на основе
-# input/output токенов и цен моделей.
+# Вычисляет стоимость использования LLM на основе input/output токенов из журнала
+# RubyLLM (ruby_llm_usages) и цен моделей из реестра (ruby_llm_models). Цена
+# считается по прайсу модели, а не по total_cost журнала: для истории, перенесённой
+# из 1.x, стоимость неизвестна.
 #
 # @example Расчет общих расходов
 #   calculator = LlmCostCalculator.new(tenant, period: 30)
@@ -102,17 +104,17 @@ class LlmCostCalculator
   #
   # @return [Array<ModelStats>] статистика по каждой модели
   def calculate_by_model
-    data = messages_with_pricing
-      .joins(:model)
-      .group('models.id', 'models.model_id', 'models.name', 'models.provider', 'models.pricing')
+    data = usages_with_pricing
+      .group('ruby_llm_models.id', 'ruby_llm_models.model_id', 'ruby_llm_models.name',
+             'ruby_llm_models.provider', 'ruby_llm_models.pricing')
       .pluck(
-        'models.id',
-        'models.model_id',
-        'models.name',
-        'models.provider',
-        'models.pricing',
-        Arel.sql('SUM(messages.input_tokens)'),
-        Arel.sql('SUM(messages.output_tokens)')
+        'ruby_llm_models.id',
+        'ruby_llm_models.model_id',
+        'ruby_llm_models.name',
+        'ruby_llm_models.provider',
+        'ruby_llm_models.pricing',
+        Arel.sql('SUM(ruby_llm_usages.input_tokens)'),
+        Arel.sql('SUM(ruby_llm_usages.output_tokens)')
       )
 
     data.map do |row|
@@ -149,14 +151,13 @@ class LlmCostCalculator
   # @return [Array<DayStats>] статистика по каждому дню
   def calculate_by_day
     # Сначала собираем данные по дням и моделям для правильного расчета стоимости
-    data = messages_with_pricing
-      .joins(:model)
-      .group(Arel.sql('DATE(messages.created_at)'), 'models.pricing')
+    data = usages_with_pricing
+      .group(Arel.sql('DATE(ruby_llm_usages.created_at)'), 'ruby_llm_models.pricing')
       .pluck(
-        Arel.sql('DATE(messages.created_at)'),
-        'models.pricing',
-        Arel.sql('SUM(messages.input_tokens)'),
-        Arel.sql('SUM(messages.output_tokens)')
+        Arel.sql('DATE(ruby_llm_usages.created_at)'),
+        'ruby_llm_models.pricing',
+        Arel.sql('SUM(ruby_llm_usages.input_tokens)'),
+        Arel.sql('SUM(ruby_llm_usages.output_tokens)')
       )
 
     # Группируем по дате и суммируем
@@ -201,13 +202,15 @@ class LlmCostCalculator
 
   attr_reader :tenant, :period, :start_date, :end_date
 
-  def messages_with_pricing
-    Message
-      .joins(chat: :tenant)
-      .where(chats: { tenant_id: tenant.id })
-      .where(created_at: start_date.beginning_of_day..end_date.end_of_day)
-      .where.not(model_id: nil)
-      .where.not(input_tokens: nil)
+  # Успешные обращения к LLM в чатах тенанта, связанные с моделью реестра
+  def usages_with_pricing
+    Chat
+      .where(tenant_id: tenant.id)
+      .joins(:ruby_llm_usages)
+      .joins('INNER JOIN ruby_llm_models ON ruby_llm_models.provider = ruby_llm_usages.provider ' \
+             'AND ruby_llm_models.model_id = ruby_llm_usages.model')
+      .where(ruby_llm_usages: { status: 'succeeded', created_at: start_date.beginning_of_day..end_date.end_of_day })
+      .where.not(ruby_llm_usages: { input_tokens: nil })
   end
 
   def extract_prices(pricing_json)

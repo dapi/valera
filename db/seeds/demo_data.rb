@@ -209,7 +209,6 @@ class DemoDataSeeder
     chat.messages.create!(
       role: msg_data['role'],
       content: msg_data['content'],
-      model: @model,
       created_at: message_time
     )
 
@@ -249,8 +248,9 @@ class DemoDataSeeder
     @stats[:bookings] += 1
   end
 
+  # Chats resolve their model from the RubyLLM registry, so make sure it has a row.
   def find_or_create_model
-    Model.find_or_create_by!(
+    RubyLLM::ActiveRecord::Model.find_or_create_by!(
       provider: ApplicationConfig.llm_provider,
       model_id: ApplicationConfig.llm_model
     ) do |m|
@@ -327,7 +327,6 @@ module DemoHistoricalData
         chat.messages.create!(
           role: role,
           content: content,
-          model: model,
           created_at: created_at
         )
         messages_created += 1

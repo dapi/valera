@@ -26,6 +26,19 @@ end
 
 module ActiveSupport
   class TestCase
+  # Records one successful LLM call for +chat+ in the RubyLLM usage ledger
+  # (ruby_llm_usages). A nil +model+ stands for a model missing from the registry.
+  def create_llm_usage(chat:, model:, input_tokens:, output_tokens:)
+    RubyLLM::ActiveRecord::Usage.create!(
+      chat: chat,
+      operation: 'chat',
+      status: 'succeeded',
+      provider: model&.provider || 'openai',
+      model: model&.model_id || 'model-missing-from-registry',
+      input_tokens: input_tokens,
+      output_tokens: output_tokens
+    )
+  end
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 

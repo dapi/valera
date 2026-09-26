@@ -407,8 +407,8 @@ class DashboardStatsServiceTest < ActiveSupport::TestCase
     chat = chats(:one)
     chat.messages.destroy_all
 
-    model = models(:one)
-    chat.messages.create!(role: 'user', content: 'Test', model: model, input_tokens: 1000, output_tokens: 500)
+    model = ruby_llm_models(:one)
+    create_llm_usage(chat: chat, model: model, input_tokens: 1000, output_tokens: 500)
 
     result = DashboardStatsService.new(@tenant).call
 
