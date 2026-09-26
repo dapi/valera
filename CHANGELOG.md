@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.41.1] - 2026-09-26
+
+### Changed
+- Deploy Valera to goga-infra.
+- Publish images with a single buildx push.
+
+### Fixed
+- Insert the changelog section with BSD awk.
+
+### Security
+- Document the ruby_llm advisory as not applicable.
+- Update gems with known vulnerabilities.
+- Update Brakeman to 8.0.6.
+
 ## [0.41.0] - 2026-01-28
 
 ### Changed
