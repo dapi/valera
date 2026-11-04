@@ -1,6 +1,6 @@
 # FIP: непрерывная доставка ассетов
 
-**Статус:** In Progress
+**Статус:** Production
 **Создан:** 04.11.2026
 **Приоритет:** High
 
@@ -21,3 +21,10 @@ PVC создаётся отдельным Helm release с wait=false (WaitForFir
 Проверить GET/HEAD/Range, запрет traversal/manifest, идемпотентную повторную публикацию, отказ при коллизии. Во время перекрытия двух ReplicaSet запрос неизвестного старой локальной сборке fingerprint должен вернуть одинаковые bytes/200 через обе реплики. Проверить страницы и Telegram/GoodJob после выпуска.
 
 Основание: поручение Данила «действуй» после отчёта о 0.44.2. Этапы Draft → BusinessAnalyzes → SystemAnalyzes → Ready → In Progress пройдены 04.11.2026: причина воспроизведена, постоянное хранилище и миграционный мост выбраны.
+
+
+04.11.2026: In Progress → Testing → Production. Полная регрессия и native
+publisher проверки пройдены. В production выполнен bootstrap, затем снята
+привязка к старому manifest; контрольный asset проверен через две одновременно
+Ready реплики разных ReplicaSet. Доказательства:
+[отчёт выпуска](../deployment/shared-assets-release.md).

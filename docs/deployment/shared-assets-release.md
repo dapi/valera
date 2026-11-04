@@ -38,6 +38,11 @@ Storage привязан к office2; автоматического удален
 ## Локальная проверка
 
 - 910 тестов, 2793 assertions, 0 failures/errors.
+- RuboCop: 5 изменённых Ruby-файлов без нарушений.
+- Brakeman: 0 warnings/errors, 2 прежних ignored; исключены `docs/`,
+  содержащие примеры vendored gems. bundler-audit с обновлённой базой: 0.
+- Отдельный boot production с включённым middleware: GET probe=200;
+  Propshaft использует bootstrap manifest и прежний tailwind-31d1ccf2.css.
 - GET/HEAD/Range; отсутствующие файлы, manifest, traversal и POST передаются
   основному приложению.
 - Четыре одновременных publisher: одинаковый результат, без потери данных.
@@ -46,5 +51,38 @@ Storage привязан к office2; автоматического удален
 
 ## Production
 
-В процессе: bootstrap rollout, затем переход на локальный manifest и
-проверка файла новой версии через обе одновременно работающие реплики.
+- Image `registry.brandymint.ru/dapi/valera:0.45.0`, source `826930c`,
+  manifest-list digest `sha256:c2dc806bf8d6492072d51ad0df318da33814229d72f0b132e8cc7300bfa5e2e9`.
+- Bootstrap rollout: release Valera revision 24, publisher 77 files / 6002662
+  bytes. Все web pods заменены до удаления старого manifest override.
+- После перехода revision 25 использует локальный `/rails/public/assets/.manifest.json`.
+  Seed-init и bootstrap EmptyDir удалены. PVC Bound, web mount read-only.
+- Дополнительный контролируемый rollout, release revision 26, завершён
+  с annotation shared-assets=v1:
+  одновременно Ready `valera-5687574575-c6swb` и `valera-59d787dcf6-gm7dk`.
+  В обоих local public/assets контрольного файла нет. Оба ответили GET/HEAD
+  200; пустое тело HEAD; cache-control public, max-age=31536000, immutable.
+- Path `/assets/rollout-probe-44ae5b3a6240690d.css`, SHA256
+  `44ae5b3a6240690db8cab2444cb4640e52ebe90d0824e0ac811c674c0e97f112`.
+  Файл опубликован отдельным native operator pod без Rails, секретов или
+  Service labels; pod удалён. Публичный HTTPS вернул тот же SHA256/200.
+- Range проверен напрямую через Puma :3001: обе реплики вернули 206 и `/*`
+  для bytes=0-1. Перед Rails работает Thruster: на cache hit он может вернуть
+  200 с полным файлом на Range-запрос; это не является 404 или повреждением.
+- Первый замер overlap прервался из-за TLS timeout Kubernetes API, следующий
+  потребовал отделить Range-ответ Puma от поведения Thruster cache. Поэтому
+  выполнен дополнительный rollout; успешный замер выше получен при двух Ready pods.
+- 180 последовательных загрузок главной страницы и CSS через public HTTPS:
+  180/180 HTML успешны, 180/180 CSS=200, ошибок нет.
+- Headless Chromium: `/`, `/price`, `/login`, `/password_resets/new` на ширинах
+  320, 390, 1280 px — 12/12 HTTP 200, CSS загружен, overflow=false;
+  pageerrors и requestfailed отсутствуют.
+- Production runner: версия 0.45.0, Rails 8.1.4.1; deepseek-flash через private
+  LiteLLM; inbox pending=0, failed=0. Demo/kuznik: API ok, pending updates=0,
+  webhook errors отсутствуют.
+- GoodJob probe `46449b1b-245a-4253-a1bd-165eabeffd94` завершён настоящим
+  worker, error=false; поллинг внутри ActiveRecord::Base.uncached.
+- Infra: bootstrap `556c05d4`, окончательная конфигурация и operator probe
+  `e6546b48`. Пользовательские пароли, права и Telegram-переписка не менялись.
+
+Открытые работы проекта: [текущее состояние](../product/current-status.md).
