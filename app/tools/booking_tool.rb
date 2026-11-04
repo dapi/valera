@@ -108,6 +108,9 @@ class BookingTool < RubyLLM::Tool
         chat_id: telegram_user.chat_id,
         conversion_data: {
           booking_id: created.id,
+          # Free-text service/price descriptions do not establish numeric totals.
+          services_count: nil,
+          estimated_total: nil,
           processing_time_ms: ((Time.current - start_time) * 1000).to_i,
           user_segment: UserSegmentationService.determine_segment_for_chat(@chat)
         }
