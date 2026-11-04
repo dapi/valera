@@ -121,5 +121,80 @@ module Telegram
       assert_includes last_message[:text], 'не настроен',
                       "Сообщение должно содержать 'не настроен': #{last_message[:text]}"
     end
+
+    test 'does not call AI when chat is in manager mode' do
+      configured_tenant = tenants(:one)
+      host! "#{configured_tenant.key}.#{ApplicationConfig.host}"
+      Tenant.any_instance.stubs(:bot_client).returns(Telegram.bot)
+
+      # Используем существующую фикстуру для telegram_user
+      telegram_user = telegram_users(:one)
+      client = Client.find_or_create_by!(tenant: configured_tenant, telegram_user: telegram_user)
+      chat = Chat.find_or_create_by!(tenant: configured_tenant, client: client)
+      manager_user = users(:one)
+      chat.takeover_by_manager!(manager_user)
+
+      # AI не должен вызываться
+      Chat.any_instance.expects(:say).never
+
+      post '/telegram/webhook',
+           params: {
+             update_id: 12345,
+             message: {
+               message_id: 1,
+               from: { id: telegram_user.id, is_bot: false, first_name: telegram_user.first_name },
+               chat: { id: telegram_user.id, type: 'private' },
+               date: Time.current.to_i,
+               text: 'Привет менеджеру'
+             }
+           }.to_json,
+           headers: {
+             'X-Telegram-Bot-Api-Secret-Token' => configured_tenant.webhook_secret,
+             'Content-Type' => 'application/json'
+           }
+
+      assert_response :ok
+
+      # Проверяем что сообщение сохранено
+      chat.reload
+      assert_equal 'Привет менеджеру', chat.messages.last.content
+    end
+
+    test 'saves client message in manager mode' do
+      configured_tenant = tenants(:one)
+      host! "#{configured_tenant.key}.#{ApplicationConfig.host}"
+      Tenant.any_instance.stubs(:bot_client).returns(Telegram.bot)
+
+      telegram_user = telegram_users(:two)
+      client = Client.find_or_create_by!(tenant: configured_tenant, telegram_user: telegram_user)
+      chat = Chat.find_or_create_by!(tenant: configured_tenant, client: client)
+      manager_user = users(:one)
+      chat.takeover_by_manager!(manager_user)
+
+      initial_message_count = chat.messages.count
+
+      post '/telegram/webhook',
+           params: {
+             update_id: 12345,
+             message: {
+               message_id: 1,
+               from: { id: telegram_user.id, is_bot: false, first_name: telegram_user.first_name },
+               chat: { id: telegram_user.id, type: 'private' },
+               date: Time.current.to_i,
+               text: 'Тестовое сообщение'
+             }
+           }.to_json,
+           headers: {
+             'X-Telegram-Bot-Api-Secret-Token' => configured_tenant.webhook_secret,
+             'Content-Type' => 'application/json'
+           }
+
+      assert_response :ok
+
+      chat.reload
+      assert_equal initial_message_count + 1, chat.messages.count
+      assert_equal 'Тестовое сообщение', chat.messages.last.content
+      assert_equal 'user', chat.messages.last.role
+    end
   end
 end

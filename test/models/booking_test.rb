@@ -209,7 +209,7 @@ class BookingTest < ActiveSupport::TestCase
     TopicClassifierConfig.stubs(:enabled).returns(true)
     chat = chats(:one)
 
-    assert_enqueued_with(job: ClassifyChatTopicJob, args: [chat.id]) do
+    assert_enqueued_with(job: ClassifyChatTopicJob, args: [ chat.id ]) do
       Booking.create!(
         tenant: chat.tenant,
         client: chat.client,

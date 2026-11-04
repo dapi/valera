@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_26_174218) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_112448) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -119,14 +119,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_174218) do
     t.datetime "topic_classified_at"
     t.datetime "updated_at", null: false
     t.boolean "cancelled", default: false, null: false
+    t.integer "mode", default: 0, null: false
+    t.bigint "taken_by_id"
+    t.datetime "taken_at"
+    t.datetime "manager_active_until"
     t.index ["bookings_count"], name: "index_chats_on_bookings_count"
     t.index ["chat_topic_id", "last_message_at"], name: "index_chats_on_chat_topic_id_and_last_message_at"
     t.index ["chat_topic_id"], name: "index_chats_on_chat_topic_id"
     t.index ["client_id"], name: "index_chats_on_client_id"
     t.index ["first_booking_at"], name: "index_chats_on_first_booking_at"
     t.index ["last_booking_at"], name: "index_chats_on_last_booking_at"
+    t.index ["mode"], name: "index_chats_on_mode"
     t.index ["ruby_llm_model_id"], name: "index_chats_on_ruby_llm_model_id"
+    t.index ["taken_by_id"], name: "index_chats_on_taken_by_id"
     t.index ["tenant_id", "last_message_at"], name: "index_chats_on_tenant_id_and_last_message_at"
+    t.index ["tenant_id", "mode"], name: "index_chats_on_tenant_id_and_mode"
     t.index ["tenant_id"], name: "index_chats_on_tenant_id"
     t.index ["topic_classified_at"], name: "index_chats_on_topic_classified_at"
   end
@@ -263,9 +270,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_174218) do
     t.jsonb "server_tool_calls"
     t.jsonb "raw_content"
     t.jsonb "raw_reasoning"
+    t.bigint "sent_by_user_id"
+    t.bigint "sender_id"
+    t.integer "sender_type", default: 0, null: false
     t.index ["chat_id", "created_at"], name: "idx_messages_chat_created_at"
     t.index ["chat_id", "role"], name: "idx_messages_chat_role"
+    t.index ["chat_id", "sender_type"], name: "index_messages_on_chat_id_and_sender_type"
     t.index ["chat_id"], name: "index_messages_on_chat_id"
+    t.index ["sent_by_user_id"], name: "index_messages_on_sent_by_user_id"
   end
 
   create_table "ruby_llm_batches", force: :cascade do |t|
@@ -352,8 +364,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_174218) do
     t.index ["chat_type", "chat_id"], name: "index_ruby_llm_usages_on_chat_type_and_chat_id"
     t.index ["message_type", "message_id"], name: "index_ruby_llm_usages_on_message_type_and_message_id"
     t.index ["status"], name: "index_ruby_llm_usages_on_status"
-    t.check_constraint "operation::text = ANY (ARRAY['chat'::character varying, 'embedding'::character varying, 'moderation'::character varying, 'image'::character varying, 'speech'::character varying, 'transcription'::character varying, 'ocr'::character varying, 'rerank'::character varying]::text[])"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'succeeded'::character varying, 'failed'::character varying, 'cancelled'::character varying]::text[])"
+    t.check_constraint "operation::text = ANY (ARRAY['chat'::character varying::text, 'embedding'::character varying::text, 'moderation'::character varying::text, 'image'::character varying::text, 'speech'::character varying::text, 'transcription'::character varying::text, 'ocr'::character varying::text, 'rerank'::character varying::text])"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'succeeded'::character varying::text, 'failed'::character varying::text, 'cancelled'::character varying::text])"
   end
 
   create_table "telegram_users", force: :cascade do |t|
@@ -457,10 +469,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_174218) do
   add_foreign_key "chats", "clients"
   add_foreign_key "chats", "ruby_llm_models"
   add_foreign_key "chats", "tenants"
+  add_foreign_key "chats", "users", column: "taken_by_id"
   add_foreign_key "clients", "telegram_users"
   add_foreign_key "clients", "tenants"
   add_foreign_key "leads", "admin_users", column: "manager_id"
   add_foreign_key "messages", "chats"
+  add_foreign_key "messages", "users", column: "sent_by_user_id"
   add_foreign_key "tenant_invites", "admin_users", column: "invited_by_admin_id"
   add_foreign_key "tenant_invites", "tenants"
   add_foreign_key "tenant_invites", "users", column: "accepted_by_id"
