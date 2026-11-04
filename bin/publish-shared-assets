@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+require 'optparse'
+require_relative '../lib/shared_assets'
+
+options = { sources: [] }
+OptionParser.new do |parser|
+  parser.on('--source PATH') { |path| options[:sources] << path }
+  parser.on('--target PATH') { |path| options[:target] = path }
+  parser.on('--manifest-source PATH') { |path| options[:manifest_source] = path }
+  parser.on('--manifest-target PATH') { |path| options[:manifest_target] = path }
+end.parse!
+puts SharedAssets::Publisher.new(**options).publish.to_json

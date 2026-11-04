@@ -62,6 +62,8 @@ class ApplicationConfig < Anyway::Config
     :tools_instruction_path,
     :company_info_path,
     :redis_cache_store_url,
+    :shared_assets_path,
+    :asset_manifest_path,
 
     # Rate limiter configuration
     :rate_limit_requests,
@@ -111,6 +113,7 @@ class ApplicationConfig < Anyway::Config
 
     # Manager takeover: таймаут в минутах до автоматического возврата чата боту
     manager_takeover_timeout_minutes: 30,
+    shared_asset_cache_seconds: 31_536_000,
     login_ip_attempts: 30,
     login_account_attempts: 10,
     login_window_seconds: 600,
@@ -149,7 +152,11 @@ class ApplicationConfig < Anyway::Config
     vertexai_location: :string,
     vertexai_project_id: :string,
 
+    shared_assets_path: :string,
+    asset_manifest_path: :string,
+
     # Integers
+    shared_asset_cache_seconds: :integer,
     login_ip_attempts: :integer,
     login_account_attempts: :integer,
     login_window_seconds: :integer,
