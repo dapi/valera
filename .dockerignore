@@ -1,112 +1,41 @@
-# See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
+# Only production runtime files enter the remote build context.
+**
+!Gemfile
+!Gemfile.lock
+!Rakefile
+!config.ru
+!.semver
+!app/
+!app/**
+!bin/
+!bin/**
+!config/
+!config/**
+!data/
+!data/**
+!db/
+!db/**
+!lib/
+!lib/**
+!public/
+!public/**
+!vendor/
+!vendor/**
+!log/
+!log/.keep
+!tmp/
+!tmp/.keep
+!storage/
+!storage/.keep
 
-init.sh
-
-# Version control
-.git
-.gitignore
-
-# Environment and secrets
-.env*
+# Machine credentials and development artifacts are never runtime inputs.
 config/master.key
 config/credentials/*.key
-
-# Documentation and README
-README.md
-CHANGELOG.md
-LICENSE
-AGENTS.md
-doc/
-DEVELOPMENT.md
-
-# Development and testing files
-.devcontainer
-.github
-.rspec
-.ruby-gemset
-.byebug_history
-coverage/
-.cypress
-spec/
-test/
-lib/tasks/dev/
-
-# Logs and temporary files
-log/*
-tmp/*
-!/log/.keep
-!/tmp/.keep
-/tmp/pids/*
-!/tmp/pids/.keep
-
-# Database files
-db/*.sqlite3*
-storage/*
-!/storage/.keep
-tmp/storage/*
-!/tmp/storage/.keep
-
-# Dependencies and build artifacts
-.bundle
-vendor/bundle/
-node_modules/
-.yarn-integrity
-app/assets/builds/*
-!/app/assets/builds/.keep
-public/assets/
-
-# Docker and deployment
-.dockerignore
-Dockerfile*
-docker-compose*.yml
+config/environments/*.backup
 config/deploy*.yml
-.kamal
-gems.tags
-tags
-
-# Development tools
-.vscode
-.idea
-.DS_Store
-*.swp
-*.swo
-*~
-
-# Protocols and documentation
-.protocols/
-
-# Cache and temporary directories
-.sentry-cli
-.venv
-venv/
-
-# Editor and OS files
-.DS_Store
-.Thumbs.db
-*.orig
-
-# Claude and AI tools
-.claude/
-.claude-on-rails/
-CLAUDE.md
-claude-swarm.yml
-
-# Ruby LSP (contains its own Gemfile, not needed in production)
-.ruby-lsp/
-
-# Code quality tools (not needed in production)
-.editorconfig
-.overcommit.yml
-.rubocop.yml
-.rubocop_todo.yml
-Gemfile.rubocop
-Gemfile.rubocop.lock
-Guardfile
-
-# Other development files
-.dockerdev/
-.gitmodules
-.qoder/
-.serena/
-TODO.md
-dip.yml
+lib/tasks/dev/
+vendor/bundle/
+app/assets/builds/*
+!app/assets/builds/.keep
+public/assets/
+db/*.sqlite3*

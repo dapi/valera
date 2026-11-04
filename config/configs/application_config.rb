@@ -34,6 +34,7 @@ class ApplicationConfig < Anyway::Config
     :platform_bot_token,
     :platform_bot_username,
     :platform_admin_chat_id,
+    :telegram_api_proxy_url,
 
     # Application branding
     :app_name,
@@ -156,6 +157,7 @@ class ApplicationConfig < Anyway::Config
     platform_bot_token: :string,
     platform_bot_username: :string,
     platform_admin_chat_id: :string,
+    telegram_api_proxy_url: :string,
     telegram_auth_expiration: :integer,
 
     # Tenant invites
