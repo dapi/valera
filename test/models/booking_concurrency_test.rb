@@ -25,13 +25,22 @@ class BookingConcurrencyTest < ActiveSupport::TestCase
     Timeout.timeout(5) { started.pop }
     second = Thread.new do
       ActiveRecord::Base.connection_pool.with_connection do
-        attempted << true
+        attempted << ActiveRecord::Base.connection.select_value('SELECT pg_backend_pid()')
         booking = Booking.create!(chat_id: chat.id, tenant_id: chat.tenant_id, client_id: chat.client_id)
         results << booking.number
       end
     end
-    Timeout.timeout(5) { attempted.pop }
-    # First INSERT is still uncommitted while the second transaction starts.
+    second_pid = Timeout.timeout(5) { attempted.pop }
+    Timeout.timeout(5) do
+      loop do
+        wait_type = ActiveRecord::Base.connection.select_value(
+          "SELECT wait_event_type FROM pg_stat_activity WHERE pid = #{Integer(second_pid)}"
+        )
+        break if wait_type == 'Lock'
+        sleep 0.01
+      end
+    end
+    # The second transaction is blocked on the row/unique-index lock before commit.
     release << true
     Timeout.timeout(5) { [ first, second ].each(&:value) }
     numbers = 2.times.map { results.pop }

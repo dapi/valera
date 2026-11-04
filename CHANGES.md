@@ -243,3 +243,7 @@ Rails 8.1.4.1. Новые аддитивные миграции inbox Telegram �
 Новые настройки ApplicationConfig (ENV без префикса): LOGIN_IP_ATTEMPTS=30, LOGIN_ACCOUNT_ATTEMPTS=10, LOGIN_WINDOW_SECONDS=600; TELEGRAM_UPDATE_ATTEMPTS=10, TELEGRAM_UPDATE_RETRY_SECONDS=5; TELEGRAM_DELIVERY_ATTEMPTS=10, TELEGRAM_DELIVERY_RETRY_SECONDS=5; TELEGRAM_PAYLOAD_RETENTION_DAYS=7. Значения по умолчанию, новые секреты не нужны.
 
 Статус доставки виден в заявке. При финальной ошибке уведомления заявка остаётся доступна в ЛК. Изменения UI: мобильное меню, ссылка на тарифы, уточнение обещаний лендинга.
+
+## 0.44.2 — 04.11.2026
+
+Перенос ссылок подвала тарифов на мобильном экране. В production worker ограничен двумя execution threads при существующем пуле БД 5; запас оставлен для служебных соединений GoodJob. CPU/RAM limits не менялись. Основная логика выпуска 0.44.1 не менялась.
