@@ -48,7 +48,7 @@ class AnalyticsService
       return unless validate_event_data(event_name, properties)
 
       # Process asynchronously to avoid blocking main flow
-      AnalyticsJob.perform_later(
+      job = AnalyticsJob.perform_later(
         event_name: event_name,
         chat_id: chat_id,
         properties: properties,
@@ -56,6 +56,9 @@ class AnalyticsService
         session_id: generate_session_id(chat_id),
         tenant_id: tenant.id
       )
+      raise ActiveJob::EnqueueError, 'Analytics event was not enqueued' unless job
+
+      job
     end
 
     # Трекинг времени ответа AI

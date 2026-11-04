@@ -68,7 +68,9 @@ class Booking < ApplicationRecord
   # @note Выполняется асинхронно через BookingNotificationJob
   # @see BookingNotificationJob для логики отправки
   after_create do
-    BookingNotificationJob.perform_later(self)
+    notification = BookingNotificationJob.perform_later(self)
+    raise ActiveJob::EnqueueError, 'Booking notification was not enqueued' unless notification
+
     ClassifyChatTopicJob.perform_later(chat_id) if TopicClassifierConfig.enabled
   end
 

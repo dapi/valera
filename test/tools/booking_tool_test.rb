@@ -78,6 +78,24 @@ class BookingToolTest < ActiveSupport::TestCase
     end
   end
 
+  test 'aborted notification enqueue rolls back the booking' do
+    BookingNotificationJob.stubs(:perform_later).returns(false)
+    assert_no_difference 'Booking.count' do
+      assert_raises(ActiveJob::EnqueueError) do
+        BookingTool.new(chat: @chat).execute(details: 'Synthetic', dialog_context: {})
+      end
+    end
+  end
+
+  test 'aborted analytics enqueue rolls back the booking' do
+    AnalyticsJob.stubs(:perform_later).returns(false)
+    assert_no_difference 'Booking.count' do
+      assert_raises(ActiveJob::EnqueueError) do
+        BookingTool.new(chat: @chat).execute(details: 'Synthetic', dialog_context: {})
+      end
+    end
+  end
+
   test 'handles telegram_user access through chat' do
     tool = BookingTool.new(chat: @chat)
 

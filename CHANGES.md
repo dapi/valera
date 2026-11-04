@@ -236,7 +236,7 @@ curl -X POST "https://api.telegram.org/bot$PLATFORM_BOT_TOKEN/sendMessage" \
 bin/rails db:migrate
 ```
 
-## 0.44.0 — 04.11.2026
+## 0.44.1 — 04.11.2026
 
 Rails 8.1.4.1. Новые аддитивные миграции inbox Telegram и статуса доставки заявок. GoodJob и бизнес-записи используют primary PostgreSQL в общей транзакции, enqueue не откладывается после commit. Worker должен работать до smoke webhook. В production включён GoodJob cron (также запускает уже настроенную классификацию неактивных чатов, если она включена). Обработанные payload очищаются ежедневно через GoodJob cron, идентификаторы дедупликации сохраняются.
 
