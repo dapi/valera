@@ -17,12 +17,14 @@ module TelegramSupport
 
     def post_message(text)
       host! "#{@test_tenant.key}.#{ApplicationConfig.host}"
+      update = message(text).merge(update_id: (TelegramUpdate.maximum(:update_id) || 0) + 1)
       post '/telegram/webhook',
-           params: message(text).to_json,
+           params: update.to_json,
            headers: {
              'X-Telegram-Bot-Api-Secret-Token' => @test_tenant.webhook_secret,
              'Content-Type' => 'application/json'
            }
+      TelegramUpdateJob.perform_now(TelegramUpdate.find_by!(tenant: @test_tenant, update_id: update[:update_id]).id)
     end
 
     def latest_reply_text

@@ -46,7 +46,7 @@ module Telegram
         return unless tenant_configured_for_private_chat?
       end
 
-      current_tenant.touch(:last_message_at)
+      current_tenant.touch(:last_message_at) unless Current.telegram_update
 
       chat_id = message.dig('chat', 'id')
 

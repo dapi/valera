@@ -235,3 +235,11 @@ curl -X POST "https://api.telegram.org/bot$PLATFORM_BOT_TOKEN/sendMessage" \
 # Выполнить миграцию для добавления manager_id к leads
 bin/rails db:migrate
 ```
+
+## 0.44.0 — 04.11.2026
+
+Rails 8.1.4.1. Новые аддитивные миграции inbox Telegram и статуса доставки заявок. GoodJob и бизнес-записи используют primary PostgreSQL в общей транзакции, enqueue не откладывается после commit. Worker должен работать до smoke webhook. В production включён GoodJob cron (также запускает уже настроенную классификацию неактивных чатов, если она включена). Обработанные payload очищаются ежедневно через GoodJob cron, идентификаторы дедупликации сохраняются.
+
+Новые настройки ApplicationConfig (ENV без префикса): LOGIN_IP_ATTEMPTS=30, LOGIN_ACCOUNT_ATTEMPTS=10, LOGIN_WINDOW_SECONDS=600; TELEGRAM_UPDATE_ATTEMPTS=10, TELEGRAM_UPDATE_RETRY_SECONDS=5; TELEGRAM_DELIVERY_ATTEMPTS=10, TELEGRAM_DELIVERY_RETRY_SECONDS=5; TELEGRAM_PAYLOAD_RETENTION_DAYS=7. Значения по умолчанию, новые секреты не нужны.
+
+Статус доставки виден в заявке. При финальной ошибке уведомления заявка остаётся доступна в ЛК. Изменения UI: мобильное меню, ссылка на тарифы, уточнение обещаний лендинга.

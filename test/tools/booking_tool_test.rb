@@ -31,7 +31,7 @@ class BookingToolTest < ActiveSupport::TestCase
       details: 'Test booking details'
     )
 
-    assert_match(/Заявка под номером \d+-\d+ отправлена/, result)
+    assert_match(/Заявка под номером \d+-\d+ сохранена/, result)
 
     # Verify booking was created with correct associations
     booking = Booking.last
@@ -46,6 +46,36 @@ class BookingToolTest < ActiveSupport::TestCase
     # The private telegram_user method should return the chat's telegram_user
     telegram_user = tool.send(:telegram_user)
     assert_equal @chat.telegram_user, telegram_user
+  end
+
+  test 'analytics enqueue failure rolls back booking instead of returning false failure' do
+    AnalyticsService.stubs(:track_conversion).raises(ActiveJob::EnqueueError, 'Synthetic analytics failure')
+    assert_no_difference 'Booking.count' do
+      assert_raises(ActiveJob::EnqueueError) do
+        BookingTool.new(chat: @chat).execute(details: 'Synthetic', dialog_context: {})
+      end
+    end
+  end
+
+  test 'repeated tool call for one update returns existing booking without duplicate analytics' do
+    update = TelegramUpdate.accept!(tenant: @tenant, payload: { 'update_id' => 99 })
+    AnalyticsService.expects(:track_conversion).once
+    Current.set(telegram_update: update) do
+      assert_difference 'Booking.count', 1 do
+        tool = BookingTool.new(chat: @chat)
+        first = tool.execute(details: 'Synthetic', dialog_context: {})
+        assert_equal first, tool.execute(details: 'Synthetic', dialog_context: {})
+      end
+    end
+  end
+
+  test 'notification enqueue failure does not commit an unnotified booking' do
+    BookingNotificationJob.stubs(:perform_later).raises(ActiveJob::EnqueueError, 'Synthetic queue failure')
+    assert_no_difference 'Booking.count' do
+      assert_raises(ActiveJob::EnqueueError) do
+        BookingTool.new(chat: @chat).execute(details: 'Synthetic', dialog_context: {})
+      end
+    end
   end
 
   test 'handles telegram_user access through chat' do

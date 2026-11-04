@@ -49,9 +49,9 @@ h1.text-2xl.font-bold.text-gray-800.mb-6 Обзор
   .grid.grid-cols-1.lg:grid-cols-3.gap-6.mt-8
     / График активности (занимает 2 колонки)
     .lg:col-span-2.bg-white.rounded-lg.shadow.p-6 data-controller="chart"
-      .flex.items-center.justify-between.mb-4
+      .flex.flex-wrap.items-center.justify-between.gap-3.mb-4
         h2.text-lg.font-semibold.text-gray-800 📈 Активность
-        .flex.gap-2
+        .flex.flex-wrap.gap-2
           = link_to "7 дней", tenant_root_path(period: 7), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 7 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
           = link_to "30 дней", tenant_root_path(period: 30), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 30 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
           = link_to "90 дней", tenant_root_path(period: 90), data: { turbo_frame: "dashboard_stats" }, class: "px-3 py-1 text-sm rounded transition-colors #{@period == 90 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"

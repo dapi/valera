@@ -47,7 +47,7 @@ module Telegram
       verify_webhook_secret!(request, tenant)
 
       update = request.request_parameters
-      controller.dispatch(tenant.bot_client, update, request)
+      TelegramUpdate.accept!(tenant: tenant, payload: update)
 
       [ 200, {}, [ '' ] ]
     rescue UnauthorizedError => e

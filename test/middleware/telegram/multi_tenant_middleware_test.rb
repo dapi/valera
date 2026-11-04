@@ -4,6 +4,8 @@ require 'test_helper'
 
 module Telegram
   class MultiTenantMiddlewareTest < ActionDispatch::IntegrationTest
+    include ActiveJob::TestHelper
+
     setup do
       @tenant = tenants(:one)
       @bot_stub = Telegram.bot
@@ -58,52 +60,38 @@ module Telegram
       assert_equal 'Unauthorized', response.body
     end
 
-    test 'sets Current.tenant for valid request' do
+    test 'persists and enqueues update without dispatching in request' do
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      WebhookController.expects(:dispatch).once.with do |bot, update, _request|
-        Current.tenant == @tenant &&
-          bot.is_a?(::Telegram::Bot::Client) &&
-          update['message']['text'] == 'Hello'
+      WebhookController.expects(:dispatch).never
+      assert_difference 'TelegramUpdate.count', 1 do
+        assert_enqueued_jobs 1, only: TelegramUpdateJob do
+          post '/telegram/webhook', params: @telegram_update.to_json, headers: @valid_headers
+        end
       end
+      assert_response :ok
+      assert_equal @tenant, TelegramUpdate.last.tenant
+      assert_equal 'Hello', TelegramUpdate.last.payload.dig('message', 'text')
+    end
 
-      post '/telegram/webhook',
-           params: @telegram_update.to_json,
-           headers: @valid_headers
-
+    test 'replayed webhook is acknowledged without enqueueing another job' do
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+      post '/telegram/webhook', params: @telegram_update.to_json, headers: @valid_headers
+      assert_no_difference 'TelegramUpdate.count' do
+        assert_no_enqueued_jobs only: TelegramUpdateJob do
+          post '/telegram/webhook', params: @telegram_update.to_json, headers: @valid_headers
+        end
+      end
       assert_response :ok
     end
 
-    test 'passes bot client to dispatch' do
-      host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      WebhookController.expects(:dispatch).once.with do |bot, _update, _request|
-        # Проверяем что передается tenant.bot_client (застабленный в setup)
-        bot == @bot_stub
+    test 'same update id is independent across tenants' do
+      [ @tenant, tenants(:two) ].each do |tenant|
+        host! "#{tenant.key}.#{ApplicationConfig.host}"
+        post '/telegram/webhook', params: @telegram_update.to_json,
+             headers: @valid_headers.merge('X-Telegram-Bot-Api-Secret-Token' => tenant.webhook_secret)
+        assert_response :ok
       end
-
-      post '/telegram/webhook',
-           params: @telegram_update.to_json,
-           headers: @valid_headers
-
-      assert_response :ok
-    end
-
-    test 'works with different tenants and sets correct Current.tenant' do
-      tenant_two = tenants(:two)
-      host! "#{tenant_two.key}.#{ApplicationConfig.host}"
-      headers_for_two = {
-        'Content-Type' => 'application/json',
-        'X-Telegram-Bot-Api-Secret-Token' => tenant_two.webhook_secret
-      }
-
-      WebhookController.expects(:dispatch).once.with do |_bot, _update, _request|
-        Current.tenant == tenant_two
-      end
-
-      post '/telegram/webhook',
-           params: @telegram_update.to_json,
-           headers: headers_for_two
-
-      assert_response :ok
+      assert_equal 2, TelegramUpdate.where(update_id: @telegram_update[:update_id]).count
     end
 
     test 'protects against timing attacks with secure_compare' do

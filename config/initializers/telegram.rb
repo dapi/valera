@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require Rails.root.join('lib/telegram/client_transport')
+require Rails.root.join('lib/telegram/response_errors')
 Telegram::Bot::Client.prepend(Telegram::ClientTransport)
+Telegram::Bot::Client.singleton_class.prepend(Telegram::ResponseErrors)
 
 Rails.application.config.telegram_updates_controller
      .session_store = :redis_cache_store, { url: ApplicationConfig.redis_cache_store_url, expires_in: 1.month }

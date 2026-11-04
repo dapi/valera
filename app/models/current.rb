@@ -16,5 +16,6 @@
 #
 class Current < ActiveSupport::CurrentAttributes
   attribute :tenant
+  attribute :telegram_update
   attribute :admin_user
 end

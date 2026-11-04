@@ -5,6 +5,8 @@
 Rails.application.configure do
   # Preserve job records for dashboard analytics
   config.good_job.preserve_job_records = true
+  # GoodJob shares the primary database: enqueue and business writes commit together.
+  config.good_job.enqueue_after_transaction_commit = false
 
   # Don't retry on unhandled errors - let jobs handle their own retries
   config.good_job.retry_on_unhandled_error = false
@@ -18,7 +20,12 @@ Rails.application.configure do
   config.good_job.cleanup_interval_seconds = 1.hour.to_i
 
   # Cron-style scheduled jobs
+  config.good_job.enable_cron = Rails.env.production?
   config.good_job.cron = {
+    cleanup_telegram_payloads: {
+      cron: '20 3 * * *',
+      class: 'CleanupTelegramPayloadsJob'
+    },
     # Классификация неактивных чатов каждый час
     classify_inactive_chats: {
       cron: '0 * * * *', # каждый час в 0 минут

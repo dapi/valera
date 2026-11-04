@@ -20,10 +20,31 @@ class BookingNotificationJob < ApplicationJob
   include ErrorLogger
 
   queue_as :default
+  self.enqueue_after_transaction_commit = false
+
+  retry_on StandardError,
+           wait: ->(attempt) { attempt**2 + ApplicationConfig.telegram_delivery_retry_seconds },
+           attempts: ApplicationConfig.telegram_delivery_attempts do |job, error|
+    job.arguments.first.update!(notification_failed_at: Time.current)
+    job.log_error(error, job: job.class.name, booking_id: job.arguments.first.id)
+    raise error
+  end
 
   # Не ретрить Telegram ошибки - они обычно постоянные (чат не найден, бот заблокирован)
   discard_on Telegram::Bot::Error do |job, error|
-    Rails.logger.warn("[BookingNotificationJob] Discarding job due to Telegram error: #{error.message}")
+    job.arguments.first.update!(notification_failed_at: Time.current)
+    job.log_error(error, job: job.class.name, booking_id: job.arguments.first.id)
+  end
+
+  rescue_from Telegram::TransientApiError do |error|
+    if executions < ApplicationConfig.telegram_delivery_attempts
+      delay = [ error.retry_after.to_i, executions**2 + ApplicationConfig.telegram_delivery_retry_seconds ].max
+      retry_job wait: delay.seconds
+    else
+      arguments.first.update!(notification_failed_at: Time.current)
+      log_error(error, job: self.class.name, booking_id: arguments.first.id)
+      raise error
+    end
   end
 
   # Выполняет отправку уведомления о новой заявке
@@ -43,10 +64,12 @@ class BookingNotificationJob < ApplicationJob
     end
 
     # Используем Telegram API для отправки сообщения в менеджерский чат
-    tenant.bot_client.send_message(
-      chat_id: tenant.admin_chat_id,
-      text: booking.details
-    )
+    booking.with_lock do
+      return if booking.notified_at?
+
+      tenant.bot_client.send_message(chat_id: tenant.admin_chat_id, text: booking.details)
+      booking.update!(notified_at: Time.current, notification_failed_at: nil)
+    end
   rescue Telegram::Bot::Error => e
     log_error(e,
               job: self.class.name,

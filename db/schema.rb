@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_04_153000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_182933) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -86,9 +86,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_153000) do
     t.bigint "tenant_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "vehicle_id"
+    t.bigint "telegram_update_id"
+    t.datetime "notified_at"
+    t.datetime "notification_failed_at"
+    t.datetime "notification_requested_at"
     t.index ["chat_id"], name: "index_bookings_on_chat_id"
     t.index ["client_id"], name: "index_bookings_on_client_id"
     t.index ["public_number"], name: "index_bookings_on_public_number", unique: true
+    t.index ["telegram_update_id"], name: "index_bookings_on_telegram_update_id", unique: true
     t.index ["tenant_id", "number"], name: "index_bookings_on_tenant_id_and_number", unique: true
     t.index ["tenant_id"], name: "index_bookings_on_tenant_id"
     t.index ["vehicle_id"], name: "index_bookings_on_vehicle_id"
@@ -368,6 +373,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_153000) do
     t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'succeeded'::character varying::text, 'failed'::character varying::text, 'cancelled'::character varying::text])"
   end
 
+  create_table "telegram_updates", force: :cascade do |t|
+    t.bigint "tenant_id", null: false
+    t.bigint "update_id", null: false
+    t.jsonb "payload", null: false
+    t.string "conversation_key", null: false
+    t.datetime "processed_at"
+    t.datetime "failed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tenant_id", "conversation_key", "id"], name: "index_pending_telegram_conversations", where: "((processed_at IS NULL) AND (failed_at IS NULL))"
+    t.index ["tenant_id", "update_id"], name: "index_telegram_updates_on_tenant_id_and_update_id", unique: true
+    t.index ["tenant_id"], name: "index_telegram_updates_on_tenant_id"
+  end
+
   create_table "telegram_users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "first_name"
@@ -464,6 +483,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_153000) do
 
   add_foreign_key "analytics_events", "tenants"
   add_foreign_key "bookings", "clients"
+  add_foreign_key "bookings", "telegram_updates"
   add_foreign_key "bookings", "tenants"
   add_foreign_key "bookings", "vehicles"
   add_foreign_key "chat_topics", "tenants"
@@ -477,6 +497,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_153000) do
   add_foreign_key "leads", "admin_users", column: "manager_id"
   add_foreign_key "messages", "chats"
   add_foreign_key "messages", "users", column: "sent_by_user_id"
+  add_foreign_key "telegram_updates", "tenants"
   add_foreign_key "tenant_invites", "admin_users", column: "invited_by_admin_id"
   add_foreign_key "tenant_invites", "tenants"
   add_foreign_key "tenant_invites", "users", column: "accepted_by_id"

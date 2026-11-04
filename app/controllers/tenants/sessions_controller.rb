@@ -5,6 +5,7 @@ module Tenants
   # Allows owner or any tenant member to login with email + password.
   #
   class SessionsController < ApplicationController
+    include PasswordLoginRateLimit
     skip_before_action :authenticate_user_with_access!
     layout 'tenants/auth'
 

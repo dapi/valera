@@ -36,6 +36,7 @@ class Booking < ApplicationRecord
   belongs_to :tenant, counter_cache: true
   belongs_to :client
   belongs_to :vehicle, optional: true
+  belongs_to :telegram_update, optional: true
 
   has_one :telegram_user, through: :client
 
@@ -66,7 +67,7 @@ class Booking < ApplicationRecord
   # @return [void]
   # @note Выполняется асинхронно через BookingNotificationJob
   # @see BookingNotificationJob для логики отправки
-  after_commit on: :create do
+  after_create do
     BookingNotificationJob.perform_later(self)
     ClassifyChatTopicJob.perform_later(chat_id) if TopicClassifierConfig.enabled
   end
@@ -75,12 +76,12 @@ class Booking < ApplicationRecord
 
   # Устанавливает номер заявки и публичный номер перед созданием
   #
-  # Номер вычисляется как максимальный номер в рамках тенанта + 1.
-  # При конфликте (race condition) база данных откатит транзакцию
-  # благодаря уникальному индексу на (tenant_id, number).
+  # Блокировка tenant сериализует выдачу номера до завершения транзакции.
   def set_booking_numbers
+    tenant.lock!
     self.number = (tenant.bookings.maximum(:number) || 0) + 1
     self.public_number = "#{tenant_id}-#{number}"
+    self.notification_requested_at = Time.current
   end
 
   # Обновляет статистику заявок в связанном чате

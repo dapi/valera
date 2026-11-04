@@ -16,6 +16,7 @@ class Tenant < ApplicationRecord
   has_many :clients, dependent: :destroy
   has_many :chats, dependent: :destroy
   has_many :bookings, dependent: :destroy
+  has_many :telegram_updates, dependent: :destroy
   has_many :analytics_events, dependent: :destroy
   has_many :chat_topics, dependent: :destroy
 

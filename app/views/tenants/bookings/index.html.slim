@@ -27,7 +27,7 @@
       = link_to t('.clear_filter'), tenant_bookings_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
 
 / Bookings table
-.bg-white.rounded-lg.shadow.overflow-hidden
+.bg-white.rounded-lg.shadow.overflow-x-auto
   - if @bookings.any?
     table.min-w-full.divide-y.divide-gray-200
       thead.bg-gray-50
@@ -44,6 +44,8 @@
           tr.hover:bg-gray-50
             td.px-6.py-4.whitespace-nowrap
               span.font-mono.text-sm.font-medium.text-gray-900 = booking.public_number
+              - if booking.notification_failed_at?
+                p.text-xs.text-red-700 Уведомление не доставлено
             td.px-6.py-4.whitespace-nowrap
               = link_to booking.client.display_name, tenant_client_path(booking.client), class: "text-sm text-blue-600 hover:text-blue-800"
             td.px-6.py-4.whitespace-nowrap

@@ -110,7 +110,15 @@ class ApplicationConfig < Anyway::Config
     manager_takeover_enabled: true,
 
     # Manager takeover: таймаут в минутах до автоматического возврата чата боту
-    manager_takeover_timeout_minutes: 30
+    manager_takeover_timeout_minutes: 30,
+    login_ip_attempts: 30,
+    login_account_attempts: 10,
+    login_window_seconds: 600,
+    telegram_update_attempts: 10,
+    telegram_update_retry_seconds: 5,
+    telegram_delivery_attempts: 10,
+    telegram_delivery_retry_seconds: 5,
+    telegram_payload_retention_days: 7,
   )
 
   # Type coercions to ensure proper data types from environment variables
@@ -142,6 +150,14 @@ class ApplicationConfig < Anyway::Config
     vertexai_project_id: :string,
 
     # Integers
+    login_ip_attempts: :integer,
+    login_account_attempts: :integer,
+    login_window_seconds: :integer,
+    telegram_update_attempts: :integer,
+    telegram_update_retry_seconds: :integer,
+    telegram_delivery_attempts: :integer,
+    telegram_delivery_retry_seconds: :integer,
+    telegram_payload_retention_days: :integer,
     rate_limit_requests: :integer,
     rate_limit_period: :integer,
     max_history_size: :integer,

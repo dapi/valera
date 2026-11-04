@@ -56,7 +56,7 @@ class BookingTool < RubyLLM::Tool
   #   tool = BookingTool.new(chat: Chat.find(1))
   def initialize(chat:)
     super()
-    @chat = chat
+    @chat = chat || raise(ArgumentError, 'No chat')
   end
 
   # Выполняет создание заявки на основе извлеченных данных
@@ -85,33 +85,38 @@ class BookingTool < RubyLLM::Tool
   #   )
   #   response.content #=> "Заявка под номером 123 отправлена администратору"
   # @note Автоматически отслеживает время выполнения и аналитику
-  # @todo Реализовать отправку в административный чат
   def execute(**meta)
     start_time = Time.current
 
-    booking = Booking
-              .create!(
-                meta:,
-                tenant: @chat.tenant,
-                client: @chat.client,
-                chat: @chat,
-                details: meta[:details],
-                context: meta[:dialog_context]
-              )
+    booking = Booking.transaction do
+      existing = @chat.bookings.find_by(telegram_update: Current.telegram_update) if Current.telegram_update
+      next existing if existing
 
-    # Track booking creation analytics
-    AnalyticsService.track_conversion(
-      AnalyticsService::Events::BOOKING_CREATED,
-      tenant: @chat.tenant,
-      chat_id: telegram_user.chat_id,
-      conversion_data: {
-        booking_id: booking.id,
-        processing_time_ms: ((Time.current - start_time) * 1000).to_i,
-        user_segment: UserSegmentationService.determine_segment_for_chat(@chat)
-      }
-    )
+      created = Booking.create!(
+        telegram_update: Current.telegram_update,
+        meta:,
+        tenant: @chat.tenant,
+        client: @chat.client,
+        chat: @chat,
+        details: meta[:details],
+        context: meta[:dialog_context]
+      )
 
-    response_text = "Заявка под номером #{booking.public_number} отправлена администратору"
+      AnalyticsService.track_conversion(
+        AnalyticsService::Events::BOOKING_CREATED,
+        tenant: @chat.tenant,
+        chat_id: telegram_user.chat_id,
+        conversion_data: {
+          booking_id: created.id,
+          processing_time_ms: ((Time.current - start_time) * 1000).to_i,
+          user_segment: UserSegmentationService.determine_segment_for_chat(@chat)
+        }
+      )
+
+      created
+    end
+
+    response_text = "Заявка под номером #{booking.public_number} сохранена. Администратор получит уведомление."
 
     # Добавляем предупреждение о development режиме
     if development_warnings_enabled?
@@ -119,14 +124,6 @@ class BookingTool < RubyLLM::Tool
     end
 
     response_text
-  rescue StandardError => e
-    log_error e
-    AnalyticsService.track_error(e, tenant: @chat.tenant, context: {
-      chat_id: @chat.id,
-      context: 'booking_tool_execution',
-      booking_data: meta
-    })
-    "Ошибка при обработке заявки: #{e.message}"
   end
 
   private

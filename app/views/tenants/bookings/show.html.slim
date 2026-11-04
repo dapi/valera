@@ -19,6 +19,18 @@
         span = @booking.client.display_name
 
 / Info cards
+.bg-white.rounded-lg.shadow.p-4.mb-6
+  - if @booking.notified_at?
+    p.text-green-700 Уведомление администратору доставлено
+  - elsif @booking.notification_failed_at?
+    p.text-red-700 Уведомление не доставлено. Заявка сохранена — свяжитесь с клиентом из личного кабинета.
+  - elsif @booking.tenant.admin_chat_id.blank?
+    p.text-gray-600 Чат уведомлений не настроен. Заявка доступна в личном кабинете.
+  - elsif @booking.notification_requested_at.nil?
+    p.text-gray-600 Статус уведомления для этой заявки не сохранён
+  - else
+    p.text-gray-600 Уведомление ожидает отправки
+
 .grid.grid-cols-1.md:grid-cols-3.gap-6.mb-6
   / Client card
   .bg-white.rounded-lg.shadow.p-4

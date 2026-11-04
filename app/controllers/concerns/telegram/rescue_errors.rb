@@ -16,15 +16,15 @@ module Telegram
 
     # Пользователь написал в бота и заблокировал его (наверное добавлен где-то в канале или тп)
     def bot_forbidden(error)
-      Bugsnag.notify error
-      Rails.logger.error "#{error} #{chat.to_json}"
+      log_error(error, tenant_id: Current.tenant&.id)
     end
 
     # У бота уже нет доступа отвечать в чат
     #
     def bot_error(error)
-      Bugsnag.notify error
-      Rails.logger.error "#{error} #{chat.to_json}"
+      raise error if error.is_a?(Telegram::TransientApiError)
+
+      log_error(error, tenant_id: Current.tenant&.id)
     end
   end
 end

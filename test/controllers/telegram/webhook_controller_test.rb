@@ -40,6 +40,7 @@ module Telegram
            }
 
       assert_response :ok
+      TelegramUpdateJob.perform_now(TelegramUpdate.last.id)
 
       # Проверяем что бот отправил сообщение о том что не настроен
       sent_messages = Telegram.bot.requests[:sendMessage]
@@ -79,6 +80,7 @@ module Telegram
            }
 
       assert_response :ok
+      TelegramUpdateJob.perform_now(TelegramUpdate.last.id)
 
       # Проверяем что бот отправил ответ (не сообщение об ошибке)
       sent_messages = Telegram.bot.requests[:sendMessage]
@@ -112,6 +114,7 @@ module Telegram
            }
 
       assert_response :ok
+      TelegramUpdateJob.perform_now(TelegramUpdate.last.id)
 
       # Проверяем что бот отправил сообщение о том что не настроен
       sent_messages = Telegram.bot.requests[:sendMessage]
@@ -154,6 +157,7 @@ module Telegram
            }
 
       assert_response :ok
+      TelegramUpdateJob.perform_now(TelegramUpdate.last.id)
 
       # Проверяем что сообщение сохранено
       chat.reload
@@ -190,6 +194,7 @@ module Telegram
            }
 
       assert_response :ok
+      TelegramUpdateJob.perform_now(TelegramUpdate.last.id)
 
       chat.reload
       assert_equal initial_message_count + 1, chat.messages.count

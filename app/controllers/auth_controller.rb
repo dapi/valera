@@ -10,6 +10,7 @@
 # @since 0.4.0
 class AuthController < ApplicationController
   include UserSession
+  include PasswordLoginRateLimit
   layout 'landing'
 
   before_action :redirect_if_logged_in, only: %i[new create telegram_login]
@@ -20,7 +21,7 @@ class AuthController < ApplicationController
 
   # POST /login
   def create
-    user = User.find_by(email: params[:email])
+    user = User.find_by(email: params[:email].to_s.strip.downcase)
 
     if user&.authenticate(params[:password])
       sign_in_user(user)
