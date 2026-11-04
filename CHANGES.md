@@ -15,6 +15,8 @@
 - `MANAGER_TAKEOVER_TIMEOUT_MINUTES` — по умолчанию `30`.
 - `CHATS_PER_PAGE` — по умолчанию `20` для подгрузки списка диалогов.
 - Для автоматического возврата боту должен работать обработчик фоновых заданий.
+- Обновлены исправления безопасности в Rack, Nokogiri, Addressable, Crass,
+  Loofah, rails-html-sanitizer и Sanitize; после обновления установить зависимости.
 
 ## v0.24.0 — Chat Topic Classification (LLM Analytics)
 
