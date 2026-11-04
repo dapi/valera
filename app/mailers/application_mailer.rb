@@ -2,6 +2,6 @@
 
 # Base mailer class for the application
 class ApplicationMailer < ActionMailer::Base
-  default from: -> { ApplicationConfig.support_email }
+  default from: -> { ApplicationConfig.mail_from.presence || ApplicationConfig.support_email }
   layout 'mailer'
 end

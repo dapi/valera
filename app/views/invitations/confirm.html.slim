@@ -1,0 +1,16 @@
+h2.text-xl.font-semibold.mb-4 = "Присоединиться к «#{@invite.tenant.name}»"
+p.text-gray-600.mb-6 = "Email подтверждён: #{session[:invite_email_verification]['email']}"
+= form_with url: invitations_confirm_path, method: :post, class: 'space-y-5', data: { turbo: false } do |f|
+  - if @existing_user&.password_digest.present?
+    p.text-gray-600 У вас уже есть аккаунт. Введите его пароль, чтобы принять приглашение.
+    = f.label :password, 'Пароль аккаунта', class: 'block font-medium'
+    = f.password_field :password, required: true, autocomplete: 'current-password', class: 'w-full border rounded-lg px-3 py-2'
+    = link_to 'Забыли пароль?', new_password_reset_path, class: 'block text-blue-600'
+  - else
+    = f.label :name, 'Имя', class: 'block font-medium'
+    = f.text_field :name, value: @existing_user&.name, required: true, autocomplete: 'name', class: 'w-full border rounded-lg px-3 py-2'
+    = f.label :password, 'Пароль (не короче 8 символов)', class: 'block font-medium'
+    = f.password_field :password, required: true, minlength: 8, autocomplete: 'new-password', class: 'w-full border rounded-lg px-3 py-2'
+    = f.label :password_confirmation, 'Повторите пароль', class: 'block font-medium'
+    = f.password_field :password_confirmation, required: true, minlength: 8, autocomplete: 'new-password', class: 'w-full border rounded-lg px-3 py-2'
+  = f.submit 'Принять приглашение', class: 'w-full bg-blue-600 text-white rounded-lg px-4 py-3 cursor-pointer'

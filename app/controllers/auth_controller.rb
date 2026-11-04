@@ -9,6 +9,7 @@
 # @author Danil Pismenny
 # @since 0.4.0
 class AuthController < ApplicationController
+  include UserSession
   layout 'landing'
 
   before_action :redirect_if_logged_in, only: %i[new create telegram_login]
@@ -22,8 +23,7 @@ class AuthController < ApplicationController
     user = User.find_by(email: params[:email])
 
     if user&.authenticate(params[:password])
-      reset_session
-      session[:user_id] = user.id
+      sign_in_user(user)
       redirect_after_login(user)
     else
       flash.now[:alert] = I18n.t('auth.create.invalid_credentials')
@@ -76,8 +76,7 @@ class AuthController < ApplicationController
     user = User.find_by(telegram_user_id: telegram_user&.id)
 
     if user
-      reset_session
-      session[:user_id] = user.id
+      sign_in_user(user)
       redirect_after_login(user)
     else
       redirect_to login_path, alert: I18n.t('auth.telegram_callback.not_linked')
@@ -86,9 +85,6 @@ class AuthController < ApplicationController
 
   private
 
-  def current_user
-    @current_user ||= User.find_by(id: session[:user_id])
-  end
   helper_method :current_user
 
   def logged_in?
@@ -124,7 +120,7 @@ class AuthController < ApplicationController
 
   def generate_cross_domain_token(user, tenant)
     Rails.application.message_verifier(:cross_auth).generate(
-      { user_id: user.id, tenant_key: tenant.key, exp: 5.minutes.from_now.to_i },
+      { user_id: user.id, tenant_key: tenant.key, session_version: user.session_version, exp: 5.minutes.from_now.to_i },
       expires_in: 5.minutes
     )
   end

@@ -33,6 +33,8 @@ class TenantInvite < ApplicationRecord
   validates :token, presence: true, uniqueness: true
   validates :role, presence: true
   validates :expires_at, presence: true
+  validates :email, 'valid_email_2/email': true, allow_blank: true
+  normalizes :email, with: ->(value) { value.strip.downcase.presence }
   validate :inviter_must_be_present
 
   scope :active, -> { pending.where('expires_at > ?', Time.current) }
@@ -80,6 +82,21 @@ class TenantInvite < ApplicationRecord
   # @return [String]
   def telegram_url
     "https://t.me/#{ApplicationConfig.platform_bot_username}?start=#{token}"
+  end
+
+  def web_url
+    url = Rails.application.routes.url_helpers.invitations_url(**ApplicationConfig.default_url_options)
+    "#{url}#token=#{ERB::Util.url_encode(token)}"
+  end
+
+  def email_verification_token(recipient)
+    Rails.application.message_verifier(:invite_email).generate(
+      { invite_id: id, email: recipient.strip.downcase }, expires_in: 30.minutes
+    )
+  end
+
+  def self.verify_email_token(token)
+    Rails.application.message_verifier(:invite_email).verified(token.to_s)&.symbolize_keys
   end
 
   private

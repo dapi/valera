@@ -1,19 +1,30 @@
 h1.text-2xl.font-bold.text-gray-800.mb-6 = t('.title')
 
-/ Invite buttons (only for admins)
+/ Invitations are managed by tenant owners and administrators.
 - if current_user_can_manage_members?
-  .mb-6.flex.gap-4
-    = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
-      = f.hidden_field :role, value: 'viewer'
-      = f.submit t('.invite_viewer'), class: 'bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded cursor-pointer'
+  .mb-6.bg-white.rounded-lg.shadow.p-6
+    h2.text-lg.font-semibold.mb-4 Пригласить сотрудника
+    = form_with url: tenant_members_path, method: :post, class: 'space-y-4', data: { turbo: false } do |f|
+      div
+        = f.label :role, 'Роль', class: 'block text-sm font-medium mb-1'
+        = f.select :role, options_for_select(TenantMembership.roles.keys.map { |r| [t(".roles.#{r}"), r] }, 'operator'), {}, class: 'w-full border rounded px-3 py-2'
+      div
+        = f.label :email, 'Email сотрудника (необязательно)', class: 'block text-sm font-medium mb-1'
+        = f.email_field :email, autocomplete: 'off', placeholder: 'name@example.com', class: 'w-full border rounded px-3 py-2'
+        p.text-sm.text-gray-500.mt-1 Укажите email для отправки письма или оставьте поле пустым, чтобы получить ссылку.
+      = f.submit 'Создать приглашение', class: 'bg-blue-600 text-white px-4 py-2 rounded cursor-pointer'
 
-    = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
-      = f.hidden_field :role, value: 'operator'
-      = f.submit t('.invite_operator'), class: 'bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded cursor-pointer'
-
-    = form_with url: tenant_members_path, method: :post, class: "inline" do |f|
-      = f.hidden_field :role, value: 'admin'
-      = f.submit t('.invite_admin'), class: 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded cursor-pointer'
+  - if @pending_invites.any?
+    .mb-6.bg-white.rounded-lg.shadow.p-6
+      h2.text-lg.font-semibold.mb-4 Ожидают принятия
+      - @pending_invites.each do |invite|
+        .flex.flex-wrap.items-center.justify-between.gap-3.py-3.border-b
+          div
+            p.font-medium = invite.email.presence || 'Приглашение по ссылке'
+            p.text-sm.text-gray-500 = "#{t(".roles.#{invite.role}")} · до #{l(invite.expires_at, format: :short)}"
+          .flex.gap-4.items-center
+            = link_to 'Открыть ссылку', invite_tenant_members_path(id: invite.id), class: 'text-blue-600'
+            = button_to 'Отменить', "/members/invites/#{invite.id}", method: :delete, class: 'text-red-600'
 
 / Members table
 .bg-white.rounded-lg.shadow.overflow-hidden

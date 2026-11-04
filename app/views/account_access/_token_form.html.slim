@@ -1,0 +1,5 @@
+= form_with url: destination, method: :post, data: { controller: 'fragment-token', fragment_token_auto_submit_value: true, turbo: false } do |f|
+  = f.hidden_field :token, data: { fragment_token_target: 'token' }
+  p.text-gray-600.mb-4 data-fragment-token-target="status" Открываем ссылку…
+  = f.submit 'Продолжить', class: 'bg-blue-600 text-white rounded-lg px-4 py-2 cursor-pointer'
+  noscript Для открытия этой ссылки включите JavaScript.

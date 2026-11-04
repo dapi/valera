@@ -27,25 +27,30 @@ module Tenants
 
       invite = current_tenant.tenant_invites.create!(
         invited_by_user: current_user,
+        email: params[:email].presence,
         role: role,
         expires_at: 7.days.from_now
       )
 
-      @invite_url = invite.telegram_url
-      @role = role
-
-      respond_to do |format|
-        format.html { redirect_to invite_tenant_members_path(token: invite.token, role: role) }
-        format.turbo_stream
-      end
+      AccountMailer.invitation(invite, invite.email).deliver_later if invite.email.present?
+      redirect_to invite_tenant_members_path(id: invite.id)
+    rescue ActiveRecord::RecordInvalid => e
+      redirect_to tenant_members_path, alert: e.record.errors.full_messages.to_sentence
     end
 
     # GET /members/invite
     def invite
-      @token = params[:token]
-      @role = params[:role]
-      @invite = current_tenant.tenant_invites.find_by(token: @token)
-      @invite_url = @invite&.telegram_url || "https://t.me/#{ApplicationConfig.platform_bot_username}?start=#{@token}"
+      @invite = if params[:id].present?
+        current_tenant.tenant_invites.active.find_by(id: params[:id])
+      else
+        current_tenant.tenant_invites.active.find_by(token: params[:token])
+      end
+      unless @invite
+        redirect_to tenant_members_path, alert: 'Приглашение недействительно или уже использовано.'
+        return
+      end
+      @role = @invite.role
+      @invite_url = @invite.web_url
     end
 
     # PATCH /members/:id

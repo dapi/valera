@@ -16,6 +16,17 @@ module Telegram
       assert_respond_to @controller, :start!
     end
 
+    test 'email-bound invitation cannot be claimed through Telegram' do
+      invite = tenant_invites(:pending_invite)
+      invite.update!(email: 'specific@example.com')
+      @controller.expects(:respond_with).with(:message, text: 'Это приглашение привязано к email. Откройте ссылку из письма.')
+      @controller.expects(:find_or_create_telegram_user).never
+      assert_no_difference 'TenantMembership.count' do
+        @controller.send(:handle_member_invite, invite.token)
+      end
+      assert invite.reload.pending?
+    end
+
     test 'handle_empty_start is defined' do
       assert @controller.respond_to?(:handle_empty_start, true)
     end

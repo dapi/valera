@@ -49,7 +49,10 @@ module Valera
     # Session cookie shared across all subdomains
     # In development, include port in key to avoid conflicts between parallel worktrees
     session_key = Rails.env.development? ? "_session_#{ApplicationConfig.port}" : '_session'
-    config.session_store :cookie_store, key: session_key, domain: :all
+    # Cookie tld_length counts the entire base domain (unlike request parsing).
+    # Explicit length also prevents lvh.me being mistaken for a compound TLD.
+    config.session_store :cookie_store, key: session_key, domain: :all,
+                         tld_length: ApplicationConfig.tld_length + 1
 
     # Configure default URL options for route helpers and mailers
     Rails.application.routes.default_url_options = ApplicationConfig.default_url_options

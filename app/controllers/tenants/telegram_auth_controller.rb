@@ -80,7 +80,7 @@ module Tenants
       end
 
       # Создаём сессию
-      session[:user_id] = user.id
+      sign_in_user(user)
 
       redirect_to tenant_root_path, notice: 'Вы успешно вошли через Telegram'
     end

@@ -1,0 +1,7 @@
+h2.text-xl.font-semibold.mb-4 Восстановление пароля
+p.text-gray-600.mb-6 Укажите email аккаунта. Мы отправим ссылку, по которой можно задать новый пароль.
+= form_with url: password_reset_path, method: :post, class: 'space-y-5', data: { turbo: false } do |f|
+  = f.label :email, 'Email', class: 'block font-medium'
+  = f.email_field :email, required: true, autocomplete: 'email', class: 'w-full border rounded-lg px-3 py-2'
+  = f.submit 'Отправить ссылку', class: 'w-full bg-blue-600 text-white rounded-lg px-4 py-3 cursor-pointer'
+= link_to 'Войти', login_path, class: 'block text-center text-blue-600 mt-6'

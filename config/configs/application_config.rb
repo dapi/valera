@@ -35,6 +35,12 @@ class ApplicationConfig < Anyway::Config
     :platform_bot_username,
     :platform_admin_chat_id,
     :telegram_api_proxy_url,
+    :mail_from,
+    :smtp_address,
+    :smtp_port,
+    :smtp_username,
+    :smtp_password,
+    :smtp_ssl,
 
     # Application branding
     :app_name,
@@ -158,6 +164,12 @@ class ApplicationConfig < Anyway::Config
     platform_bot_username: :string,
     platform_admin_chat_id: :string,
     telegram_api_proxy_url: :string,
+    mail_from: :string,
+    smtp_address: :string,
+    smtp_port: :integer,
+    smtp_username: :string,
+    smtp_password: :string,
+    smtp_ssl: :boolean,
     telegram_auth_expiration: :integer,
 
     # Tenant invites

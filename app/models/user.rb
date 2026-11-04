@@ -3,6 +3,9 @@
 class User < ApplicationRecord
   has_secure_password validations: false
 
+  normalizes :email, with: ->(value) { value.strip.downcase }
+  before_update :invalidate_password_sessions, if: :will_save_change_to_password_digest?
+
   belongs_to :telegram_user, optional: true
   has_many :owned_tenants, class_name: 'Tenant', foreign_key: :owner_id, dependent: :nullify, inverse_of: :owner
   has_many :tenant_memberships, dependent: :destroy
@@ -65,5 +68,11 @@ class User < ApplicationRecord
   # @return [String]
   def display_name
     name.presence || email.presence || 'Пользователь'
+  end
+
+  private
+
+  def invalidate_password_sessions
+    self.session_version += 1
   end
 end

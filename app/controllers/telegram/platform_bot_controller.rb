@@ -216,6 +216,11 @@ module Telegram
 
       tenant = invite.tenant
 
+      if invite.email.present?
+        respond_with :message, text: 'Это приглашение привязано к email. Откройте ссылку из письма.'
+        return
+      end
+
       telegram_user = find_or_create_telegram_user
       user = find_or_create_user_by_telegram(telegram_user)
 
@@ -234,7 +239,12 @@ module Telegram
 
       # Создаём membership и принимаем инвайт атомарно
       became_owner = false
-      ActiveRecord::Base.transaction do
+      invite.with_lock do
+        unless invite.pending? && invite.expires_at > Time.current
+          respond_with :message, text: I18n.t('platform_bot.errors.invite_expired')
+          return
+        end
+
         # Если у tenant нет владельца, назначаем первого приглашённого пользователя владельцем
         if tenant.owner_id.nil?
           tenant.update!(owner: user)

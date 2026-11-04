@@ -30,13 +30,14 @@ module Tenants
       end
 
       if user.password_digest.nil?
-        session[:pending_user_id] = user.id
-        redirect_to new_tenant_password_path
+        reset_session
+        redirect_to new_password_reset_url(**ApplicationConfig.default_url_options),
+                    allow_other_host: true, notice: 'Запросите ссылку на email, чтобы задать пароль.'
         return
       end
 
       if user.authenticate(params[:password])
-        session[:user_id] = user.id
+        sign_in_user(user)
         redirect_to tenant_root_path, notice: I18n.t('tenants.sessions.create.success')
       else
         flash.now[:alert] = I18n.t('tenants.sessions.create.invalid_credentials')

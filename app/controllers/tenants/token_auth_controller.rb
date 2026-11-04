@@ -25,8 +25,13 @@ module Tenants
         return
       end
 
-      reset_session
-      session[:user_id] = data[:user_id]
+      user = User.find_by(id: data[:user_id])
+      unless user&.has_access_to?(current_tenant) && user.session_version == data[:session_version].to_i
+        redirect_to new_tenant_session_path, alert: I18n.t('tenants.token_auth.invalid_token')
+        return
+      end
+
+      sign_in_user(user)
       redirect_to tenant_root_path, notice: I18n.t('tenants.token_auth.success')
     end
 

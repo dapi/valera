@@ -18,14 +18,15 @@ module Tenants
       assert_select 'input[type=password]'
     end
 
-    test 'redirects to set password when user has no password' do
+    test 'requires mailbox proof when user has no password' do
       @owner.update_column(:password_digest, nil)
       host! "#{@tenant.key}.#{ApplicationConfig.host}"
 
       post '/session', params: { email: @owner.email, password: 'anything' }
 
-      assert_redirected_to '/password/new'
-      assert_equal @owner.id, session[:pending_user_id]
+      assert_redirected_to new_password_reset_url(**ApplicationConfig.default_url_options)
+      assert_nil session[:pending_user_id]
+      assert_nil session[:user_id]
     end
 
     test 'logs in with correct email and password' do

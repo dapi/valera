@@ -14,6 +14,7 @@ module Tenants
   #
   class ApplicationController < ::ApplicationController
     include RoleAuthorization
+    include UserSession
 
     before_action :authenticate_user_with_access!
 
@@ -74,12 +75,6 @@ module Tenants
     # Returns current logged in user from session.
     #
     # @return [User, nil]
-    def current_user
-      return @current_user if defined?(@current_user)
-
-      @current_user = User.find_by(id: session[:user_id])
-    end
-
     # Returns whether user is authenticated.
     #
     # @return [Boolean]

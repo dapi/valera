@@ -1,0 +1,7 @@
+h2.text-xl.font-semibold.mb-4 = "Приглашение в «#{@invite.tenant.name}»"
+p.text-gray-600.mb-4 Роль: #{ { 'viewer' => 'Наблюдатель', 'operator' => 'Оператор', 'admin' => 'Администратор' }.fetch(@invite.role) }
+p.text-gray-600.mb-6 Подтвердите email, чтобы принять приглашение. Ссылка придёт на почту.
+= form_with url: invitations_email_path, method: :post, class: 'space-y-5', data: { turbo: false } do |f|
+  = f.label :email, 'Email', class: 'block font-medium'
+  = f.email_field :email, value: @invite.email, readonly: @invite.email.present?, required: true, autocomplete: 'email', class: 'w-full border rounded-lg px-3 py-2'
+  = f.submit 'Отправить письмо', class: 'w-full bg-blue-600 text-white rounded-lg px-4 py-3 cursor-pointer'

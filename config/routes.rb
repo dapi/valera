@@ -53,6 +53,7 @@ Rails.application.routes.draw do
     scope module: :tenants, as: :tenant do
       resource :session, only: %i[new create destroy]
       resource :password, only: %i[new create]
+      resource :account_password, path: 'account/password', only: %i[edit update]
 
       # Cross-domain auth token endpoint
       get 'auth/token', to: 'token_auth#show', as: :auth_token
@@ -111,6 +112,20 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Universal auth on main domain (no subdomain)
+  get 'password_resets/new', to: 'password_resets#new', as: :new_password_reset
+  post 'password_resets', to: 'password_resets#create'
+  get 'password_resets/edit', to: 'password_resets#edit', as: :edit_password_reset
+  patch 'password_resets', to: 'password_resets#update', as: :password_reset
+
+  get 'invitations', to: 'invitations#index', as: :invitations
+  post 'invitations/open', to: 'invitations#open'
+  get 'invitations/email', to: 'invitations#email', as: :invitations_email
+  post 'invitations/email', to: 'invitations#send_email'
+  get 'invitations/accept', to: 'invitations#accept', as: :invitations_accept
+  post 'invitations/verify', to: 'invitations#verify'
+  get 'invitations/confirm', to: 'invitations#confirm', as: :invitations_confirm
+  post 'invitations/confirm', to: 'invitations#create'
+
   scope :login, controller: :auth do
     get '/', action: :new, as: :login
     post '/', action: :create

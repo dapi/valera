@@ -8,68 +8,20 @@ module Tenants
       @tenant = tenants(:one)
       @owner = @tenant.owner
       @owner.update_column(:password_digest, nil)
+      host! "#{@tenant.key}.#{ApplicationConfig.host}"
     end
 
-    test 'redirects to login without pending user' do
-      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+    test 'legacy password page redirects to verified email reset' do
       get '/password/new'
-
-      assert_redirected_to '/session/new'
+      assert_redirected_to new_password_reset_url(**ApplicationConfig.default_url_options)
     end
 
-    test 'shows set password form with pending user' do
-      host! "#{@tenant.key}.#{ApplicationConfig.host}"
+    test 'knowing an email is insufficient to set an initial password' do
       post '/session', params: { email: @owner.email, password: 'anything' }
-
-      get '/password/new'
-
-      assert_response :success
-      assert_select 'input[type=password]', count: 2
-    end
-
-    test 'sets password and logs in' do
-      host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { email: @owner.email, password: 'anything' }
-
-      post '/password', params: {
-        user: {
-          password: 'newpassword123',
-          password_confirmation: 'newpassword123'
-        }
-      }
-
-      assert_redirected_to '/'
-      assert_equal @owner.id, session[:user_id]
-      assert_nil session[:pending_user_id]
-      assert @owner.reload.authenticate('newpassword123')
-    end
-
-    test 'rejects mismatched password confirmation' do
-      host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { email: @owner.email, password: 'anything' }
-
-      post '/password', params: {
-        user: {
-          password: 'newpassword123',
-          password_confirmation: 'differentpassword'
-        }
-      }
-
-      assert_response :unprocessable_entity
-    end
-
-    test 'rejects password shorter than 8 characters' do
-      host! "#{@tenant.key}.#{ApplicationConfig.host}"
-      post '/session', params: { email: @owner.email, password: 'anything' }
-
-      post '/password', params: {
-        user: {
-          password: 'short',
-          password_confirmation: 'short'
-        }
-      }
-
-      assert_response :unprocessable_entity
+      post '/password', params: { user: { password: 'new-password', password_confirmation: 'new-password' } }
+      assert_redirected_to new_password_reset_url(**ApplicationConfig.default_url_options)
+      assert_nil @owner.reload.password_digest
+      assert_nil session[:user_id]
     end
   end
 end
