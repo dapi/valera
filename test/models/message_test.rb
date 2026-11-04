@@ -12,7 +12,7 @@ class MessageTest < ActiveSupport::TestCase
   test 'valid roles are accepted' do
     chat = chats(:one)
     Message::VALID_ROLES.each do |role|
-      message = Message.new(chat: chat, role: role, content: 'Test content')
+      message = Message.new(chat: chat, role: role, content: 'Test content', sent_by_user: (users(:one) if role == 'manager'))
       assert message.valid?, "Role '#{role}' should be valid but got errors: #{message.errors.full_messages}"
     end
   end
@@ -43,5 +43,101 @@ class MessageTest < ActiveSupport::TestCase
     missing = llm_roles - Message::VALID_ROLES
     assert missing.empty?,
       "Message::VALID_ROLES is missing RubyLLM roles: #{missing.join(', ')}"
+  end
+  test 'manager role requires sent_by_user' do
+    chat = chats(:one)
+    message = chat.messages.build(role: 'manager', content: 'Test')
+
+    assert_not message.valid?
+    assert message.errors[:sent_by_user].any?
+  end
+
+  test 'manager role is valid with sent_by_user' do
+    chat = chats(:one)
+    user = users(:one)
+    message = chat.messages.build(role: 'manager', content: 'Test', sent_by_user: user)
+
+    assert message.valid?
+  end
+
+  test 'user role does not require sent_by_user' do
+    chat = chats(:one)
+    message = chat.messages.build(role: 'user', content: 'Test')
+
+    assert message.valid?
+  end
+
+  test 'assistant role does not require sent_by_user' do
+    chat = chats(:one)
+    message = chat.messages.build(role: 'assistant', content: 'Test')
+
+    assert message.valid?
+  end
+
+  # Helper method tests
+
+  test 'from_manager? returns true for manager role' do
+    chat = chats(:one)
+    user = users(:one)
+    message = chat.messages.create!(role: 'manager', content: 'Test', sent_by_user: user)
+
+    assert message.from_manager?
+    assert_not message.from_bot?
+    assert_not message.from_client?
+  end
+
+  test 'from_bot? returns true for assistant role' do
+    message = messages(:one)
+    message.role = 'assistant'
+
+    assert message.from_bot?
+    assert_not message.from_manager?
+    assert_not message.from_client?
+  end
+
+  test 'from_client? returns true for user role' do
+    message = messages(:one)
+    message.role = 'user'
+
+    assert message.from_client?
+    assert_not message.from_manager?
+    assert_not message.from_bot?
+  end
+
+  # Scope tests
+
+  test 'from_manager scope returns only manager messages' do
+    chat = chats(:one)
+    user = users(:one)
+
+    manager_message = chat.messages.create!(role: 'manager', content: 'Manager msg', sent_by_user: user)
+    bot_message = chat.messages.create!(role: 'assistant', content: 'Bot msg')
+
+    manager_messages = Message.from_manager
+    assert_includes manager_messages, manager_message
+    assert_not_includes manager_messages, bot_message
+  end
+
+  test 'from_bot scope returns only assistant messages' do
+    chat = chats(:one)
+    user = users(:one)
+
+    manager_message = chat.messages.create!(role: 'manager', content: 'Manager msg', sent_by_user: user)
+    bot_message = chat.messages.create!(role: 'assistant', content: 'Bot msg')
+
+    bot_messages = Message.from_bot
+    assert_includes bot_messages, bot_message
+    assert_not_includes bot_messages, manager_message
+  end
+
+  test 'from_client scope returns only user messages' do
+    chat = chats(:one)
+
+    client_message = chat.messages.create!(role: 'user', content: 'Client msg')
+    bot_message = chat.messages.create!(role: 'assistant', content: 'Bot msg')
+
+    client_messages = Message.from_client
+    assert_includes client_messages, client_message
+    assert_not_includes client_messages, bot_message
   end
 end

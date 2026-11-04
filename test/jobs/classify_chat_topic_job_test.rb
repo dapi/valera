@@ -65,7 +65,7 @@ class ClassifyChatTopicJobTest < ActiveSupport::TestCase
   end
 
   test 'enqueues job with chat_id' do
-    assert_enqueued_with(job: ClassifyChatTopicJob, args: [@chat.id]) do
+    assert_enqueued_with(job: ClassifyChatTopicJob, args: [ @chat.id ]) do
       ClassifyChatTopicJob.perform_later(@chat.id)
     end
   end
