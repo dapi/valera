@@ -5,6 +5,8 @@ Sentry.init do |config|
   config.release = "super-valera@#{AppVersion.format('%M.%m.%p')}"
   config.environment = Rails.env
   config.enabled_environments = %w[production staging]
+  # Rails SDK excludes CSRF failures by default; retain them to diagnose login 422s.
+  config.excluded_exceptions -= [ 'ActionController::InvalidAuthenticityToken' ]
   config.send_default_pii = false
   config.traces_sample_rate = 0.0
   config.send_modules = false

@@ -14,6 +14,10 @@ class ErrorLoggerTest < ActiveSupport::TestCase
     Reporter.log_error_with_backtrace(error, operation: 'test')
   end
 
+  test 'captures CSRF failures for login diagnostics' do
+    assert_not_includes Sentry.configuration.excluded_exceptions, 'ActionController::InvalidAuthenticityToken'
+  end
+
   test 'scrubs request user and breadcrumbs before transmission' do
     event = Sentry::ErrorEvent.new(configuration: Sentry.configuration)
     event.rack_env = { 'REQUEST_METHOD' => 'POST', 'PATH_INFO' => '/session' }
