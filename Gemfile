@@ -117,7 +117,8 @@ gem 'ruby_llm', '~> 2.0'
 gem 'hiredis', '~> 0.6.3'
 gem 'redis', '~> 5.4'
 
-gem 'bugsnag', '~> 6.28'
+gem 'sentry-rails', '~> 6.0'
+gem 'sentry-ruby', '~> 6.0'
 
 gem 'request_store'
 

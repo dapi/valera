@@ -2,6 +2,21 @@
 
 Инструкции по обновлению для SRE и DevOps.
 
+## Следующее обновление — GlitchTip вместо Bugsnag
+
+- Установить `SENTRY_DSN` из Kubernetes Secret `valera-glitchtip`, ключ
+  `SENTRY_DSN`. SSOT: `pass:brandymint/infra/env/VALERA_SENTRY_DSN`.
+- Проект ошибок: `https://glitchtip.brandymint.ru/brandymint/issues?project=5`.
+- Bugsnag SDK и `BUGSNAG_API_KEY` больше не используются. Старые записи `pass`
+  сохраняются для отката; исторические события Bugsnag не переносятся.
+- Автоматический Rails/ActiveJob capture и ErrorLogger используют Sentry SDK;
+  LLM fallback сохраняет warning и отдельный fingerprint.
+- Отправка только в production/staging. PII, тело запроса, query string,
+  cookies, заголовки, request env и breadcrumbs исключены; performance tracing
+  отключён. Exception message и явно переданный ErrorLogger context сохраняются.
+- После rollout проверить synthetic event из web и job-processing и его
+  появление в GlitchTip. Изменений схемы БД нет.
+
 ## 0.45.0 — ассеты при rolling update
 
 - `SHARED_ASSETS_PATH` включает раздачу immutable fingerprint-файлов из общего

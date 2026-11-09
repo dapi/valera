@@ -26,14 +26,16 @@ class LlmFallbacksTest < ActiveSupport::TestCase
     assert_includes LlmFallbacks::ERRORS, Faraday::ConnectionFailed
   end
 
-  test 'reports a fallback to Bugsnag as a warning with the models involved' do
+  test 'reports a fallback to GlitchTip as a warning with the models involved' do
     error = RubyLLM::UnauthorizedError.new('subscription session expired')
     fallback = stub(from: stub(id: 'kimi-subscription'), to: stub(id: 'deepseek-v4-flash'), attempt: 2, error: error)
-    report = mock
-    report.expects(:severity=).with('warning')
-    report.expects(:grouping_hash=).with('llm-fallback-kimi-subscription-RubyLLM::UnauthorizedError')
-    report.expects(:add_metadata).with(:llm_fallback, has_entries(from: 'kimi-subscription', to: 'deepseek-v4-flash'))
-    Bugsnag.expects(:notify).with(error).yields(report)
+    Sentry.expects(:capture_exception).with(
+      error,
+      level: :warning,
+      fingerprint: [ 'llm-fallback-kimi-subscription-RubyLLM::UnauthorizedError' ],
+      contexts: { llm_fallback: { from: 'kimi-subscription', to: 'deepseek-v4-flash',
+                                attempt: 2, error_class: 'RubyLLM::UnauthorizedError' } }
+    )
 
     LlmFallbacks.report(fallback)
   end

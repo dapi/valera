@@ -126,7 +126,7 @@ class ChatTakeoverService
 
     result = Manager::TelegramMessageSender.call(chat:, text: message)
 
-    # TelegramMessageSender уже логирует ошибки в Bugsnag с полным контекстом.
+    # TelegramMessageSender уже логирует ошибки в GlitchTip с полным контекстом.
     # Здесь только debug для локальной отладки без дублирования в production.
     unless result.success?
       Rails.logger.debug(

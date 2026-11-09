@@ -28,7 +28,7 @@ class ChatTakeoverTimeoutJob < ApplicationJob
 
   # Retry с экспоненциальной задержкой для временных ошибок
   # SolidQueue не поддерживает символы, используем lambda
-  # Логируем в Bugsnag только после исчерпания всех попыток
+  # Логируем в GlitchTip только после исчерпания всех попыток
   retry_on *RETRIABLE_ERRORS,
            wait: ->(executions) { (executions**2) + 2 },
            attempts: 3 do |job, error|

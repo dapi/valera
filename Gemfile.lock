@@ -108,8 +108,6 @@ GEM
       msgpack (~> 1.2)
     brakeman (8.1.0)
       racc
-    bugsnag (6.28.0)
-      concurrent-ruby (~> 1.0)
     builder (3.3.0)
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
@@ -499,6 +497,13 @@ GEM
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
     semver2 (3.4.2)
+    sentry-rails (6.7.0)
+      railties (>= 5.2.0)
+      sentry-ruby (~> 6.7.0)
+    sentry-ruby (6.7.0)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      logger
     slim (5.2.1)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
@@ -593,7 +598,6 @@ DEPENDENCIES
   bcrypt (~> 3.1.21)
   bootsnap
   brakeman
-  bugsnag (~> 6.28)
   bundler-audit
   capybara
   claude-on-rails
@@ -627,6 +631,8 @@ DEPENDENCIES
   sanitize (~> 7.0)
   selenium-webdriver
   semver2 (~> 3.4)
+  sentry-rails (~> 6.0)
+  sentry-ruby (~> 6.0)
   slim-rails (~> 4.0)
   solid_cable
   solid_cache
