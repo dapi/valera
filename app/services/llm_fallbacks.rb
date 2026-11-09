@@ -47,11 +47,10 @@ module LlmFallbacks
     Rails.logger.warn "LLM fallback: #{context.to_json} #{fallback.error&.message}"
     return unless fallback.error
 
-    Bugsnag.notify(fallback.error) do |report|
-      report.severity = 'warning'
-      report.grouping_hash = "llm-fallback-#{context[:from]}-#{context[:error_class]}"
-      report.add_metadata(:llm_fallback, context)
-    end
+    Sentry.capture_exception(fallback.error,
+                             level: :warning,
+                             fingerprint: [ "llm-fallback-#{context[:from]}-#{context[:error_class]}" ],
+                             contexts: { llm_fallback: context })
   end
 
   def find_model(model_id, provider)

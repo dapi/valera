@@ -6,7 +6,7 @@ module ErrorLogger
   extend ActiveSupport::Concern
 
   class_methods do # rubocop:disable Metrics/BlockLength
-    # Логирует ошибку с полным backtrace и контекстом И отправляет в Bugsnag
+    # Логирует ошибку с полным backtrace и контекстом И отправляет в GlitchTip
     # @param error [Exception] - объект исключения
     # @param context [Hash] - дополнительный контекст (опционально)
     def log_error_with_backtrace(error, context = {})
@@ -14,9 +14,7 @@ module ErrorLogger
       Rails.logger.error "Context: #{context.inspect}"
       log_error_backtrace(Rails.logger, error)
       finalize_error_log(Rails.logger)
-      Bugsnag.notify(error) do |b|
-        b.metadata = context
-      end
+      Sentry.capture_exception(error, extra: context)
     end
 
     private

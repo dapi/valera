@@ -6,6 +6,7 @@ class ApplicationConfig < Anyway::Config
 
   # Defaults are in config/application.yml
   attr_config(
+    :sentry_dsn,
     # RubyLLM configuration
     :llm_provider,
     :llm_model,
@@ -135,7 +136,7 @@ class ApplicationConfig < Anyway::Config
     welcome_message_path: :string,
     price_list_path: :string,
     company_info_path: :string,
-    bugsnag_api_key: :string,
+    sentry_dsn: :string,
 
     anthropic_base_url: :string,
 

@@ -7,8 +7,8 @@
 ## ⚙️ Critical Rules
 
 🚨 **Models:** ВСЕГДА `rails generate model` (модель + миграция вместе)
-🚨 **Error Handling:** `ErrorLogger` вместо `Bugsnag.notify()` — проект использует Bugsnag для error tracking
-🚨 **Fatal DB Errors:** НЕ ловить фатальные ошибки БД (`ActiveRecord::ConnectionNotEstablished`, `PG::ConnectionBad`, `ActiveRecord::QueryCanceled`) — это инфраструктурные проблемы, ожидаемое поведение: 500 ошибка + лог в Bugsnag. Ловить только `ActiveRecord::StatementInvalid` для graceful degradation бизнес-логики.
+🚨 **Error Handling:** `ErrorLogger` вместо `Sentry.capture_exception()` — проект использует GlitchTip для error tracking
+🚨 **Fatal DB Errors:** НЕ ловить фатальные ошибки БД (`ActiveRecord::ConnectionNotEstablished`, `PG::ConnectionBad`, `ActiveRecord::QueryCanceled`) — это инфраструктурные проблемы, ожидаемое поведение: 500 ошибка + лог в GlitchTip. Ловить только `ActiveRecord::StatementInvalid` для graceful degradation бизнес-логики.
 🚨 **Configuration:** Только `anyway_config`, никаких `.env*` файлов
 🚨 **Documentation:** НЕ архивировать FIP/US/TSD документы из `docs/requirements/`
 🚨 **Testing:** Без `File.write/File.delete` и изменения ENV в тестах
@@ -20,7 +20,7 @@
 🚨 **Slim + Tailwind arbitrary values:** НЕ использовать shorthand-синтаксис `.class-[value]` в Slim — парсер обрезает класс на `[`. Вместо `.max-w-[70%]` используй `div class="max-w-[70%]"` или inline style `div style="max-width: 70%"`. См. [issue #165](https://github.com/dapi/valera/issues/165).
 🚨 **Turbo Streams:** Для real-time обновлений используй `broadcasts_refreshes` / `broadcasts_refreshes_to` с Turbo 8 morphing. См. @docs/development/hotwire-guide.md для полного руководства по Turbo/Stimulus.
 🚨 **Service Objects валидация:** Обязательные аргументы валидируй в `initialize` через `|| raise`: `@chat = chat || raise('No chat')`. НЕ ловить эти ошибки — это ошибки программиста. Бизнес-валидации (проверки состояния) делай в отдельном методе `validate_state!` с кастомным `ValidationError`.
-🚨 **Programming Errors:** НЕ ловить `ArgumentError`, `TypeError`, `NameError`, `NoMethodError` — это ошибки программиста, они должны падать и попадать в Bugsnag. Ловить только ожидаемые runtime-ошибки (сетевые, API, валидация данных).
+🚨 **Programming Errors:** НЕ ловить `ArgumentError`, `TypeError`, `NameError`, `NoMethodError` — это ошибки программиста, они должны падать и попадать в GlitchTip. Ловить только ожидаемые runtime-ошибки (сетевые, API, валидация данных).
 🚨 **Analytics:** НЕ оборачивать `AnalyticsService.track` в rescue. Аналитика использует background job (SolidQueue) — если job не встал в очередь, это инфраструктурная ошибка, которая должна падать.
 
 ## 🚀 Запуск проекта в новом каталоге (worktree)

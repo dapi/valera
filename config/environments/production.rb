@@ -106,5 +106,5 @@ Rails.application.configure do
   # Enable detailed error logging for monitoring
   config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'info')
 
-  # Error reporting: Bugsnag (configured via bugsnag initializer)
+  # Error reporting: GlitchTip (configured via sentry initializer)
 end
